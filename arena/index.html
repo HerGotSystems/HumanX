@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>HumanX — Prove Your Claim</title>
+<link rel="manifest" href="/manifest.json"/>
+<style>
+:root{--bg:#07080d;--panel:#10131d;--panel2:#151a27;--line:#273044;--text:#eef3ff;--muted:#8c97ad;--red:#ff3b5c;--green:#39ff9f;--yellow:#ffd166;--blue:#57b8ff;--purple:#a066ff}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% -10%,rgba(160,102,255,.25),transparent 30%),radial-gradient(circle at 80% 0,rgba(255,59,92,.18),transparent 28%),linear-gradient(180deg,#07080d,#0b0d15 50%,#050507);color:var(--text)}
+button,input,textarea,select{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:270px 1fr 390px;gap:16px;padding:16px}.sidebar,.main,.right{background:rgba(16,19,29,.78);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 60px rgba(0,0,0,.35);backdrop-filter:blur(14px)}.sidebar{padding:18px;position:sticky;top:16px;height:calc(100vh - 32px);overflow:auto}.main{padding:18px;min-width:0}.right{padding:18px;position:sticky;top:16px;height:calc(100vh - 32px);overflow:auto}.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--red),var(--purple));display:grid;place-items:center;font-weight:900;letter-spacing:-2px;box-shadow:0 0 28px rgba(255,59,92,.45)}.brand h1{font-size:24px;line-height:1;margin:0;letter-spacing:-1px}.brand small,.tag,.small{color:var(--muted)}.tag{font-size:13px;line-height:1.45;margin:0 0 18px}.nav button{width:100%;text-align:left;border:1px solid transparent;background:transparent;color:var(--muted);padding:11px 12px;border-radius:14px;cursor:pointer;margin-bottom:6px}.nav button.active,.nav button:hover{background:var(--panel2);border-color:var(--line);color:var(--text)}.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.stat{background:#0b0e16;border:1px solid var(--line);border-radius:16px;padding:12px}.stat b{display:block;font-size:22px}.stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.hero{border-radius:24px;padding:22px;background:linear-gradient(135deg,rgba(255,59,92,.16),rgba(87,184,255,.08)),#0d111c;border:1px solid var(--line);margin-bottom:16px;position:relative;overflow:hidden}.hero h2{font-size:40px;line-height:.95;margin:0 0 8px;letter-spacing:-2px}.hero p{color:var(--muted);max-width:720px;margin:0 0 16px}.claimbox{display:grid;grid-template-columns:1fr auto;gap:10px}.claimbox input,.searchbar input,.searchbar select,.form input,.form textarea,.form select,.reviewPanel select,.reviewPanel input{background:#080b12;border:1px solid var(--line);border-radius:14px;color:var(--text);padding:11px;outline:none;width:100%}.claimbox button,.primary{border:0;border-radius:16px;background:linear-gradient(135deg,var(--red),var(--purple));color:white;font-weight:800;padding:14px 18px;cursor:pointer;box-shadow:0 0 24px rgba(255,59,92,.25)}.searchbar{display:grid;grid-template-columns:1fr 150px 130px;gap:8px;margin:0 0 14px}.toolbar,.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px}.chip,.tab{border:1px solid var(--line);background:#0a0d15;color:var(--muted);padding:8px 11px;border-radius:999px;cursor:pointer;font-size:13px}.chip.active,.tab.active{color:var(--text);border-color:var(--blue);box-shadow:0 0 0 1px rgba(87,184,255,.15) inset}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:linear-gradient(180deg,#131827,#0d1018);border:1px solid var(--line);border-radius:22px;padding:15px;position:relative;overflow:hidden}.card:hover{border-color:#465575}.card h3{margin:8px 0 10px;font-size:18px;letter-spacing:-.3px}.meta{display:flex;gap:6px;flex-wrap:wrap}.badge{font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:6px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}.b-green{color:var(--green);border-color:rgba(57,255,159,.4);background:rgba(57,255,159,.07)}.b-red{color:var(--red);border-color:rgba(255,59,92,.45);background:rgba(255,59,92,.08)}.b-yellow{color:var(--yellow);border-color:rgba(255,209,102,.45);background:rgba(255,209,102,.08)}.b-blue{color:var(--blue);border-color:rgba(87,184,255,.45);background:rgba(87,184,255,.08)}.b-black{color:white;border-color:#000;background:#000}.meters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}.meter{background:#080b12;border:1px solid var(--line);border-radius:14px;padding:9px}.meter span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.bar{height:7px;background:#20283a;border-radius:999px;margin-top:7px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));border-radius:999px;width:40%}.small{font-size:12px;line-height:1.45}.dangerline{color:var(--red);font-weight:800}.actions{display:flex;gap:8px;margin-top:12px}.actions button,.miniBtns button{flex:1;border:1px solid var(--line);background:#0a0d15;color:var(--text);border-radius:13px;padding:9px;cursor:pointer;font-size:13px}.paneltitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.paneltitle h2{font-size:18px;margin:0}.form{display:grid;gap:10px}.form textarea{min-height:88px;resize:vertical}.vaultitem,.leaderrow{background:#0b0e16;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px}.collapse,.reviewPanel,.casebox{background:#080a10;border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:12px}.collapse h3{margin:0 0 8px;color:var(--red)}.chain{display:grid;gap:8px;margin-top:10px}.chain div{padding:9px 10px;border-left:3px solid var(--red);background:#111522;border-radius:8px;color:#dce4f6;font-size:13px}.casegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.casebox h4{margin:0 0 6px;font-size:13px;color:var(--blue);text-transform:uppercase;letter-spacing:.08em}.graph{position:relative;height:340px;background:radial-gradient(circle at center,rgba(87,184,255,.08),transparent 45%),#080b12;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:12px}.node{position:absolute;transform:translate(-50%,-50%);border:1px solid var(--line);background:#111827;border-radius:999px;padding:8px 10px;font-size:11px;max-width:130px;text-align:center;box-shadow:0 0 24px rgba(0,0,0,.4)}.node.core{background:linear-gradient(135deg,rgba(255,59,92,.35),rgba(160,102,255,.25));border-color:rgba(255,59,92,.5);font-weight:900}.edge{position:absolute;height:1px;background:rgba(255,59,92,.45);transform-origin:left center}.warning{border:1px solid rgba(255,209,102,.35);background:rgba(255,209,102,.07);color:#ffe4a3;border-radius:16px;padding:12px;font-size:12px;line-height:1.45;margin-bottom:12px}.templateRow{display:grid;gap:8px;margin-bottom:10px}.templateBtn{border:1px solid var(--line);background:#0b0e16;color:var(--text);padding:10px;border-radius:14px;text-align:left;cursor:pointer}.sourceTag{font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:5px 7px;border-radius:999px;background:#151b2a;color:var(--muted);display:inline-block;margin-right:5px;margin-top:5px}canvas#socialCanvas{width:100%;border-radius:22px;border:1px solid #3b435a;background:#050507}.hidden{display:none!important}.empty{border:1px dashed var(--line);border-radius:20px;padding:24px;color:var(--muted);text-align:center}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#10131d;border:1px solid var(--line);border-radius:999px;padding:10px 14px;color:var(--text);box-shadow:0 10px 40px #000;z-index:10}
+@media(max-width:1150px){.app{grid-template-columns:1fr}.sidebar,.right{position:static;height:auto}.grid{grid-template-columns:1fr}.searchbar{grid-template-columns:1fr}.casegrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">HX</div><div><h1>HumanX</h1><small>Full system</small></div></div>
+    <p class="tag">Claims become public case files. Evidence gets scored. Contradictions become pressure points. Weak proofs fail in daylight.</p>
+    <div class="nav">
+      <button class="active" data-view="arena">Claim Arena</button>
+      <button data-view="vault">Evidence Vault</button>
+      <button data-view="collapse">Collapse Engine</button>
+      <button data-view="leaderboard">Leaderboards</button>
+      <button data-view="graph">Claim Graph</button>
+      <button data-view="submit">Submit Claim</button>
+      <button data-view="settings">Export / Admin</button>
+    </div>
+    <div class="statgrid">
+      <div class="stat"><b id="statClaims">0</b><span>Claims</span></div>
+      <div class="stat"><b id="statEvidence">0</b><span>Proofs</span></div>
+      <div class="stat"><b id="statKilled">0</b><span>Collapsed</span></div>
+      <div class="stat"><b id="statChaos">0</b><span>Pressure</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section id="arenaView">
+      <div class="hero">
+        <h2>You said it.<br/>Now prove it.</h2>
+        <p>Submit claims. Attach evidence. Watch weak proofs fail, strong claims survive, and reality-collapse nonsense expose its dependency chain.</p>
+        <div class="claimbox"><input id="quickClaim" placeholder="What do you claim is true?"/><button onclick="quickAdd()">Prove It</button></div>
+      </div>
+      <div class="searchbar">
+        <input id="searchInput" placeholder="Search claims, categories, evidence..." oninput="loadClaims()"/>
+        <select id="sortMode" onchange="loadClaims()"><option value="hot">Sort: Hot</option><option value="evidence">Evidence</option><option value="collapse">Collapse</option><option value="testability">Testability</option><option value="newest">Newest</option></select>
+        <select id="riskMode" onchange="renderClaims()"><option value="all">All risk</option><option value="safe">Low risk</option><option value="high">High risk</option></select>
+      </div>
+      <div class="toolbar" id="filters">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="Proven">Proven</button>
+        <button class="chip" data-filter="Strongly Supported">Supported</button>
+        <button class="chip" data-filter="Untestable">Untestable</button>
+        <button class="chip" data-filter="Disproven">Disproven</button>
+        <button class="chip" data-filter="Reality Collapse">Reality Collapse</button>
+      </div>
+      <div class="grid" id="claimGrid"><div class="empty">Loading claims...</div></div>
+    </section>
+
+    <section id="vaultView" class="hidden"><div class="paneltitle"><h2>Evidence Vault</h2><span class="small">Every proof is attackable.</span></div><div id="vaultList"></div></section>
+    <section id="collapseView" class="hidden"><div class="paneltitle"><h2>Collapse Engine</h2><span class="small">What must also be true?</span></div><div id="collapseList"></div></section>
+    <section id="leaderboardView" class="hidden"><div class="paneltitle"><h2>Leaderboards</h2><span class="small">Best proofs, worst collapses.</span></div><div class="tabs"><button class="tab active" data-board="supported">Most Supported</button><button class="tab" data-board="collapsed">Biggest Collapse</button><button class="tab" data-board="newest">Newest</button></div><div id="leaderboardList"></div></section>
+    <section id="graphView" class="hidden"><div class="paneltitle"><h2>Claim Graph</h2><span class="small">Dependency map.</span></div><div id="graphTitle" class="warning">Select a claim.</div><div id="claimGraph" class="graph"></div></section>
+
+    <section id="settingsView" class="hidden">
+      <div class="paneltitle"><h2>Export / Admin</h2><span class="small">Portable evidence archive.</span></div>
+      <div class="warning">Export creates a JSON archive of claims, evidence, pressure points, and reviews. Delete requires ADMIN_TOKEN on the backend.</div>
+      <div class="card"><div class="form">
+        <button class="primary" onclick="exportArchive()">Download Archive JSON</button>
+        <input id="adminToken" placeholder="Admin token optional"/>
+        <button onclick="deleteSelectedClaim()" style="border:1px solid var(--line);background:#0a0d15;color:var(--text);border-radius:13px;padding:11px;cursor:pointer">Delete Selected Claim</button>
+      </div></div>
+      <div id="exportPreview" class="collapse"><h3>System state</h3><p class="small">No export loaded yet.</p></div>
+    </section>
+
+    <section id="submitView" class="hidden">
+      <div class="paneltitle"><h2>Submit Claim</h2><span class="small">Burden of proof starts here.</span></div>
+      <div class="warning">HumanX measures evidence pressure. It does not certify personal identity claims, medical advice, legal guilt, harassment, or accusations against private people.</div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="paneltitle"><h2>Claim Templates</h2><span class="small">Fast structured starts</span></div>
+        <div class="templateRow">
+          <button class="templateBtn" onclick="useTemplate('physical')">Physical claim — observable, measurable, repeatable</button>
+          <button class="templateBtn" onclick="useTemplate('history')">Historical claim — source trail, archives, witnesses</button>
+          <button class="templateBtn" onclick="useTemplate('belief')">Belief claim — meaningful but usually untestable</button>
+          <button class="templateBtn" onclick="useTemplate('conspiracy')">Conspiracy claim — dependency chain required</button>
+        </div>
+      </div>
+      <div class="card"><div class="form">
+        <input id="claimText" placeholder="Claim"/>
+        <select id="claimType"><option>Physical/Testable</option><option>Historical</option><option>Medical/High Risk</option><option>Religious/Belief</option><option>Conspiracy</option><option>Internet Drama</option><option>Product Claim</option></select>
+        <textarea id="claimWhy" placeholder="Why do you think this is true?"></textarea>
+        <input id="evidenceTitle" placeholder="Evidence title"/>
+        <input id="evidenceUrl" placeholder="Evidence URL optional"/>
+        <select id="sourceQuality"><option value="repeatable">Repeatable experiment / raw data / official record</option><option value="documented">Documented source / archive / publication</option><option value="media">Photo / video / screenshot</option><option value="testimony">Personal testimony</option><option value="vibes">Vibes / meme / internet argument</option></select>
+        <textarea id="evidenceSummary" placeholder="What does this evidence supposedly prove?"></textarea>
+        <button class="primary" onclick="submitClaim()">Submit to HumanX</button>
+      </div></div>
+    </section>
+  </main>
+
+  <aside class="right">
+    <div class="paneltitle"><h2>Case File</h2><span id="selectedId" class="small">None</span></div>
+    <div id="detailPanel"><div class="empty">Select a claim.</div></div>
+    <div style="height:14px"></div>
+    <div class="paneltitle"><h2>Social Reveal</h2><span class="small">9:16 PNG</span></div>
+    <div id="sharePanel"></div>
+  </aside>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
