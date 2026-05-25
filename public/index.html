@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>HumanX</title>
+<style>
+body{margin:0;font-family:Inter,system-ui;background:#07080d;color:#eef3ff}main{max-width:1100px;margin:auto;padding:24px}.hero{padding:28px;border:1px solid #273044;border-radius:24px;background:#10131d}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:20px}.card{background:#10131d;border:1px solid #273044;border-radius:20px;padding:18px}.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #273044;font-size:11px;text-transform:uppercase;color:#8c97ad}.b-green{color:#39ff9f}.b-red{color:#ff3b5c}.b-yellow{color:#ffd166}button{padding:10px 14px;border-radius:12px;border:1px solid #273044;background:#0b0e16;color:white;cursor:pointer}.hero button{margin-top:12px;background:linear-gradient(135deg,#ff3b5c,#a066ff);border:0}pre{white-space:pre-wrap;background:#0b0e16;border:1px solid #273044;padding:14px;border-radius:16px;color:#8c97ad}
+</style>
+</head>
+<body>
+<main>
+<div class="hero">
+<h1>HumanX</h1>
+<p>You said it. Now prove it.</p>
+<p>Claim pressure system with AIP-first architecture.</p>
+<button onclick="showAIP()">Generate AIP Task</button>
+</div>
+<div class="grid" id="claims"></div>
+<h2>AIP Task Output</h2>
+<pre id="aip">No task generated yet.</pre>
+</main>
+<script>
+async function load(){
+ const res = await fetch('/api/claims');
+ const data = await res.json();
+ const el = document.getElementById('claims');
+ el.innerHTML = data.claims.map(c => `
+  <div class="card">
+   <div class="badge ${status(c.status)}">${c.status}</div>
+   <h3>${c.claim}</h3>
+   <p>${c.category} · ${c.type}</p>
+   <p>Evidence: ${c.evidenceScore}/100</p>
+   <p>Contradictions: ${c.contradictions}</p>
+  </div>
+ `).join('');
+ window.claims = data.claims;
+}
+function status(s){
+ if(s.includes('Supported')||s==='Proven') return 'b-green';
+ if(s.includes('Disproven')||s.includes('Collapse')) return 'b-red';
+ return 'b-yellow';
+}
+function showAIP(){
+ const claim = (window.claims||[])[0];
+ if(!claim) return;
+ const packet = {
+  aip_version:'1.0',
+  app:'HumanX',
+  task_type:'claim_pressure_analysis',
+  claim_id:claim.id,
+  claim:claim.claim,
+  current_status:claim.status,
+  scores:{
+   evidence:claim.evidenceScore,
+   testability:claim.testability,
+   survivability:claim.survivability
+  },
+  instructions:'Stress-test this claim. Return verdict, contradictions, survivability, and pressure points.'
+ };
+ document.getElementById('aip').textContent = JSON.stringify(packet,null,2);
+}
+load();
+</script>
+</body>
+</html>
