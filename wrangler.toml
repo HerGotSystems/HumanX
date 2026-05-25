@@ -4,7 +4,5 @@ compatibility_date = "2026-05-24"
 
 assets = { directory = "./public", binding = "ASSETS" }
 
-[[d1_databases]]
-binding = "DB"
-database_name = "humanx-db"
-database_id = "REPLACE_WITH_D1_ID"
+# D1 database is optional for the current lightweight AIP-first deploy.
+# Add DB binding later in Cloudflare UI or replace this file with a real database_id.
