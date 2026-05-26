@@ -25,6 +25,8 @@ export default {
       if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
       if (!env.DB) return fallbackApi(request, url);
 
+      if (url.pathname === '/api/debug' && request.method === 'GET') return debugState(request, env);
+      if (url.pathname === '/api/seed' && request.method === 'GET') return seedDemoClaims(request, env);
       if (url.pathname === '/api/session' && request.method === 'POST') return createOrGetUser(request, env);
       if (url.pathname === '/api/claims' && request.method === 'GET') return listClaims(request, env);
       if (url.pathname === '/api/claims' && request.method === 'POST') return createClaim(request, env);
@@ -42,17 +44,49 @@ export default {
   }
 };
 
+async function debugState(request, env) {
+  const tables = ['users', 'claims', 'evidence', 'pressure_points', 'reports', 'aip_packets', 'rate_limits'];
+  const counts = {};
+  for (const table of tables) {
+    try {
+      const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first();
+      counts[table] = row?.n ?? 0;
+    } catch (err) {
+      counts[table] = `ERROR: ${err.message}`;
+    }
+  }
+  const latest = await env.DB.prepare(`SELECT id, claim, status, review_state, created_at FROM claims ORDER BY created_at DESC LIMIT 5`).all().catch(err => ({ error: err.message, results: [] }));
+  return json({ ok: true, counts, latest: latest.results || [], latest_error: latest.error || null });
+}
+
+async function seedDemoClaims(request, env) {
+  await ensureUser(env, 'usr_demo_seed');
+  const existing = await env.DB.prepare(`SELECT COUNT(*) AS n FROM claims`).first();
+  if ((existing?.n || 0) > 0) return json({ ok: true, message: 'Database already has claims. Seed not needed.', count: existing.n });
+
+  const now = Date.now();
+  for (const c of demoClaims()) {
+    await env.DB.prepare(`INSERT OR IGNORE INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      .bind(c.id, 'usr_demo_seed', c.claim, c.category, c.type, c.status, c.evidenceScore, c.survivability, c.testability, c.contradictions, now, now, 'public').run();
+  }
+  return json({ ok: true, seeded: demoClaims().length });
+}
+
 async function createOrGetUser(request, env) {
   const body = await readJson(request);
   const now = Date.now();
-  const id = cleanId(body.id) || id('usr');
-  const handle = cleanHandle(body.handle) || `anon-${id.slice(-6)}`;
+  const userId = cleanId(body.id) || makeId('usr');
+  const handle = cleanHandle(body.handle) || `anon-${userId.slice(-6)}`;
   const fingerprint = String(body.fingerprintHash || '').slice(0, 128);
 
   await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, fingerprint_hash, created_at) VALUES (?, ?, ?, ?)`)
-    .bind(id, handle, fingerprint, now).run();
+    .bind(userId, handle, fingerprint, now).run();
 
-  const user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned, is_admin FROM users WHERE id=?`).bind(id).first();
+  let user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned, is_admin FROM users WHERE id=?`).bind(userId).first();
+  if (!user) {
+    await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`).bind(userId, `anon-${userId.slice(-6)}`, now).run();
+    user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned, is_admin FROM users WHERE id=?`).bind(userId).first();
+  }
   return json({ user });
 }
 
@@ -62,8 +96,8 @@ async function listClaims(request, env) {
   const status = String(url.searchParams.get('status') || 'all');
   const limit = Math.min(50, Math.max(1, Number(url.searchParams.get('limit') || 30)));
   const rows = status === 'all'
-    ? await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.review_state='public' AND c.claim LIKE ? ORDER BY c.created_at DESC LIMIT ?`).bind(q, limit).all()
-    : await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.review_state='public' AND c.status=? AND c.claim LIKE ? ORDER BY c.created_at DESC LIMIT ?`).bind(status, q, limit).all();
+    ? await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE COALESCE(c.review_state,'public')='public' AND c.claim LIKE ? ORDER BY c.created_at DESC LIMIT ?`).bind(q, limit).all()
+    : await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE COALESCE(c.review_state,'public')='public' AND c.status=? AND c.claim LIKE ? ORDER BY c.created_at DESC LIMIT ?`).bind(status, q, limit).all();
   return json({ claims: mapClaims(rows.results || []) });
 }
 
@@ -77,16 +111,16 @@ async function getClaim(request, env, claimId) {
 
 async function createClaim(request, env) {
   const userId = requireUser(request);
-  await rateLimit(request, env, `claim:${ip(request)}`, 8, 3600000);
+  await safeRateLimit(request, env, `claim:${ip(request)}`, 8, 3600000);
   const body = await readJson(request);
   const claim = cleanText(body.claim, 500);
   if (claim.length < 8) return json({ error: 'CLAIM_TOO_SHORT' }, 400);
 
   await ensureUser(env, userId);
   const now = Date.now();
-  const claimId = id('clm');
+  const claimId = makeId('clm');
   const type = cleanText(body.type || 'Physical/Testable', 80);
-  const category = cleanText(body.category || inferCategory(claim), 80);
+  const category = cleanText(body.category || inferCategory(claim), 80) || 'General';
   const testability = inferTestability(type, claim);
 
   await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
@@ -102,7 +136,7 @@ async function createClaim(request, env) {
 
 async function addEvidence(request, env) {
   const userId = requireUser(request);
-  await rateLimit(request, env, `evidence:${ip(request)}`, 20, 3600000);
+  await safeRateLimit(request, env, `evidence:${ip(request)}`, 20, 3600000);
   const body = await readJson(request);
   const claimId = cleanId(body.claimId);
   const title = cleanText(body.title || 'Evidence', 120);
@@ -116,7 +150,7 @@ async function addEvidence(request, env) {
 
 async function addPressure(request, env) {
   const userId = requireUser(request);
-  await rateLimit(request, env, `pressure:${ip(request)}`, 20, 3600000);
+  await safeRateLimit(request, env, `pressure:${ip(request)}`, 20, 3600000);
   const body = await readJson(request);
   const claimId = cleanId(body.claimId);
   const title = cleanText(body.title || 'Pressure point', 120);
@@ -124,7 +158,7 @@ async function addPressure(request, env) {
   if (!claimId || note.length < 3) return json({ error: 'BAD_PRESSURE' }, 400);
   await ensureUser(env, userId);
   const now = Date.now();
-  const pressureId = id('prs');
+  const pressureId = makeId('prs');
   const severity = Math.max(1, Math.min(5, Number(body.severity || 1)));
   await env.DB.prepare(`INSERT INTO pressure_points (id,claim_id,user_id,title,body,severity,created_at) VALUES (?,?,?,?,?,?,?)`)
     .bind(pressureId, claimId, userId, title, note, severity, now).run();
@@ -134,7 +168,7 @@ async function addPressure(request, env) {
 
 async function reportTarget(request, env) {
   const userId = requireUser(request);
-  await rateLimit(request, env, `report:${ip(request)}`, 20, 3600000);
+  await safeRateLimit(request, env, `report:${ip(request)}`, 20, 3600000);
   const body = await readJson(request);
   const targetType = cleanText(body.targetType || 'claim', 30);
   const targetId = cleanId(body.targetId);
@@ -143,7 +177,7 @@ async function reportTarget(request, env) {
   await ensureUser(env, userId);
   const now = Date.now();
   await env.DB.prepare(`INSERT INTO reports (id,target_type,target_id,reporter_id,reason,created_at,status) VALUES (?,?,?,?,?,?,?)`)
-    .bind(id('rpt'), targetType, targetId, userId, reason, now, 'open').run();
+    .bind(makeId('rpt'), targetType, targetId, userId, reason, now, 'open').run();
   if (targetType === 'claim') {
     await env.DB.prepare(`UPDATE claims SET report_count=report_count+1, review_state=CASE WHEN report_count>=2 THEN 'review' ELSE review_state END WHERE id=?`).bind(targetId).run();
   }
@@ -158,7 +192,7 @@ async function createAipPacket(request, env) {
   if (!detail.claim) return json({ error: 'CLAIM_NOT_FOUND' }, 404);
   const packet = buildAip(detail);
   await env.DB.prepare(`INSERT INTO aip_packets (id,claim_id,packet_json,created_at) VALUES (?,?,?,?)`)
-    .bind(id('aip'), claimId, JSON.stringify(packet), Date.now()).run();
+    .bind(makeId('aip'), claimId, JSON.stringify(packet), Date.now()).run();
   return json({ packet });
 }
 
@@ -171,7 +205,7 @@ async function reviewQueue(request, env) {
 
 async function insertEvidence(env, claimId, userId, stance, body, title, quality, sourceUrl) {
   const now = Date.now();
-  const evidenceId = id('evd');
+  const evidenceId = makeId('evd');
   await env.DB.prepare(`INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at) VALUES (?,?,?,?,?,?,?,?,?)`)
     .bind(evidenceId, claimId, userId, stance, quality, title, body, sourceUrl, now).run();
   return { id: evidenceId, claim_id: claimId, stance, quality, title, body, source_url: sourceUrl, created_at: now };
@@ -234,21 +268,26 @@ function buildAip(detail) {
   };
 }
 
-async function rateLimit(request, env, key, maxHits, windowMs) {
-  const now = Date.now();
-  const row = await env.DB.prepare(`SELECT hits, window_start FROM rate_limits WHERE key=?`).bind(key).first();
-  if (!row || now - row.window_start > windowMs) {
-    await env.DB.prepare(`INSERT OR REPLACE INTO rate_limits (key,hits,window_start) VALUES (?,?,?)`).bind(key, 1, now).run();
-    return;
+async function safeRateLimit(request, env, rateKey, maxHits, windowMs) {
+  try {
+    const now = Date.now();
+    const row = await env.DB.prepare(`SELECT hits, window_start FROM rate_limits WHERE "key"=?`).bind(rateKey).first();
+    if (!row || now - row.window_start > windowMs) {
+      await env.DB.prepare(`INSERT OR REPLACE INTO rate_limits ("key",hits,window_start) VALUES (?,?,?)`).bind(rateKey, 1, now).run();
+      return;
+    }
+    if (row.hits >= maxHits) throw new Error('RATE_LIMITED');
+    await env.DB.prepare(`UPDATE rate_limits SET hits=hits+1 WHERE "key"=?`).bind(rateKey).run();
+  } catch (err) {
+    if (String(err.message || err).includes('RATE_LIMITED')) throw err;
+    console.log('rate limit skipped:', err.message || err);
   }
-  if (row.hits >= maxHits) throw new Error('RATE_LIMITED');
-  await env.DB.prepare(`UPDATE rate_limits SET hits=hits+1 WHERE key=?`).bind(key).run();
 }
 
 async function ensureUser(env, userId) {
   const existing = await env.DB.prepare(`SELECT id FROM users WHERE id=?`).bind(userId).first();
   if (!existing) {
-    await env.DB.prepare(`INSERT INTO users (id, handle, created_at) VALUES (?, ?, ?)`).bind(userId, `anon-${userId.slice(-6)}`, Date.now()).run();
+    await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`).bind(userId, `anon-${userId.slice(-6)}`, Date.now()).run();
   }
 }
 
@@ -267,12 +306,12 @@ function mapClaim(c) {
     category: c.category,
     type: c.type,
     status: c.status,
-    evidenceScore: c.evidence_score,
+    evidenceScore: c.evidence_score ?? c.evidenceScore,
     survivability: c.survivability,
     testability: c.testability,
     contradictions: c.contradictions,
-    reportCount: c.report_count,
-    reviewState: c.review_state,
+    reportCount: c.report_count || 0,
+    reviewState: c.review_state || 'public',
     createdAt: c.created_at,
     updatedAt: c.updated_at,
     handle: c.handle || 'anon'
@@ -296,12 +335,12 @@ function json(data, status = 200) {
 }
 
 function requireUser(request) {
-  const id = cleanId(request.headers.get('x-humanx-user'));
-  if (!id) throw new Error('MISSING_PSEUDONYMOUS_USER');
-  return id;
+  const userId = cleanId(request.headers.get('x-humanx-user'));
+  if (!userId) throw new Error('MISSING_PSEUDONYMOUS_USER');
+  return userId;
 }
 
-function id(prefix) {
+function makeId(prefix) {
   return `${prefix}_${crypto.randomUUID().replaceAll('-', '').slice(0, 18)}`;
 }
 
