@@ -1,81 +1,60 @@
-# HumanX
+# PHUL Kit — Personal Human Use License
+## EMVY CHECK / Michal Veltruský
 
-HumanX is the umbrella system for the Human Experience / Human Experiment / Human X.
+Drop this kit into every project repo. Seven files plus one optional HTML head block. No dependencies.
 
-It is built around a simple idea:
+---
 
-Nobody is forced to use anything here. But if you do use it, you should understand that your beliefs, actions, claims, contradictions, evidence and public behaviour can all be examined.
+## Files and Where They Go
 
-HumanX has two connected layers:
+| File | Destination | Purpose |
+|------|-------------|---------|
+| `robots.txt` | Repo root (served at `/robots.txt`) | Blocks all major AI crawlers by name |
+| `llms.txt` | Repo root (served at `/llms.txt`) | Emerging AI agent standard — policy in plain language |
+| `ai.txt` | Repo root (served at `/ai.txt`) | Machine-readable operator-level policy |
+| `LICENSE-PHUL.txt` | Repo root (served at `/LICENSE-PHUL.txt`) | Full license text — the legal anchor |
+| `_headers` | Repo root — Cloudflare Pages picks it up automatically | Injects license headers on every HTTP response |
+| `meta-tags.html` | Copy the contents into `<head>` of every HTML page | In-page machine-readable signals |
 
-## 1. HumanX Belief Engine — personal layer
+---
 
-The Belief Engine is the personal starting point.
+## Before Deploying
 
-It maps belief structure, identity load, contradiction pressure, inherited ideas, pain-shaped views, tribal influence and personal response patterns.
+1. Keep `emvycheck.com` if this is for EMVY CHECK projects. For other brands/domains, replace it consistently in `robots.txt`, `llms.txt`, `ai.txt`, `_headers`, `meta-tags.html`, `WELCOME.txt`, and `LICENSE-PHUL.txt`.
+2. Put all `.txt` files and `_headers` in the repo root so they are served publicly.
+3. Copy the contents of `meta-tags.html` into the `<head>` of every HTML page.
+4. The `_headers` file works on Cloudflare Pages and Netlify. For Vercel, convert the same headers into `vercel.json`.
 
-It can be used anonymously, casually, or seriously.
+---
 
-Purpose:
+## What This Does
 
-- understand your own belief profile
-- see where your views come from
-- identify contradiction patterns
-- test how answers shift your profile
-- prepare for deeper claim testing later
+- **Removes plausible deniability** for AI companies and crawlers — notices exist at every layer (HTTP, robots, meta, structured data, plain text).
+- **Establishes constructive notice** — the legal "parking sign" principle. You knew or should have known.
+- **Covers four enforcement layers**: human-readable, machine-readable, HTTP, and contractual.
+- **Positions you for future enforcement** as AI training regulations tighten.
 
-This part is personal. It is about the individual.
+## What This Does NOT Do
 
-## 2. HumanX Claims Engine — public / mass layer
+- Force bots to comply (nothing can). Rogue scrapers will scrape.
+- Win you a lawsuit tomorrow against OpenAI/Google on its own.
+- Replace a proper lawyer if you're pursuing serious infringement.
 
-The Claims Engine is the public pressure system.
+---
 
-Users submit claims, attach evidence, add pressure points, generate social reveal cards, and run server-side AI pressure analysis through Cloudflare Workers.
+## Fingerprinting (Next Layer)
 
-Purpose:
+To go further — inject unique invisible markers into generated content,
+downloadable files, or tool outputs. Then if your content appears in AI
+training data or model outputs, you have forensic proof.
 
-- make a claim
-- challenge a claim
-- support a claim with evidence
-- attack weak claims with counter-evidence
-- expose contradiction, stupidity, bad reasoning or social performance
-- show how belief affects what people accept as proof
+Ask Claude to build a fingerprinting injector when you're ready.
 
-This part is social. It is about people, groups, tribes, arguments and public stupidity.
+---
 
-## Relationship between the two
+© EMVY CHECK / Michal Veltruský
 
-The Belief Engine comes first.
 
-The Claims Engine becomes more interesting when it understands the belief structure behind a claim.
+## Version
 
-A person can use HumanX just for fun, anonymously, or as an open challenge to their own thinking. A claim can be judged not only by whether it sounds convincing, but by what kind of belief structure produced it and what kind of evidence survives pressure.
-
-In short:
-
-- Belief Engine = personal profile
-- Claims Engine = public claim pressure
-- HumanX = the system connecting belief, behaviour, evidence and social exposure
-
-## What is included in this repo
-
-This repo currently contains the Claims Engine side:
-
-- Cloudflare Worker API
-- D1 database schema
-- Static frontend in `public/index.html`
-- Standalone demo mode
-- Server-side Anthropic proxy at `/api/ai/analyse`
-
-The Belief Engine currently lives as a runnable app in the RINKIMIRIKATA hub.
-
-## Required Cloudflare secrets
-
-The following secret names are required for deployment. Do not commit the actual values into GitHub.
-
-- `ANTHROPIC_KEY`
-- `ADMIN_TOKEN`
-
-## Deployment
-
-Connect this GitHub repo to Cloudflare Workers / Pages, set the D1 binding as `DB`, set the static assets binding as `ASSETS`, and add the two secrets above using Cloudflare secrets.
+PHUL v1.0 — reusable repo kit prepared for EMVY CHECK projects.
