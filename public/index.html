@@ -3,30 +3,32 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>HumanX — Belief → Claim → Evidence</title>
+<title>HumanX — Belief → Truth → Claim → Evidence</title>
 <link rel="stylesheet" href="/styles.css?v=4">
 </head>
 <body>
 <main>
 <section class="welcome" id="welcome">
-  <div class="badge-row"><span class="badge b-green">working system</span><span class="badge">belief → claim → evidence</span><span id="who" class="badge">anonymous</span></div>
+  <div class="badge-row"><span class="badge b-green">working system</span><span class="badge">belief → truth → claim → evidence</span><span id="who" class="badge">anonymous</span></div>
   <h1>HumanX</h1>
-  <p><b>HumanX maps what people believe, then pressure-tests what they claim.</b> Start with the Belief Engine for your personal map, or enter the Claim Engine to make, defend, attack and test public claims with evidence.</p>
+  <p><b>HumanX maps what people believe, records what they call truth, then pressure-tests what they claim.</b> Start with the Belief Engine for your personal map, open Truths to inspect repeated certainties, or enter the Claim Engine to defend and attack claims with evidence.</p>
   <div class="welcome-actions">
     <a class="btn primary" href="https://rinkimirikata.com/apps/humanx-belief-engine/">Start Belief Engine</a>
     <button class="primary" onclick="hideWelcome()">Open Claim Engine</button>
     <button onclick="setMode('vault');hideWelcome()">Evidence Vault</button>
+    <button onclick="setMode('truths');hideWelcome()">Truths</button>
   </div>
-  <div class="explain-grid">
+  <div class="explain-grid four">
     <div class="panel"><h3>Belief Engine</h3><p class="small">Personal layer. Maps identity load, contradiction pressure, inherited beliefs and response patterns.</p></div>
     <div class="panel"><h3>Claim Engine</h3><p class="small">Public layer. Claims are defended with evidence, attacked with pressure points, voted on, tested and exported as AIP packets.</p></div>
-    <div class="panel"><h3>Evidence Vault</h3><p class="small">Evidence should become reusable. One document, video, dataset or test can support or pressure many claims.</p></div>
+    <div class="panel"><h3>Evidence Vault</h3><p class="small">Reusable materials. One document, video, dataset or test can support or pressure many claims.</p></div>
+    <div class="panel"><h3>Truths</h3><p class="small">Repeated certainties, slogans, doctrines and inherited statements. Repetition is tracked separately from proof.</p></div>
   </div>
 </section>
 <section class="hero compact">
 <h1>Claim Engine</h1>
 <p><b>You said it. Now prove it.</b> Claims are not truth until they survive evidence, pressure and repeatable testing.</p>
-<div class="topbar"><input id="search" placeholder="Search public claims..." oninput="loadClaims()"><select id="filter" onchange="loadClaims()"><option value="all">All verdicts</option><option>Proven</option><option>Strongly Supported</option><option>Plausible</option><option>Untestable</option><option>Weak Evidence</option><option>Disproven</option><option>Reality Collapse</option></select></div>
+<div class="topbar"><input id="search" placeholder="Search public claims, evidence or truths..." oninput="loadClaims()"><select id="filter" onchange="loadClaims()"><option value="all">All verdicts</option><option>Proven</option><option>Strongly Supported</option><option>Plausible</option><option>Untestable</option><option>Weak Evidence</option><option>Disproven</option><option>Reality Collapse</option></select></div>
 <div class="statusline"><span id="dot" class="dot"></span><span id="status" class="small">Starting…</span></div>
 </section>
 <div class="layout">
