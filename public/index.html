@@ -3,22 +3,38 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>HumanX — Public Claim Arena</title>
-<link rel="stylesheet" href="/styles.css?v=2">
+<title>HumanX — Belief → Claim → Evidence</title>
+<link rel="stylesheet" href="/styles.css?v=4">
 </head>
 <body>
 <main>
-<section class="hero">
-<h1>HumanX</h1>
-<p><b>You said it. Now prove it.</b> Public shared claim arena. Pseudonymous users only. Evidence defence, pressure attacks, reports, admin review, and AIP packets users run with their own AI. No public API-credit burn.</p>
-<div class="topbar"><input id="search" placeholder="Search public claims..." oninput="loadClaims()"><select id="filter" onchange="loadClaims()"><option value="all">All verdicts</option><option>Proven</option><option>Strongly Supported</option><option>Plausible</option><option>Untestable</option><option>Weak Evidence</option><option>Disproven</option><option>Reality Collapse</option></select><button class="primary" onclick="setMode('submit')">Submit Claim</button></div>
-<div class="statusline"><span id="dot" class="dot"></span><span id="status" class="small">Starting…</span><span id="who" class="badge">anonymous</span></div>
+<section class="welcome" id="welcome">
+  <div class="badge-row"><span class="badge b-green">working system</span><span class="badge">belief → claim → evidence</span><span id="who" class="badge">anonymous</span></div>
+  <h1>HumanX</h1>
+  <p><b>HumanX maps what people believe, then pressure-tests what they claim.</b> Start with the Belief Engine for your personal map, or enter the Claim Engine to make, defend, attack and test public claims with evidence.</p>
+  <div class="welcome-actions">
+    <a class="btn primary" href="https://rinkimirikata.com/apps/humanx-belief-engine/">Start Belief Engine</a>
+    <button class="primary" onclick="hideWelcome()">Open Claim Engine</button>
+    <button onclick="setMode('vault');hideWelcome()">Evidence Vault</button>
+  </div>
+  <div class="explain-grid">
+    <div class="panel"><h3>Belief Engine</h3><p class="small">Personal layer. Maps identity load, contradiction pressure, inherited beliefs and response patterns.</p></div>
+    <div class="panel"><h3>Claim Engine</h3><p class="small">Public layer. Claims are defended with evidence, attacked with pressure points, voted on, tested and exported as AIP packets.</p></div>
+    <div class="panel"><h3>Evidence Vault</h3><p class="small">Evidence should become reusable. One document, video, dataset or test can support or pressure many claims.</p></div>
+  </div>
+</section>
+<section class="hero compact">
+<h1>Claim Engine</h1>
+<p><b>You said it. Now prove it.</b> Claims are not truth until they survive evidence, pressure and repeatable testing.</p>
+<div class="topbar"><input id="search" placeholder="Search public claims..." oninput="loadClaims()"><select id="filter" onchange="loadClaims()"><option value="all">All verdicts</option><option>Proven</option><option>Strongly Supported</option><option>Plausible</option><option>Untestable</option><option>Weak Evidence</option><option>Disproven</option><option>Reality Collapse</option></select></div>
+<div class="statusline"><span id="dot" class="dot"></span><span id="status" class="small">Starting…</span></div>
 </section>
 <div class="layout">
-<section><div class="tabs"><button id="tab-arena" class="tab active" onclick="setMode('arena')">Claim Arena</button><button id="tab-submit" class="tab" onclick="setMode('submit')">Submit</button><button id="tab-vault" class="tab" onclick="setMode('vault')">Evidence Vault</button><button id="tab-export" class="tab" onclick="setMode('export')">AIP / Export</button></div><div id="main"></div></section>
-<aside class="panel"><h2>Case File</h2><div id="casefile" class="small">Select a claim.</div><h2 style="margin-top:18px">Add Evidence / Attack</h2><div class="claimbox"><input id="eTitle" placeholder="Evidence or pressure title"><select id="eKind"><option value="evidence">Support evidence</option><option value="pressure">Attack / contradiction</option></select><select id="eQuality"><option value="repeatable">Repeatable / raw data</option><option value="documented">Documented source</option><option value="media">Photo / video / screenshot</option><option value="testimony">Testimony</option><option value="vibes">Vibes / weak argument</option></select><textarea id="eNote" placeholder="What does this prove or break?"></textarea><button class="primary" onclick="addCaseItem()">Attach to Claim</button></div><h2 style="margin-top:18px">AIP Packet</h2><div class="actions"><button class="primary" onclick="generateAIP()">Generate</button><button onclick="copyAIP()">Copy</button></div><pre id="aip" class="output">No packet generated yet.</pre><h2 style="margin-top:18px">Report</h2><div class="actions"><button class="danger" onclick="reportSelected()">Report selected claim</button></div></aside>
+<section><div class="tabs"><button id="tab-arena" class="tab active" onclick="setMode('arena')">Claim Arena</button><button id="tab-submit" class="tab" onclick="setMode('submit')">Submit Claim</button><button id="tab-vault" class="tab" onclick="setMode('vault')">Evidence Vault</button><button id="tab-export" class="tab" onclick="setMode('export')">AIP / Export</button></div><div id="main"></div></section>
+<aside class="panel"><h2>Workspace</h2><div id="casefile" class="small">Open a claim to study it. Evidence and attacks are added inside study mode.</div><h2 style="margin-top:18px">Add Evidence / Attack</h2><div class="claimbox"><input id="eTitle" placeholder="Evidence or pressure title"><select id="eKind"><option value="evidence">Support evidence</option><option value="pressure">Attack / contradiction</option></select><select id="eQuality"><option value="repeatable">Repeatable / raw data</option><option value="documented">Documented source</option><option value="media">Photo / video / screenshot</option><option value="testimony">Testimony</option><option value="vibes">Vibes / weak argument</option></select><input id="eSource" placeholder="Source URL, optional"><textarea id="eNote" placeholder="What does this prove or break?"></textarea><button class="primary" onclick="addCaseItem()">Attach to Selected Claim</button></div><h2 style="margin-top:18px">AIP Packet</h2><div class="actions"><button class="primary" onclick="generateAIP()">Generate</button><button onclick="copyAIP()">Copy</button></div><pre id="aip" class="output">No packet generated yet.</pre><h2 style="margin-top:18px">Report</h2><div class="actions"><button class="danger" onclick="reportSelected()">Report selected claim</button></div></aside>
 </div>
 </main>
-<script src="/app-v3.js?v=3"></script>
+<script src="/app-v3.js?v=4"></script>
+<script>function hideWelcome(){document.getElementById('welcome')?.classList.add('hidden')}</script>
 </body>
 </html>
