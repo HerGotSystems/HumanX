@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "updated": "2026-05-27",
+  "purpose": "Starter claims, evidence, pressure points and home tests for HumanX. These are seed examples only; public users can add stronger evidence and challenges later.",
+  "claims": [
+    {
+      "id": "seed-flat-earth",
+      "claim": "The Earth is flat",
+      "category": "Cosmology",
+      "type": "Physical/Testable",
+      "status_target": "Disproven",
+      "summary": "A high-pressure test claim used to demonstrate the difference between repeated belief statements and independently testable evidence.",
+      "evidence_support": [
+        {
+          "title": "Local horizon often appears flat",
+          "quality": "media",
+          "media_type": "observation",
+          "body": "Standing at normal human scale, the visible horizon can appear flat. This explains why the claim feels intuitive to some observers, but local perception is not enough to establish planetary geometry.",
+          "reliability_score": 20
+        },
+        {
+          "title": "Water-level phrase argument",
+          "quality": "vibes",
+          "media_type": "argument",
+          "body": "The repeated phrase 'water finds its level' is often used as support. HumanX should classify this as language-based pressure, not a measurement of global shape.",
+          "reliability_score": 8
+        }
+      ],
+      "pressure_points": [
+        {
+          "title": "Time zones require different sun angles across the globe",
+          "severity": 5,
+          "body": "A flat local appearance does not explain predictable global day/night timing without adding complex unsupported mechanisms. Any flat-Earth model must account for synchronized time zones and seasonal shifts."
+        },
+        {
+          "title": "Lunar eclipse shadow geometry",
+          "severity": 5,
+          "body": "The Earth's shadow during lunar eclipses repeatedly appears curved from different orientations. The model must explain why this happens consistently."
+        },
+        {
+          "title": "Circumnavigation and flight routing",
+          "severity": 4,
+          "body": "Long-distance navigation, aviation routing and circumnavigation are operational tests used every day. A competing model must predict these routes at least as well."
+        },
+        {
+          "title": "Satellite telemetry and independent tracking",
+          "severity": 5,
+          "body": "Satellite signals, orbital prediction, amateur radio tracking and GPS operation form a repeatable technical evidence layer."
+        }
+      ],
+      "home_tests": [
+        {
+          "title": "Measure shadow angles at two distant locations",
+          "difficulty": "medium",
+          "safety_level": "normal",
+          "instructions": "At the same time on the same day, compare the shadow length from identical vertical sticks in two distant locations. A simple geometry comparison shows whether sunlight arrives at the same angle everywhere."
+        },
+        {
+          "title": "Track ships or buildings disappearing bottom-first",
+          "difficulty": "easy",
+          "safety_level": "normal",
+          "instructions": "Use a zoom camera near a large body of water and record distant objects. Check whether lower sections disappear before upper sections. Control for haze and atmospheric distortion."
+        }
+      ]
+    },
+    {
+      "id": "seed-moon-landing",
+      "claim": "Humans landed on the Moon",
+      "category": "History/Space",
+      "type": "Historical",
+      "status_target": "Strongly Supported",
+      "summary": "A historical and technical claim with multiple independent evidence streams.",
+      "evidence_support": [
+        {
+          "title": "Apollo mission documentation chain",
+          "quality": "documented",
+          "media_type": "document",
+          "body": "Mission planning records, telemetry, photography, transcripts and hardware documentation form a large cross-linked documentary chain. Individual documents can be challenged, but the whole archive creates a broad consistency burden.",
+          "reliability_score": 68
+        },
+        {
+          "title": "Lunar retroreflector experiments",
+          "quality": "repeatable",
+          "media_type": "experiment",
+          "body": "Retroreflectors placed on the Moon allow laser ranging experiments. This is a repeatable measurement stream independent of belief or testimony.",
+          "reliability_score": 85
+        },
+        {
+          "title": "Moon rocks and sample analysis",
+          "quality": "documented",
+          "media_type": "physical_sample",
+          "body": "Returned lunar samples have been studied by researchers over decades. The evidence is strongest when sample custody, composition and independent analysis are examined together.",
+          "reliability_score": 72
+        }
+      ],
+      "pressure_points": [
+        {
+          "title": "Hoax claim must explain independent tracking",
+          "severity": 4,
+          "body": "A successful hoax explanation must account for independent radio tracking, international observation and technical telemetry, not just visual doubts about photos."
+        },
+        {
+          "title": "Photo anomalies are not enough alone",
+          "severity": 3,
+          "body": "Claims about shadows, flags or camera behavior must be converted into testable technical arguments and compared against lighting, vacuum and camera constraints."
+        }
+      ],
+      "home_tests": [
+        {
+          "title": "Recreate single-light shadow scenes",
+          "difficulty": "easy",
+          "safety_level": "normal",
+          "instructions": "Use one strong light, rough ground texture and small models to test whether non-parallel looking shadows can appear from terrain and perspective alone."
+        }
+      ]
+    },
+    {
+      "id": "seed-dream-prediction",
+      "claim": "A dream predicted my future",
+      "category": "Belief",
+      "type": "Religious/Belief",
+      "status_target": "Untestable",
+      "summary": "A sincere personal claim that may matter emotionally but usually lacks independent timestamped prediction data.",
+      "evidence_support": [
+        {
+          "title": "Personal testimony",
+          "quality": "testimony",
+          "media_type": "personal_report",
+          "body": "The claimant reports a dream and later event match. This can be meaningful to the claimant but is weak as public proof without timestamped records and clear prediction criteria.",
+          "reliability_score": 24
+        }
+      ],
+      "pressure_points": [
+        {
+          "title": "Memory distortion and retrofitting",
+          "severity": 4,
+          "body": "After an event happens, people often reinterpret vague memories as more specific than they were. HumanX should ask for timestamped dream records before the event."
+        },
+        {
+          "title": "Prediction criteria missing",
+          "severity": 3,
+          "body": "A claim needs exact prediction, timestamp, event window and failure condition. Without these, it may be emotionally true but publicly untestable."
+        }
+      ],
+      "home_tests": [
+        {
+          "title": "Timestamped dream log test",
+          "difficulty": "easy",
+          "safety_level": "normal",
+          "instructions": "Write dreams into a timestamped document before events happen. Define what would count as a hit and what would count as a miss. Review after a fixed period."
+        }
+      ]
+    },
+    {
+      "id": "seed-perpetual-motion",
+      "claim": "Perpetual motion machines can produce free energy forever",
+      "category": "Physics",
+      "type": "Physical/Testable",
+      "status_target": "Reality Collapse",
+      "summary": "A physics claim that collapses under controlled measurement unless a working reproducible machine is demonstrated.",
+      "evidence_support": [
+        {
+          "title": "Video demonstrations of magnet wheels",
+          "quality": "media",
+          "media_type": "video",
+          "body": "Videos can show motion, but without controlled measurement they do not prove net energy production. Hidden inputs, editing, stored energy or external power must be ruled out.",
+          "reliability_score": 25
+        }
+      ],
+      "pressure_points": [
+        {
+          "title": "Energy conservation burden",
+          "severity": 5,
+          "body": "A free-energy device must show measured energy output exceeding all energy input under controlled conditions. The stronger the claim, the stricter the measurement burden."
+        },
+        {
+          "title": "Independent replication required",
+          "severity": 5,
+          "body": "A single inventor video is not enough. The device must be reproduced and measured independently."
+        },
+        {
+          "title": "Continuous load test",
+          "severity": 5,
+          "body": "A useful machine must power an external load continuously without hidden batteries, mains supply or energy storage depletion."
+        }
+      ],
+      "home_tests": [
+        {
+          "title": "Input/output load measurement",
+          "difficulty": "hard",
+          "safety_level": "caution",
+          "instructions": "Measure all electrical/mechanical energy entering and leaving the device over time. Include batteries, capacitors, falling weights, temperature changes and external fields. Do not work with dangerous voltages."
+        }
+      ]
+    }
+  ]
+}
