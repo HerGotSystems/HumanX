@@ -1,3 +1,4 @@
+import { importSeedData } from './importer.js';
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET,POST,OPTIONS',
@@ -27,6 +28,7 @@ export default {
 
       if (url.pathname === '/api/debug' && request.method === 'GET') return debugState(request, env);
       if (url.pathname === '/api/seed' && request.method === 'GET') return seedDemoClaims(request, env);
+      if (url.pathname === '/api/import-seed' && request.method === 'GET') return json(await importSeedData(env));
       if (url.pathname === '/api/session' && request.method === 'POST') return createOrGetUser(request, env);
       if (url.pathname === '/api/claims' && request.method === 'GET') return listClaims(request, env);
       if (url.pathname === '/api/claims' && request.method === 'POST') return createClaim(request, env);
