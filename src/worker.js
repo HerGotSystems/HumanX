@@ -109,9 +109,19 @@ async function listClaims(request, env) {
 async function getClaim(request, env, claimId) {
   const claim = await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(claimId).first();
   if (!claim) return json({ error: 'CLAIM_NOT_FOUND' }, 404);
+
   const evidence = await env.DB.prepare(`SELECT e.*, u.handle FROM evidence e LEFT JOIN users u ON u.id=e.user_id WHERE e.claim_id=? ORDER BY e.created_at DESC`).bind(claimId).all();
+
   const pressure = await env.DB.prepare(`SELECT p.*, u.handle FROM pressure_points p LEFT JOIN users u ON u.id=p.user_id WHERE p.claim_id=? ORDER BY p.created_at DESC`).bind(claimId).all();
-  return json({ claim: mapClaim(claim), evidence: evidence.results || [], pressure: pressure.results || [] });
+
+  const tests = await env.DB.prepare(`SELECT t.*, u.handle FROM home_tests t LEFT JOIN users u ON u.id=t.user_id WHERE t.claim_id=? ORDER BY t.created_at DESC`).bind(claimId).all();
+
+  return json({
+    claim: mapClaim(claim),
+    evidence: evidence.results || [],
+    pressure: pressure.results || [],
+    tests: tests.results || []
+  });
 }
 
 async function createClaim(request, env) {
