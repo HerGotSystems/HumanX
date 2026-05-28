@@ -27,15 +27,34 @@ function truthCard(t){return`<article class="card truth-card"><span class="badge
 </div>
 </article>`}
 async function attachEvidencePrompt(evidenceId){
-  const claimId = prompt('Paste target claim ID to attach this evidence to:');
-  if(!claimId) return;
+  if(!claims.length) await loadClaims();
+
+  const options = claims.map((c,i)=>`${i+1}. ${c.claim}`).join('\n');
+  const choice = prompt('Choose target claim number:\n\n'+options);
+
+  if(!choice) return;
+
+  const index = Number(choice)-1;
+  const target = claims[index];
+
+  if(!target){
+    toast('Invalid claim choice');
+    return;
+  }
+
   const stance = prompt('Use as support or pressure?', 'support') || 'support';
+
   try{
     await api('/api/evidence-attach',{
       method:'POST',
-      body:JSON.stringify({evidenceId,claimId,stance})
+      body:JSON.stringify({
+        evidenceId,
+        claimId:target.id,
+        stance
+      })
     });
-    toast('Evidence attached to claim');
+
+    toast('Evidence attached to: '+target.claim);
   }catch(e){
     toast(e.message || 'Could not attach evidence');
   }
