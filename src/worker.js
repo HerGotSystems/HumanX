@@ -358,6 +358,9 @@ function mapClaim(c) {
     contradictions: c.contradictions,
     reportCount: c.report_count || 0,
     reviewState: c.review_state || 'public',
+    beliefYes: c.belief_yes || 0,
+    beliefNo: c.belief_no || 0,
+    uncertainty: c.uncertainty || 0,
     createdAt: c.created_at,
     updatedAt: c.updated_at,
     handle: c.handle || 'anon'
