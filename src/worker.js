@@ -3,6 +3,7 @@ import { importSeedData } from './importer.js';
 import { voteClaim } from './votes.js';
 import { listTruths, createTruth } from './truths.js';
 import { importTruthSeeds } from './truth-seed.js';
+import { convertTruthToClaim } from './truth-claim-bridge.js';
 
 const CORS = {
   'access-control-allow-origin': '*',
@@ -42,6 +43,7 @@ export default {
       if (url.pathname === '/api/evidence-vault' && request.method === 'GET') return listEvidenceVault(request, env, { json });
       if (url.pathname === '/api/truths' && request.method === 'GET') return listTruths(request, env, { json });
       if (url.pathname === '/api/truths' && request.method === 'POST') return createTruth(request, env, { readJson, cleanText, cleanId, json, requireUser, makeId });
+      if (url.pathname === '/api/truth-to-claim' && request.method === 'POST') return convertTruthToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
       if (url.pathname.match(/^\/api\/claims\/[^/]+$/) && request.method === 'GET') return getClaim(request, env, url.pathname.split('/').pop());
       if (url.pathname === '/api/evidence' && request.method === 'POST') return addEvidence(request, env);
       if (url.pathname === '/api/pressure' && request.method === 'POST') return addPressure(request, env);
