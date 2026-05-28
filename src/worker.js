@@ -2,6 +2,7 @@ import { listEvidenceVault } from './evidence-vault.js';
 import { importSeedData } from './importer.js';
 import { voteClaim } from './votes.js';
 import { listTruths, createTruth } from './truths.js';
+import { importTruthSeeds } from './truth-seed.js';
 
 const CORS = {
   'access-control-allow-origin': '*',
@@ -33,6 +34,7 @@ export default {
       if (url.pathname === '/api/debug' && request.method === 'GET') return debugState(request, env);
       if (url.pathname === '/api/seed' && request.method === 'GET') return seedDemoClaims(request, env);
       if (url.pathname === '/api/import-seed' && request.method === 'GET') return json(await importSeedData(env));
+      if (url.pathname === '/api/import-truths' && request.method === 'GET') return json(await importTruthSeeds(env));
       if (url.pathname === '/api/claim-vote' && request.method === 'POST') return voteClaim(request, env, { readJson, cleanId, json, requireUser, makeId });
       if (url.pathname === '/api/session' && request.method === 'POST') return createOrGetUser(request, env);
       if (url.pathname === '/api/claims' && request.method === 'GET') return listClaims(request, env);
