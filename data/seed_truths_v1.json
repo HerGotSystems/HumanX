@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "purpose": "Starter truth statements for the HumanX Truths layer. These are repeated statements, slogans, inherited certainties and doctrines, not verified facts.",
+  "truths": [
+    {"statement":"Money is evil","category":"culture","origin":"common saying","truth_type":"common","confidence_label":"claimed"},
+    {"statement":"Hard work always pays off","category":"culture","origin":"family / school","truth_type":"cultural","confidence_label":"claimed"},
+    {"statement":"Everything happens for a reason","category":"belief","origin":"religion / self-help","truth_type":"religious","confidence_label":"claimed"},
+    {"statement":"Trust the experts","category":"institution","origin":"media / government","truth_type":"institutional","confidence_label":"claimed"},
+    {"statement":"Never trust the experts","category":"institution","origin":"counterculture / internet","truth_type":"common","confidence_label":"claimed"},
+    {"statement":"The customer is always right","category":"business","origin":"commerce","truth_type":"common","confidence_label":"claimed"},
+    {"statement":"Children should always obey adults","category":"family","origin":"family / school","truth_type":"family","confidence_label":"claimed"},
+    {"statement":"Science has proven it","category":"science","origin":"public debate","truth_type":"scientific","confidence_label":"claimed"},
+    {"statement":"My religion is the only true path","category":"religion","origin":"religious doctrine","truth_type":"religious","confidence_label":"claimed"},
+    {"statement":"People are basically good","category":"human nature","origin":"philosophy / culture","truth_type":"common","confidence_label":"claimed"},
+    {"statement":"People are stupid","category":"human nature","origin":"cynicism / internet","truth_type":"common","confidence_label":"claimed"},
+    {"statement":"You can be anything you want","category":"identity","origin":"school / self-help","truth_type":"cultural","confidence_label":"claimed"}
+  ]
+}
