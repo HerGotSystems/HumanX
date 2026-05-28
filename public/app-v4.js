@@ -45,5 +45,19 @@ async function generateAIP(){if(!selected)return toast('Select a claim first');t
 async function copyAIP(){if(!lastPacket)await generateAIP();navigator.clipboard.writeText(lastPacket);toast('Copied')}
 function downloadJSON(){const blob=new Blob([JSON.stringify({user,claims,evidenceVault,truths},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='humanx-visible-data.json';a.click();URL.revokeObjectURL(a.href)}
 function renderError(e){document.getElementById('main').innerHTML=`<div class="panel"><h2>HumanX backend notice</h2><p class="small">${esc(e.message||e)}</p></div>`}
-window.setMode=setMode;window.loadClaims=loadClaims;window.selectClaim=selectClaim;window.quickPressure=quickPressure;window.quickEvidence=quickEvidence;window.saveClaim=saveClaim;window.addCaseItem=addCaseItem;window.reportSelected=reportSelected;window.generateAIP=generateAIP;window.copyAIP=copyAIP;window.downloadJSON=downloadJSON;window.voteClaim=voteClaim;window.backToArena=backToArena;window.submitTruth=submitTruth;
+async function convertTruth(truthId){
+  try{
+    const data=await api('/api/truth-to-claim',{
+      method:'POST',
+      body:JSON.stringify({truthId})
+    });
+    toast('Truth converted to claim');
+    mode='arena';
+    await loadClaims();
+    if(data.bridge?.claimId) await selectClaim(data.bridge.claimId);
+  }catch(e){
+    toast(e.message||'Could not convert truth');
+  }
+}
+window.convertTruth=convertTruth;window.setMode=setMode;window.loadClaims=loadClaims;window.selectClaim=selectClaim;window.quickPressure=quickPressure;window.quickEvidence=quickEvidence;window.saveClaim=saveClaim;window.addCaseItem=addCaseItem;window.reportSelected=reportSelected;window.generateAIP=generateAIP;window.copyAIP=copyAIP;window.downloadJSON=downloadJSON;window.voteClaim=voteClaim;window.backToArena=backToArena;window.submitTruth=submitTruth;
 boot();
