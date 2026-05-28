@@ -121,7 +121,27 @@ async function getClaim(request, env, claimId) {
   const claim = await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(claimId).first();
   if (!claim) return json({ error: 'CLAIM_NOT_FOUND' }, 404);
 
-  const evidence = await env.DB.prepare(`SELECT e.*, u.handle FROM evidence e LEFT JOIN users u ON u.id=e.user_id WHERE e.claim_id=? ORDER BY e.created_at DESC`).bind(claimId).all();
+  const directEvidence = await env.DB.prepare(`
+  SELECT e.*, u.handle, 'direct' AS link_type
+  FROM evidence e
+  LEFT JOIN users u ON u.id=e.user_id
+  WHERE e.claim_id=?
+`).bind(claimId).all();
+
+const reusedEvidence = await env.DB.prepare(`
+  SELECT e.*, u.handle, l.stance AS linked_stance, l.link_note, 'reused' AS link_type
+  FROM evidence_claim_links l
+  JOIN evidence e ON e.id=l.evidence_id
+  LEFT JOIN users u ON u.id=e.user_id
+  WHERE l.claim_id=?
+`).bind(claimId).all();
+
+const evidence = {
+  results: [
+    ...(directEvidence.results || []),
+    ...(reusedEvidence.results || [])
+  ].sort((a,b)=>(b.created_at||0)-(a.created_at||0))
+};
 
   const pressure = await env.DB.prepare(`SELECT p.*, u.handle FROM pressure_points p LEFT JOIN users u ON u.id=p.user_id WHERE p.claim_id=? ORDER BY p.created_at DESC`).bind(claimId).all();
 
