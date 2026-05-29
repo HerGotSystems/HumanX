@@ -288,9 +288,61 @@ async function claimOnly(env, claimId) {
 
 async function claimDetail(env, claimId) {
   const claim = await claimOnly(env, claimId);
-  const evidence = await env.DB.prepare(`SELECT title,body,quality,source_url,stance FROM evidence WHERE claim_id=? ORDER BY created_at DESC`).bind(claimId).all();
-  const pressure = await env.DB.prepare(`SELECT title,body,severity FROM pressure_points WHERE claim_id=? ORDER BY created_at DESC`).bind(claimId).all();
-  return { claim, evidence: evidence.results || [], pressure: pressure.results || [] };
+
+  const directEvidence = await env.DB.prepare(`
+    SELECT
+      title,
+      body,
+      quality,
+      source_url,
+      stance,
+      'direct' AS link_type,
+      NULL AS linked_stance,
+      NULL AS link_note
+    FROM evidence
+    WHERE claim_id=?
+  `).bind(claimId).all();
+
+  const reusedEvidence = await env.DB.prepare(`
+    SELECT
+      e.title,
+      e.body,
+      e.quality,
+      e.source_url,
+      e.stance,
+      'reused' AS link_type,
+      l.stance AS linked_stance,
+      l.link_note
+    FROM evidence_claim_links l
+    JOIN evidence e ON e.id=l.evidence_id
+    WHERE l.claim_id=?
+  `).bind(claimId).all();
+
+  const evidence = [
+    ...(directEvidence.results || []),
+    ...(reusedEvidence.results || [])
+  ];
+
+  const pressure = await env.DB.prepare(`
+    SELECT title, body, severity
+    FROM pressure_points
+    WHERE claim_id=?
+    ORDER BY created_at DESC
+  `).bind(claimId).all();
+
+  const tests = await env.DB.prepare(`
+    SELECT title, instructions, safety_level, difficulty
+    FROM home_tests
+    WHERE claim_id=?
+    ORDER BY created_at DESC
+  `).bind(claimId).all();
+
+  return {
+    claim,
+    evidence,
+    pressure: pressure.results || [],
+    tests: tests.results || []
+  };
 }
 
 function buildAip(detail) {
