@@ -13,6 +13,24 @@ export async function convertTruthToClaim(request, env, helpers) {
     .bind(userId, `anon-${userId.slice(-6)}`, Date.now())
     .run();
 
+  const existing = await findExistingClaim(env, truthId, truth);
+  if (existing) {
+    return json({
+      ok: true,
+      existing: true,
+      truth: {
+        id: truth.id,
+        statement: truth.statement
+      },
+      claim: existing,
+      bridge: {
+        truthId,
+        claimId: existing.id,
+        linkId: existing.link_id || null
+      }
+    });
+  }
+
   const now = Date.now();
   const claimId = makeId('clm');
 
@@ -58,12 +76,19 @@ export async function convertTruthToClaim(request, env, helpers) {
     now
   ).run();
 
-  await env.DB.prepare(`UPDATE truths SET converted_claim_count=COALESCE(converted_claim_count,0)+1, updated_at=? WHERE id=?`).bind(now, truthId).run();
+  await env.DB.prepare(`
+    UPDATE truths
+    SET converted_claim_count=COALESCE(converted_claim_count,0)+1,
+        linked_claim_id=COALESCE(linked_claim_id, ?),
+        updated_at=?
+    WHERE id=?
+  `).bind(claimId, now, truthId).run();
 
   const claim = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(claimId).first();
 
   return json({
     ok: true,
+    existing: false,
     truth: {
       id: truth.id,
       statement: truth.statement
@@ -75,4 +100,33 @@ export async function convertTruthToClaim(request, env, helpers) {
       linkId
     }
   });
+}
+
+async function findExistingClaim(env, truthId, truth) {
+  if (truth.linked_claim_id) {
+    const linked = await env.DB.prepare(`SELECT *, NULL AS link_id FROM claims WHERE id=?`).bind(truth.linked_claim_id).first();
+    if (linked) return linked;
+  }
+
+  const linkedByTable = await env.DB.prepare(`
+    SELECT c.*, l.id AS link_id
+    FROM truth_claim_links l
+    JOIN claims c ON c.id=l.claim_id
+    WHERE l.truth_id=?
+    ORDER BY l.created_at ASC
+    LIMIT 1
+  `).bind(truthId).first();
+  if (linkedByTable) return linkedByTable;
+
+  const expectedClaim = `${truth.statement} — this statement reflects reality consistently enough to survive evidence and repeatable pressure testing.`;
+  const sameText = await env.DB.prepare(`
+    SELECT *, NULL AS link_id
+    FROM claims
+    WHERE claim=? AND type='Truth-Derived'
+    ORDER BY created_at ASC
+    LIMIT 1
+  `).bind(expectedClaim).first();
+  if (sameText) return sameText;
+
+  return null;
 }
