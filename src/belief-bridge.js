@@ -36,6 +36,7 @@ async function promoteToTruth(env, json, helpers, userId, snap, statement, body)
     return json({ ok: true, target: 'truth', existing: true, truth: mapTruth(row) });
   }
 
+  const linkedClaim = await findExistingClaim(env, statement);
   const id = makeId('tru');
   await env.DB.prepare(`
     INSERT INTO truths (
@@ -54,22 +55,20 @@ async function promoteToTruth(env, json, helpers, userId, snap, statement, body)
     confidenceLabel(snap),
     1,
     Number(snap.pressure_score || 0),
-    cleanId(body.linkedClaimId || body.linked_claim_id || ''),
+    cleanId(body.linkedClaimId || body.linked_claim_id || linkedClaim?.id || ''),
     now,
     now,
     'public'
   ).run();
 
   const row = await env.DB.prepare(`SELECT * FROM truths WHERE id=?`).bind(id).first();
-  return json({ ok: true, target: 'truth', existing: false, truth: mapTruth(row) });
+  return json({ ok: true, target: 'truth', existing: false, linkedClaimId: linkedClaim?.id || '', truth: mapTruth(row) });
 }
 
 async function promoteToClaim(env, json, helpers, userId, snap, statement, body) {
   const { cleanText, makeId } = helpers;
-  const normalized = normalizeClaim(statement);
   const now = Date.now();
-  const rows = await env.DB.prepare(`SELECT * FROM claims ORDER BY created_at DESC LIMIT 300`).all();
-  const existing = (rows.results || []).find(c => normalizeClaim(c.claim) === normalized);
+  const existing = await findExistingClaim(env, statement);
   if (existing) return json({ ok: true, target: 'claim', existing: true, claimId: existing.id, claim: mapClaim(existing) });
 
   const id = makeId('clm');
@@ -88,8 +87,18 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
     .bind(makeId('evd'), id, userId, 'support', 'testimony', 'Belief snapshot origin', cleanText(snap.summary || 'Claim created from a personal belief snapshot.', 1200), '', now)
     .run();
 
+  await env.DB.prepare(`UPDATE truths SET linked_claim_id=?, updated_at=? WHERE normalized_statement=? AND (linked_claim_id IS NULL OR linked_claim_id='')`)
+    .bind(id, now, normalize(statement))
+    .run();
+
   const row = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(id).first();
   return json({ ok: true, target: 'claim', existing: false, claimId: id, claim: mapClaim(row) });
+}
+
+async function findExistingClaim(env, statement) {
+  const normalized = normalizeClaim(statement);
+  const rows = await env.DB.prepare(`SELECT * FROM claims ORDER BY created_at DESC LIMIT 500`).all();
+  return (rows.results || []).find(c => normalizeClaim(c.claim) === normalized) || null;
 }
 
 function confidenceLabel(snap) {
