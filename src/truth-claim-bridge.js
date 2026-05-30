@@ -35,7 +35,7 @@ export async function convertTruthToClaim(request, env, helpers) {
   const claimId = makeId('clm');
 
   const generatedClaim = cleanText(
-    body.claim || `${truth.statement} — this statement reflects reality consistently enough to survive evidence and repeatable pressure testing.`,
+    body.claim || `${truth.statement} — X`,
     1200
   );
 
@@ -118,7 +118,7 @@ async function findExistingClaim(env, truthId, truth) {
   `).bind(truthId).first();
   if (linkedByTable) return linkedByTable;
 
-  const expectedClaim = `${truth.statement} — this statement reflects reality consistently enough to survive evidence and repeatable pressure testing.`;
+  const expectedClaim = `${truth.statement} — X`;
   const sameText = await env.DB.prepare(`
     SELECT *, NULL AS link_id
     FROM claims
