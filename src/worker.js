@@ -7,6 +7,7 @@ import { convertTruthToClaim } from './truth-claim-bridge.js';
 import { attachEvidenceToClaim } from './evidence-reuse.js';
 import { graphStatus } from './graph-status.js';
 import { addAnalysisResult, listAnalysisForClaim } from './analysis-results.js';
+import { saveBeliefSnapshot, listBeliefSnapshots } from './belief-snapshots.js';
 
 const CORS = {
   'access-control-allow-origin': '*',
@@ -50,6 +51,8 @@ export default {
       if (url.pathname === '/api/evidence-attach' && request.method === 'POST') return attachEvidenceToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
       if (url.pathname === '/api/graph-status' && request.method === 'GET') return graphStatus(request, env, { json });
       if (url.pathname === '/api/analysis' && request.method === 'POST') return addAnalysisResult(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
+      if (url.pathname === '/api/belief-snapshots' && request.method === 'GET') return listBeliefSnapshots(request, env, { json, requireUser });
+      if (url.pathname === '/api/belief-snapshots' && request.method === 'POST') return saveBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
       if (url.pathname.match(/^\/api\/claims\/[^/]+$/) && request.method === 'GET') return getClaim(request, env, url.pathname.split('/').pop());
       if (url.pathname === '/api/evidence' && request.method === 'POST') return addEvidence(request, env);
       if (url.pathname === '/api/pressure' && request.method === 'POST') return addPressure(request, env);
@@ -65,7 +68,7 @@ export default {
 };
 
 async function debugState(request, env) {
-  const tables = ['users', 'claims', 'evidence', 'pressure_points', 'reports', 'aip_packets', 'rate_limits', 'analysis_results'];
+  const tables = ['users', 'claims', 'evidence', 'pressure_points', 'reports', 'aip_packets', 'rate_limits', 'analysis_results', 'belief_snapshots'];
   const counts = {};
   for (const table of tables) {
     try {
