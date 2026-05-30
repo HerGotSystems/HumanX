@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>HumanX — Belief Engine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800;900&family=Inter:wght@400;500;600&display=swap');
+:root{
+  --bg:#07080d;--panel:#10131d;--panel2:#151a27;--line:#273044;
+  --text:#eef3ff;--muted:#8c97ad;--red:#ff3b5c;--green:#39ff9f;
+  --yellow:#ffd166;--blue:#57b8ff;--purple:#a066ff;--orange:#ff8c42;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',sans-serif;
+  background:radial-gradient(circle at 20% -10%,rgba(160,102,255,.2),transparent 35%),
+             radial-gradient(circle at 80% 5%,rgba(255,59,92,.15),transparent 30%),
+             linear-gradient(180deg,#07080d,#090b13);
+  color:var(--text);min-height:100vh;
+}
+button,input,select{font:inherit}
+.hidden{display:none!important}
+.screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+
+/* ── INTRO ── */
+#screen-intro{text-align:center}
+.intro-logo{
+  font-family:'Syne',sans-serif;font-size:11px;letter-spacing:.25em;
+  color:var(--red);text-transform:uppercase;margin-bottom:32px;
+  display:flex;align-items:center;gap:12px;justify-content:center;
+}
+.intro-logo::before,.intro-logo::after{content:'';flex:1;max-width:60px;height:1px;background:var(--red);opacity:.4}
+.intro-h1{
+  font-family:'Syne',sans-serif;font-size:clamp(52px,8vw,96px);
+  font-weight:900;letter-spacing:-4px;line-height:.9;margin-bottom:24px;
+  background:linear-gradient(135deg,#fff 40%,rgba(160,102,255,.7));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.intro-sub{font-size:18px;color:var(--muted);max-width:560px;line-height:1.6;margin-bottom:12px}
+.intro-hook{
+  font-family:'Syne',sans-serif;font-size:22px;color:var(--text);
+  margin-bottom:48px;letter-spacing:-.5px;
+}
+.intro-hook span{color:var(--red)}
+.intro-stats{
+  display:flex;gap:32px;justify-content:center;margin-bottom:48px;flex-wrap:wrap;
+}
+.intro-stat{text-align:center}
+.intro-stat b{display:block;font-family:'Syne',sans-serif;font-size:36px;color:var(--purple)}
+.intro-stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.btn-primary{
+  border:0;border-radius:20px;padding:18px 48px;font-family:'Syne',sans-serif;
+  font-size:18px;font-weight:900;letter-spacing:-.3px;cursor:pointer;
+  background:linear-gradient(135deg,var(--red),var(--purple));color:white;
+  box-shadow:0 0 40px rgba(255,59,92,.35);transition:transform .15s,box-shadow .15s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(255,59,92,.5)}
+.intro-note{font-size:12px;color:var(--muted);margin-top:16px;font-style:italic}
+.existing-result{
+  margin-top:24px;padding:12px 24px;border:1px solid var(--line);border-radius:14px;
+  background:rgba(87,184,255,.05);cursor:pointer;font-size:13px;color:var(--blue);
+}
+.existing-result:hover{background:rgba(87,184,255,.1)}
+
+/* ── IDENTITY ── */
+.id-wrap{width:100%;max-width:680px;margin:0 auto;padding:32px 24px}
+.id-skip-banner{
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(87,184,255,.06);border:1px solid rgba(87,184,255,.2);
+  border-radius:14px;padding:12px 18px;margin-bottom:32px;
+}
+.id-skip-banner span{font-size:13px;color:var(--blue)}
+.id-skip-btn{
+  border:1px solid rgba(87,184,255,.3);background:transparent;color:var(--blue);
+  border-radius:10px;padding:7px 16px;cursor:pointer;font-size:13px;white-space:nowrap;
+}
+.id-skip-btn:hover{background:rgba(87,184,255,.1)}
+.id-hero{margin-bottom:36px}
+.id-hero h2{font-family:'Syne',sans-serif;font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:8px}
+.id-hero p{color:var(--muted);font-size:15px;line-height:1.6}
+.id-section{margin-bottom:28px}
+.id-section-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:12px}
+.id-chips{display:flex;flex-wrap:wrap;gap:8px}
+.id-chip{
+  border:1px solid var(--line);background:#0a0d15;color:var(--muted);
+  border-radius:999px;padding:9px 16px;cursor:pointer;font-size:13px;
+  transition:all .15s;user-select:none;
+}
+.id-chip:hover{border-color:rgba(160,102,255,.4);color:var(--text)}
+.id-chip.active{
+  border-color:var(--purple);color:var(--purple);
+  background:rgba(160,102,255,.1);
+  box-shadow:0 0 0 1px rgba(160,102,255,.2) inset;
+}
+.id-chip.solo.active{border-color:var(--blue);color:var(--blue);background:rgba(87,184,255,.1)}
+.id-chip.god.active{border-color:var(--yellow);color:var(--yellow);background:rgba(255,209,102,.08)}
+.id-group{margin-bottom:20px}
+.id-group-label{
+  font-size:10px;text-transform:uppercase;letter-spacing:.14em;
+  color:rgba(160,102,255,.6);margin-bottom:8px;padding-left:2px;
+}
+.id-group-note{
+  font-size:11px;color:rgba(255,209,102,.6);font-style:italic;
+  margin-bottom:8px;padding-left:2px;
+}
+.id-section-divider{height:1px;background:rgba(255,255,255,.06);margin:24px 0}
+.god-count-section{
+  background:rgba(255,209,102,.04);border:1px solid rgba(255,209,102,.15);
+  border-radius:18px;padding:18px;margin-bottom:28px;
+}
+.god-count-title{
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+  color:var(--yellow);margin-bottom:4px;
+}
+.god-count-sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+.id-nav{display:flex;justify-content:flex-end;margin-top:8px}
+/* Info panel */
+.info-drawer{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:#0f1220;border-top:1px solid var(--line);
+  border-radius:24px 24px 0 0;padding:28px 28px 36px;
+  max-height:45vh;overflow-y:auto;
+  box-shadow:0 -12px 60px rgba(0,0,0,.7);
+  transform:translateY(100%);transition:transform .25s ease;
+}
+.info-drawer.open{transform:translateY(0)}
+.info-drawer-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.info-drawer-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;letter-spacing:-.5px;max-width:85%}
+.info-close{
+  border:1px solid var(--line);background:#0a0d15;color:var(--muted);
+  border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.info-close:hover{color:var(--text);border-color:rgba(255,255,255,.3)}
+.info-drawer-desc{font-size:14px;line-height:1.7;color:#b0bbd4}
+.info-backdrop{
+  position:fixed;inset:0;z-index:199;background:rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.info-backdrop.open{opacity:1;pointer-events:all}
+.chip-pair{display:inline-flex;align-items:center;gap:3px;margin:4px 3px}
+.chip-info-btn{
+  border:1px solid rgba(255,255,255,.08);background:transparent;
+  color:rgba(255,255,255,.28);border-radius:50%;width:18px;height:18px;
+  cursor:pointer;font-size:9px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;padding:0;transition:all .15s;
+}
+.chip-info-btn:hover{color:var(--blue);border-color:rgba(87,184,255,.45)}
+
+/* ── QUIZ ── */
+#screen-quiz{justify-content:flex-start;padding:0}
+.quiz-wrap{width:100%;max-width:760px;margin:0 auto;padding:24px}
+.progress-bar{height:3px;background:#1a2035;border-radius:999px;margin-bottom:24px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--purple));border-radius:999px;transition:width .4s ease}
+.cat-header{margin-bottom:28px}
+.cat-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.cat-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:900;letter-spacing:-1.5px;margin-bottom:6px}
+.cat-desc{color:var(--muted);font-size:14px}
+.q-list{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+.q-card{
+  background:rgba(16,19,29,.85);border:1px solid var(--line);
+  border-radius:20px;padding:20px 22px;
+  transition:border-color .2s;
+}
+.q-card.answered{border-color:rgba(87,184,255,.25)}
+.q-text{font-size:15px;line-height:1.55;margin-bottom:16px;color:#d0d8ef}
+.q-responses{display:flex;gap:8px}
+.resp-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:transparent;border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;padding:10px 4px;cursor:pointer;
+  color:var(--muted);font-size:10px;text-align:center;transition:all .15s;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.resp-btn:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.18)}
+.resp-dot{
+  width:12px;height:12px;border-radius:50%;border:2px solid currentColor;
+  transition:all .15s;
+}
+.resp-btn[data-val="-2"]{color:#ff3b5c}
+.resp-btn[data-val="-1"]{color:#ff7b3a}
+.resp-btn[data-val="0"] {color:#4a5568}
+.resp-btn[data-val="1"] {color:#57b8ff}
+.resp-btn[data-val="2"] {color:#39ff9f}
+.resp-btn.selected .resp-dot{background:currentColor;box-shadow:0 0 10px currentColor}
+.resp-btn.selected{background:rgba(255,255,255,.06);border-color:currentColor}
+/* Moral scenario choice cards */
+.scenario-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--yellow);margin-bottom:8px}
+.choice-grid{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.choice-btn{
+  background:#0a0d15;border:1px solid var(--line);border-radius:14px;
+  padding:12px 14px;cursor:pointer;text-align:left;color:#c8d0e0;font-size:13px;
+  line-height:1.4;transition:all .15s;
+}
+.choice-btn:hover{background:rgba(255,255,255,.04);border-color:#465575}
+.choice-btn.selected{
+  background:rgba(255,209,102,.07);border-color:rgba(255,209,102,.5);
+  color:var(--yellow);font-weight:600;
+}
+.quiz-nav{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-bottom:24px}
+.btn-nav{
+  border:1px solid var(--line);background:#0a0d15;color:var(--text);
+  border-radius:14px;padding:12px 24px;cursor:pointer;font-size:14px;
+}
+.btn-nav:hover{background:var(--panel2)}
+.btn-nav.primary{
+  background:linear-gradient(135deg,var(--red),var(--purple));
+  border:0;color:white;font-weight:700;
+  box-shadow:0 0 20px rgba(255,59,92,.3);
+}
+.answer-count{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* ── RESULTS ── */
+#screen-results{justify-content:flex-start;padding:0}
+.results-wrap{width:100%;max-width:960px;margin:0 auto;padding:32px 24px 64px}
+.results-hero{text-align:center;margin-bottom:48px}
+.results-hero h1{font-family:'Syne',sans-serif;font-size:clamp(36px,5vw,56px);font-weight:900;letter-spacing:-2px;margin-bottom:8px}
+.results-hero p{color:var(--muted);font-size:15px}
+.results-grid{display:grid;grid-template-columns:420px 1fr;gap:24px;align-items:start}
+.panel{background:rgba(16,19,29,.85);border:1px solid var(--line);border-radius:24px;padding:22px}
+.panel h2{font-family:'Syne',sans-serif;font-size:16px;margin-bottom:16px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+/* Radar */
+#radar-canvas{display:block;margin:0 auto}
+.dim-bars{display:flex;flex-direction:column;gap:10px}
+.dim-row{display:flex;align-items:center;gap:10px}
+.dim-name{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;width:110px;flex-shrink:0}
+.dim-bar{flex:1;height:6px;background:#1a2035;border-radius:999px;overflow:hidden}
+.dim-fill{height:100%;border-radius:999px;transition:width .6s ease}
+.dim-score{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);width:30px;text-align:right;flex-shrink:0}
+/* Alignments */
+.align-list{display:flex;flex-direction:column;gap:12px}
+.align-row{display:flex;flex-direction:column;gap:6px}
+.align-head{display:flex;justify-content:space-between;align-items:baseline}
+.align-name{font-size:14px;font-weight:600}
+.align-pct{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)}
+.align-desc{font-size:11px;color:var(--muted);line-height:1.4}
+.align-bar{height:5px;background:#1a2035;border-radius:999px;overflow:hidden}
+.align-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--blue))}
+/* Contradictions */
+.contra-list{display:flex;flex-direction:column;gap:12px}
+.contra-item{border-radius:14px;padding:14px 16px}
+.contra-item.critical{background:rgba(255,59,92,.1);border:1px solid rgba(255,59,92,.3)}
+.contra-item.high   {background:rgba(255,140,66,.08);border:1px solid rgba(255,140,66,.25)}
+.contra-item.moderate{background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.2)}
+.contra-item.low    {background:rgba(87,184,255,.05);border:1px solid rgba(87,184,255,.15)}
+.contra-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.contra-item.critical .contra-title{color:var(--red)}
+.contra-item.high    .contra-title{color:var(--orange)}
+.contra-item.moderate .contra-title{color:var(--yellow)}
+.contra-item.low     .contra-title{color:var(--blue)}
+.contra-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.no-contra{color:var(--muted);font-size:13px;font-style:italic}
+/* Profile summary */
+.dna-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  border-radius:999px;padding:7px 12px;font-size:12px;margin:4px;
+  border:1px solid var(--line);color:var(--text);background:#0d1020;
+}
+.dna-chip b{color:var(--purple)}
+/* Share */
+canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);background:#050507}
+.results-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn-action{
+  flex:1;min-width:140px;border:1px solid var(--line);background:#0a0d15;color:var(--text);
+  border-radius:13px;padding:11px;cursor:pointer;font-size:13px;text-align:center;
+}
+.btn-action:hover{background:var(--panel2)}
+.btn-action.primary{background:linear-gradient(135deg,var(--red),var(--purple));border:0;color:white;font-weight:700}
+/* Gap analysis */
+.gap-panel{margin-bottom:20px}
+.gap-declared{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.gap-declared strong{color:var(--purple)}
+.gap-row{margin-bottom:14px}
+.gap-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.gap-bars{display:flex;flex-direction:column;gap:4px}
+.gap-bar-row{display:flex;align-items:center;gap:8px}
+.gap-bar-label{font-size:10px;color:var(--muted);width:56px;flex-shrink:0;text-align:right}
+.gap-bar-track{flex:1;height:5px;background:#1a2035;border-radius:999px;overflow:hidden}
+.gap-bar-fill{height:100%;border-radius:999px}
+.gap-score{font-family:'DM Mono',monospace;font-size:10px;width:28px;text-align:right;flex-shrink:0}
+.gap-delta-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.gap-delta{border-radius:12px;padding:10px 14px;font-size:12px;line-height:1.5}
+.gap-delta.over {background:rgba(57,255,159,.07);border:1px solid rgba(57,255,159,.2);color:#a8ffd8}
+.gap-delta.under{background:rgba(255,59,92,.07);border:1px solid rgba(255,59,92,.2);color:#ffb3bf}
+.gap-summary{background:rgba(160,102,255,.07);border:1px solid rgba(160,102,255,.2);border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:var(--text);margin-top:16px}
+
+/* V5 forensic layers */
+.meta-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.meta-card{background:#0a0d15;border:1px solid var(--line);border-radius:14px;padding:12px}
+.meta-card b{display:block;font-family:'DM Mono',monospace;font-size:22px;margin-bottom:3px}
+.meta-card span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.meta-card p{font-size:11px;color:#aeb8cf;line-height:1.45;margin-top:6px}
+.forensic-block{border-left:2px solid var(--purple);padding:10px 12px;background:rgba(160,102,255,.055);border-radius:0 12px 12px 0;margin-bottom:10px}
+.forensic-block h3{font-size:12px;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.forensic-block p{font-size:13px;color:#c9d2e8;line-height:1.55}
+.stress-row{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;background:#0a0d15}
+.stress-title{font-size:13px;font-weight:700;margin-bottom:5px}.stress-choice{font-size:12px;color:var(--muted);line-height:1.5}
+.constellation{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}.node-pill{border:1px solid var(--line);border-radius:999px;padding:8px 10px;font-size:11px;text-align:center;background:#0a0d15;color:#b5bfd5}.node-pill.hot{border-color:rgba(255,59,92,.55);color:#ff9bad;box-shadow:0 0 20px rgba(255,59,92,.12)}.node-pill.calm{border-color:rgba(57,255,159,.35);color:#9fffd2}
+.timeline-list{display:flex;flex-direction:column;gap:8px}.timeline-item{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:10px;background:#0a0d15}.timeline-age{font-family:'DM Mono',monospace;color:var(--yellow);font-size:11px;width:72px;flex-shrink:0}.timeline-text{font-size:12px;color:#c5cee3;line-height:1.45}
+@media(max-width:800px){.meta-grid{grid-template-columns:1fr}.constellation{grid-template-columns:repeat(2,1fr)}}
+/* Behavioral prediction layer */
+.behav-intro{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:16px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:12px;border-left:3px solid var(--line)}
+.behav-row{margin-bottom:18px}
+.behav-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.behav-label{font-size:13px;color:var(--text);font-weight:600}
+.behav-right{display:flex;align-items:center;gap:8px}
+.behav-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+.behav-tag{font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:999px;font-weight:700}
+.behav-bar{height:6px;background:#1a2035;border-radius:999px;overflow:hidden;margin-bottom:6px}
+.behav-fill{height:100%;border-radius:999px}
+.behav-desc{font-size:12px;color:var(--muted);line-height:1.5}
+/* Badge CSS */
+.badge{font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:5px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);display:inline-block}
+.b-green{color:#39ff9f;border-color:rgba(57,255,159,.4);background:rgba(57,255,159,.07)}
+.b-red{color:var(--red);border-color:rgba(255,59,92,.4);background:rgba(255,59,92,.07)}
+.b-blue{color:var(--blue);border-color:rgba(87,184,255,.4);background:rgba(87,184,255,.07)}
+.b-yellow{color:var(--yellow);border-color:rgba(255,209,102,.4);background:rgba(255,209,102,.07)}
+.b-purple{color:var(--purple);border-color:rgba(160,102,255,.4);background:rgba(160,102,255,.07)}
+/* Timeline scored section */
+/* Timeline screen */
+.timeline-wrap{width:100%;max-width:680px;margin:0 auto;padding:32px 24px}
+.timeline-intro{margin-bottom:36px}
+.timeline-intro h2{font-family:'Syne',sans-serif;font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:10px}
+.timeline-intro p{color:var(--muted);font-size:15px;line-height:1.6}
+.timeline-era{background:rgba(16,19,29,.85);border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin-bottom:14px}
+.timeline-era-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--yellow);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+.timeline-q{font-size:14px;color:#d0d8ef;margin-bottom:7px;line-height:1.4}
+.timeline-input{
+  width:100%;background:#080b12;border:1px solid var(--line);border-radius:12px;
+  color:var(--text);padding:10px 12px;font-size:13px;resize:vertical;min-height:52px;
+  outline:none;line-height:1.5;
+}
+.timeline-input:focus{border-color:rgba(255,209,102,.4)}
+.timeline-fear-section{
+  background:rgba(255,59,92,.05);border:1px solid rgba(255,59,92,.18);
+  border-radius:20px;padding:20px 22px;margin-bottom:20px;
+}
+.timeline-fear-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--red);margin-bottom:14px}
+/* Fragmentation */
+.frag-bars{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.frag-row{display:flex;align-items:center;gap:10px}
+.frag-name{font-size:12px;color:var(--text);flex:1}
+.frag-pct-bar{width:120px;height:6px;background:#1a2035;border-radius:999px;overflow:hidden;flex-shrink:0}
+.frag-pct-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--blue))}
+.frag-pct-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);width:30px;text-align:right;flex-shrink:0}
+.frag-summary{font-size:13px;color:var(--muted);line-height:1.55;margin-top:12px;font-style:italic}
+/* Timeline result display */
+.tl-result{display:flex;flex-direction:column;gap:8px}
+.tl-result-item{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:#0a0d15;border:1px solid var(--line);border-radius:12px}
+.tl-age{font-family:'DM Mono',monospace;color:var(--yellow);font-size:11px;min-width:70px;flex-shrink:0;padding-top:1px}
+.tl-text{font-size:13px;color:#c5cee3;line-height:1.5}
+.tl-fear{background:rgba(255,59,92,.07);border-color:rgba(255,59,92,.25)}
+.tl-fear .tl-age{color:var(--red)}
+
+
+/* V10 compact results + profile modes */
+.mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.mode-card{border:1px solid var(--line);background:#0a0d15;border-radius:16px;padding:13px 14px;cursor:pointer;transition:all .15s}
+.mode-card:hover{border-color:rgba(160,102,255,.4);background:#10131d}
+.mode-card.active{border-color:var(--purple);box-shadow:0 0 0 1px rgba(160,102,255,.25) inset;background:rgba(160,102,255,.08)}
+.mode-card b{display:block;font-size:13px;color:var(--text);margin-bottom:4px}
+.mode-card span{font-size:11px;color:var(--muted);line-height:1.4;display:block}
+.mode-note{font-size:12px;color:var(--muted);line-height:1.55;margin-top:10px;background:rgba(87,184,255,.045);border:1px solid rgba(87,184,255,.14);border-radius:12px;padding:10px 12px}
+.results-wrap{max-width:1180px}
+.results-overview{display:grid;grid-template-columns:390px 1fr;gap:20px;margin-bottom:20px;align-items:start}
+.results-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-bottom:20px;align-items:start}
+.results-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+.compact-panel{padding:18px}
+.compact-scroll{max-height:360px;overflow:auto;padding-right:4px}
+.panel details{border-top:1px solid rgba(255,255,255,.06);padding-top:12px;margin-top:12px}
+.panel summary{cursor:pointer;color:var(--blue);font-size:13px;font-weight:700;list-style:none}
+.panel summary::-webkit-details-marker{display:none}
+.mode-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#0a0d15;border-radius:999px;padding:6px 10px;font-size:11px;color:var(--muted);margin-top:10px}
+.mode-pill strong{color:var(--purple)}
+@media(max-width:950px){.results-overview,.results-stack,.results-details{grid-template-columns:1fr}.mode-grid{grid-template-columns:1fr}.compact-scroll{max-height:none}}
+
+@media(max-width:800px){
+  .results-grid{grid-template-columns:1fr}
+  .q-responses{flex-wrap:wrap}
+  .resp-btn{min-width:calc(20% - 8px)}
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="screen-intro" class="screen">
+  <div class="intro-logo">HumanX</div>
+  <div class="intro-h1">Belief<br/>Engine</div>
+  <p class="intro-sub">Most people do not actually know what they believe. They know what they were told. They know what their group believes. They know what sounds correct.</p>
+  <p class="intro-hook">This exposes the <span>actual architecture</span>.</p>
+  <div class="intro-stats">
+    <div class="intro-stat"><b>77</b><span>Statements</span></div>
+    <div class="intro-stat"><b>19</b><span>Dimensions</span></div>
+    <div class="intro-stat"><b>15</b><span>Archetypes</span></div>
+    <div class="intro-stat"><b>36</b><span>Contradictions Checked</span></div>
+  </div>
+  <button class="btn-primary" onclick="startQuiz()">Begin Mapping</button>
+  <p class="intro-note">No correct answers. No religion assigned. ~12 minutes.<br/>
+  <span style="color:rgba(87,184,255,.7)">Stored in this browser only. Nothing leaves your device unless you export it.</span></p>
+  <div id="existing-btn" class="existing-result hidden" onclick="showResults()">
+    ↩ View previous results
+  </div>
+</div>
+
+<!-- IDENTITY (optional) -->
+<div id="screen-identity" class="screen hidden">
+  <div class="id-wrap">
+    <div class="id-skip-banner">
+      <span>Everything here is optional. None of it is required.</span>
+      <button class="id-skip-btn" onclick="skipIdentity()">Skip all of this →</button>
+    </div>
+    <div class="id-hero">
+      <h2>Before you start —</h2>
+      <p>What do you currently think you are? This creates a before/after comparison. Skip anything. Pick as many or as few as you want. Nothing locked in.</p>
+    </div>
+
+    <div class="id-section">
+      <div class="id-section-label">What you believe — pick everything that fits, or nothing</div>
+      <div id="chips-worldview"></div>
+    </div>
+
+    <div class="id-section-divider"></div>
+
+    <div class="god-count-section">
+      <div class="god-count-title">The God Question</div>
+      <div class="god-count-sub">How many gods exist? Pick one, or skip.</div>
+      <div class="id-chips" id="chips-godcount"></div>
+    </div>
+
+    <div class="id-section">
+      <div class="id-section-label">Political leaning — or skip entirely</div>
+      <div class="id-chips" id="chips-political"></div>
+    </div>
+
+    <div class="id-section">
+      <div class="id-section-label">How settled are your beliefs right now?</div>
+      <div class="id-chips" id="chips-settled"></div>
+    </div>
+
+    <div class="id-section">
+      <div class="id-section-label">Run mode — this controls what gets saved</div>
+      <div class="mode-grid" id="profile-mode-grid">
+        <div class="mode-card active" data-mode="main" onclick="setProfileMode('main')"><b>Main Profile</b><span>Saves as your current character/profile. Use when you mean it.</span></div>
+        <div class="mode-card" data-mode="sandbox" onclick="setProfileMode('sandbox')"><b>Sandbox Test</b><span>Experiment freely. Does not overwrite your main profile.</span></div>
+        <div class="mode-card" data-mode="anonymous" onclick="setProfileMode('anonymous')"><b>Anonymous Voice</b><span>Local result only. Excluded from public/aggregate charts.</span></div>
+      </div>
+      <div class="mode-note">One person can test many masks. Only a verified main profile should count as one real voice in HumanX charts.</div>
+    </div>
+
+    <div class="id-nav">
+      <button class="btn-primary" style="padding:14px 36px;font-size:16px" onclick="confirmIdentity()">Start the test →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIMELINE (optional) -->
+<div id="screen-timeline" class="screen hidden">
+  <div class="timeline-wrap">
+    <div class="id-skip-banner">
+      <span>Optional. Skip any question or all of it.</span>
+      <button class="id-skip-btn" onclick="skipTimeline()">Skip →</button>
+    </div>
+    <div class="timeline-intro">
+      <h2>Belief Timeline</h2>
+      <p>Most analysis treats beliefs as static. Yours aren't. Three quick scored questions, then your own words. All optional.</p>
+    </div>
+
+    <div class="timeline-era" style="background:rgba(160,102,255,.05);border-color:rgba(160,102,255,.2)">
+      <div class="timeline-era-label" style="color:var(--purple)">Scored questions</div>
+      <div id="tl-scored-qs"></div>
+    </div>
+    <div class="timeline-era">
+      <div class="timeline-era-label">Childhood — roughly age 8–12</div>
+      <div class="timeline-q">What did you most strongly believe about the world, death, or meaning?</div>
+      <textarea class="timeline-input" id="tl-child-belief" placeholder="e.g. God existed and watched over me / death was very far away / the world was basically fair..."></textarea>
+    </div>
+    <div class="timeline-era">
+      <div class="timeline-era-label">Teenage years — roughly 13–18</div>
+      <div class="timeline-q">What happened to those beliefs?</div>
+      <textarea class="timeline-input" id="tl-teen-change" placeholder="What broke, collapsed, hardened, or shifted?"></textarea>
+    </div>
+    <div class="timeline-era">
+      <div class="timeline-era-label">Early adulthood — roughly 18–25</div>
+      <div class="timeline-q">What did you consciously construct or choose?</div>
+      <textarea class="timeline-input" id="tl-adult-belief" placeholder="What did you rebuild, pick up, or decide for yourself?"></textarea>
+    </div>
+    <div class="timeline-era">
+      <div class="timeline-era-label">Biggest single shift — any age</div>
+      <div class="timeline-q">What was the single largest change in what you believe? What triggered it?</div>
+      <textarea class="timeline-input" id="tl-biggest" placeholder="A person, book, event, loss, experience, conversation..."></textarea>
+    </div>
+    <div class="timeline-fear-section">
+      <div class="timeline-fear-label">The hard questions</div>
+      <div class="timeline-q" style="margin-bottom:10px">What belief are you afraid might actually be true?</div>
+      <textarea class="timeline-input" id="tl-fear-true" placeholder="The thing you avoid examining too closely..."></textarea>
+      <div class="timeline-q" style="margin-top:14px;margin-bottom:10px">What belief, if you held it publicly, would most isolate you from people you care about?</div>
+      <textarea class="timeline-input" id="tl-isolate" placeholder=""></textarea>
+      <div class="timeline-q" style="margin-top:14px;margin-bottom:10px">What belief, if it turned out to be false, would feel like losing yourself?</div>
+      <textarea class="timeline-input" id="tl-identity" placeholder=""></textarea>
+    </div>
+    <div class="id-nav">
+      <button class="btn-primary" style="padding:14px 36px;font-size:16px" onclick="finishQuiz()">See Full Report →</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen hidden">
+  <div class="quiz-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="cat-header">
+      <div class="cat-num" id="cat-num"></div>
+      <div class="cat-title" id="cat-title"></div>
+      <div class="cat-desc" id="cat-desc"></div>
+    </div>
+    <div class="q-list" id="questions-list"></div>
+    <div class="quiz-nav">
+      <button class="btn-nav" id="btn-back" onclick="prevCat()">← Back</button>
+      <span class="answer-count" id="answer-count"></span>
+      <button class="btn-nav primary" id="btn-next" onclick="nextCat()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen hidden">
+  <div class="results-wrap dashboard-wrap">
+    <div class="results-hero dashboard-hero">
+      <h1>Your Belief Architecture</h1>
+      <p id="results-tagline"></p>
+    </div>
+
+    <div class="results-dashboard">
+      <section class="panel compact-panel dash-card visual-card">
+        <h2>Worldview Radar</h2>
+        <canvas id="radar-canvas" width="360" height="360"></canvas>
+        <div id="result-mode-pill" class="mode-pill"></div>
+      </section>
+
+      <section class="panel compact-panel dash-card visual-card">
+        <h2>Contradiction Constellation</h2>
+        <canvas id="constellation-canvas" width="320" height="320" style="display:block;margin:0 auto"></canvas>
+        <div id="constellation-legend" style="margin-top:10px"></div>
+      </section>
+
+      <section class="panel compact-panel dash-card span-2 snapshot-card">
+        <h2>Profile Snapshot</h2>
+        <div class="snapshot-grid">
+          <div class="snapshot-section snapshot-dna">
+            <h3>Belief DNA</h3>
+            <div id="dna-chips"></div>
+          </div>
+          <div class="snapshot-section">
+            <h3>Identity Fragmentation</h3>
+            <div id="frag-panel"></div>
+          </div>
+          <div class="snapshot-section snapshot-archetypes">
+            <h3>Top Archetypes</h3>
+            <div class="align-list compact-scroll small-scroll" id="align-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel compact-panel dash-card span-2">
+        <h2>Core Dimensions</h2>
+        <div class="dim-bars" id="dim-bars"></div>
+      </section>
+
+      <section class="panel compact-panel dash-card span-2">
+        <h2>Psychological Dimensions</h2>
+        <div class="dim-bars" id="forensic-dim-bars"></div>
+        <p class="panel-note">These reflect belief structure — where beliefs came from and how they're held — not what they are.</p>
+      </section>
+
+      <section class="panel compact-panel dash-card">
+        <h2>Forensic Meta-Scores</h2>
+        <div class="meta-grid meta-grid-compact" id="meta-grid"></div>
+      </section>
+
+      <section class="panel compact-panel dash-card">
+        <h2>Behavioral Profile</h2>
+        <div id="behavior-panel" class="compact-scroll behavior-scroll"></div>
+      </section>
+
+      <section class="panel compact-panel dash-card">
+        <h2>Belief Origin Load</h2>
+        <div id="origin-report" class="compact-scroll detail-scroll"></div>
+      </section>
+
+      <section class="panel compact-panel dash-card">
+        <h2>Stress Test Readout</h2>
+        <div id="stress-report" class="compact-scroll detail-scroll"></div>
+      </section>
+
+      <div id="gap-panel-wrap" class="dash-insert span-2"></div>
+
+      <section class="panel compact-panel dash-card span-2">
+        <h2>Contradiction Scan</h2>
+        <div class="contra-list compact-scroll contradiction-scroll" id="contra-list"></div>
+      </section>
+
+      <div id="timeline-result-panel" class="dash-insert span-2"></div>
+
+      <section class="panel compact-panel dash-card span-2 share-panel">
+        <h2>Share Card</h2>
+        <canvas id="share-canvas" width="900" height="500"></canvas>
+        <div class="results-actions">
+          <button class="btn-action" onclick="downloadShare()">Download PNG</button>
+          <button class="btn-action" onclick="copyShareText()">Copy Summary</button>
+          <button class="btn-action" onclick="retake()">Retake</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="info-backdrop" id="info-backdrop" onclick="closeInfo()"></div>
+<div class="info-drawer" id="info-drawer">
+  <div class="info-drawer-head">
+    <div class="info-drawer-name" id="info-drawer-name"></div>
+    <button class="info-close" onclick="closeInfo()">✕</button>
+  </div>
+  <div class="info-drawer-desc" id="info-drawer-desc"></div>
+</div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+
+const CATEGORIES = [
+  {label:'Reality & Existence',   desc:'What is real? What exists beyond what you can touch?'},
+  {label:'Truth & Evidence',      desc:'How do you decide what is true?'},
+  {label:'Authority & Order',     desc:'Who or what should be obeyed — and why?'},
+  {label:'Morality & Ethics',     desc:'What is right? Where do moral rules come from?'},
+  {label:'Spirituality & Sacred', desc:'What exists beyond the physical world?'},
+  {label:'Society & Civilisation',desc:'How should humans live together?'},
+  {label:'Death & Meaning',       desc:'What happens after? Why does anything matter?'},
+  {label:'Self & Belief',         desc:'What do you actually believe — and how did you get there?'},
+  {label:'Belief Origins',       desc:'Where did the belief come from: choice, tribe, pain, study, fear, or accident?'},
+  {label:'Certainty vs Understanding', desc:'How much of your confidence is earned, borrowed, or emotionally protected?'},
+  {label:'Moral Stress Tests',   desc:'Abstract morality is cheap. Tradeoffs expose the operating system.'},
+];
+
+const RESP_LABELS = ['Strongly\nDisagree','Disagree','Neutral','Agree','Strongly\nAgree'];
+
+// Core 9 — used for radar, alignment comparison, gap analysis, fragmentation
+const DIMS = [
+  {k:'META',label:'Metaphysical',   color:'#a066ff', desc:'Openness to non-physical explanations of reality'},
+  {k:'EVID',label:'Evidence',       color:'#57b8ff', desc:'Reliance on empirical and testable truth'},
+  {k:'AUTH',label:'Authority',      color:'#ff8c42', desc:'Deference to hierarchy, tradition, and external power'},
+  {k:'COLL',label:'Collective',     color:'#ffd166', desc:'Priority of group over individual'},
+  {k:'RITE',label:'Sacred/Ritual',  color:'#ff3b5c', desc:'Weight given to ritual, sacred objects, and spiritual practice'},
+  {k:'ABSO',label:'Absolutism',     color:'#ff7b3a', desc:'Belief in fixed, universal moral truths'},
+  {k:'RIGD',label:'Rigidity',       color:'#8c97ad', desc:'Resistance to changing core beliefs'},
+  {k:'PROG',label:'Progress',       color:'#39ff9f', desc:'Optimism about human and technological advancement'},
+  {k:'TRAN',label:'Transcendence',  color:'#c084fc', desc:'Need for meaning that extends beyond the material world'},
+];
+
+// Forensic 10 — psychological / structural layer, not mapped against external traditions
+const FORENSIC_DIMS = [
+  {k:'INHR',label:'Inherited',       color:'#f59e0b', desc:'Beliefs absorbed before conscious examination — family, culture, place'},
+  {k:'SELF',label:'Self-Built',      color:'#22d3ee', desc:'Beliefs deliberately assembled through study, testing, and revision'},
+  {k:'TRIB',label:'Tribal Load',     color:'#fb7185', desc:'Belief dependence on community belonging and group identity'},
+  {k:'PAIN',label:'Pain Architecture',color:'#ef4444',desc:'Beliefs organised around suffering, threat, betrayal, or survival need'},
+  {k:'EXPR',label:'Experience',      color:'#34d399', desc:'Weight given to direct personal experience over argument'},
+  {k:'DOGM',label:'Dogma Load',      color:'#f97316', desc:'Certainty exceeding demonstrated study or willingness to revise'},
+  {k:'OPEN',label:'Revision Openness',color:'#60a5fa',desc:'Capacity to doubt, update, and metabolise opposing arguments'},
+  {k:'FUSE',label:'Identity Fusion', color:'#e879f9', desc:'How much belief is fused with selfhood and social survival'},
+  {k:'HUMI',label:'Epistemic Humility',color:'#a7f3d0',desc:'Recognition of uncertainty and the limits of one\'s own understanding'},
+  {k:'STRS',label:'Stress Ethics',   color:'#facc15', desc:'How moral principles hold under real consequence and pressure'},
+];
+
+// All dims for scoring — both sets
+const ALL_DIMS = [...DIMS, ...FORENSIC_DIMS];
+
+// ─── IDENTITY OPTIONS ─────────────────────────────────────────────────────────
+// Worldview groups — fringe first, big religions last (scroll to find them)
+const WORLDVIEW_GROUPS = [
+  {
+    group:'Fringe & speculative',
+    note:'Yes, all of these are real belief systems people actually hold.',
+    options:[
+      {label:'Ancient aliens built civilisation',
+       desc:"Pyramids, Stonehenge, Nazca lines, and other ancient engineering were built or assisted by extraterrestrials. Humans at the time weren't capable — or at least that's the claim. Mainstream archaeology disagrees entirely. Largely popularised by Erich von Däniken's 'Chariots of the Gods' (1968). Still sells millions of books.",
+       dims:{META:88,EVID:6,AUTH:40,COLL:40,RITE:30,ABSO:55,RIGD:68,PROG:32,TRAN:62}},
+      {label:'Simulation theory (literal belief)',
+       desc:"Physical reality is a computed simulation running on some hardware outside our observable universe. Nick Bostrom formalised it in 2003. If advanced civilisations can run ancestor simulations, the ratio of simulated to real minds is astronomically high. Provides no testable predictions. Can't be falsified, which is exactly why some physicists take it seriously.",
+       dims:{META:92,EVID:32,AUTH:15,COLL:30,RITE:10,ABSO:25,RIGD:42,PROG:55,TRAN:52}},
+      {label:'Flat Earth',
+       desc:"The Earth is a flat disc, not a sphere. Antarctica is an ice wall around the perimeter. Gravity doesn't exist — the disc accelerates upward. NASA, airlines, navies, and every space agency in history are understood to be coordinating a globe deception — a conspiracy requiring silence from millions of professionals across mutually hostile nations for over five centuries.",
+       dims:{META:62,EVID:4,AUTH:72,COLL:62,RITE:20,ABSO:78,RIGD:92,PROG:8,TRAN:32}},
+      {label:'Astrology as literal truth',
+       desc:"The positions of planets and stars at the moment of your birth determine personality traits, life patterns, and tendencies. Not as metaphor or poetry — as a literal causal mechanism. The Sun is 150 million kilometres away and Jupiter is a gas giant, but their precise positions when you were born shape who you are. No controlled study has confirmed a mechanism.",
+       dims:{META:82,EVID:8,AUTH:28,COLL:48,RITE:68,ABSO:48,RIGD:58,PROG:22,TRAN:72}},
+      {label:'Crystals / energy healing',
+       desc:"Certain minerals emit, amplify, or channel energy fields that affect human biology and consciousness. Amethyst for calm. Rose quartz for love. Clear quartz as an amplifier. Not metaphorical — the crystals are doing something physical. The mechanism is described as 'vibrations' or 'frequencies'. No controlled study has confirmed any effect beyond placebo.",
+       dims:{META:88,EVID:6,AUTH:18,COLL:42,RITE:82,ABSO:32,RIGD:48,PROG:28,TRAN:82}},
+      {label:'Law of attraction / manifesting',
+       desc:"Your thoughts generate frequencies that attract matching circumstances. Visualise success and the universe delivers it. Visualise illness and you summon it. Popularised by 'The Secret' (2006). The theological implication — that poverty and suffering are partly the result of negative thinking by the people suffering — is rarely addressed directly.",
+       dims:{META:82,EVID:8,AUTH:18,COLL:32,RITE:62,ABSO:38,RIGD:48,PROG:52,TRAN:72}},
+      {label:'Conspiracy spirituality (Icke etc)',
+       desc:"The world is secretly controlled by hidden elites who are reptilian, Satanic, extraterrestrial, or some combination. Spiritual awakening and political awakening are the same process. David Icke, QAnon, and similar frameworks blend political conspiracy with mystical cosmology — the 'Great Awakening' is both a spiritual and geopolitical event.",
+       dims:{META:78,EVID:6,AUTH:12,COLL:35,RITE:38,ABSO:72,RIGD:82,PROG:12,TRAN:55}},
+      {label:'Near-death experiences as proof',
+       desc:"People clinically dead and then revived consistently report tunnels, bright light, deceased relatives, life review, and sometimes verified observations made while unconscious. This pattern, across cultures, is evidence that consciousness survives bodily death. Sceptics attribute it to oxygen deprivation, neurological shutdown, and the brain constructing familiar imagery under extreme stress.",
+       dims:{META:85,EVID:22,AUTH:28,COLL:42,RITE:45,ABSO:52,RIGD:55,PROG:38,TRAN:85}},
+    ]
+  },
+  {
+    group:'Occult & esoteric',
+    options:[
+      {label:'Satanism (LaVeyan / atheistic)',
+       desc:"Anton LaVey's Church of Satan (founded 1966) uses Satan as a symbol of individualism, carnal pleasure, and rejection of herd morality — not an actual supernatural being. Atheistic at its core: you are your own god. Emphasises self-interest, rejection of altruism as a moral duty, and contempt for weakness. More Nietzsche than Dante.",
+       dims:{META:28,EVID:62,AUTH:4,COLL:10,RITE:62,ABSO:42,RIGD:38,PROG:58,TRAN:22}},
+      {label:'Luciferianism',
+       desc:"Lucifer as the light-bringer — symbol of enlightenment, knowledge, and the refusal to submit to divine authority. Distinct from LaVeyan Satanism. Can be theistic (Lucifer as an actual entity) or philosophical. Emphasises self-deification, gnosis, and the left-hand path. The fall from heaven was an act of liberation, not disobedience.",
+       dims:{META:55,EVID:45,AUTH:8,COLL:12,RITE:68,ABSO:42,RIGD:42,PROG:62,TRAN:58}},
+      {label:'Hermeticism / Kabbalah',
+       desc:"Jewish mysticism (Kabbalah's Tree of Life, ten divine emanations called Sefirot) combined with Hermetic philosophy ('As above, so below — as within, so without'). Reality has a hidden mathematical-spiritual structure accessible to the initiated. Enormously influential on Western occultism, Freemasonry, and Renaissance thought. The Zohar is the central Kabbalistic text.",
+       dims:{META:92,EVID:22,AUTH:35,COLL:35,RITE:82,ABSO:58,RIGD:52,PROG:32,TRAN:92}},
+      {label:'Gnosticism',
+       desc:"The material world was created by a flawed or evil secondary god (the Demiurge), not the highest, unknowable God. Humans contain a divine spark imprisoned in matter. Salvation comes through gnosis — direct experiential knowledge of one's true divine nature, not faith in a creed. Declared heresy by proto-orthodox Christianity in the 4th century. Still practiced.",
+       dims:{META:90,EVID:18,AUTH:22,COLL:28,RITE:72,ABSO:62,RIGD:52,PROG:28,TRAN:94}},
+      {label:'Theosophy / Anthroposophy',
+       desc:"Helena Blavatsky's Theosophy (1875) synthesises Eastern and Western esoteric traditions: root races, astral planes, akashic records, cosmic evolution of consciousness. Rudolf Steiner's Anthroposophy is an offshoot. Highly influential on New Age thought, Waldorf education, and early 20th-century European spiritualism. Much of what people call 'New Age' traces directly back here.",
+       dims:{META:92,EVID:18,AUTH:42,COLL:38,RITE:72,ABSO:58,RIGD:55,PROG:38,TRAN:92}},
+      {label:'Wicca',
+       desc:"Modern pagan witchcraft developed in 1950s Britain by Gerald Gardner. Worships a Horned God and a Triple Goddess. Works with seasonal cycles (the Wheel of the Year) and natural energies through ritual magic. 'An it harm none, do what ye will' is the central ethical principle. Largely reconstructed and invented — the 'ancient tradition' claim is historically dubious, the practice is genuine.",
+       dims:{META:82,EVID:18,AUTH:18,COLL:58,RITE:92,ABSO:35,RIGD:35,PROG:45,TRAN:82}},
+      {label:'Chaos magick',
+       desc:"Magic works because belief itself is the active ingredient — any system works if you commit to it. Therefore: invent your own system, use corporate logos as sigils, borrow from Crowley one day and the Simpsons the next. Reality is more plastic than it appears. Works ironically if you decide that's funnier. The most postmodern religion that actually functions as a religion.",
+       dims:{META:72,EVID:35,AUTH:5,COLL:18,RITE:75,ABSO:8,RIGD:15,PROG:52,TRAN:65}},
+    ]
+  },
+  {
+    group:'Neo-pagan & reconstructed polytheism',
+    options:[
+      {label:'Asatru / Norse paganism',
+       desc:"Worship of the Norse gods — Odin, Thor, Freya, Loki, Tyr, and others. Reconstructed from medieval Icelandic sources (the Eddas) and archaeological evidence. Emphasises honour, courage, community, and fate (wyrd). Some practitioners emphasise ethnic Norse heritage, which has created serious political tension within the community around far-right appropriation.",
+       dims:{META:70,EVID:22,AUTH:58,COLL:68,RITE:82,ABSO:58,RIGD:58,PROG:32,TRAN:72}},
+      {label:'Hellenism (Greek gods, literally)',
+       desc:"Actual worship of the ancient Greek gods — Zeus, Athena, Aphrodite, Apollo, Hephaestus, and the rest. Not as metaphor or cultural heritage. The gods are real divine beings who can be petitioned, appeased, and angered. Reconstructed from ancient texts, art, and inscription evidence. Officially recognised as a religion in Greece since 2017.",
+       dims:{META:72,EVID:22,AUTH:45,COLL:52,RITE:82,ABSO:52,RIGD:48,PROG:32,TRAN:72}},
+      {label:'Kemetic (Egyptian) religion',
+       desc:"Worship of the ancient Egyptian gods — Ra, Osiris, Isis, Anubis, Thoth, Sekhmet, Set, and many more. Reconstructed from hieroglyphic texts and temple records. The gods are real divine principles present in nature and human life. Ma'at — truth, justice, and cosmic balance — is the central ethical concept. The afterlife involves weighing your heart against a feather.",
+       dims:{META:74,EVID:22,AUTH:58,COLL:55,RITE:88,ABSO:58,RIGD:52,PROG:32,TRAN:78}},
+      {label:'Druidry',
+       desc:"Modern reconstruction (and partly invention) of the beliefs and practices of the pre-Roman Celtic priest class. Practices vary widely: some focus on nature spirituality and seasonal ceremony, others on philosophical approach to life, others on polytheism. The ancient Druids left no written records, so reconstruction involves significant creative gap-filling. Stonehenge at solstice is the image.",
+       dims:{META:78,EVID:22,AUTH:28,COLL:62,RITE:88,ABSO:42,RIGD:42,PROG:28,TRAN:82}},
+      {label:'Celticism / general pagan',
+       desc:"Reconstructed or inspired Celtic and European pre-Christian religion without the specific structure of Druidry or Wicca. Nature as sacred. Seasonal cycles as religious calendar. Multiple gods with personality and domain. Animism often present. A broad umbrella that's more about orientation than doctrine.",
+       dims:{META:80,EVID:20,AUTH:25,COLL:60,RITE:87,ABSO:40,RIGD:40,PROG:30,TRAN:80}},
+      {label:'Roman reconstructionism',
+       desc:"Worship of the Roman state religion — Jupiter, Juno, Mars, Venus, Minerva, Mercury, and the full pantheon. Called religio romana or Nova Roma. Emphasises pietas (duty to gods, family, and state) and ritual correctness (orthopraxis — doing the ritual right matters more than believing the right thing). The most civic and duty-oriented of the reconstructed pagan traditions.",
+       dims:{META:68,EVID:28,AUTH:68,COLL:62,RITE:85,ABSO:62,RIGD:58,PROG:35,TRAN:70}},
+    ]
+  },
+  {
+    group:'Animism, shamanism & indigenous',
+    options:[
+      {label:'Animism (everything is alive)',
+       desc:"Everything has consciousness or spirit — rocks, rivers, trees, animals, weather systems, the land itself. Not metaphorical. The spirit world is a real parallel layer of existence. Humans are one kind of being among many, not the dominant category. The oldest identifiable form of religion. Still practiced across every inhabited continent.",
+       dims:{META:88,EVID:22,AUTH:55,COLL:88,RITE:92,ABSO:55,RIGD:62,PROG:22,TRAN:92}},
+      {label:'Shamanism',
+       desc:"A specialist (shaman) enters altered states of consciousness to travel to spirit realms, negotiate with spirits, retrieve lost souls, and heal the sick or the community. Found in Siberia, Central Asia, the Americas, and sub-Saharan Africa. Techniques include drumming, isolation, fasting, and plant medicines. The spirit world is as real as the physical world.",
+       dims:{META:88,EVID:18,AUTH:45,COLL:78,RITE:92,ABSO:52,RIGD:58,PROG:22,TRAN:92}},
+      {label:'Voodoo / Vodou',
+       desc:"Haitian Vodou synthesises West African Fon and Ewe religion with Catholicism, imposed during the slave trade. The Loa are powerful spirits who act as intermediaries to a remote Creator God. Ritual possession — the Loa ride their devotees — is central and normal, not aberrant. Not the Hollywood version involving dolls and zombies. A sophisticated theological system.",
+       dims:{META:82,EVID:18,AUTH:68,COLL:82,RITE:94,ABSO:58,RIGD:62,PROG:28,TRAN:88}},
+      {label:'Santería / Candomblé',
+       desc:"Afro-Caribbean religions (Santería from Cuba, Candomblé from Brazil) that preserved Yoruba religion through a Catholic surface layer imposed by slaveholders. The Orishas are divine beings governing nature and human affairs. Ritual possession, Ifá divination, and animal sacrifice are central practices. Not corrupted or diluted — a distinct theological system that survived oppression.",
+       dims:{META:82,EVID:18,AUTH:62,COLL:80,RITE:92,ABSO:58,RIGD:62,PROG:28,TRAN:88}},
+      {label:'Tenrikyo',
+       desc:"Founded in Japan in 1838 after God the Parent (Tenri-O-No-Mikoto) possessed Miki Nakayama and spoke through her for 50 years. God created humanity for the purpose of joyous life. Illness and suffering are 'dust' accumulated through selfish thoughts. Salvation comes through sweeping the dust away through service and charitable acts. 2 million adherents.",
+       dims:{META:72,EVID:28,AUTH:82,COLL:78,RITE:85,ABSO:78,RIGD:72,PROG:48,TRAN:82}},
+    ]
+  },
+  {
+    group:'New & invented — all founded after 1800',
+    note:'Every religion was invented at some point. These ones are just recent enough that we have the paperwork.',
+    options:[
+      {label:'Mormonism / LDS',
+       desc:"Founded by Joseph Smith in 1830 after God and Jesus appeared to him in upstate New York and he translated golden plates into the Book of Mormon. Jesus visited ancient America after the resurrection. Humans can become gods. God the Father has a physical body. Previously practiced polygamy (officially ended 1890). 17 million members. Enormous missionary infrastructure.",
+       dims:{META:70,EVID:28,AUTH:92,COLL:82,RITE:82,ABSO:96,RIGD:82,PROG:55,TRAN:90}},
+      {label:"Jehovah's Witnesses",
+       desc:"Founded from the Bible Student movement in the 1870s. No Trinity — Jesus is God's first creation, not God himself. Blood transfusions are medically forbidden (leading to deaths and legal battles). Only 144,000 go to heaven; faithful others inherit a renewed Earth. Jehovah is God's specific name, not a title. The organisation has made specific end-date predictions that passed without the forecast event — on multiple occasions across its history. Disfellowshipping severs all family contact.",
+       dims:{META:65,EVID:22,AUTH:96,COLL:85,RITE:72,ABSO:98,RIGD:92,PROG:28,TRAN:90}},
+      {label:'Scientology',
+       desc:"Founded by science fiction writer L. Ron Hubbard in the 1950s. Humans are immortal spiritual beings (thetans) carrying trauma from past lives and from alien civilisations (revealed at expensive advanced levels). Auditing — a process of guided questioning — removes engrams (mental trauma). IRS-recognised religion in the US since 1993. Classified as a dangerous cult by courts in Germany, France, and Russia.",
+       dims:{META:62,EVID:18,AUTH:99,COLL:82,RITE:78,ABSO:96,RIGD:92,PROG:65,TRAN:72}},
+      {label:'Raëlism (aliens created humanity)',
+       desc:"In 1973, French journalist Claude Vorilhon was contacted by an alien called Yahweh who explained that the Elohim (a highly advanced alien species) created all life on Earth through genetic engineering. The Bible describes their work. A world embassy should be built for their return. 90,000 members worldwide. The movement claimed to have produced the first human clone in 2002 (independently unverified).",
+       dims:{META:88,EVID:18,AUTH:78,COLL:52,RITE:52,ABSO:72,RIGD:72,PROG:82,TRAN:68}},
+      {label:"Bahá'í",
+       desc:"Founded by Bahá'u'lláh in 19th-century Persia. All major religions are successive revelations of the same God for different stages of humanity's development. Moses, Jesus, Muhammad, Buddha, and Bahá'u'lláh are all manifestations of God. Humanity is now in the stage of unity. No clergy, elected institutions. Progressive but hierarchically structured. Severely persecuted in Iran to this day.",
+       dims:{META:65,EVID:45,AUTH:72,COLL:68,RITE:58,ABSO:78,RIGD:62,PROG:78,TRAN:82}},
+      {label:'Unitarian Universalism',
+       desc:"No creed — you can be atheist, Christian, pagan, Buddhist, or 'spiritual but unsure' and fully belong. Seven principles including the inherent dignity of every person and a free search for truth. Emerged from liberal Protestantism. Essentially a community defined by method rather than content — shared inquiry rather than shared conclusions. Sometimes described as 'believing in one God, at most', which captures the structure if not the spirit.",
+       dims:{META:50,EVID:65,AUTH:18,COLL:62,RITE:38,ABSO:18,RIGD:18,PROG:82,TRAN:58}},
+      {label:'Christian Science',
+       desc:"Founded by Mary Baker Eddy in 1879. Matter is an illusion; spirit is the only reality. Therefore illness is a mental error, not a physical fact, and is healed through correct prayer and understanding — not medicine. Medical treatment is theologically inappropriate. Has led to child deaths when parents chose prayer over treatment. The Christian Science Monitor, their newspaper, operates editorially independently from the religious organisation and covers international affairs.",
+       dims:{META:82,EVID:8,AUTH:88,COLL:68,RITE:62,ABSO:92,RIGD:82,PROG:38,TRAN:88}},
+      {label:'Cao Dai (all-in-one Vietnamese)',
+       desc:"Founded in Vietnam in 1926 after God revealed himself to Ngo Van Chieu. The religion explicitly synthesises Buddhism, Confucianism, Taoism, and Christianity. Has a Pope, cardinals, and a hierarchical clergy. Its pantheon of divine figures includes Buddha, Confucius, Jesus, and Victor Hugo. Currently 4–6 million adherents, mostly in Vietnam. Genuinely one of the stranger religious documents on Earth.",
+       dims:{META:72,EVID:28,AUTH:78,COLL:72,RITE:82,ABSO:72,RIGD:68,PROG:52,TRAN:85}},
+      {label:'Rastafari',
+       desc:"Ethiopian Emperor Haile Selassie I (1892–1975) is God incarnate — Jah — the returned Messiah prophesied in the Bible. Africa (specifically Ethiopia) is Zion; Western society is Babylon. Repatriation to Africa is the spiritual goal. Cannabis (ganja) is a sacrament aiding meditation and scriptural reasoning. Developed in Jamaica in the 1930s. Bob Marley is the most globally recognised adherent.",
+       dims:{META:72,EVID:28,AUTH:68,COLL:75,RITE:75,ABSO:78,RIGD:68,PROG:48,TRAN:85}},
+      {label:'Pastafarianism (FSM)',
+       desc:"Created in 2005 by Bobby Henderson as a protest letter to the Kansas Board of Education against teaching creationism as science. The Flying Spaghetti Monster created the universe while drunk, which explains its imperfections. Legally recognised as a religion in the Netherlands, New Zealand, and several other countries. Pirates are divine. The correlation between declining pirate numbers and rising global temperatures is considered holy scripture.",
+       dims:{META:12,EVID:82,AUTH:4,COLL:28,RITE:28,ABSO:4,RIGD:4,PROG:72,TRAN:8}},
+      {label:'Discordianism (chaos / Eris)',
+       desc:"Eris, the Greek goddess of chaos and discord, is the true deity. The Principia Discordia (1963) is the holy text. All structure is an arbitrary human imposition called the Aneristic Illusion. All chaos is equally arbitrary and called the Eristic Illusion. Every man, woman, and child on Earth is a Pope. Impossible to tell where the joke ends and the philosophy begins, which is probably the point.",
+       dims:{META:52,EVID:45,AUTH:4,COLL:15,RITE:32,ABSO:4,RIGD:4,PROG:52,TRAN:38}},
+    ]
+  },
+  {
+    group:'Eastern & dharmic traditions',
+    options:[
+      {label:'Hindu',
+       desc:"Not one religion but a family of related traditions with wildly different theologies. Six major philosophical schools (Advaita Vedanta, Dvaita, Samkhya, Nyaya, etc.) disagree on fundamental questions. Common threads: dharma (cosmic order and personal duty), karma (action and its consequences), samsara (cycle of rebirth), and moksha (liberation). Multiple gods as aspects of Brahman, or as independent beings, depending entirely on which Hindu you ask.",
+       dims:{META:82,EVID:32,AUTH:65,COLL:78,RITE:88,ABSO:62,RIGD:62,PROG:32,TRAN:90}},
+      {label:'Buddhist',
+       desc:"Founded by Siddhartha Gautama (~500 BCE). The Four Noble Truths: life involves suffering; suffering arises from craving; cessation of craving ends suffering; the Eightfold Path is how. No eternal soul — what continues between rebirths is contested among schools. 500 million practitioners. Theravada, Mahayana, and Vajrayana disagree on almost everything except the Four Truths. The Dalai Lama and Zen monasteries are the same religion in name only.",
+       dims:{META:70,EVID:45,AUTH:25,COLL:62,RITE:72,ABSO:42,RIGD:32,PROG:38,TRAN:87}},
+      {label:'Jain',
+       desc:"One of the oldest living religions. Every soul is eternal and carries karma accumulated through action. The path to liberation requires extreme non-violence (ahimsa) — Jain monks sweep the ground ahead of them to avoid stepping on insects. Material attachment is bondage. Fasting to death (santhara/sallekhana) is an accepted and honoured spiritual practice for the advanced. No creator god.",
+       dims:{META:72,EVID:38,AUTH:52,COLL:58,RITE:78,ABSO:82,RIGD:62,PROG:38,TRAN:85}},
+      {label:'Sikh',
+       desc:"Founded by Guru Nanak in 15th-century Punjab after receiving a divine experience. One formless God (Waheguru). Ten human Gurus, then the scripture (Guru Granth Sahib) became the eternal living Guru. Radical equality of all humans. Compulsory service (seva). The Five K's include uncut hair (kesh) and a steel bracelet (kara). Not a blend of Hinduism and Islam — a distinct tradition, despite that being a common lazy description.",
+       dims:{META:72,EVID:45,AUTH:72,COLL:78,RITE:82,ABSO:82,RIGD:68,PROG:55,TRAN:88}},
+      {label:'Taoist',
+       desc:"Tao (the Way) is the underlying natural order of everything — not a god, not a force, not quite a concept. The Tao Te Ching (Laozi, ~4th century BCE): 81 short chapters of deliberate paradox. Don't force. Flow. Wu wei (non-action or effortless action) is the highest wisdom. Taoism as philosophy and Taoism as religion (with gods, alchemy, ritual) are quite different things that share a name.",
+       dims:{META:68,EVID:38,AUTH:28,COLL:52,RITE:68,ABSO:28,RIGD:32,PROG:32,TRAN:78}},
+      {label:'Shinto',
+       desc:"Japan's indigenous religion. Kami (spirits or gods) inhabit and animate everything — rocks, rivers, specific mountains, ancient trees, ancestral spirits. Ritual purity is central. Shrines are everywhere; 80,000 in Japan. No single founder, no scripture, no unified doctrine. Until 1945 the Emperor was a living kami. Still semi-official. Most Japanese practice both Shinto and Buddhism without conflict.",
+       dims:{META:72,EVID:28,AUTH:68,COLL:82,RITE:92,ABSO:62,RIGD:62,PROG:45,TRAN:80}},
+    ]
+  },
+  {
+    group:'Middle Eastern & ancient',
+    options:[
+      {label:'Zoroastrian',
+       desc:"Founded by Zarathustra in ancient Persia (~1500–600 BCE), making it one of the world's oldest monotheistic religions. Ahura Mazda (truth, light) versus Angra Mainyu (evil, darkness) — an ongoing cosmic struggle. Fire is sacred. Dead are not buried (they pollute the earth) — historically exposed to vultures on towers of silence. Directly influenced Jewish, Christian, and Islamic concepts of heaven, hell, angels, the Last Judgement, and the Messiah.",
+       dims:{META:72,EVID:38,AUTH:78,COLL:68,RITE:82,ABSO:88,RIGD:72,PROG:48,TRAN:88}},
+      {label:'Yazidi',
+       desc:"Kurdish people primarily. Monotheistic, combining ancient Iranian religion, Islam, and other elements. The Peacock Angel (Melek Taus) refused to bow to Adam, was tested by God, repented, and was restored — governing the world on God's behalf. Widely misidentified as devil worship by Muslims, leading to centuries of persecution. ISIS declared them infidels and conducted systematic genocide against Yazidis in 2014.",
+       dims:{META:78,EVID:22,AUTH:82,COLL:82,RITE:88,ABSO:82,RIGD:78,PROG:28,TRAN:88}},
+      {label:'Mandaeism',
+       desc:"One of the world's oldest living Gnostic religions, practiced by roughly 60,000–70,000 people mostly in Iraq and Iran. John the Baptist is the supreme prophet — not Jesus. The creator-god of the material world is a flawed being. Ritual baptism in flowing water is frequent and central. Has survived two millennia of conquest, persecution, and displacement. Almost entirely unknown in the West.",
+       dims:{META:78,EVID:25,AUTH:78,COLL:75,RITE:88,ABSO:80,RIGD:75,PROG:32,TRAN:88}},
+      {label:'Druze',
+       desc:"An 11th-century offshoot of Ismaili Islam that became an entirely separate religion. The Fatimid Caliph Al-Hakim bi-Amr Allah was a divine manifestation of God. The Druze keep their actual theology secret — non-initiated members and outsiders don't have access to it. Reincarnation. No conversion in or out. Found mainly in Lebanon, Syria, and Israel. Some of the most fiercely fought-over land in the Middle East.",
+       dims:{META:72,EVID:32,AUTH:82,COLL:82,RITE:68,ABSO:82,RIGD:80,PROG:38,TRAN:82}},
+    ]
+  },
+  {
+    group:'Abrahamic mysticism & offshoots',
+    options:[
+      {label:'Sufi (Islamic mysticism)',
+       desc:"The mystical dimension of Islam, seeking direct personal experience of God through dhikr (remembrance — repeated divine names), sama (sacred music and poetry), and sometimes the whirling meditation of the Mevlevi order. The goal is fana — annihilation of the individual self in God. Rumi is the most famous Sufi. Considered deviation or heresy by stricter orthodox Islamic traditions.",
+       dims:{META:88,EVID:28,AUTH:62,COLL:68,RITE:88,ABSO:78,RIGD:58,PROG:38,TRAN:94}},
+      {label:'Kabbalah (Jewish mysticism)',
+       desc:"The esoteric dimension of Judaism, mapping divine structure through the Sefirot — ten divine emanations on the Tree of Life through which God created and sustains the universe. The goal is devekut (cleaving to God). Studied seriously by rabbis for centuries. Popularised and largely stripped of meaning in the 1990s-2000s celebrity version. The Zohar is the central text. Has nothing to do with red string bracelets.",
+       dims:{META:92,EVID:22,AUTH:72,COLL:68,RITE:82,ABSO:82,RIGD:68,PROG:32,TRAN:94}},
+      {label:'Gnostic Christian',
+       desc:"Early Christian tradition (2nd–4th century CE) teaching that the God of the Old Testament was not the highest God but a flawed secondary creator (the Demiurge). The true God is unknown and beyond creation. Jesus brought gnosis — liberating secret knowledge, not just faith. Declared heresy by proto-orthodox Christianity. Suppressed for 1,600 years until the Nag Hammadi library was discovered in Egypt in 1945.",
+       dims:{META:90,EVID:18,AUTH:22,COLL:35,RITE:72,ABSO:68,RIGD:52,PROG:32,TRAN:94}},
+      {label:'Orthodox Christian',
+       desc:"The oldest continuous form of Christianity — Eastern and Oriental Orthodox traditions. The Trinity (as defined at Nicaea, 325 CE). Icons are windows to heaven, not idols. The liturgy has been largely unchanged since the 4th century. The Pope in Rome broke away in 1054 — the Orthodox are the original church, from their perspective. Theosis — humans literally participating in divine nature — is the actual goal of salvation.",
+       dims:{META:80,EVID:28,AUTH:94,COLL:72,RITE:94,ABSO:96,RIGD:82,PROG:32,TRAN:92}},
+      {label:'Evangelical / Pentecostal',
+       desc:"Born-again Christianity emphasising personal salvation experience, the Bible as inerrant word of God, and often charismatic gifts: speaking in tongues, faith healing, prophecy. The fastest-growing form of Christianity globally, especially in Africa and Latin America. The Holy Spirit is active in daily life. Jesus is returning soon. Prosperity gospel (God rewards faith with wealth) is an influential and controversial offshoot.",
+       dims:{META:68,EVID:38,AUTH:90,COLL:65,RITE:68,ABSO:96,RIGD:80,PROG:52,TRAN:92}},
+      {label:'Orthodox Jewish',
+       desc:"Both the written Torah and the oral Torah (Talmud) are God's complete and binding revelation to Moses at Sinai. Halakha (Jewish law) governs every aspect of life — food, sex, Sabbath observance, calendar, dress. Gender roles are strictly distinct. The Messiah has not yet arrived. Ultra-Orthodox (Haredi) communities often actively resist secular education and modernity. Total community observance is the norm, not the exception.",
+       dims:{META:68,EVID:48,AUTH:90,COLL:82,RITE:94,ABSO:92,RIGD:82,PROG:48,TRAN:88}},
+      {label:'Shia Muslim',
+       desc:"The Imam — a direct descendant of the Prophet Muhammad's family — is the rightful and infallible leader of the Muslim community. The first Imam was Ali. The Twelfth Imam went into occultation in 874 CE and will return as the Mahdi to bring justice. Pilgrimage to Imam shrines is devotional practice. The Sunni-Shia split started as a political dispute over leadership in 632 CE and has never been resolved.",
+       dims:{META:72,EVID:42,AUTH:90,COLL:75,RITE:88,ABSO:96,RIGD:82,PROG:42,TRAN:90}},
+    ]
+  },
+  {
+    group:'Non-religious frameworks',
+    options:[
+      {label:'Atheist',
+       desc:"No gods exist. Not 'I'm not sure' — no. This is a position about evidence proportioned to claims. The universe has natural explanations that don't require a creator. Atheism says nothing about morality, meaning, or purpose — it answers only the god question in the negative. ",
+       dims:{META:10,EVID:87,AUTH:18,COLL:40,RITE:5,ABSO:30,RIGD:35,PROG:78,TRAN:10}},
+      {label:'Agnostic',
+       desc:"The existence of gods is either unanswered or unanswerable. Thomas Huxley coined the term in 1869. Strong agnosticism: nobody can know. Weak agnosticism: I personally don't know. Compatible with atheism — you can think the question unanswerable and still live as if no gods exist. Frequently misused to mean 'not very religious but not wanting to commit'.",
+       dims:{META:45,EVID:65,AUTH:18,COLL:35,RITE:18,ABSO:24,RIGD:30,PROG:62,TRAN:42}},
+      {label:'Spiritual, not religious',
+       desc:"Something is out there or in here — but not a personal interventionist god and not organised religion. Nature, consciousness, love, or the universe itself has a quality that deserves the word 'sacred'. No doctrine, no institution, no mandatory practice. The most individually defined category in existence. Criticised as avoiding commitment; also the honest response to finding all the available doctrines inadequate.",
+       dims:{META:78,EVID:38,AUTH:18,COLL:45,RITE:68,ABSO:28,RIGD:35,PROG:45,TRAN:88}},
+      {label:'Humanist',
+       desc:"Ethics and meaning are grounded in human experience and reason without appeal to gods or the supernatural. Human dignity, scientific method, and rational inquiry are sufficient foundations for a good life. The British Humanist Association does naming ceremonies, weddings, and funerals. Secular, rationalist, and civic in orientation. Influential in drafting the UN Declaration of Human Rights.",
+       dims:{META:18,EVID:87,AUTH:22,COLL:68,RITE:12,ABSO:52,RIGD:24,PROG:82,TRAN:45}},
+      {label:'Rationalist / sceptic',
+       desc:"Claims should be proportioned to evidence. Extraordinary claims require extraordinary evidence (Sagan's maxim). The scientific method is the most reliable tool for understanding reality. Cognitive biases are real, systematic, and to be actively countered. Scepticism is not cynicism — it means following evidence wherever it leads, including when that's uncomfortable.",
+       dims:{META:10,EVID:94,AUTH:18,COLL:40,RITE:4,ABSO:35,RIGD:32,PROG:80,TRAN:10}},
+      {label:'Pantheist (universe = god)',
+       desc:"God and the universe are identical — not that God created the universe and stands apart from it, but that God IS everything that exists. Spinoza argued this and Leibniz called it atheism with decoration. Einstein described himself as a Spinozistic pantheist. Nature is sacred not as metaphor but literally. No personal god who listens to prayers, no afterlife, no miracles — just the profound and inexplicable fact of existence.",
+       dims:{META:68,EVID:38,AUTH:12,COLL:45,RITE:35,ABSO:22,RIGD:35,PROG:52,TRAN:72}},
+      {label:'Deist (creator, then nothing)',
+       desc:"God created the universe and its natural laws, then stepped back and does not intervene. The watchmaker who built the clock and left. Common in 18th-century Enlightenment thought — Jefferson, Voltaire, Paine, and many founders were deists. Prayer is pointless. Miracles don't happen. Morality is discoverable through reason without revelation. The most intellectually tidy position, and the one that explains the problem of evil most cleanly.",
+       dims:{META:62,EVID:52,AUTH:18,COLL:30,RITE:12,ABSO:42,RIGD:42,PROG:58,TRAN:62}},
+      {label:'Panpsychist (everything has mind)',
+       desc:"Consciousness is a fundamental and irreducible feature of reality — not something that mysteriously emerges only in complex brains, but present at every level of matter in some minimal form. Taken seriously by philosophers David Chalmers and Philip Goff. Proposed as a solution to the 'hard problem of consciousness' — why does subjective experience exist at all. Difficult to test or falsify, which is both its strength and its weakness.",
+       dims:{META:88,EVID:38,AUTH:12,COLL:42,RITE:28,ABSO:22,RIGD:32,PROG:52,TRAN:75}},
+      {label:'No label — figuring it out',
+       desc:"You haven't found a framework that accurately describes where you are, you're actively constructing your own, or you think the categories themselves are more limiting than useful. Whether that's uncertainty, ongoing construction, or a recognition that the categories themselves are inadequate.",
+       dims:null},
+    ]
+  },
+  {
+    group:'The big three — yes, you had to scroll',
+    note:"Christianity, Islam, Judaism. Right here at the bottom, where you earned them.",
+    options:[
+      {label:'Christian (general)',
+       desc:"Jesus of Nazareth was the Son of God, was crucified for humanity's sins, and was resurrected. Through this, humans can be reconciled to God. 2.4 billion practitioners. 45,000+ denominations disagreeing about almost everything beyond that core — the Trinity, salvation, the Pope, women's ordination, homosexuality, end times, the Eucharist. Calling yourself Christian describes your orientation, not your theology.",
+       dims:{META:75,EVID:33,AUTH:90,COLL:68,RITE:84,ABSO:94,RIGD:74,PROG:40,TRAN:90}},
+      {label:'Muslim (general)',
+       desc:"There is one God (Allah) and Muhammad is His final and greatest prophet. The Quran is the literal word of God, revealed in Arabic — translation changes it. Five Pillars: declaration of faith (shahada), five daily prayers (salat), annual fasting (Ramadan), obligatory charity (zakat), and pilgrimage to Mecca at least once if able (hajj). 1.8 billion practitioners. Sunni/Shia split over who should lead after Muhammad's death in 632 CE. Still unresolved.",
+       dims:{META:72,EVID:42,AUTH:92,COLL:72,RITE:87,ABSO:96,RIGD:82,PROG:44,TRAN:92}},
+      {label:'Jewish (general)',
+       desc:"A covenant between God and the Jewish people, established with Abraham and formalised at Sinai with Moses. Torah as foundational law. The Messiah has not arrived yet. No hell in the Christian sense. Jewish identity is both ethnic and religious — you can be an atheist and culturally, legally, and theologically Jewish. 15 million practitioners globally — a number roughly equal to a mid-sized European city — with cultural and intellectual influence wildly disproportionate to the headcount.",
+       dims:{META:65,EVID:55,AUTH:80,COLL:74,RITE:80,ABSO:82,RIGD:68,PROG:58,TRAN:82}},
+    ]
+  },
+];
+
+function findWorldviewDims(label){
+  for(const g of WORLDVIEW_GROUPS){
+    const opt=g.options.find(o=>o.label===label);
+    if(opt) return opt.dims;
+  }
+  return null;
+}
+function findWorldviewDesc(label){
+  for(const g of WORLDVIEW_GROUPS){
+    const opt=g.options.find(o=>o.label===label);
+    if(opt) return opt.desc||null;
+  }
+  return null;
+}
+const GOD_COUNT_OPTIONS = [
+  'Zero — and I\'m certain',
+  'Zero — but existence is still unsettling',
+  'One — obviously the correct one',
+  'One — somehow also three (we\'ll explain later)',
+  'Two — light versus dark',
+  'A few specialists (love, war, sea, storms...)',
+  'Hundreds — classical polytheism',
+  'Thousands — Hindu territory',
+  'Uncountable — gods absolutely everywhere',
+  'All of them, just in case',
+  'Gods are human constructs, full stop',
+  'The question is philosophically incoherent',
+  'I might be one',
+  'Skip this',
+];
+
+const POLITICAL_OPTIONS = [
+  {label:'Anarchist',              dims:{COLL:52,AUTH:2, PROG:72,RIGD:32,ABSO:28}},
+  {label:'Anarcho-communist',      dims:{COLL:82,AUTH:3, PROG:78,RIGD:38,ABSO:52}},
+  {label:'Libertarian socialist',  dims:{COLL:68,AUTH:8, PROG:75,RIGD:28,ABSO:38}},
+  {label:'Far left / communist',   dims:{COLL:90,AUTH:68,PROG:82,RIGD:68,ABSO:74}},
+  {label:'Socialist',              dims:{COLL:78,AUTH:45,PROG:78,RIGD:45}},
+  {label:'Social democrat',        dims:{COLL:65,AUTH:38,PROG:74,RIGD:32}},
+  {label:'Liberal / progressive',  dims:{COLL:55,AUTH:28,PROG:74,RIGD:26}},
+  {label:'Centrist',               dims:{COLL:50,AUTH:50,PROG:56,RIGD:46}},
+  {label:'Conservative',           dims:{COLL:45,AUTH:70,ABSO:70,RIGD:64}},
+  {label:'Libertarian',            dims:{COLL:10,AUTH:10,PROG:74,RIGD:35}},
+  {label:'Nationalist',            dims:{COLL:82,AUTH:84,ABSO:78,RIGD:78}},
+  {label:'Technocrat',             dims:{COLL:52,AUTH:62,PROG:92,EVID:82,RIGD:52}},
+  {label:'Green / eco-centrist',   dims:{COLL:68,AUTH:28,PROG:58,TRAN:58}},
+  {label:'Religious right',        dims:{COLL:72,AUTH:90,ABSO:92,RIGD:82,TRAN:82}},
+  {label:'Post-political / none',  dims:null},
+  {label:'It\'s complicated',      dims:null},
+];
+
+const SETTLED_OPTIONS = [
+  {label:'Actively questioning everything'},
+  {label:'Open but mostly settled'},
+  {label:'Firmly held — unlikely to change'},
+];
+
+// ─── TIMELINE SCORED QUESTIONS ───────────────────────────────────────────────
+// Three structured questions on the timeline screen.
+// Stored as answers[qid] = choice index. Scored in calcScores via TIMELINE_QUESTIONS loop.
+const TIMELINE_QUESTIONS = [
+  {
+    id:'TL_DRIFT',
+    label:'How much has your worldview fundamentally shifted since you were 15?',
+    choices:[
+      {label:'Very little — essentially the same person',dim:{RIGD:0.9,OPEN:-0.6,SELF:-0.4,INHR:0.4}},
+      {label:'Some shifts, but the core is stable',     dim:{RIGD:0.3,OPEN:0.2,SELF:0.2}},
+      {label:'Significantly different in key areas',    dim:{OPEN:0.6,SELF:0.5,RIGD:-0.5,INHR:-0.3}},
+      {label:'Completely rebuilt — barely recognisable',dim:{SELF:1.0,OPEN:0.8,RIGD:-0.8,INHR:-0.6,PAIN:0.3}},
+    ]
+  },
+  {
+    id:'TL_DRIVER',
+    label:'What has most strongly reshaped your beliefs?',
+    choices:[
+      {label:'Suffering, loss, or trauma',              dim:{PAIN:1.0,EXPR:0.6,SELF:0.3}},
+      {label:'Deliberate study, argument, or evidence', dim:{SELF:0.9,EVID:0.6,HUMI:0.4,INHR:-0.3}},
+      {label:'Community, relationship, or belonging',   dim:{TRIB:0.8,INHR:0.5,COLL:0.3}},
+      {label:'A direct experience nothing explained',   dim:{EXPR:1.0,META:0.6,TRAN:0.4}},
+      {label:'Nothing major — mostly gradual',          dim:{RIGD:0.6,INHR:0.5,PAIN:-0.2}},
+    ]
+  },
+  {
+    id:'TL_COST',
+    label:'If your core beliefs turned out to be false, how would you feel?',
+    choices:[
+      {label:'Fine — beliefs should track truth',              dim:{OPEN:0.9,HUMI:0.8,DOGM:-0.7,FUSE:-0.6}},
+      {label:'Unsettled, but I would adapt eventually',        dim:{OPEN:0.3,FUSE:0.3,DOGM:0.1}},
+      {label:'Very distressed — it would feel like losing myself',dim:{FUSE:1.0,DOGM:0.5,PAIN:0.5,OPEN:-0.4}},
+      {label:'I would struggle to accept it regardless of evidence',dim:{DOGM:0.9,RIGD:0.7,FUSE:0.8,OPEN:-0.7}},
+    ]
+  },
+];
+
+const QUESTIONS = [
+  // REALITY (cat 0)
+  {id:'RE1',cat:0,text:'An objective reality exists independently of any mind that perceives it.',dim:{META:-0.4,EVID:0.5}},
+  {id:'RE2',cat:0,text:'Consciousness cannot be fully explained by brain activity — it may extend beyond the physical.',dim:{META:0.8,EVID:-0.3}},
+  {id:'RE3',cat:0,text:'Our reality could be a simulation, construct, or something fundamentally other than it appears.',dim:{META:0.5}},
+  {id:'RE4',cat:0,text:'Genuine free will — the ability to have truly chosen otherwise — exists.',dim:{META:0.3,AUTH:-0.2,TRAN:0.2}},
+  {id:'RE5',cat:0,text:'Fate or destiny plays a real role in shaping human lives.',dim:{META:0.4,AUTH:0.2,TRAN:0.4}},
+  {id:'RE6',cat:0,text:'Meaning exists to be discovered in the world, not invented by individuals.',dim:{TRAN:0.7,META:0.3,ABSO:0.3}},
+  {id:'RE7',cat:0,text:'There are questions about existence that science will permanently fail to answer.',dim:{META:0.7,EVID:-0.4,TRAN:0.3}},
+  // TRUTH (cat 1)
+  {id:'TR1',cat:1,text:'Scientific consensus is the most reliable guide to factual truth.',dim:{EVID:0.8,META:-0.2}},
+  {id:'TR2',cat:1,text:'Personal lived experience is valid evidence even when it cannot be independently verified.',dim:{META:0.4,EVID:0.2}},
+  {id:'TR3',cat:1,text:'Ancient texts and oral traditions contain genuine wisdom inaccessible through modern methods.',dim:{META:0.4,AUTH:0.3,RIGD:0.2,TRAN:0.2}},
+  {id:'TR4',cat:1,text:'If something feels emotionally or intuitively true, that carries real weight independent of data.',dim:{META:0.5,EVID:-0.4,RIGD:0.2}},
+  {id:'TR5',cat:1,text:'I am willing to fully abandon a strongly held belief if confronted with sufficient evidence.',dim:{EVID:0.6,RIGD:-0.8}},
+  {id:'TR6',cat:1,text:'Intuition can access truths that careful rational analysis cannot reach.',dim:{META:0.5,EVID:-0.3,RITE:0.2}},
+  {id:'TR7',cat:1,text:'A belief held by billions across centuries carries more credibility than a recent scientific finding.',dim:{AUTH:0.6,RIGD:0.4,META:0.2,EVID:-0.4}},
+  // AUTHORITY (cat 2)
+  {id:'AU1',cat:2,text:'Moral truth requires grounding in an authority that transcends human consensus.',dim:{AUTH:0.9,ABSO:0.6,TRAN:0.4}},
+  {id:'AU2',cat:2,text:'Tradition deserves default respect even when the original reasons are no longer known.',dim:{AUTH:0.7,RIGD:0.5,COLL:0.3}},
+  {id:'AU3',cat:2,text:'Qualified experts should be trusted over popular opinion on complex matters.',dim:{AUTH:0.4,EVID:0.3}},
+  {id:'AU4',cat:2,text:'Social order and strong governance matter more than maximum individual freedom.',dim:{AUTH:0.6,COLL:0.7}},
+  {id:'AU5',cat:2,text:"Children have a right to be taught their community's values as fundamental truth.",dim:{AUTH:0.5,RIGD:0.4,COLL:0.4}},
+  {id:'AU6',cat:2,text:'Rules are more important than exceptions, even when an exception would seem more compassionate.',dim:{AUTH:0.5,ABSO:0.4,RIGD:0.3}},
+  {id:'AU7',cat:2,text:'Some ideas are too dangerous to be allowed to circulate freely in society.',dim:{AUTH:0.5,COLL:0.4,RIGD:0.3}},
+  // MORALITY (cat 3)
+  {id:'MO1',cat:3,text:'Reducing suffering is the highest moral priority, above all other values.',dim:{PROG:0.3,ABSO:-0.2}},
+  {id:'MO2',cat:3,text:'Justice matters more than mercy when the two are in direct conflict.',dim:{ABSO:0.5,AUTH:0.2,RIGD:0.2}},
+  {id:'MO3',cat:3,text:'Some acts are absolutely wrong regardless of cultural context or consequences.',dim:{ABSO:0.9,AUTH:0.2}},
+  {id:'MO4',cat:3,text:'Human beings are fundamentally inclined toward goodness when conditions allow.',dim:{PROG:0.5,META:0.2,TRAN:0.2}},
+  {id:'MO5',cat:3,text:'Revenge can be morally justified.',dim:{ABSO:0.3,AUTH:0.2}},
+  {id:'MO6',cat:3,text:'The ends can justify the means if the outcome is sufficiently beneficial.',dim:{ABSO:-0.4,PROG:0.2}},
+  {id:'MO7',cat:3,text:'My loyalty to those close to me can legitimately override broader ethical duties.',dim:{COLL:0.5,RIGD:0.2}},
+  // SPIRITUALITY (cat 4)
+  {id:'SP1',cat:4,text:'Prayer or directed intention can affect outcomes in the external world.',dim:{RITE:0.7,META:0.6,EVID:-0.5}},
+  {id:'SP2',cat:4,text:'Ritual — repeated symbolic action — has value beyond its psychological effects on the practitioner.',dim:{RITE:0.8,META:0.4,TRAN:0.3}},
+  {id:'SP3',cat:4,text:'Souls exist as non-physical entities that survive bodily death.',dim:{META:0.8,TRAN:0.8,EVID:-0.4}},
+  {id:'SP4',cat:4,text:'Spiritual experiences are genuine encounters with something that exists beyond ordinary reality.',dim:{META:0.7,RITE:0.5,TRAN:0.6,EVID:-0.3}},
+  {id:'SP5',cat:4,text:'Miracles — events that genuinely violate natural law — have occurred or can occur.',dim:{META:0.8,EVID:-0.6,TRAN:0.4}},
+  {id:'SP6',cat:4,text:'The universe exhibits intentionality or purpose beyond mechanical causation.',dim:{META:0.7,TRAN:0.7,EVID:-0.2}},
+  {id:'SP7',cat:4,text:'Sacred objects, places, or texts carry genuine power beyond their symbolic function.',dim:{RITE:0.7,META:0.5,AUTH:0.2}},
+  // SOCIETY (cat 5)
+  {id:'SO1',cat:5,text:'Human civilisation represents genuine moral and social progress over historical time.',dim:{PROG:0.7,EVID:0.2}},
+  {id:'SO2',cat:5,text:'National or cultural identity is a fundamental part of who a person is.',dim:{COLL:0.6,AUTH:0.3,RIGD:0.3}},
+  {id:'SO3',cat:5,text:'Technology consistently improves human wellbeing over time.',dim:{PROG:0.7,EVID:0.2}},
+  {id:'SO4',cat:5,text:'Hierarchy is a natural and necessary feature of healthy human communities.',dim:{AUTH:0.7,COLL:0.4,ABSO:0.2}},
+  {id:'SO5',cat:5,text:'Individual rights should take precedence over collective stability when they conflict.',dim:{COLL:-0.7,AUTH:-0.3,PROG:0.2}},
+  {id:'SO6',cat:5,text:'Economic competition produces better social outcomes than economic cooperation.',dim:{COLL:-0.5,PROG:0.2}},
+  {id:'SO7',cat:5,text:'Artificial intelligence systems may eventually deserve moral consideration or rights.',dim:{PROG:0.6,META:0.3,EVID:0.2}},
+  // DEATH (cat 6)
+  {id:'DE1',cat:6,text:'Death is the permanent, final end of personal consciousness — nothing persists.',dim:{EVID:0.5,META:-0.5,TRAN:-0.7}},
+  {id:'DE2',cat:6,text:'Suffering serves a deeper purpose or contributes to meaningful growth.',dim:{TRAN:0.7,META:0.3,RITE:0.2,ABSO:0.2}},
+  {id:'DE3',cat:6,text:'A life without visible impact or legacy is just as meaningful as one that shaped history.',dim:{PROG:0.2,ABSO:-0.2}},
+  {id:'DE4',cat:6,text:'How one is remembered after death matters morally.',dim:{TRAN:0.4,AUTH:0.2,COLL:0.3}},
+  {id:'DE5',cat:6,text:'Something of consciousness persists, in some form, beyond physical death.',dim:{META:0.7,TRAN:0.8,EVID:-0.4}},
+  {id:'DE6',cat:6,text:'The universe would be fundamentally different — not merely emptier — if no conscious beings existed.',dim:{META:0.6,TRAN:0.5}},
+  {id:'DE7',cat:6,text:'Those who commit terrible acts deserve consequences beyond what is practically useful as punishment.',dim:{ABSO:0.5,TRAN:0.3,AUTH:0.2}},
+  // SELF (cat 7)
+  {id:'SE1',cat:7,text:'I have genuinely chosen my core beliefs rather than inherited them from my environment.',dim:{RIGD:-0.3}},
+  {id:'SE2',cat:7,text:'My current beliefs are fundamentally correct and unlikely to change significantly.',dim:{RIGD:0.8,AUTH:0.2}},
+  {id:'SE3',cat:7,text:'I actively seek out information and arguments that challenge my existing worldview.',dim:{RIGD:-0.8,EVID:0.4}},
+  {id:'SE4',cat:7,text:'I would hold essentially the same views had I been raised in a radically different cultural environment.',dim:{RIGD:0.5,AUTH:0.2}},
+  {id:'SE5',cat:7,text:'Belonging to a community matters more to me than holding fully independent views.',dim:{COLL:0.6,RIGD:0.3}},
+  {id:'SE6',cat:7,text:'Human behaviour is primarily shaped by forces outside individual control.',dim:{META:0.3,RIGD:0.3,AUTH:0.2}},
+  {id:'SE7',cat:7,text:'I would rather belong to a group that is collectively wrong than be correct in isolation.',dim:{COLL:0.7,RIGD:0.3}},
+
+  // BELIEF ORIGINS (cat 8)
+  {id:'BO1',cat:8,text:'Many of my strongest beliefs came from family, culture, or community before I consciously examined them.',dim:{INHR:0.9,TRIB:0.4,SELF:-0.3}},
+  {id:'BO2',cat:8,text:'I have rebuilt major parts of my worldview through deliberate study rather than inheritance.',dim:{SELF:0.9,OPEN:0.4,INHR:-0.3}},
+  {id:'BO3',cat:8,text:'Personal suffering has shaped my worldview more than abstract argument ever could.',dim:{PAIN:0.9,EXPR:0.5,EVID:-0.1}},
+  {id:'BO4',cat:8,text:'A direct personal experience can justify belief even when outsiders would not accept it as evidence.',dim:{EXPR:0.8,META:0.4,EVID:-0.2}},
+  {id:'BO5',cat:8,text:'Belonging to a group or tradition is part of why my beliefs feel stable.',dim:{TRIB:0.8,COLL:0.4,FUSE:0.4}},
+  {id:'BO6',cat:8,text:'Fear of death, chaos, meaninglessness, or social collapse has influenced what I believe.',dim:{PAIN:0.6,TRAN:0.4,AUTH:0.2,FUSE:0.3}},
+  {id:'BO7',cat:8,text:'I would probably believe differently if I had been born in another country, family, or era.',dim:{HUMI:0.7,OPEN:0.4,INHR:0.4,RIGD:-0.3}},
+  // CERTAINTY VS UNDERSTANDING (cat 9)
+  {id:'CU1',cat:9,text:'I am highly certain about beliefs I have not studied in serious opposing detail.',dim:{DOGM:0.9,HUMI:-0.5,OPEN:-0.5}},
+  {id:'CU2',cat:9,text:'I can explain the strongest arguments against my own worldview without mocking them.',dim:{HUMI:0.8,OPEN:0.7,EVID:0.3,DOGM:-0.4}},
+  {id:'CU3',cat:9,text:'Losing one of my core beliefs would feel like losing part of myself.',dim:{FUSE:0.9,DOGM:0.3,PAIN:0.3}},
+  {id:'CU4',cat:9,text:'I would rather be socially isolated with a true belief than accepted with a false one.',dim:{EVID:0.5,TRIB:-0.6,SELF:0.4}},
+  {id:'CU5',cat:9,text:'When evidence threatens my worldview, my first reaction is defensive rather than curious.',dim:{DOGM:0.7,OPEN:-0.7,RIGD:0.5}},
+  {id:'CU6',cat:9,text:'I am comfortable saying “I do not know” about the biggest questions.',dim:{HUMI:0.9,OPEN:0.5,ABSO:-0.2,DOGM:-0.5}},
+  {id:'CU7',cat:9,text:'Some beliefs are too socially or emotionally expensive for me to question honestly.',dim:{FUSE:0.8,TRIB:0.6,DOGM:0.4,OPEN:-0.5}},
+  // MORAL STRESS TESTS (cat 10)
+  // MORAL STRESS TESTS (cat 10) — choice format, not Likert
+  {id:'MS1',cat:10,type:'choice',
+   text:'A true statement, if made public, would predictably cause mass violence.',
+   choices:[
+     {label:'Publish it — truth has no gatekeeper',      dim:{EVID:1.8,STRS:1.2,AUTH:-0.8}},
+     {label:'Suppress it — consequences outweigh principle',dim:{AUTH:1.2,COLL:0.8,EVID:-1.2,STRS:0.8}},
+     {label:'Controlled phased release',                 dim:{EVID:0.6,AUTH:0.6,STRS:0.8}},
+     {label:'Let appropriate authority decide',          dim:{AUTH:1.8,RIGD:0.6,STRS:0.4}},
+   ]},
+  {id:'MS2',cat:10,type:'choice',
+   text:'AI surveillance could reduce violent crime by 80% but requires monitoring all communications.',
+   choices:[
+     {label:'Acceptable — safety justifies the trade',   dim:{AUTH:1.2,COLL:1.0,PROG:0.8,STRS:0.6}},
+     {label:'Unacceptable — surveillance is always wrong',dim:{EVID:0.8,AUTH:-1.2,STRS:1.0}},
+     {label:'Acceptable if transparent and independently regulated',dim:{EVID:0.6,AUTH:0.4,PROG:0.8,STRS:0.8}},
+     {label:'Depends entirely on who controls the system',dim:{AUTH:-0.4,PROG:0.4,STRS:1.2}},
+   ]},
+  {id:'MS3',cat:10,type:'choice',
+   text:'A society becomes significantly less equal but produces dramatically greater human achievement and capability.',
+   choices:[
+     {label:'Acceptable — results justify inequality',   dim:{PROG:1.4,COLL:-1.2,ABSO:-0.4,STRS:0.8}},
+     {label:'Never — equality cannot be traded away',    dim:{ABSO:1.0,COLL:1.2,PROG:-0.4,STRS:0.6}},
+     {label:'Acceptable temporarily if gains are measurable',dim:{PROG:0.8,COLL:-0.4,STRS:1.0}},
+     {label:'Only if the least equal can still escape their position',dim:{COLL:0.6,EVID:0.6,STRS:1.2}},
+   ]},
+  {id:'MS4',cat:10,type:'choice',
+   text:'A genuinely reformed murderer, now capable of saving thousands of lives, remains imprisoned.',
+   choices:[
+     {label:'Release them — future good is clear',       dim:{ABSO:-1.2,PROG:0.8,STRS:1.4,AUTH:-0.4}},
+     {label:'Never release — the crime cannot be undone',dim:{ABSO:1.4,RIGD:0.8,STRS:0.4}},
+     {label:'Conditional supervised release',            dim:{EVID:0.6,PROG:0.6,STRS:1.0}},
+     {label:"This decision belongs to the victims' families",dim:{AUTH:-0.4,COLL:0.6,STRS:1.2}},
+   ]},
+  {id:'MS5',cat:10,type:'choice',
+   text:'Your own community or nation commits proven, documented atrocities.',
+   choices:[
+     {label:'Condemn publicly — truth above loyalty',    dim:{EVID:1.2,TRIB:-1.4,HUMI:0.8,STRS:1.4}},
+     {label:'Defend the group — it is still my community',dim:{TRIB:1.4,COLL:0.8,DOGM:0.6,STRS:0.4}},
+     {label:'Challenge from within, not publicly',       dim:{TRIB:0.4,EVID:0.4,STRS:0.8}},
+     {label:'Remain silent — this is not my place',      dim:{TRIB:0.8,PAIN:0.6,STRS:0.4}},
+   ]},
+  {id:'MS6',cat:10,type:'choice',
+   text:'An idea you consider genuinely dangerous is spreading rapidly.',
+   choices:[
+     {label:'Restrict it — some ideas must be controlled', dim:{AUTH:1.4,DOGM:0.8,RIGD:0.6,OPEN:-0.8,STRS:0.6}},
+     {label:'Permit it — suppression always backfires',   dim:{EVID:0.8,AUTH:-1.2,OPEN:0.8,STRS:1.0}},
+     {label:'Counter with better arguments and platforms', dim:{EVID:1.0,OPEN:0.6,STRS:1.2}},
+     {label:'Ignore it — bad ideas die in open markets',  dim:{EVID:0.6,AUTH:-0.8,PROG:0.4,STRS:0.8}},
+   ]},
+  {id:'MS7',cat:10,type:'choice',
+   text:'A serious wrongdoer shows genuine understanding and remorse but refuses any formal accountability.',
+   choices:[
+     {label:'Remorse alone is enough — move forward',    dim:{ABSO:-0.8,META:0.4,STRS:0.8}},
+     {label:'Accountability must still follow regardless',dim:{ABSO:1.2,AUTH:0.6,RIGD:0.4,STRS:0.6}},
+     {label:'Neither alone is sufficient — both required',dim:{EVID:0.6,ABSO:0.4,STRS:1.2}},
+     {label:'Depends entirely on the nature of the harm', dim:{STRS:1.4,EVID:0.4}},
+   ]},
+];
+
+const SYSTEMS = [
+  {name:'Scientific Materialism',  desc:'Reality is fully physical and explicable through empirical inquiry.',          profile:{META:5, EVID:90,AUTH:25,COLL:40,RITE:5, ABSO:25,RIGD:35,PROG:80,TRAN:10}},
+  {name:'Secular Humanism',        desc:'Human dignity and reason as foundations, without the supernatural.',           profile:{META:20,EVID:85,AUTH:25,COLL:65,RITE:15,ABSO:50,RIGD:25,PROG:80,TRAN:45}},
+  {name:'Stoicism',                desc:'Virtue and reason as highest goods; acceptance of what cannot be changed.',    profile:{META:35,EVID:65,AUTH:50,COLL:50,RITE:30,ABSO:70,RIGD:45,PROG:50,TRAN:65}},
+  {name:'Buddhism',                desc:'Liberation through detachment, compassion, and insight into impermanence.',    profile:{META:70,EVID:45,AUTH:25,COLL:60,RITE:70,ABSO:40,RIGD:30,PROG:40,TRAN:85}},
+  {name:'Traditional Christianity',desc:'Salvation through divine authority, revealed scripture, and moral absolutes.', profile:{META:75,EVID:35,AUTH:90,COLL:65,RITE:90,ABSO:95,RIGD:75,PROG:40,TRAN:90}},
+  {name:'Islam (Traditional)',     desc:'Complete submission to divine will through scripture, law, and community.',    profile:{META:70,EVID:45,AUTH:90,COLL:70,RITE:85,ABSO:95,RIGD:80,PROG:45,TRAN:90}},
+  {name:'Mysticism',               desc:'Direct experience of unity with ultimate reality beyond rational categories.', profile:{META:95,EVID:15,AUTH:30,COLL:40,RITE:85,ABSO:50,RIGD:50,PROG:25,TRAN:95}},
+  {name:'Existentialism',          desc:'Radical freedom and responsibility to create meaning in an indifferent cosmos.',profile:{META:40,EVID:55,AUTH:10,COLL:25,RITE:15,ABSO:20,RIGD:30,PROG:50,TRAN:55}},
+  {name:'Nihilism',                desc:'No inherent meaning, value, or moral truth exists in the universe.',          profile:{META:30,EVID:55,AUTH:10,COLL:20,RITE:5, ABSO:5, RIGD:40,PROG:20,TRAN:5}},
+  {name:'Absurdism',               desc:'Embracing the tension between needing meaning and a universe that offers none.',profile:{META:55,EVID:55,AUTH:10,COLL:25,RITE:20,ABSO:10,RIGD:25,PROG:45,TRAN:40}},
+  {name:'Transhumanism',           desc:'Technology as the path beyond biological limits and human suffering.',         profile:{META:50,EVID:85,AUTH:20,COLL:45,RITE:10,ABSO:35,RIGD:25,PROG:100,TRAN:55}},
+  {name:'Confucianism',            desc:'Social harmony through hierarchical relationships, ritual, and moral cultivation.',profile:{META:45,EVID:55,AUTH:85,COLL:80,RITE:75,ABSO:75,RIGD:70,PROG:60,TRAN:65}},
+  {name:'Libertarianism',          desc:'Maximum individual freedom with minimal state or collective interference.',    profile:{META:35,EVID:70,AUTH:10,COLL:10,RITE:20,ABSO:60,RIGD:40,PROG:75,TRAN:35}},
+  {name:'Animism / Indigenous',    desc:'Everything is alive; the sacred is present in nature, ancestors, and place.', profile:{META:85,EVID:30,AUTH:60,COLL:85,RITE:90,ABSO:55,RIGD:65,PROG:25,TRAN:90}},
+  {name:'Stoic Atheism',           desc:'Ethics grounded in reason and nature, accepting mortality without consolation.',profile:{META:15,EVID:75,AUTH:30,COLL:45,RITE:20,ABSO:60,RIGD:35,PROG:60,TRAN:30}},
+];
+
+const CONTRADICTIONS = [
+  {
+    title:'Evidence vs Revelation',severity:'moderate',
+    desc:'You weight scientific evidence highly but also grant credibility to pre-scientific texts and traditions.',
+    check:(a,s)=>(a.TR1??0)>=1&&(a.TR3??0)>=1&&s.EVID>60&&s.META>50
+  },
+  {
+    title:'Claimed openness vs actual rigidity',severity:'high',
+    desc:"You say you'd abandon beliefs given evidence — but your answers reveal strong resistance to worldview change.",
+    check:(a,s)=>(a.TR5??0)>=1&&s.RIGD>68
+  },
+  {
+    title:'Free will vs determinism',severity:'moderate',
+    desc:'You affirm genuine free will while agreeing that human behaviour is primarily shaped by forces outside individual control.',
+    check:(a,s)=>(a.RE4??0)>=1&&(a.SE6??0)>=1
+  },
+  {
+    title:'Free inquiry vs suppression',severity:'high',
+    desc:'You rely on evidence and rational inquiry, but support restricting which ideas can circulate. One undermines the other.',
+    check:(a,s)=>(a.AU7??0)>=1&&s.EVID>65
+  },
+  {
+    title:'Absolute ethics vs consequentialism',severity:'high',
+    desc:'You hold that some acts are absolutely wrong regardless of context, but also accept that ends can justify means. These cannot coexist without tension.',
+    check:(a,s)=>(a.MO3??0)>=1&&(a.MO6??0)>=1
+  },
+  {
+    title:'Death as ending vs persistence',severity:'critical',
+    desc:'You hold that death permanently ends personal consciousness — and also that something of consciousness persists beyond physical death.',
+    check:(a,s)=>(a.DE1??0)>=1&&(a.DE5??0)>=1
+  },
+  {
+    title:'Autonomy claim vs inherited dependence',severity:'moderate',
+    desc:"You believe you've genuinely chosen your beliefs — but your pattern shows strong tribal, traditional, or authority-based thought.",
+    check:(a,s)=>(a.SE1??0)>=1&&s.RIGD>62&&(s.AUTH>65||s.COLL>65)
+  },
+  {
+    title:'Hierarchy vs individual primacy',severity:'moderate',
+    desc:'You support hierarchy as natural and necessary, but also believe individual rights should override collective stability.',
+    check:(a,s)=>(a.SO4??0)>=1&&(a.SO5??0)>=1
+  },
+  {
+    title:'Prayer and physical law',severity:'moderate',
+    desc:'You believe directed intention affects external reality, but also trust scientific consensus as your guide. One implies a causal mechanism the other denies.',
+    check:(a,s)=>(a.SP1??0)>=1&&(a.TR1??0)>=1&&s.EVID>65
+  },
+  {
+    title:'Suffering reduction vs retributive justice',severity:'low',
+    desc:'You hold reducing suffering as the highest moral priority, but also believe justice matters more than mercy — even when mercy would reduce suffering.',
+    check:(a,s)=>(a.MO1??0)>=1&&(a.MO2??0)>=1
+  },
+  {
+    title:'Intuition and scientific method',severity:'low',
+    desc:'You trust scientific consensus while also believing intuition accesses truths that rational analysis cannot. The epistemologies pull in opposite directions.',
+    check:(a,s)=>(a.TR1??0)>=1&&(a.TR6??0)>=1&&s.EVID>70&&s.META>55
+  },
+  {
+    title:'Loyalty overriding ethics',severity:'moderate',
+    desc:'You believe individual rights should take precedence over collective interests — but also that personal loyalty can override broader ethical duties.',
+    check:(a,s)=>(a.SO5??0)>=1&&(a.MO7??0)>=1
+  },
+
+  {
+    title:'Certainty without tested understanding',severity:'critical',
+    desc:'You report high certainty while also admitting limited serious engagement with opposing views. That is not knowledge; it is protected conviction.',
+    check:(a,s)=>(a.CU1??0)>=1&&s.DOGM>68&&s.HUMI<45
+  },
+  {
+    title:'Chosen beliefs vs inherited load',severity:'high',
+    desc:'You say you chose your beliefs, but your origin pattern suggests strong inheritance from family, culture, or community.',
+    check:(a,s)=>(a.SE1??0)>=1&&s.INHR>65&&s.SELF<60
+  },
+  {
+    title:'Truth above all — except dangerous truth',severity:'high',
+    desc:'You privilege evidence and truth, but accept suppressing true claims when consequences become socially dangerous.',
+    check:(a,s)=>s.EVID>65&&a.MS1===1
+  },
+  {
+    title:'Anti-tribal identity with tribal dependency',severity:'moderate',
+    desc:'Your answers reject group control in principle, yet show belief stability tied to belonging and social identity.',
+    check:(a,s)=>s.AUTH<35&&s.COLL<45&&s.TRIB>65
+  },
+  {
+    title:'Openness claim under defensive reflex',severity:'moderate',
+    desc:'You present as open to revision, but threat response suggests defensiveness when evidence touches sacred beliefs.',
+    check:(a,s)=>(a.TR5??0)>=1&&(a.CU5??0)>=1
+  },
+  {
+    title:'Privacy freedom vs security bargain',severity:'low',
+    desc:'You value individual freedom, but accept surveillance when the promised outcome is safety. That is the classic liberty/security fracture.',
+    check:(a,s)=>s.AUTH<45&&a.MS2===0
+  },
+  {
+    title:'Group loyalty under atrocity pressure',severity:'critical',
+    desc:'You show strong tribal belonging while hesitating to condemn your own group under moral pressure. That is where ideology becomes dangerous.',
+    check:(a,s)=>s.TRIB>70&&(a.MS5===1||a.MS5===3)
+  },
+  {
+    title:'Identity fused to belief',severity:'moderate',
+    desc:'Your belief system appears fused with personal identity. Changing your mind may feel less like updating a map and more like self-destruction.',
+    check:(a,s)=>s.FUSE>72&&s.OPEN<55
+  },
+
+  // ─── Forensic dimension contradictions (new in v8) ─────────────────────────
+  {
+    title:'Certainty without openness',severity:'high',
+    desc:'High dogma load coexists with high revision openness — these cannot both be genuine simultaneously. One is likely the performed version of the other.',
+    check:(a,s)=>s.DOGM>68&&s.OPEN>68
+  },
+  {
+    title:'Humility that stops at the self',severity:'moderate',
+    desc:'High epistemic humility scores alongside high identity fusion. Humility that operates everywhere except where belief intersects with selfhood is selective rather than genuine.',
+    check:(a,s)=>s.FUSE>68&&s.HUMI>68
+  },
+  {
+    title:'Belonging without obligation',severity:'low',
+    desc:'Strong tribal dependence scores alongside low collective priority. This pattern wants the psychological benefits of group membership without the reciprocal obligations.',
+    check:(a,s)=>s.TRIB>68&&s.COLL<35
+  },
+  {
+    title:'Invisible inheritance',severity:'moderate',
+    desc:'High inherited belief load alongside a claim to have independently chosen your worldview. Inherited frameworks are often invisible from the inside — they read as obvious truth rather than received tradition.',
+    check:(a,s)=>s.INHR>68&&(a.SE1??0)>=1
+  },
+  {
+    title:'Evidential selectivity',severity:'high',
+    desc:'Evidence dependency is high but revision openness is low. This combination suggests evidence is being recruited to confirm existing positions rather than genuinely test them.',
+    check:(a,s)=>s.EVID>68&&s.OPEN<35
+  },
+  {
+    title:'Competing truth sources',severity:'moderate',
+    desc:'Both authority deference and evidence dependency are elevated. Under pressure, one must override the other — and the result is often unpredictable from the outside.',
+    check:(a,s)=>s.AUTH>65&&s.EVID>65
+  },
+
+  // ─── Stress test behavioral contradictions ─────────────────────────────────
+  {
+    title:'Evidence value buckled under pressure',severity:'high',
+    desc:'You identify with evidence-based values but chose to suppress true information in the scenario test. The stated principle may not survive high-stakes conditions.',
+    check:(a,s)=>a.MS1===1&&s.EVID>65
+  },
+  {
+    title:'Tribe won over truth under direct test',severity:'high',
+    desc:'High evidential self-identification alongside a choice of tribal loyalty over public truth in the group atrocity scenario. The discrepancy between stated values and scenario behavior is significant.',
+    check:(a,s)=>(a.MS5===1||a.MS5===3)&&s.EVID>60
+  },
+  {
+    title:'Speech restriction despite epistemic openness',severity:'moderate',
+    desc:'Support for restricting dangerous ideas despite high revision openness and evidence dependency. The principle of open discourse may apply to ideas already inside the framework, not outside it.',
+    check:(a,s)=>a.MS6===0&&s.EVID>60&&s.OPEN>55
+  },
+
+  // ─── Cross-category theological/structural contradictions ──────────────────
+  {
+    title:'Ritual without metaphysics',severity:'low',
+    desc:'High ritual weighting and high evidence dependency alongside low metaphysical openness. The ritual is being maintained as psychological technology while its spiritual claim is denied — a structurally unstable position.',
+    check:(a,s)=>s.RITE>68&&s.EVID>65&&s.META<38
+  },
+  {
+    title:'Transcendence without non-physical reality',severity:'moderate',
+    desc:'Strong need for meaning beyond the material while rejecting non-physical explanations for reality. Transcendence without a metaphysical ground becomes either pure aesthetics or a suppressed contradiction.',
+    check:(a,s)=>s.TRAN>68&&s.META<32
+  },
+  {
+    title:'Absolute morality without authority',severity:'moderate',
+    desc:'Universal moral absolutes exist but require no external authority — this implies either natural law or pure rational ethics, both of which are difficult to ground without eventually invoking something that functions like authority.',
+    check:(a,s)=>s.ABSO>72&&s.AUTH<32
+  },
+  {
+    title:'Pain architecture denies its own cost',severity:'moderate',
+    desc:'High pain-shaped belief architecture alongside a claim that losing core beliefs would be fine. Beliefs built under existential pressure tend to be structurally load-bearing even when the person carrying them does not feel the weight.',
+    check:(a,s)=>s.PAIN>68&&a.TL_COST===0
+  },
+  {
+    title:'Layered construction over inherited foundation',severity:'low',
+    desc:'Both self-built and inherited load are elevated. This is not necessarily a contradiction — conscious reconstruction often builds above an inherited base rather than replacing it. The question is how much the foundation is visible to the builder.',
+    check:(a,s)=>s.SELF>65&&s.INHR>65
+  },
+  {
+    title:'Dogma and fusion deny their own cost',severity:'high',
+    desc:'High dogma load and identity fusion alongside a claim of equanimity about belief loss. The architecture of these scores suggests the self-report is not accurate — belief loss at this fusion level would not be fine.',
+    check:(a,s)=>s.FUSE>72&&a.TL_COST===0&&s.DOGM>65
+  },
+  {
+    title:'Free will claimed in a determined architecture',severity:'moderate',
+    desc:'Free will is affirmed while acknowledging external forces primarily shape behavior — and the timeline reports that beliefs were primarily shaped by suffering. The claim to genuine choice may be post-hoc framing of events that arrived without consultation.',
+    check:(a,s)=>(a.RE4??0)>=1&&(a.SE6??0)>=1&&a.TL_DRIVER===0
+  },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const state = {
+  phase: 'intro',
+  catIndex: 0,
+  identity: { worldview:[], political:null, settled:null, godCount:null },
+  profileMode: 'main',
+  timeline: { childBelief:'', teenChange:'', adultBelief:'', biggest:'', fearTrue:'', isolate:'', identity:'' },
+  answers: {},
+  scores: null,
+  alignments: null,
+  contradictions: null,
+};
+
+function $id(id){return document.getElementById(id)}
+
+function scrollTopNow(){ requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'})); }
+function currentViewKey(){ return `${state.phase}:${state.catIndex}`; }
+function getStorageKey(){
+  if(state.profileMode==='main') return 'humanx_belief_main';
+  if(state.profileMode==='sandbox') return 'humanx_belief_sandbox_latest';
+  return 'humanx_belief_anonymous_latest';
+}
+function getModeLabel(mode=state.profileMode){
+  return mode==='main'?'Main Profile':mode==='sandbox'?'Sandbox Test':'Anonymous Voice';
+}
+function saveRunRecord(payload){
+  const key=getStorageKey();
+  localStorage.setItem(key,JSON.stringify(payload));
+  // Legacy/latest pointer for older View previous results button
+  localStorage.setItem('humanx_belief',JSON.stringify(payload));
+  if(state.profileMode==='sandbox' || state.profileMode==='anonymous'){
+    const listKey=state.profileMode==='sandbox'?'humanx_belief_sandbox_runs':'humanx_belief_anonymous_runs';
+    const arr=JSON.parse(localStorage.getItem(listKey)||'[]');
+    arr.unshift({...payload, runId:'run_'+Date.now()});
+    localStorage.setItem(listKey,JSON.stringify(arr.slice(0,12)));
+  }
+}
+function setProfileMode(mode){
+  state.profileMode=mode;
+  document.querySelectorAll('.mode-card').forEach(card=>card.classList.toggle('active',card.dataset.mode===mode));
+}
+
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+function startQuiz(){
+  state.phase='identity';
+  render();
+  scrollTopNow();
+}
+function skipIdentity(){
+  state.identity={worldview:[],political:null,settled:null,godCount:null};
+  state.phase='quiz'; state.catIndex=0;
+  render();
+  scrollTopNow();
+}
+function confirmIdentity(){
+  state.phase='quiz'; state.catIndex=0;
+  render();
+  scrollTopNow();
+}
+function toggleWorldview(label){
+  const idx=state.identity.worldview.indexOf(label);
+  if(idx>-1) state.identity.worldview.splice(idx,1);
+  else        state.identity.worldview.push(label);
+  renderIdentityChips();
+}
+function setGodCount(label){
+  state.identity.godCount=state.identity.godCount===label?null:label;
+  renderIdentityChips();
+}
+function setPolitical(label){
+  state.identity.political=state.identity.political===label?null:label;
+  renderIdentityChips();
+}
+function setSettled(label){
+  state.identity.settled=state.identity.settled===label?null:label;
+  renderIdentityChips();
+}
+function retake(){
+  state.answers={};state.scores=null;state.alignments=null;state.contradictions=null;
+  state.timeline={childBelief:'',teenChange:'',adultBelief:'',biggest:'',fearTrue:'',isolate:'',identity:''};
+  localStorage.removeItem(getStorageKey());
+  state.phase='quiz';state.catIndex=0;
+  render();
+  scrollTopNow();
+}
+function prevCat(){
+  if(state.catIndex>0){state.catIndex--;render();}
+  else{state.phase='identity';render();}
+  scrollTopNow();
+}
+function nextCat(){
+  if(state.catIndex<CATEGORIES.length-1){state.catIndex++;render();}
+  else{state.phase='timeline';render();}  // go to timeline before results
+  scrollTopNow();
+}
+function skipTimeline(){
+  state.phase='timeline'; // mark as reached, just don't collect data
+  finishQuiz();
+}
+function collectTimeline(){
+  state.timeline={
+    childBelief:($id('tl-child-belief')?.value||'').trim(),
+    teenChange:($id('tl-teen-change')?.value||'').trim(),
+    adultBelief:($id('tl-adult-belief')?.value||'').trim(),
+    biggest:($id('tl-biggest')?.value||'').trim(),
+    fearTrue:($id('tl-fear-true')?.value||'').trim(),
+    isolate:($id('tl-isolate')?.value||'').trim(),
+    identity:($id('tl-identity')?.value||'').trim(),
+  };
+}
+function finishQuiz(){
+  if(state.phase==='timeline') collectTimeline();
+  const scores=calcScores(state.answers);
+  state.scores=scores;
+  state.alignments=calcAlignments(scores);
+  state.contradictions=detectContradictions(state.answers,scores);
+  state.metaReport=calcMetaReport(state.answers,scores,state.contradictions);
+  saveRunRecord({
+    answers:state.answers,
+    identity:state.identity,
+    profileMode:state.profileMode,
+    countedAsRealVoice:state.profileMode==='main',
+    timeline:state.timeline,
+    scores,
+    metaReport:state.metaReport,
+    ts:Date.now()
+  });
+  state.phase='results';
+  render();
+  scrollTopNow();
+}
+function showResults(){
+  const saved=localStorage.getItem('humanx_belief_main')||localStorage.getItem('humanx_belief');
+  if(!saved)return;
+  const d=JSON.parse(saved);
+  state.answers=d.answers;
+  state.identity=d.identity||{worldview:[],political:null,settled:null,godCount:null};
+  state.timeline=d.timeline||{};
+  state.profileMode=d.profileMode||'main';
+  state.scores=d.scores;
+  state.alignments=calcAlignments(d.scores);
+  state.contradictions=detectContradictions(d.answers,d.scores);
+  state.metaReport=d.metaReport||calcMetaReport(state.answers,state.scores,state.contradictions);
+  state.phase='results';
+  render();
+  scrollTopNow();
+}
+function answer(qid,val){
+  state.answers[qid]=val;
+  const wrap=document.querySelector(`.q-responses[data-qid="${qid}"]`);
+  if(wrap){
+    wrap.querySelectorAll('.resp-btn').forEach(b=>{
+      b.classList.toggle('selected',parseInt(b.dataset.val)===val);
+    });
+    wrap.closest('.q-card').classList.add('answered');
+  }
+  updateAnswerCount();
+}
+function answerChoice(qid, idx){
+  state.answers[qid]=idx;
+  // Update choice buttons without full re-render
+  const card=document.querySelector(`.choice-grid`)?.closest('.q-card');
+  const allGrids=document.querySelectorAll('.choice-grid');
+  allGrids.forEach(grid=>{
+    const parentCard=grid.closest('.q-card');
+    const firstBtn=grid.querySelector('.choice-btn');
+    if(!firstBtn)return;
+    // Find which question this grid belongs to by checking onclick
+    const onclick=firstBtn.getAttribute('onclick')||'';
+    if(!onclick.includes(`'${qid}'`))return;
+    grid.querySelectorAll('.choice-btn').forEach((b,i)=>{
+      b.classList.toggle('selected',i===idx);
+    });
+    parentCard.classList.add('answered');
+  });
+  updateAnswerCount();
+}
+function updateAnswerCount(){
+  const qs=QUESTIONS.filter(q=>q.cat===state.catIndex);
+  const answered=qs.filter(q=>state.answers[q.id]!==undefined).length;
+  const el=$id('answer-count');
+  if(el)el.textContent=`${answered}/${qs.length} answered`;
+}
+
+// ─── SCORING ENGINE ────────────────────────────────────────────────────────────
+function calcScores(answers){
+  const dimKeys=ALL_DIMS.map(d=>d.k);
+  const raw=Object.fromEntries(dimKeys.map(k=>[k,0]));
+  const tw=Object.fromEntries(dimKeys.map(k=>[k,0]));
+
+  // Scale factor: makes one scenario choice ≈ 3 strong Likert agreements in weight.
+  // Raw is doubled because a strong Likert answer is ±2, not ±1.
+  const CHOICE_SCALE = 3;
+
+  QUESTIONS.forEach(q=>{
+    if(q.type==='choice'){
+      // Always add max possible tw across all choices (keeps normaliser range consistent
+      // whether or not a choice was made, and regardless of which choice was made)
+      const maxW={};
+      q.choices.forEach(ch=>Object.entries(ch.dim).forEach(([k,w])=>{
+        maxW[k]=Math.max(maxW[k]||0, Math.abs(w));
+      }));
+      Object.entries(maxW).forEach(([k,mw])=>{ tw[k]+=mw*CHOICE_SCALE; });
+
+      // Add actual chosen contribution to raw (0 if unanswered = neutral position).
+      // Choice weights are expressed as directional tendencies; multiplying by 2
+      // makes a chosen scenario count like a strong Likert answer, then CHOICE_SCALE
+      // gives each scenario the intended extra weight.
+      const idx=answers[q.id];
+      if(idx!==undefined && q.choices[idx]){
+        Object.entries(q.choices[idx].dim).forEach(([k,w])=>{
+          raw[k]+=w*CHOICE_SCALE*2;
+        });
+      }
+      return;
+    }
+    // Likert questions
+    const a=answers[q.id]??0;
+    Object.entries(q.dim).forEach(([k,w])=>{
+      raw[k]+=a*w;
+      tw[k]+=Math.abs(w);
+    });
+  });
+
+  // Process timeline scored questions (same choice logic)
+  TIMELINE_QUESTIONS.forEach(q=>{
+    const maxW={};
+    q.choices.forEach(ch=>Object.entries(ch.dim).forEach(([k,w])=>{
+      maxW[k]=Math.max(maxW[k]||0,Math.abs(w));
+    }));
+    Object.entries(maxW).forEach(([k,mw])=>{ tw[k]+=mw*CHOICE_SCALE; });
+    const idx=answers[q.id];
+    if(idx!==undefined && q.choices[idx]){
+      Object.entries(q.choices[idx].dim).forEach(([k,w])=>{ raw[k]+=w*CHOICE_SCALE*2; });
+    }
+  });
+
+  const scores={};
+  dimKeys.forEach(k=>{
+    if(tw[k]===0){scores[k]=50;return;}
+    const maxR=2*tw[k], minR=-2*tw[k];
+    scores[k]=Math.max(0,Math.min(100,Math.round(((raw[k]-minR)/(maxR-minR))*100)));
+  });
+  return scores;
+}
+
+// Helper: get choice label for a stress test question
+function getChoiceLabel(qid){
+  const q=QUESTIONS.find(x=>x.id===qid);
+  const idx=state.answers[qid];
+  if(!q||idx===undefined||!q.choices)return null;
+  return q.choices[idx]?.label||null;
+}
+
+function calcAlignments(scores){
+  const dimKeys=DIMS.map(d=>d.k); // core 9 only — SYSTEMS profiles only define these
+  const maxDist=Math.sqrt(dimKeys.length*100*100);
+  return SYSTEMS.map(sys=>{
+    let sumSq=0;
+    dimKeys.forEach(k=>{const d=(scores[k]??50)-(sys.profile[k]??50);sumSq+=d*d;});
+    const dist=Math.sqrt(sumSq);
+    const sim=Math.round((1-dist/maxDist)*100);
+    return {...sys,similarity:sim};
+  }).sort((a,b)=>b.similarity-a.similarity);
+}
+
+function detectContradictions(answers,scores){
+  return CONTRADICTIONS.filter(r=>r.check(answers,scores));
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function showInfo(name, desc){
+  if(!desc) return;
+  $id('info-drawer-name').textContent = name;
+  $id('info-drawer-desc').textContent = desc;
+  $id('info-drawer').classList.add('open');
+  $id('info-backdrop').classList.add('open');
+}
+function closeInfo(){
+  $id('info-drawer').classList.remove('open');
+  $id('info-backdrop').classList.remove('open');
+}
+
+function renderTimelineScreen(){
+  const el=$id('tl-scored-qs');
+  if(!el)return;
+  el.innerHTML=TIMELINE_QUESTIONS.map(q=>`
+    <div style="margin-bottom:18px">
+      <p style="font-size:14px;color:#d0d8ef;margin-bottom:10px;line-height:1.5">${escHtml(q.label)}</p>
+      <div class="choice-grid">
+        ${q.choices.map((c,i)=>`
+          <button class="choice-btn ${state.answers[q.id]===i?'selected':''}"
+                  onclick="answerTimelineQ('${q.id}',${i})">${escHtml(c.label)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answerTimelineQ(qid, idx){
+  state.answers[qid]=idx;
+  const container=$id('tl-scored-qs');
+  if(!container)return;
+  container.querySelectorAll('.choice-grid').forEach(grid=>{
+    const firstBtn=grid.querySelector('.choice-btn');
+    if(!firstBtn)return;
+    const onclick=firstBtn.getAttribute('onclick')||'';
+    if(!onclick.includes("'"+qid+"'"))return;
+    grid.querySelectorAll('.choice-btn').forEach((b,i)=>b.classList.toggle('selected',i===idx));
+  });
+}
+
+function render(){
+  const before=state._lastViewKey;
+  const now=currentViewKey();
+  $id('screen-intro').classList.toggle('hidden',state.phase!=='intro');
+  $id('screen-identity').classList.toggle('hidden',state.phase!=='identity');
+  $id('screen-quiz').classList.toggle('hidden',state.phase!=='quiz');
+  $id('screen-timeline').classList.toggle('hidden',state.phase!=='timeline');
+  $id('screen-results').classList.toggle('hidden',state.phase!=='results');
+  if(state.phase==='intro')renderIntro();
+  if(state.phase==='identity')renderIdentity();
+  if(state.phase==='quiz')renderQuiz();
+  if(state.phase==='results')setTimeout(renderResults,50);
+  if(state.phase==='timeline') setTimeout(renderTimelineScreen, 30);
+  if(before!==undefined && before!==now) scrollTopNow();
+  state._lastViewKey=now;
+}
+
+function renderIdentity(){
+  renderIdentityChips();
+  setTimeout(()=>setProfileMode(state.profileMode||'main'),0);
+}
+function renderIdentityChips(){
+  // Grouped worldview — each chip gets a ? info button
+  $id('chips-worldview').innerHTML = WORLDVIEW_GROUPS.map(g => `
+    <div class="id-group">
+      <div class="id-group-label">${g.group}</div>
+      ${g.note ? `<div class="id-group-note">${g.note}</div>` : ''}
+      <div style="display:flex;flex-wrap:wrap;gap:0">
+        ${g.options.map(o => chipPair(o.label, o.desc||'', state.identity.worldview.includes(o.label), `toggleWorldview`, false)).join('')}
+      </div>
+    </div>`).join('');
+
+  // God count — objects now
+  $id('chips-godcount').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0">` +
+    GOD_COUNT_OPTIONS.map(o => chipPair(o.label, o.desc||'', state.identity.godCount===o.label, `setGodCount`, true, 'god')).join('') +
+    `</div>`;
+
+  // Political
+  $id('chips-political').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0">` +
+    POLITICAL_OPTIONS.map(o => chipPair(o.label, '', state.identity.political===o.label, `setPolitical`, true)).join('') +
+    `</div>`;
+
+  // Settled
+  $id('chips-settled').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0">` +
+    SETTLED_OPTIONS.map(o => chipPair(o.label, '', state.identity.settled===o.label, `setSettled`, true)).join('') +
+    `</div>`;
+}
+
+function chipPair(label, desc, isActive, toggleFn, isSolo, extraClass=''){
+  const safeLabel = label.replace(/'/g,"\\'").replace(/`/g,'\\`');
+  const hasDesc = desc && desc.length > 0;
+  return `<span class="chip-pair">
+    <button class="id-chip ${isSolo?'solo':''} ${extraClass} ${isActive?'active':''}"
+            onclick="${toggleFn}('${safeLabel}')">${escHtml(label)}</button>${
+    hasDesc ? `<button class="chip-info-btn" onclick="showInfo('${safeLabel}',\`${desc.replace(/`/g,"'")}\`)" title="What does this mean?">?</button>` : ''
+  }</span>`;
+}
+
+function renderIntro(){
+  const saved=localStorage.getItem('humanx_belief');
+  $id('existing-btn').classList.toggle('hidden',!saved);
+}
+
+function renderQuiz(){
+  const cat=CATEGORIES[state.catIndex];
+  const qs=QUESTIONS.filter(q=>q.cat===state.catIndex);
+  $id('cat-num').textContent=`Category ${state.catIndex+1} of ${CATEGORIES.length}`;
+  $id('cat-title').textContent=cat.label;
+  $id('cat-desc').textContent=cat.desc;
+  $id('progress-fill').style.width=`${(state.catIndex/CATEGORIES.length)*100}%`;
+  $id('btn-back').textContent=state.catIndex===0?'← Intro':'← Back';
+  $id('btn-next').textContent=state.catIndex===CATEGORIES.length-1?'Belief Timeline →':'Next →';
+  $id('questions-list').innerHTML=qs.map(q=>{
+    const answered=state.answers[q.id]!==undefined;
+    if(q.type==='choice'){
+      return `<div class="q-card ${answered?'answered':''}">
+        <div class="scenario-label">Scenario</div>
+        <p class="q-text">${escHtml(q.text)}</p>
+        <div class="choice-grid">
+          ${q.choices.map((c,i)=>`
+            <button class="choice-btn ${state.answers[q.id]===i?'selected':''}"
+                    onclick="answerChoice('${q.id}',${i})">
+              ${escHtml(c.label)}
+            </button>`).join('')}
+        </div>
+      </div>`;
+    }
+    return `<div class="q-card ${answered?'answered':''}">
+      <p class="q-text">${escHtml(q.text)}</p>
+      <div class="q-responses" data-qid="${q.id}">
+        ${[-2,-1,0,1,2].map((v,i)=>`
+          <button class="resp-btn${state.answers[q.id]===v?' selected':''}"
+                  data-val="${v}" onclick="answer('${q.id}',${v})">
+            <span class="resp-dot"></span>
+            <span>${RESP_LABELS[i].replace('\n','<br/>')}</span>
+          </button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  updateAnswerCount();
+}
+
+
+function calcMetaReport(answers,scores,contradictions){
+  const g=k=>scores[k]??50;
+  const clamp=n=>Math.max(0,Math.min(100,Math.round(n)));
+  const meta={
+    coherence: clamp(100 - (contradictions||[]).reduce((t,c)=>t+({critical:18,high:12,moderate:7,low:4}[c.severity]||5),0)),
+    flexibility: clamp((g('OPEN')+g('HUMI')+(100-g('RIGD'))+(100-g('DOGM')))/4),
+    tribalDependence: clamp((g('TRIB')+g('COLL')+g('FUSE'))/3),
+    authorityReliance: clamp((g('AUTH')+g('RIGD')+g('ABSO'))/3),
+    epistemicDiscipline: clamp((g('EVID')+g('HUMI')+g('OPEN')+(100-g('DOGM')))/4),
+    identityFragility: clamp((g('FUSE')+g('PAIN')+g('DOGM')+(100-g('OPEN')))/4),
+    meaningDependency: clamp((g('TRAN')+g('META')+g('RITE'))/3),
+    stressIntegrity: clamp((g('STRS')+g('EVID')+(100-g('TRIB'))+g('HUMI'))/4),
+  };
+  const origin=[];
+  if(g('INHR')>62) origin.push('High inherited load: family, culture, tradition, or early environment still shape the map.');
+  if(g('SELF')>62) origin.push('Strong self-built layer: beliefs appear actively assembled rather than merely absorbed.');
+  if(g('TRIB')>62) origin.push('Tribal load is visible: belonging and group stability matter to the belief structure.');
+  if(g('PAIN')>62) origin.push('Pain-shaped architecture: threat, suffering, betrayal, or mortality may be doing hidden design work.');
+  if(g('EXPR')>62) origin.push('Experience-driven load: direct lived experience has authority even where outsiders would demand proof.');
+  if(!origin.length) origin.push('No single origin dominates. The system looks blended rather than driven by one obvious source.');
+  const stress=[];
+  const stressMap={
+    MS1:{'Publish it — truth has no gatekeeper':['Truth vs Stability','Truth published regardless of consequence. Principle above stability.'],
+         'Suppress it — consequences outweigh principle':['Truth vs Stability','Suppression accepted when social damage becomes severe enough.'],
+         'Controlled phased release':['Truth vs Stability','Staged release as compromise between principle and consequence.'],
+         'Let appropriate authority decide':['Truth vs Stability','Authority delegated to manage truth-release decisions.']},
+    MS2:{'Acceptable — safety justifies the trade':['Freedom vs Safety','Surveillance accepted when safety gains are sufficiently large.'],
+         'Unacceptable — surveillance is always wrong':['Freedom vs Safety','Surveillance rejected as a matter of principle regardless of benefit.'],
+         'Acceptable if transparent and independently regulated':['Freedom vs Safety','Surveillance conditionally acceptable under structural constraints.'],
+         'Depends entirely on who controls the system':['Freedom vs Safety','Trust in the mechanism entirely conditional on power structure.']},
+    MS3:{'Acceptable — results justify inequality':['Equality vs Advancement','Inequality tolerated when progress or capability gains are large enough.'],
+         'Never — equality cannot be traded away':['Equality vs Advancement','Equality treated as non-negotiable regardless of outcome.'],
+         'Acceptable temporarily if gains are measurable':['Equality vs Advancement','Temporary inequality accepted when gains are concrete and reversible.'],
+         'Only if the least equal can still escape their position':['Equality vs Advancement','Floor-based condition: mobility matters more than raw distribution.']},
+    MS4:{'Release them — future good is clear':['Justice vs Mercy','Consequentialist: future benefit overrides the original crime.'],
+         'Never release — the crime cannot be undone':['Justice vs Mercy','Retributive: the act itself demands permanent consequence.'],
+         'Conditional supervised release':['Justice vs Mercy','Conditional mercy: reform earns graduated freedom.'],
+         "This decision belongs to the victims' families":['Justice vs Mercy','Delegated justice: moral authority rests with those harmed.']},
+    MS5:{'Condemn publicly — truth above loyalty':['Tribe vs Principle','Willing to condemn own group when evidence is unambiguous.'],
+         'Defend the group — it is still my community':['Tribe vs Principle','Group loyalty persists even under strong counter-evidence.'],
+         'Challenge from within, not publicly':['Tribe vs Principle','Dissent contained inside the group — loyalty and principle both preserved.'],
+         'Remain silent — this is not my place':['Tribe vs Principle','Silence as self-protective neutrality when conflict becomes costly.']},
+    MS6:{'Restrict it — some ideas must be controlled':['Freedom Under Threat','Suppression accepted when ideas feel sufficiently dangerous.'],
+         'Permit it — suppression always backfires':['Freedom Under Threat','Free expression maintained even when ideas feel threatening.'],
+         'Counter with better arguments and platforms':['Freedom Under Threat','Competitive epistemics: counter speech, not suppression.'],
+         'Ignore it — bad ideas die in open markets':['Freedom Under Threat','Market of ideas: bad ideas self-destruct without amplification.']},
+    MS7:{"Remorse alone is enough — move forward":['Mercy vs Accountability','Remorse treated as sufficient; future matters more than past.'],
+         'Accountability must still follow regardless':['Mercy vs Accountability','Accountability non-negotiable regardless of displayed remorse.'],
+         'Neither alone is sufficient — both required':['Mercy vs Accountability','Full reconciliation requires both remorse and accountability.'],
+         'Depends entirely on the nature of the harm':['Mercy vs Accountability','Context-sensitive: harm type determines the appropriate response.']},
+  };
+  Object.entries(stressMap).forEach(([qid,labelMap])=>{
+    const label=getChoiceLabel(qid);
+    if(label&&labelMap[label]) stress.push(labelMap[label]);
+  });
+  if(!stress.length) stress.push(['Stress profile','No moral scenario choices recorded. Scenarios skipped or all neutral.']);
+  if(!stress.length) stress.push(['Stress profile','No moral scenario choices recorded. Scenarios were skipped or not reached.']);
+  return {meta,origin,stress};
+}
+
+function renderForensicPanels(scores,contradictions){
+  const report=state.metaReport||calcMetaReport(state.answers,scores,contradictions);
+  const metaDefs=[
+    ['coherence','Belief Coherence','Internal fit after contradiction penalties.'],
+    ['flexibility','Cognitive Flexibility','Capacity to revise without self-collapse.'],
+    ['tribalDependence','Tribal Dependence','How much belonging powers belief.'],
+    ['authorityReliance','Authority Reliance','Deference to order, hierarchy, and fixed rules.'],
+    ['epistemicDiscipline','Epistemic Discipline','Evidence plus humility minus dogma.'],
+    ['identityFragility','Identity Fragility','How painful belief-loss may become.'],
+    ['meaningDependency','Meaning Dependency','Need for cosmic or sacred meaning.'],
+    ['stressIntegrity','Stress Integrity','How principles behave under pressure.'],
+  ];
+  const mg=$id('meta-grid');
+  if(mg) mg.innerHTML=metaDefs.map(([k,l,d])=>`<div class="meta-card"><b>${report.meta[k]??50}</b><span>${l}</span><p>${d}</p></div>`).join('');
+  const or=$id('origin-report');
+  if(or) or.innerHTML=report.origin.map(x=>`<div class="forensic-block"><h3>Origin signal</h3><p>${escHtml(x)}</p></div>`).join('');
+  const sr=$id('stress-report');
+  if(sr) sr.innerHTML=report.stress.map(([t,d])=>`<div class="stress-row"><div class="stress-title">${escHtml(t)}</div><div class="stress-choice">${escHtml(d)}</div></div>`).join('');
+  const hot=[];
+  if((contradictions||[]).some(c=>c.severity==='critical')) hot.push('critical fracture');
+  if((scores.DOGM??50)>68) hot.push('dogma');
+  if((scores.FUSE??50)>68) hot.push('identity fusion');
+  if((scores.TRIB??50)>68) hot.push('tribe');
+  if((scores.AUTH??50)>68) hot.push('authority');
+  if((scores.EVID??50)>68) hot.push('evidence');
+  if((scores.META??50)>68) hot.push('metaphysics');
+  if((scores.OPEN??50)>68) hot.push('revision');
+  const nodes=['truth','authority','tribe','freedom','sacred','evidence','identity','death','progress','mercy','order','meaning'];
+  // constellation-report panel removed in v6 — canvas handles it now
+}
+
+function renderForensicDimBars(scores){
+  const el=$id('forensic-dim-bars');
+  if(!el)return;
+  el.innerHTML=FORENSIC_DIMS.map(d=>{
+    const v=scores[d.k]??50;
+    return`<div class="dim-row">
+      <span class="dim-name">${d.label}</span>
+      <div class="dim-bar"><div class="dim-fill" style="width:${v}%;background:${d.color}"></div></div>
+      <span class="dim-score">${v}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── BEHAVIORAL PREDICTION ────────────────────────────────────────────────────
+// All outputs are derived from existing dimension scores — no new questions.
+// These describe architectural tendencies, not individual certainties.
+
+const BEHAV_DEFS = [
+  {
+    id:'censorship',
+    label:'Censorship Tolerance',
+    note:'Tendency to accept or support restricting information and speech.',
+    formula: s => s.AUTH*0.40 + s.DOGM*0.30 + s.TRIB*0.20 + s.ABSO*0.10,
+    interps: [
+      [0,  28, 'Consistently favours open information flow even when ideas feel dangerous or wrong.'],
+      [28, 52, 'Accepts some content limits under specific conditions — not a universal principle.'],
+      [52, 70, 'Authority and ideological framing are doing meaningful filtering work on what ideas receive space.'],
+      [70, 87, 'Strong tendency to support restricting discourse perceived as destabilising or definitively wrong.'],
+      [87,101, 'Will actively support suppression of ideas that threaten the belief framework or the group.'],
+    ],
+  },
+  {
+    id:'defection',
+    label:'Tribe Defection Probability',
+    note:'Likelihood of breaking from community consensus under evidence pressure.',
+    formula: s => s.EVID*0.30 + s.OPEN*0.30 + s.HUMI*0.25 + (100-s.TRIB)*0.15,
+    interps: [
+      [0,  28, 'Unlikely to break from community consensus even under sustained evidence pressure.'],
+      [28, 52, 'Capable of internal dissent — public defection is costly and reserved for clear cases.'],
+      [52, 70, 'Will challenge the group openly when evidence becomes sufficiently unambiguous.'],
+      [70, 87, 'Truth-tracking over loyalty is a practiced rather than merely aspirational value.'],
+      [87,101, 'Low loyalty threshold — breaks from consensus with less evidence than most.'],
+    ],
+  },
+  {
+    id:'compliance',
+    label:'Authority Compliance Range',
+    note:'How far institutional authority can direct behaviour before conscience activates.',
+    formula: s => s.AUTH*0.40 + s.RIGD*0.25 + s.INHR*0.20 + s.DOGM*0.15,
+    interps: [
+      [0,  28, 'Authority given limited inherent weight. Compliance is conditional on independent reasoning.'],
+      [28, 52, 'Follows institutional direction within recognisable limits — not unconditionally.'],
+      [52, 70, 'Authority carries meaningful default weight. Conscience activates later in the sequence.'],
+      [70, 87, 'Compliance extends further than direct evidence or personal reasoning would justify alone.'],
+      [87,101, 'Authority can direct behaviour well into territory personal conscience might otherwise interrupt first.'],
+    ],
+  },
+  {
+    id:'evidence_resistance',
+    label:'Evidence Resistance',
+    note:'The evidential threshold required to shift a held position.',
+    formula: s => (100-s.OPEN)*0.35 + s.DOGM*0.35 + s.FUSE*0.20 + (100-s.HUMI)*0.10,
+    interps: [
+      [0,  28, 'Low resistance — positions shift readily under new information.'],
+      [28, 52, 'Requires reasonable evidence but is not unusually resistant to updating.'],
+      [52, 70, 'Evidence must overcome significant structural resistance before changing a held position.'],
+      [70, 87, 'Positions are heavily defended. Evidence operates at the margins rather than the core.'],
+      [87,101, 'Positions are largely impervious to evidential pressure from outside the belief framework.'],
+    ],
+  },
+  {
+    id:'moral_override',
+    label:'Moral Override Threshold',
+    note:'Likelihood of invoking higher-order justification to suspend normal ethical constraints.',
+    formula: s => s.ABSO*0.30 + s.TRAN*0.25 + s.FUSE*0.25 + (100-s.STRS)*0.20,
+    interps: [
+      [0,  28, 'Normal ethical constraints hold under most conditions. Principled exceptions are narrow.'],
+      [28, 52, 'Moral framework is relatively stable under pressure. Override conditions are clearly bounded.'],
+      [52, 70, 'Elevated likelihood of invoking higher-order justification for normally-excluded actions.'],
+      [70, 87, 'Strong tendency to justify unusual action under moral, sacred, or transcendent framing.'],
+      [87,101, 'The belief system contains architecture capable of suspending ordinary ethics under the right conditions.'],
+    ],
+  },
+  {
+    id:'preservation',
+    label:'Belief Preservation Drive',
+    note:'Active drive to protect and insulate the current worldview from disconfirmation.',
+    formula: s => s.FUSE*0.40 + s.DOGM*0.30 + s.RIGD*0.20 + s.INHR*0.10,
+    interps: [
+      [0,  28, 'Low drive. Exposure to disconfirmation is relatively welcome rather than threatening.'],
+      [28, 52, 'Some defensive filtering, but active disconfirmation-seeking is possible.'],
+      [52, 70, 'Meaningful effort invested in rationalising, insulating, and protecting the current worldview.'],
+      [70, 87, 'High systematic drive to prevent, discount, or reframe challenges to the belief framework.'],
+      [87,101, 'The worldview is heavily fortified. Challenge is processed as attack rather than information.'],
+    ],
+  },
+  {
+    id:'mobility',
+    label:'Ideological Mobility',
+    note:'Probability of significant worldview change in the coming years.',
+    formula: s => s.OPEN*0.35 + s.HUMI*0.25 + s.SELF*0.25 + (100-s.RIGD)*0.15,
+    interps: [
+      [0,  28, 'Architecture is stable and largely settled. Major worldview shifts are unlikely.'],
+      [28, 52, 'The map is mostly drawn — active re-evaluation is occurring but only at the edges.'],
+      [52, 70, 'Meaningful ongoing revision is probable. The current position is not the final position.'],
+      [70, 87, 'The worldview is still actively under construction. Significant changes are likely.'],
+      [87,101, 'High ideological mobility — this person may look substantially different in five years.'],
+    ],
+  },
+];
+
+function calcBehavioralProfile(scores){
+  const g = k => scores[k] ?? 50;
+  const clamp = n => Math.max(0, Math.min(100, Math.round(n)));
+  const fullScores = Object.fromEntries(ALL_DIMS.map(d => [d.k, g(d.k)]));
+  return BEHAV_DEFS.map(def => ({
+    ...def,
+    score: clamp(def.formula(fullScores)),
+  }));
+}
+
+function behavLevel(score){
+  if(score < 28) return {label:'Low',      color:'#39ff9f', bg:'rgba(57,255,159,.12)'};
+  if(score < 52) return {label:'Moderate', color:'#57b8ff', bg:'rgba(87,184,255,.12)'};
+  if(score < 70) return {label:'Elevated', color:'#ffd166', bg:'rgba(255,209,102,.12)'};
+  if(score < 87) return {label:'High',     color:'#ff8c42', bg:'rgba(255,140,66,.14)'};
+  return               {label:'Critical',  color:'#ff3b5c', bg:'rgba(255,59,92,.14)'};
+}
+
+function renderBehavioralProfile(scores){
+  const el=$id('behavior-panel');
+  if(!el)return;
+  const profile=calcBehavioralProfile(scores);
+  el.innerHTML=`
+    <div class="behav-intro">
+      Derived entirely from your existing dimension scores — no new questions. These are not diagnoses, labels, or predictions of what you will do. They are pressure-tendency estimates: how your stated worldview may behave under conflict, social pressure, evidence pressure, or identity threat.
+    </div>
+    ${profile.map(b=>{
+      const lv=behavLevel(b.score);
+      const interp=b.interps.find(([min,max])=>b.score>=min&&b.score<max);
+      const desc=interp?interp[2]:'';
+      return`<div class="behav-row">
+        <div class="behav-head">
+          <span class="behav-label">${escHtml(b.label)}</span>
+          <div class="behav-right">
+            <span class="behav-val">${b.score}</span>
+            <span class="behav-tag" style="color:${lv.color};background:${lv.bg}">${lv.label}</span>
+          </div>
+        </div>
+        <div class="behav-bar"><div class="behav-fill" style="width:${b.score}%;background:${lv.color}"></div></div>
+        <div class="behav-desc">${escHtml(desc)}</div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ─── IDENTITY FRAGMENTATION ────────────────────────────────────────────────────
+// Show worldview as a blend of systems rather than a single top match
+function calcFragmentation(scores){
+  const dimKeys=DIMS.map(d=>d.k); // core 9 only
+  const maxDist=Math.sqrt(dimKeys.length*100*100);
+  const sims=SYSTEMS.map(sys=>{
+    let sq=0;
+    dimKeys.forEach(k=>{const d=(scores[k]??50)-(sys.profile[k]??50);sq+=d*d;});
+    return{name:sys.name,raw:Math.max(0,1-Math.sqrt(sq)/maxDist)};
+  });
+  const total=sims.reduce((a,s)=>a+s.raw,0)||1;
+  return sims.map(s=>({name:s.name,pct:Math.round(s.raw/total*100)}))
+    .filter(s=>s.pct>=4).sort((a,b)=>b.pct-a.pct);
+}
+
+function renderFragmentation(scores){
+  const fp=$id('frag-panel');
+  if(!fp)return;
+  const frags=calcFragmentation(scores);
+  const top3=frags.slice(0,3).map(f=>f.name).join(' · ');
+  fp.innerHTML=`
+    <div class="frag-bars">
+      ${frags.slice(0,8).map(f=>`
+        <div class="frag-row">
+          <span class="frag-name">${escHtml(f.name)}</span>
+          <div class="frag-pct-bar"><div class="frag-pct-fill" style="width:${f.pct}%"></div></div>
+          <span class="frag-pct-num">${f.pct}%</span>
+        </div>`).join('')}
+    </div>
+    <div class="frag-summary">No worldview is a single system. Yours fragments across ${frags.length} identifiable clusters. Dominant: ${top3}.</div>`;
+}
+
+// ─── CONTRADICTION CONSTELLATION (Canvas) ─────────────────────────────────────
+const CONST_NODES = [
+  {label:'truth',     dim:'EVID'},
+  {label:'authority', dim:'AUTH'},
+  {label:'tribe',     dim:'TRIB'},
+  {label:'freedom',   dim:'COLL',  invert:true},
+  {label:'sacred',    dim:'RITE'},
+  {label:'evidence',  dim:'EVID'},
+  {label:'identity',  dim:'FUSE'},
+  {label:'death',     dim:'TRAN'},
+  {label:'progress',  dim:'PROG'},
+  {label:'mercy',     dim:'ABSO',  invert:true},
+  {label:'order',     dim:'AUTH'},
+  {label:'meaning',   dim:'TRAN'},
+];
+
+// Pairs that are in structural tension when both high (or one high, one inverted-high)
+const TENSION_PAIRS = [
+  [0,1],[0,2],[0,6],[0,9],   // truth vs authority/tribe/identity/justice
+  [1,3],[1,9],                // authority vs freedom, vs mercy
+  [2,3],[2,5],                // tribe vs freedom, vs evidence
+  [4,5],[4,8],                // sacred vs evidence, vs progress
+  [6,5],                      // identity vs evidence
+  [8,4],[8,2],                // progress vs sacred, vs tribe
+  [10,3],                     // order vs freedom
+  [7,5],                      // death vs evidence
+];
+
+// Pairs that align when both high
+const ALIGN_PAIRS = [
+  [0,5],[0,8],[1,10],[2,6],[4,7],[4,11],[7,11],[9,3],
+];
+
+function drawConstellationCanvas(scores){
+  const c=$id('constellation-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  const W=c.width,H=c.height;
+  const cx=W/2,cy=H/2;
+  const R=Math.min(W,H)*0.36;
+  ctx.clearRect(0,0,W,H);
+  // Background subtle glow
+  const bg=ctx.createRadialGradient(cx,cy,10,cx,cy,R*1.4);
+  bg.addColorStop(0,'rgba(160,102,255,0.04)');bg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  // Node positions
+  const n=CONST_NODES.length;
+  const pts=CONST_NODES.map((_,i)=>{
+    const a=(Math.PI*2*i/n)-Math.PI/2;
+    return{x:cx+R*Math.cos(a),y:cy+R*Math.sin(a)};
+  });
+
+  // Node scores (0-100)
+  const nodeScores=CONST_NODES.map(nd=>{
+    const v=scores[nd.dim]??50;
+    return nd.invert?100-v:v;
+  });
+
+  // Draw tension lines
+  TENSION_PAIRS.forEach(([a,b])=>{
+    const sa=nodeScores[a],sb=nodeScores[b];
+    const tension=Math.max(0,(sa-45)/55)*Math.max(0,(sb-45)/55); // 0 if either low
+    if(tension<0.1)return;
+    const alpha=Math.min(0.7,tension*0.9);
+    ctx.beginPath();
+    ctx.moveTo(pts[a].x,pts[a].y);
+    ctx.lineTo(pts[b].x,pts[b].y);
+    ctx.strokeStyle=`rgba(255,59,92,${alpha})`;
+    ctx.lineWidth=1+tension*2;
+    ctx.stroke();
+  });
+
+  // Draw alignment lines
+  ALIGN_PAIRS.forEach(([a,b])=>{
+    const sa=nodeScores[a],sb=nodeScores[b];
+    const align=Math.max(0,(sa-45)/55)*Math.max(0,(sb-45)/55);
+    if(align<0.15)return;
+    ctx.beginPath();
+    ctx.moveTo(pts[a].x,pts[a].y);
+    ctx.lineTo(pts[b].x,pts[b].y);
+    ctx.strokeStyle=`rgba(57,255,159,${Math.min(0.4,align*0.5)})`;
+    ctx.lineWidth=1;
+    ctx.setLineDash([3,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Draw nodes
+  CONST_NODES.forEach((nd,i)=>{
+    const {x,y}=pts[i];
+    const score=nodeScores[i];
+    const hot=score>65;
+    const calm=score<35;
+    const r=5+score/25; // node size scales with score
+
+    // Glow
+    if(hot){
+      const glow=ctx.createRadialGradient(x,y,0,x,y,r*3);
+      glow.addColorStop(0,'rgba(255,59,92,0.35)');
+      glow.addColorStop(1,'rgba(255,59,92,0)');
+      ctx.beginPath();ctx.arc(x,y,r*3,0,Math.PI*2);
+      ctx.fillStyle=glow;ctx.fill();
+    }
+
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=hot?'#ff3b5c':calm?'#273044':'#455070';
+    ctx.fill();
+    if(hot){ctx.strokeStyle='rgba(255,59,92,0.8)';ctx.lineWidth=1.5;ctx.stroke();}
+
+    // Label
+    const angle=(Math.PI*2*i/n)-Math.PI/2;
+    const lx=cx+(R+22)*Math.cos(angle);
+    const ly=cy+(R+22)*Math.sin(angle);
+    ctx.font=`${hot?'bold ':''}11px Inter,sans-serif`;
+    ctx.fillStyle=hot?'#ff9bad':calm?'#3a4560':'#8c97ad';
+    ctx.textAlign=lx<cx-5?'right':lx>cx+5?'left':'center';
+    ctx.textBaseline=ly<cy-5?'bottom':ly>cy+5?'top':'middle';
+    ctx.fillText(nd.label,lx,ly);
+  });
+
+  // Legend
+  const leg=$id('constellation-legend');
+  const hotNodes=CONST_NODES.filter((_,i)=>nodeScores[i]>65).map(n=>n.label);
+  if(leg) leg.innerHTML=`<div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6">
+    ${hotNodes.length?`<span style="color:var(--red)">Hot nodes: ${hotNodes.join(', ')}</span><br/>Red lines show active tension between these concepts.`:'No dominant tension nodes. Comparatively stable constellation.'}
+  </div>`;
+}
+
+// ─── TIMELINE RESULTS ─────────────────────────────────────────────────────────
+function renderTimelinePanel(){
+  const tl=state.timeline||{};
+  const p=$id('timeline-result-panel');
+  if(!p)return;
+  const entries=[
+    {age:'Childhood',text:tl.childBelief},
+    {age:'Teenage',text:tl.teenChange},
+    {age:'Early adult',text:tl.adultBelief},
+    {age:'Biggest shift',text:tl.biggest},
+  ].filter(e=>e.text);
+  const fears=[
+    {age:'Afraid might be true',text:tl.fearTrue,fear:true},
+    {age:'Would isolate you',text:tl.isolate,fear:true},
+    {age:'Would break identity',text:tl.identity,fear:true},
+  ].filter(e=>e.text);
+
+  // Use scored answers for drift analysis
+  const driftQ   = TIMELINE_QUESTIONS[0];
+  const driverQ  = TIMELINE_QUESTIONS[1];
+  const costQ    = TIMELINE_QUESTIONS[2];
+  const driftIdx  = state.answers['TL_DRIFT'];
+  const driverIdx = state.answers['TL_DRIVER'];
+  const costIdx   = state.answers['TL_COST'];
+  const driftLabel  = driftIdx!==undefined  ? driftQ.choices[driftIdx]?.label  : null;
+  const driverLabel = driverIdx!==undefined ? driverQ.choices[driverIdx]?.label : null;
+  const costLabel   = costIdx!==undefined   ? costQ.choices[costIdx]?.label    : null;
+
+  // Text keyword signals
+  const allText=[...entries,...fears].map(e=>e.text.toLowerCase()).join(' ');
+  const collapseWords=['died','death','lost','broke','collapsed','divorce','fired','failed','abuse','accident','trauma','left','betrayal','grief'];
+  const driftWords=['realized','changed','stopped','no longer','abandoned','found','discovered','questioned','rejected','rebuilt'];
+  const hasCollapse=collapseWords.some(w=>allText.includes(w));
+  const hasDrift=driftWords.some(w=>allText.includes(w));
+
+  // Build analysis paragraphs from scored + text signals
+  const analysis=[];
+
+  if(driftLabel){
+    const driftDesc={
+      'Very little — essentially the same person': 'Worldview shows high continuity from adolescence — either stability, protection from serious challenge, or both.',
+      'Some shifts, but the core is stable': 'Core structure has held while peripheral beliefs adjusted. Moderate reconstruction visible.',
+      'Significantly different in key areas': 'Meaningful reconstruction has occurred. The person who held the earlier beliefs would likely not fully recognise the current position.',
+      'Completely rebuilt — barely recognisable': 'Near-complete reconstruction. This is unusual and indicates either significant disruption, intense intellectual engagement, or both.',
+    }[driftLabel];
+    if(driftDesc) analysis.push(['Belief Drift',driftDesc]);
+  }
+
+  if(driverLabel){
+    const driverDesc={
+      'Suffering, loss, or trauma': 'The architecture has been shaped more by pain than argument. Beliefs built under pressure tend to be defended more emotionally than intellectually.',
+      'Deliberate study, argument, or evidence': 'Conscious intellectual reconstruction is the primary driver. This correlates with higher epistemic flexibility but doesn\'t immunise against motivated reasoning.',
+      'Community, relationship, or belonging': 'Social pressure has been the primary shaping force. The beliefs likely feel native rather than chosen, and may be harder to examine precisely because of that.',
+      'A direct experience nothing explained': 'Direct experience carries authority that argument cannot touch. This is epistemically valid; it\'s also why it\'s nearly impossible to debate with.',
+      'Nothing major — mostly gradual': 'No identifiable rupture point. Beliefs arrived rather than were chosen. Often the hardest type to examine because there\'s no clear moment to revisit.',
+    }[driverLabel];
+    if(driverDesc) analysis.push(['Change Driver',driverDesc]);
+  }
+
+  if(costLabel){
+    const costDesc={
+      'Fine — beliefs should track truth': 'Low identity fusion with current beliefs. High epistemic flexibility. Also possible: beliefs aren\'t yet fully stress-tested.',
+      'Unsettled, but I would adapt eventually': 'Moderate attachment. The identity cost is real but not incapacitating. This is a functional position.',
+      'Very distressed — it would feel like losing myself': 'High identity fusion. Belief change would be experienced as personal loss or death. Challenges to belief will likely be processed as attacks.',
+      'I would struggle to accept it regardless of evidence': 'Dogmatic architecture. Evidence alone cannot move the position. The psychological cost of disconfirmation exceeds the psychological benefit of truth.',
+    }[costLabel];
+    if(costDesc) analysis.push(['Identity Cost',costDesc]);
+  }
+
+  if(hasCollapse && !driverLabel) analysis.push(['Collapse Signal','A loss, rupture, or collapse event appears in the text. These typically reshape beliefs more durably than intellectual argument.']);
+  if(hasDrift && !driftLabel) analysis.push(['Reconstruction Signal','Active reconstruction language is present. The worldview appears to be one the person built rather than simply inherited.']);
+  if(fears.length>0) analysis.push(['Fear Pressure','The fear and identity questions reveal live, unresolved pressure points. These are the areas where the architecture is still working on itself.']);
+
+  if(!entries.length&&!fears.length&&!analysis.length){p.innerHTML='';return;}
+
+  p.innerHTML=`<div class="panel" style="margin-bottom:20px">
+    <h2>Belief Timeline</h2>
+    ${driftLabel||driverLabel||costLabel?`
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      ${driftLabel?`<span class="badge b-blue" style="font-size:11px">Drift: ${escHtml(driftLabel.split('—')[0].trim())}</span>`:''}
+      ${driverLabel?`<span class="badge b-purple" style="font-size:11px;color:var(--purple);border-color:rgba(160,102,255,.4);background:rgba(160,102,255,.07)">Driver: ${escHtml(driverLabel.split(',')[0])}</span>`:''}
+      ${costLabel?`<span class="badge b-red" style="font-size:11px">Cost: ${escHtml(costLabel.split('—')[0].trim())}</span>`:''}
+    </div>`:''}
+    ${entries.length||fears.length?`<div class="tl-result">
+      ${entries.map(e=>`<div class="tl-result-item"><span class="tl-age">${escHtml(e.age)}</span><span class="tl-text">${escHtml(e.text)}</span></div>`).join('')}
+      ${fears.map(e=>`<div class="tl-result-item tl-fear"><span class="tl-age">${escHtml(e.age)}</span><span class="tl-text">${escHtml(e.text)}</span></div>`).join('')}
+    </div>`:''}
+    ${analysis.length?`<div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+      ${analysis.map(([title,text])=>`<div class="forensic-block"><h3>${escHtml(title)}</h3><p>${escHtml(text)}</p></div>`).join('')}
+    </div>`:''}
+  </div>`;
+}
+
+function renderResults(){
+  const {scores,alignments,contradictions}=state;
+  // Tagline
+  const top2=DIMS.slice().sort((a,b)=>(scores[b.k]??50)-(scores[a.k]??50)).slice(0,2);
+  const bot2=DIMS.slice().sort((a,b)=>(scores[a.k]??50)-(scores[b.k]??50)).slice(0,2);
+  $id('results-tagline').textContent=
+    `High ${top2.map(d=>d.label).join(' · ')}  ·  Low ${bot2.map(d=>d.label).join(' · ')}`;
+
+  const mp=$id('result-mode-pill');
+  if(mp){
+    const counted=state.profileMode==='main';
+    mp.innerHTML=`Run mode: <strong>${getModeLabel()}</strong> · ${counted?'counts as real voice':'excluded from public charts'}`;
+  }
+  // Radar
+  drawRadar(scores);
+  // Dim bars
+  $id('dim-bars').innerHTML=DIMS.map(d=>{
+    const v=scores[d.k]??50;
+    return`<div class="dim-row">
+      <span class="dim-name">${d.label}</span>
+      <div class="dim-bar"><div class="dim-fill" style="width:${v}%;background:${d.color}"></div></div>
+      <span class="dim-score">${v}</span>
+    </div>`;
+  }).join('');
+  // Alignments (top 7)
+  $id('align-list').innerHTML=alignments.slice(0,7).map(a=>`
+    <div class="align-row">
+      <div class="align-head">
+        <span class="align-name">${escHtml(a.name)}</span>
+        <span class="align-pct">${a.similarity}%</span>
+      </div>
+      <div class="align-desc">${escHtml(a.desc)}</div>
+      <div class="align-bar"><div class="align-fill" style="width:${a.similarity}%"></div></div>
+    </div>`).join('');
+  // DNA chips
+  const dominant=DIMS.filter(d=>(scores[d.k]??50)>65);
+  const weak=DIMS.filter(d=>(scores[d.k]??50)<35);
+  $id('dna-chips').innerHTML=
+    dominant.map(d=>`<span class="dna-chip"><b style="color:${d.color}">↑</b>${d.label}</span>`).join('')+
+    weak.map(d=>`<span class="dna-chip"><b style="color:#4a5568">↓</b>${d.label}</span>`).join('')||
+    `<span style="color:var(--muted);font-size:13px">Balanced worldview — no extreme dimensions detected.</span>`;
+  // Contradictions
+  if(contradictions.length===0){
+    $id('contra-list').innerHTML=`<p class="no-contra">No major internal contradictions detected in your responses.</p>`;
+  } else {
+    $id('contra-list').innerHTML=contradictions.map(c=>`
+      <div class="contra-item ${c.severity}">
+        <div class="contra-title">${escHtml(c.title)}</div>
+        <div class="contra-desc">${escHtml(c.desc)}</div>
+      </div>`).join('');
+  }
+  // V5 forensic panels
+  renderForensicPanels(scores,contradictions);
+  renderForensicDimBars(scores);
+  renderFragmentation(scores);
+  renderBehavioralProfile(scores);
+  setTimeout(()=>drawConstellationCanvas(scores),80);
+  renderTimelinePanel();
+  // Share card
+  setTimeout(()=>drawShareCard(scores,alignments,contradictions),100);
+  // Gap analysis
+  renderGapPanel(scores);
+}
+
+// ─── GAP ANALYSIS ─────────────────────────────────────────────────────────────
+function renderGapPanel(scores){
+  const wrap=$id('gap-panel-wrap');
+  const id=state.identity||{worldview:[],political:null,settled:null};
+  const hasWorldview=id.worldview&&id.worldview.length>0;
+  const hasPolitical=!!id.political;
+
+  if(!hasWorldview&&!hasPolitical){wrap.innerHTML='';return;}
+
+  // Build a blended expected profile from all declared identities
+  const allDeclared=[];
+  if(hasWorldview){
+    id.worldview.forEach(label=>{
+      const dims=findWorldviewDims(label);
+      if(dims) allDeclared.push({label,dims,type:'worldview'});
+    });
+  }
+  if(hasPolitical){
+    const opt=POLITICAL_OPTIONS.find(o=>o.label===id.political);
+    if(opt&&opt.dims) allDeclared.push({label:id.political,dims:opt.dims,type:'political'});
+  }
+  if(allDeclared.length===0){wrap.innerHTML='';return;}
+
+  // Average the expected profiles
+  const dimKeys=DIMS.map(d=>d.k);
+  const expected={};
+  dimKeys.forEach(k=>{
+    const vals=allDeclared.map(d=>d.dims[k]).filter(v=>v!==undefined);
+    expected[k]=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):50;
+  });
+
+  // Compute deltas
+  const deltas=DIMS.map(d=>{
+    const actual=scores[d.k]??50;
+    const exp=expected[d.k]??50;
+    return{...d, actual, expected:exp, delta:actual-exp};
+  }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+
+  const bigGaps=deltas.filter(d=>Math.abs(d.delta)>22);
+  const labelStr=allDeclared.map(d=>`<strong>${escHtml(d.label)}</strong>`).join(', ');
+  const godNote=id.godCount&&id.godCount!=='Skip this'?
+    ` On the God Question: <strong>${escHtml(id.godCount)}</strong>.`:'';
+  const settledNote=id.settled?` Belief settledness: <strong>${escHtml(id.settled)}</strong>.`:'';
+
+  // Gap summary text
+  let summary='';
+  if(bigGaps.length===0){
+    summary='Your declared identity and your actual belief architecture are broadly consistent. Your self-knowledge appears accurate.';
+  } else {
+    const over=bigGaps.filter(d=>d.delta>0).map(d=>d.label);
+    const under=bigGaps.filter(d=>d.delta<0).map(d=>d.label);
+    const parts=[];
+    if(over.length) parts.push(`you score significantly <em>higher</em> than expected on: ${over.join(', ')}`);
+    if(under.length) parts.push(`significantly <em>lower</em> than expected on: ${under.join(', ')}`);
+    summary=`Compared to what ${allDeclared.map(d=>d.label).join(' / ')} typically implies, ${parts.join('; ')}.`;
+  }
+
+  wrap.innerHTML=`
+    <div class="panel gap-panel" style="margin-bottom:20px">
+      <h2>Claimed vs Actual</h2>
+      <p class="gap-declared">You identified as ${labelStr}.${godNote}${settledNote}</p>
+
+      <div class="gap-row">
+        <div class="gap-label">Top divergences — expected vs actual</div>
+        ${deltas.slice(0,6).map(d=>`
+          <div class="gap-bar-row" style="margin-bottom:10px">
+            <span style="font-size:11px;color:var(--muted);width:100px;flex-shrink:0">${d.label}</span>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:9px;color:#4a5568;width:42px;text-align:right;flex-shrink:0">Expected</span>
+                <div class="gap-bar-track"><div class="gap-bar-fill" style="width:${d.expected}%;background:#2a3550"></div></div>
+                <span class="gap-score" style="color:#4a5568">${d.expected}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:9px;color:${d.color};width:42px;text-align:right;flex-shrink:0">Actual</span>
+                <div class="gap-bar-track"><div class="gap-bar-fill" style="width:${d.actual}%;background:${d.color}"></div></div>
+                <span class="gap-score" style="color:${d.color}">${d.actual}</span>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+
+      ${bigGaps.length>0?`
+        <div class="gap-delta-list">
+          ${bigGaps.map(d=>d.delta>0?`
+            <div class="gap-delta over">
+              <strong>↑ ${d.label} higher than expected (+${d.delta})</strong><br/>
+              Your answers show stronger <em>${d.label.toLowerCase()}</em> than ${allDeclared.map(x=>x.label).join('/')} typically implies.
+            </div>`:`
+            <div class="gap-delta under">
+              <strong>↓ ${d.label} lower than expected (${d.delta})</strong><br/>
+              Your answers show weaker <em>${d.label.toLowerCase()}</em> than ${allDeclared.map(x=>x.label).join('/')} typically implies.
+            </div>`).join('')}
+        </div>`:''}
+
+      <div class="gap-summary">${summary}</div>
+    </div>`;
+}
+
+// ─── RADAR CHART ──────────────────────────────────────────────────────────────
+function drawRadar(scores){
+  const canvas=$id('radar-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const cx=W/2,cy=H/2;
+  const n=DIMS.length;
+  const maxR=Math.min(W,H)*0.36;
+  const rings=4;
+  ctx.clearRect(0,0,W,H);
+  // Rings
+  for(let r=1;r<=rings;r++){
+    ctx.beginPath();
+    ctx.strokeStyle=`rgba(255,255,255,${r===rings?0.12:0.05})`;
+    ctx.lineWidth=1;
+    for(let i=0;i<=n;i++){
+      const a=(Math.PI*2*i/n)-Math.PI/2;
+      const rx=cx+(maxR*r/rings)*Math.cos(a);
+      const ry=cy+(maxR*r/rings)*Math.sin(a);
+      i===0?ctx.moveTo(rx,ry):ctx.lineTo(rx,ry);
+    }
+    ctx.closePath();ctx.stroke();
+  }
+  // Axes
+  DIMS.forEach((_,i)=>{
+    const a=(Math.PI*2*i/n)-Math.PI/2;
+    ctx.beginPath();
+    ctx.strokeStyle='rgba(255,255,255,0.08)';
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+maxR*Math.cos(a),cy+maxR*Math.sin(a));
+    ctx.stroke();
+  });
+  // Data polygon
+  const pts=DIMS.map((d,i)=>{
+    const a=(Math.PI*2*i/n)-Math.PI/2;
+    const r=((scores[d.k]??50)/100)*maxR;
+    return[cx+r*Math.cos(a),cy+r*Math.sin(a)];
+  });
+  ctx.beginPath();
+  pts.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));
+  ctx.closePath();
+  ctx.fillStyle='rgba(160,102,255,0.12)';ctx.fill();
+  ctx.strokeStyle='rgba(160,102,255,0.7)';ctx.lineWidth=2;ctx.stroke();
+  // Dots
+  pts.forEach(([x,y],i)=>{
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle=DIMS[i].color;ctx.fill();
+  });
+  // Labels
+  DIMS.forEach((d,i)=>{
+    const a=(Math.PI*2*i/n)-Math.PI/2;
+    const r=maxR+26;
+    const x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);
+    ctx.font='11px Inter,sans-serif';
+    ctx.fillStyle=d.color;
+    ctx.textAlign=x<cx-5?'right':x>cx+5?'left':'center';
+    ctx.textBaseline=y<cy-5?'bottom':y>cy+5?'top':'middle';
+    ctx.fillText(d.label,x,y);
+  });
+}
+
+// ─── SHARE CARD ───────────────────────────────────────────────────────────────
+function drawShareCard(scores,alignments,contradictions){
+  const c=$id('share-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  const W=c.width,H=c.height;
+
+  // Background
+  const bg=ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#0b0d18');bg.addColorStop(1,'#07080d');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  // Corner glow
+  const g1=ctx.createRadialGradient(0,0,10,0,0,320);
+  g1.addColorStop(0,'rgba(160,102,255,0.22)');g1.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g1;ctx.fillRect(0,0,W,H);
+  const g2=ctx.createRadialGradient(W,H,10,W,H,320);
+  g2.addColorStop(0,'rgba(255,59,92,0.15)');g2.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g2;ctx.fillRect(0,0,W,H);
+
+  // Header
+  ctx.fillStyle='#a066ff';ctx.font='bold 11px Inter,sans-serif';
+  ctx.fillText('HUMANX BELIEF ENGINE — FORENSIC PROFILE',40,38);
+  ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(40,50);ctx.lineTo(W-40,50);ctx.stroke();
+
+  // Mini radar left
+  drawMiniRadar(ctx,scores,130,220,100);
+  ctx.fillStyle='#4a5568';ctx.font='10px Inter,sans-serif';ctx.textAlign='center';
+  ctx.fillText('Core 9 dims',130,335);ctx.textAlign='left';
+
+  // Fragmentation top 3 (left, below radar)
+  const frags=calcFragmentation(scores);
+  ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';
+  ctx.fillText('WORLDVIEW ASSEMBLY',40,370);
+  frags.slice(0,4).forEach((f,i)=>{
+    const y=388+i*22;
+    ctx.fillStyle='#c8d0e0';ctx.font=`12px Inter,sans-serif`;ctx.fillText(f.name,40,y);
+    ctx.fillStyle='#a066ff';ctx.font='bold 12px Inter,sans-serif';ctx.fillText(`${f.pct}%`,270,y);
+  });
+
+  // Meta scores right column
+  const meta=state.metaReport?.meta||calcMetaReport(state.answers,scores,contradictions).meta;
+  const metaDefs=[
+    ['coherence','Coherence'],['flexibility','Flexibility'],
+    ['tribalDependence','Tribal Load'],['epistemicDiscipline','Epistemic'],
+    ['identityFragility','ID Fragility'],['stressIntegrity','Stress Hold'],
+  ];
+  ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';
+  ctx.fillText('FORENSIC META-SCORES',320,68);
+  metaDefs.forEach(([k,l],i)=>{
+    const row=i%3,col=Math.floor(i/3);
+    const x=320+col*280,y=88+row*68;
+    const v=meta[k]??50;
+    const color=v>65?'#39ff9f':v<35?'#ff3b5c':'#57b8ff';
+    ctx.fillStyle=color;ctx.font=`bold 22px Syne,sans-serif`;ctx.fillText(v,x,y+18);
+    ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';ctx.fillText(l,x,y+30);
+    ctx.fillStyle='#1a2035';ctx.fillRect(x,y+36,120,4);
+    ctx.fillStyle=color;ctx.fillRect(x,y+36,v*1.2,4);
+  });
+
+  // Origin signal
+  const origin=state.metaReport?.origin||[];
+  if(origin[0]){
+    ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';ctx.fillText('ORIGIN SIGNAL',320,290);
+    ctx.fillStyle='#c8d0e0';ctx.font='12px Inter,sans-serif';
+    wrapTextCard(ctx,origin[0],320,308,560,16);
+  }
+
+  // Stress test signal
+  const stress=state.metaReport?.stress||[];
+  if(stress[0]){
+    ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';ctx.fillText('STRESS POSITION',320,358);
+    ctx.fillStyle='#facc15';ctx.font='bold 12px Inter,sans-serif';ctx.fillText(stress[0][0],320,374);
+    ctx.fillStyle='#c8d0e0';ctx.font='11px Inter,sans-serif';
+    wrapTextCard(ctx,stress[0][1],320,390,560,15);
+  }
+
+  // Behavioral top signals
+  const behav=calcBehavioralProfile(scores);
+  const topBehav=behav.sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50)).slice(0,3);
+  ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';
+  ctx.fillText('BEHAVIORAL SIGNALS',320,415);
+  topBehav.forEach((b,i)=>{
+    const lv=behavLevel(b.score);
+    const y=433+i*18;
+    ctx.fillStyle=lv.color;ctx.font='bold 11px Inter,sans-serif';
+    ctx.fillText(`${lv.label.toUpperCase()}  ${b.label}`,320,y);
+  });
+  ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(40,450);ctx.lineTo(W-40,450);ctx.stroke();
+  const cc=contradictions.length;
+  ctx.fillStyle=cc>0?'#ff3b5c':'#39ff9f';ctx.font='bold 11px Inter,sans-serif';
+  ctx.fillText(`${cc===0?'No':cc} contradiction${cc!==1?'s':''} detected`,40,470);
+  ctx.fillStyle='#4a5568';ctx.font='10px Inter,sans-serif';
+  ctx.textAlign='right';ctx.fillText('humanx · stored locally · you said it. now prove it.',W-40,470);ctx.textAlign='left';
+}
+
+function wrapTextCard(ctx,text,x,y,maxW,lineH){
+  if(!text)return;
+  const words=text.split(' ');let line='';
+  for(const w of words){
+    const t=line+w+' ';
+    if(ctx.measureText(t).width>maxW&&line){ctx.fillText(line,x,y);line=w+' ';y+=lineH;}
+    else line=t;
+  }
+  ctx.fillText(line,x,y);
+}
+
+function drawMiniRadar(ctx,scores,cx,cy,maxR){
+  const n=DIMS.length;
+  const rings=3;
+  for(let r=1;r<=rings;r++){
+    ctx.beginPath();
+    ctx.strokeStyle=`rgba(255,255,255,0.06)`;ctx.lineWidth=1;
+    for(let i=0;i<=n;i++){
+      const a=(Math.PI*2*i/n)-Math.PI/2;
+      const rx=cx+(maxR*r/rings)*Math.cos(a),ry=cy+(maxR*r/rings)*Math.sin(a);
+      i===0?ctx.moveTo(rx,ry):ctx.lineTo(rx,ry);
+    }
+    ctx.closePath();ctx.stroke();
+  }
+  const pts=DIMS.map((d,i)=>{
+    const a=(Math.PI*2*i/n)-Math.PI/2;
+    const r=((scores[d.k]??50)/100)*maxR;
+    return[cx+r*Math.cos(a),cy+r*Math.sin(a)];
+  });
+  ctx.beginPath();
+  pts.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));
+  ctx.closePath();
+  ctx.fillStyle='rgba(160,102,255,0.15)';ctx.fill();
+  ctx.strokeStyle='rgba(160,102,255,0.6)';ctx.lineWidth=1.5;ctx.stroke();
+}
+
+function downloadShare(){
+  const c=$id('share-canvas');
+  const a=document.createElement('a');
+  a.download='humanx-belief-engine.png';a.href=c.toDataURL('image/png');a.click();
+}
+function copyShareText(){
+  const {scores,alignments}=state;
+  const meta=state.metaReport?.meta||calcMetaReport(state.answers,scores,state.contradictions).meta;
+  const top3=alignments.slice(0,3).map(a=>`${a.name} (${a.similarity}%)`).join(', ');
+  const dimStr=DIMS.map(d=>`${d.label}:${scores[d.k]??50}`).join(' | ');
+  navigator.clipboard?.writeText(`HUMANX BELIEF ENGINE\n\nTop alignments: ${top3}\n\nDimensions: ${dimStr}\n\nCoherence: ${meta.coherence} | Flexibility: ${meta.flexibility} | Epistemic Discipline: ${meta.epistemicDiscipline}\n\nhumanx.app`);
+  alert('Summary copied to clipboard.');
+}
+
+function escHtml(s){
+  return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
