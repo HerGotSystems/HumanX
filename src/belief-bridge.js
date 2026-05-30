@@ -66,9 +66,10 @@ async function promoteToTruth(env, json, helpers, userId, snap, statement, body)
 
 async function promoteToClaim(env, json, helpers, userId, snap, statement, body) {
   const { cleanText, makeId } = helpers;
-  const normalized = normalize(statement);
+  const normalized = normalizeClaim(statement);
   const now = Date.now();
-  const existing = await env.DB.prepare(`SELECT * FROM claims WHERE lower(trim(claim))=? LIMIT 1`).bind(statement.toLowerCase().trim()).first();
+  const rows = await env.DB.prepare(`SELECT * FROM claims ORDER BY created_at DESC LIMIT 300`).all();
+  const existing = (rows.results || []).find(c => normalizeClaim(c.claim) === normalized);
   if (existing) return json({ ok: true, target: 'claim', existing: true, claimId: existing.id, claim: mapClaim(existing) });
 
   const id = makeId('clm');
@@ -146,4 +147,12 @@ function safeParse(v) {
 
 function normalize(v) {
   return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function normalizeClaim(v) {
+  return normalize(v)
+    .replace(/\bthis statement reflects reality consistently enough to survive evidence and repeatable pressure testing\b/g, '')
+    .replace(/\bclaim\b/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
