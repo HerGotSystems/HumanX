@@ -78,10 +78,28 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
   const pressure = Number(snap.pressure_score || 0);
   const survivability = Math.max(0, Math.min(100, Math.round(evidenceScore - pressure * 0.4 + testability * 0.25)));
   const status = testability < 15 ? 'Untestable' : evidenceScore > 65 ? 'Plausible' : 'Weak Evidence';
+  const normalizedClaim = normalizeClaim(statement);
 
-  await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-    .bind(id, userId, statement, cleanText(body.category || 'Belief', 80), type, status, evidenceScore, survivability, testability, pressure > 55 ? 1 : 0, now, now, 'public')
-    .run();
+  const insertedWithKey = await tryInsertClaimWithNormalizedKey(env, {
+    id,
+    userId,
+    statement,
+    category: cleanText(body.category || 'Belief', 80),
+    type,
+    status,
+    evidenceScore,
+    survivability,
+    testability,
+    contradictions: pressure > 55 ? 1 : 0,
+    now,
+    normalizedClaim
+  });
+
+  if (!insertedWithKey) {
+    await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      .bind(id, userId, statement, cleanText(body.category || 'Belief', 80), type, status, evidenceScore, survivability, testability, pressure > 55 ? 1 : 0, now, now, 'public')
+      .run();
+  }
 
   await env.DB.prepare(`INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at) VALUES (?,?,?,?,?,?,?,?,?)`)
     .bind(makeId('evd'), id, userId, 'support', 'testimony', 'Belief snapshot origin', cleanText(snap.summary || 'Claim created from a personal belief snapshot.', 1200), '', now)
@@ -95,8 +113,25 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
   return json({ ok: true, target: 'claim', existing: false, claimId: id, claim: mapClaim(row) });
 }
 
+async function tryInsertClaimWithNormalizedKey(env, c) {
+  try {
+    await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state,normalized_claim) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      .bind(c.id, c.userId, c.statement, c.category, c.type, c.status, c.evidenceScore, c.survivability, c.testability, c.contradictions, c.now, c.now, 'public', c.normalizedClaim)
+      .run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function findExistingClaim(env, statement) {
   const normalized = normalizeClaim(statement);
+
+  try {
+    const indexed = await env.DB.prepare(`SELECT * FROM claims WHERE normalized_claim=? ORDER BY created_at ASC LIMIT 1`).bind(normalized).first();
+    if (indexed) return indexed;
+  } catch {}
+
   const rows = await env.DB.prepare(`SELECT * FROM claims ORDER BY created_at DESC LIMIT 500`).all();
   return (rows.results || []).find(c => normalizeClaim(c.claim) === normalized) || null;
 }
