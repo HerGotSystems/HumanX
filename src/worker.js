@@ -65,7 +65,7 @@ export default {
 };
 
 async function debugState(request, env) {
-  const tables = ['users', 'claims', 'evidence', 'pressure_points', 'reports', 'aip_packets', 'rate_limits'];
+  const tables = ['users', 'claims', 'evidence', 'pressure_points', 'reports', 'aip_packets', 'rate_limits', 'analysis_results'];
   const counts = {};
   for (const table of tables) {
     try {
@@ -99,8 +99,7 @@ async function createOrGetUser(request, env) {
   const handle = cleanHandle(body.handle) || `anon-${userId.slice(-6)}`;
   const fingerprint = String(body.fingerprintHash || '').slice(0, 128);
 
-  await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, fingerprint_hash, created_at) VALUES (?, ?, ?, ?)`)
-    .bind(userId, handle, fingerprint, now).run();
+  await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, fingerprint_hash, created_at) VALUES (?, ?, ?, ?)`).bind(userId, handle, fingerprint, now).run();
 
   let user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned, is_admin FROM users WHERE id=?`).bind(userId).first();
   if (!user) {
@@ -124,39 +123,38 @@ async function listClaims(request, env) {
 async function getClaim(request, env, claimId) {
   const claim = await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(claimId).first();
   if (!claim) return json({ error: 'CLAIM_NOT_FOUND' }, 404);
+
   const analyses = await listAnalysisForClaim(env, claimId);
+
   const directEvidence = await env.DB.prepare(`
-  SELECT e.*, u.handle, 'direct' AS link_type
-  FROM evidence e
-  LEFT JOIN users u ON u.id=e.user_id
-  WHERE e.claim_id=?
-`).bind(claimId).all();
+    SELECT e.*, u.handle, 'direct' AS link_type
+    FROM evidence e
+    LEFT JOIN users u ON u.id=e.user_id
+    WHERE e.claim_id=?
+  `).bind(claimId).all();
 
-const reusedEvidence = await env.DB.prepare(`
-  SELECT e.*, u.handle, l.stance AS linked_stance, l.link_note, 'reused' AS link_type
-  FROM evidence_claim_links l
-  JOIN evidence e ON e.id=l.evidence_id
-  LEFT JOIN users u ON u.id=e.user_id
-  WHERE l.claim_id=?
-`).bind(claimId).all();
+  const reusedEvidence = await env.DB.prepare(`
+    SELECT e.*, u.handle, l.stance AS linked_stance, l.link_note, 'reused' AS link_type
+    FROM evidence_claim_links l
+    JOIN evidence e ON e.id=l.evidence_id
+    LEFT JOIN users u ON u.id=e.user_id
+    WHERE l.claim_id=?
+  `).bind(claimId).all();
 
-const evidence = {
-  results: [
+  const evidence = [
     ...(directEvidence.results || []),
     ...(reusedEvidence.results || [])
-  ].sort((a,b)=>(b.created_at||0)-(a.created_at||0))
-};
+  ].sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
 
   const pressure = await env.DB.prepare(`SELECT p.*, u.handle FROM pressure_points p LEFT JOIN users u ON u.id=p.user_id WHERE p.claim_id=? ORDER BY p.created_at DESC`).bind(claimId).all();
-
   const tests = await env.DB.prepare(`SELECT t.*, u.handle FROM home_tests t LEFT JOIN users u ON u.id=t.user_id WHERE t.claim_id=? ORDER BY t.created_at DESC`).bind(claimId).all();
 
   return json({
     claim: mapClaim(claim),
-    evidence: evidence.results || [],
+    evidence,
     pressure: pressure.results || [],
     tests: tests.results || [],
-    analyses
+    analyses: analyses || []
   });
 }
 
@@ -174,8 +172,7 @@ async function createClaim(request, env) {
   const category = cleanText(body.category || inferCategory(claim), 80) || 'General';
   const testability = inferTestability(type, claim);
 
-  await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-    .bind(claimId, userId, claim, category, type, 'Plausible', 5, 50, testability, 0, now, now, 'public').run();
+  await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(claimId, userId, claim, category, type, 'Plausible', 5, 50, testability, 0, now, now, 'public').run();
 
   if (body.initialEvidence) {
     await insertEvidence(env, claimId, userId, 'support', cleanText(body.initialEvidence, 900), 'Initial evidence', 'testimony', '');
@@ -211,8 +208,7 @@ async function addPressure(request, env) {
   const now = Date.now();
   const pressureId = makeId('prs');
   const severity = Math.max(1, Math.min(5, Number(body.severity || 1)));
-  await env.DB.prepare(`INSERT INTO pressure_points (id,claim_id,user_id,title,body,severity,created_at) VALUES (?,?,?,?,?,?,?)`)
-    .bind(pressureId, claimId, userId, title, note, severity, now).run();
+  await env.DB.prepare(`INSERT INTO pressure_points (id,claim_id,user_id,title,body,severity,created_at) VALUES (?,?,?,?,?,?,?)`).bind(pressureId, claimId, userId, title, note, severity, now).run();
   await recalcClaim(env, claimId);
   return json({ pressure: { id: pressureId, claim_id: claimId, title, body: note, severity, created_at: now }, claim: await claimOnly(env, claimId) });
 }
@@ -227,8 +223,7 @@ async function reportTarget(request, env) {
   if (!targetId) return json({ error: 'BAD_REPORT' }, 400);
   await ensureUser(env, userId);
   const now = Date.now();
-  await env.DB.prepare(`INSERT INTO reports (id,target_type,target_id,reporter_id,reason,created_at,status) VALUES (?,?,?,?,?,?,?)`)
-    .bind(makeId('rpt'), targetType, targetId, userId, reason, now, 'open').run();
+  await env.DB.prepare(`INSERT INTO reports (id,target_type,target_id,reporter_id,reason,created_at,status) VALUES (?,?,?,?,?,?,?)`).bind(makeId('rpt'), targetType, targetId, userId, reason, now, 'open').run();
   if (targetType === 'claim') {
     await env.DB.prepare(`UPDATE claims SET report_count=report_count+1, review_state=CASE WHEN report_count>=2 THEN 'review' ELSE review_state END WHERE id=?`).bind(targetId).run();
   }
@@ -242,8 +237,7 @@ async function createAipPacket(request, env) {
   const detail = await claimDetail(env, claimId);
   if (!detail.claim) return json({ error: 'CLAIM_NOT_FOUND' }, 404);
   const packet = buildAip(detail);
-  await env.DB.prepare(`INSERT INTO aip_packets (id,claim_id,packet_json,created_at) VALUES (?,?,?,?)`)
-    .bind(makeId('aip'), claimId, JSON.stringify(packet), Date.now()).run();
+  await env.DB.prepare(`INSERT INTO aip_packets (id,claim_id,packet_json,created_at) VALUES (?,?,?,?)`).bind(makeId('aip'), claimId, JSON.stringify(packet), Date.now()).run();
   return json({ packet });
 }
 
@@ -257,8 +251,7 @@ async function reviewQueue(request, env) {
 async function insertEvidence(env, claimId, userId, stance, body, title, quality, sourceUrl) {
   const now = Date.now();
   const evidenceId = makeId('evd');
-  await env.DB.prepare(`INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at) VALUES (?,?,?,?,?,?,?,?,?)`)
-    .bind(evidenceId, claimId, userId, stance, quality, title, body, sourceUrl, now).run();
+  await env.DB.prepare(`INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at) VALUES (?,?,?,?,?,?,?,?,?)`).bind(evidenceId, claimId, userId, stance, quality, title, body, sourceUrl, now).run();
   return { id: evidenceId, claim_id: claimId, stance, quality, title, body, source_url: sourceUrl, created_at: now };
 }
 
@@ -273,8 +266,7 @@ async function recalcClaim(env, claimId) {
   const testability = Number(claim?.testability || 50);
   const survivability = clamp(Math.round(avg - pressure * 1.8 + testability * 0.22), 0, 100);
   const status = verdict(claim?.type || '', avg, testability, survivability, contradictions);
-  await env.DB.prepare(`UPDATE claims SET evidence_score=?, survivability=?, contradictions=?, status=?, updated_at=? WHERE id=?`)
-    .bind(avg, survivability, contradictions, status, Date.now(), claimId).run();
+  await env.DB.prepare(`UPDATE claims SET evidence_score=?, survivability=?, contradictions=?, status=?, updated_at=? WHERE id=?`).bind(avg, survivability, contradictions, status, Date.now(), claimId).run();
 }
 
 function verdict(type, avg, testability, survivability, contradictions) {
@@ -294,30 +286,15 @@ async function claimOnly(env, claimId) {
 async function claimDetail(env, claimId) {
   const claim = await claimOnly(env, claimId);
   const analyses = await listAnalysisForClaim(env, claimId);
+
   const directEvidence = await env.DB.prepare(`
-    SELECT
-      title,
-      body,
-      quality,
-      source_url,
-      stance,
-      'direct' AS link_type,
-      NULL AS linked_stance,
-      NULL AS link_note
+    SELECT title, body, quality, source_url, stance, 'direct' AS link_type, NULL AS linked_stance, NULL AS link_note
     FROM evidence
     WHERE claim_id=?
   `).bind(claimId).all();
 
   const reusedEvidence = await env.DB.prepare(`
-    SELECT
-      e.title,
-      e.body,
-      e.quality,
-      e.source_url,
-      e.stance,
-      'reused' AS link_type,
-      l.stance AS linked_stance,
-      l.link_note
+    SELECT e.title, e.body, e.quality, e.source_url, e.stance, 'reused' AS link_type, l.stance AS linked_stance, l.link_note
     FROM evidence_claim_links l
     JOIN evidence e ON e.id=l.evidence_id
     WHERE l.claim_id=?
@@ -328,26 +305,15 @@ async function claimDetail(env, claimId) {
     ...(reusedEvidence.results || [])
   ];
 
-  const pressure = await env.DB.prepare(`
-    SELECT title, body, severity
-    FROM pressure_points
-    WHERE claim_id=?
-    ORDER BY created_at DESC
-  `).bind(claimId).all();
-
-  const tests = await env.DB.prepare(`
-    SELECT title, instructions, safety_level, difficulty
-    FROM home_tests
-    WHERE claim_id=?
-    ORDER BY created_at DESC
-  `).bind(claimId).all();
+  const pressure = await env.DB.prepare(`SELECT title, body, severity FROM pressure_points WHERE claim_id=? ORDER BY created_at DESC`).bind(claimId).all();
+  const tests = await env.DB.prepare(`SELECT title, instructions, safety_level, difficulty FROM home_tests WHERE claim_id=? ORDER BY created_at DESC`).bind(claimId).all();
 
   return {
     claim,
     evidence,
     pressure: pressure.results || [],
     tests: tests.results || [],
-    analyses
+    analyses: analyses || []
   };
 }
 
