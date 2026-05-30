@@ -19,9 +19,13 @@ export async function addAnalysisResult(request, env, helpers) {
   const now = Date.now();
   const id = makeId('anl');
   const verdict = cleanText(analysis.verdict || '', 80);
-  const evidenceScore = clampNum(analysis.evidence_score, 0, 100);
+  const evidenceScore = clampNum(analysis.evidence_score ?? analysis.evidenceScore, 0, 100);
   const testability = clampNum(analysis.testability, 0, 100);
   const survivability = clampNum(analysis.survivability, 0, 100);
+  const strongestSupport = analysis.strongest_support ?? analysis.strongestSupport;
+  const strongestPressure = analysis.strongest_pressure ?? analysis.strongestPressure;
+  const missingTests = analysis.missing_tests ?? analysis.missingTests;
+  const plainLanguageSummary = analysis.plain_language_summary ?? analysis.plainLanguageSummary ?? '';
 
   await env.DB.prepare(`
     INSERT INTO analysis_results (
@@ -33,15 +37,15 @@ export async function addAnalysisResult(request, env, helpers) {
     id,
     claimId,
     userId,
-    cleanText(body.source || 'aip-user', 40),
+    cleanText(body.source || 'runpack-user', 40),
     verdict,
     evidenceScore,
     testability,
     survivability,
-    JSON.stringify(asArray(analysis.strongest_support)),
-    JSON.stringify(asArray(analysis.strongest_pressure)),
-    JSON.stringify(asArray(analysis.missing_tests)),
-    cleanText(analysis.plain_language_summary || '', 1200),
+    JSON.stringify(asArray(strongestSupport)),
+    JSON.stringify(asArray(strongestPressure)),
+    JSON.stringify(asArray(missingTests)),
+    cleanText(plainLanguageSummary, 1200),
     JSON.stringify(analysis),
     now
   ).run();
