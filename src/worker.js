@@ -123,9 +123,8 @@ async function listClaims(request, env) {
 
 async function getClaim(request, env, claimId) {
   const claim = await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(claimId).first();
-  const analyses = await listAnalysisForClaim(env, claimId);
   if (!claim) return json({ error: 'CLAIM_NOT_FOUND' }, 404);
-
+  const analyses = await listAnalysisForClaim(env, claimId);
   const directEvidence = await env.DB.prepare(`
   SELECT e.*, u.handle, 'direct' AS link_type
   FROM evidence e
@@ -156,7 +155,7 @@ const evidence = {
     claim: mapClaim(claim),
     evidence: evidence.results || [],
     pressure: pressure.results || [],
-    tests: tests.results || []
+    tests: tests.results || [],
     analyses
   });
 }
