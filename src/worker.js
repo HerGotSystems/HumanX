@@ -6,6 +6,7 @@ import { importTruthSeeds } from './truth-seed.js';
 import { convertTruthToClaim } from './truth-claim-bridge.js';
 import { attachEvidenceToClaim } from './evidence-reuse.js';
 import { graphStatus } from './graph-status.js';
+import { addAnalysisResult, listAnalysisForClaim } from './analysis-results.js';
 
 const CORS = {
   'access-control-allow-origin': '*',
@@ -48,6 +49,7 @@ export default {
       if (url.pathname === '/api/truth-to-claim' && request.method === 'POST') return convertTruthToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
       if (url.pathname === '/api/evidence-attach' && request.method === 'POST') return attachEvidenceToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
       if (url.pathname === '/api/graph-status' && request.method === 'GET') return graphStatus(request, env, { json });
+      if (url.pathname === '/api/analysis' && request.method === 'POST') return addAnalysisResult(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
       if (url.pathname.match(/^\/api\/claims\/[^/]+$/) && request.method === 'GET') return getClaim(request, env, url.pathname.split('/').pop());
       if (url.pathname === '/api/evidence' && request.method === 'POST') return addEvidence(request, env);
       if (url.pathname === '/api/pressure' && request.method === 'POST') return addPressure(request, env);
@@ -121,6 +123,7 @@ async function listClaims(request, env) {
 
 async function getClaim(request, env, claimId) {
   const claim = await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(claimId).first();
+  const analyses = await listAnalysisForClaim(env, claimId);
   if (!claim) return json({ error: 'CLAIM_NOT_FOUND' }, 404);
 
   const directEvidence = await env.DB.prepare(`
@@ -154,6 +157,7 @@ const evidence = {
     evidence: evidence.results || [],
     pressure: pressure.results || [],
     tests: tests.results || []
+    analyses
   });
 }
 
@@ -290,7 +294,7 @@ async function claimOnly(env, claimId) {
 
 async function claimDetail(env, claimId) {
   const claim = await claimOnly(env, claimId);
-
+  const analyses = await listAnalysisForClaim(env, claimId);
   const directEvidence = await env.DB.prepare(`
     SELECT
       title,
@@ -343,7 +347,8 @@ async function claimDetail(env, claimId) {
     claim,
     evidence,
     pressure: pressure.results || [],
-    tests: tests.results || []
+    tests: tests.results || [],
+    analyses
   };
 }
 
