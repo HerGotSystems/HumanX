@@ -122,6 +122,8 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
 
 async function linkTruthToClaim(env, helpers, truthId, claimId, userId, note, now = Date.now()) {
   const { cleanText, makeId } = helpers;
+  const existing = await env.DB.prepare(`SELECT id FROM truth_claim_links WHERE truth_id=? AND claim_id=? LIMIT 1`).bind(truthId, claimId).first();
+  if (existing) return;
   await env.DB.prepare(`
     INSERT OR IGNORE INTO truth_claim_links (
       id,truth_id,claim_id,user_id,bridge_note,created_at
@@ -142,14 +144,11 @@ async function tryInsertClaimWithNormalizedKey(env, c) {
 
 async function findExistingClaim(env, statement) {
   const normalized = normalizeClaim(statement);
-
   try {
-    const indexed = await env.DB.prepare(`SELECT * FROM claims WHERE normalized_claim=? ORDER BY created_at ASC LIMIT 1`).bind(normalized).first();
-    if (indexed) return indexed;
-  } catch {}
-
-  const rows = await env.DB.prepare(`SELECT * FROM claims ORDER BY created_at DESC LIMIT 500`).all();
-  return (rows.results || []).find(c => normalizeClaim(c.claim) === normalized) || null;
+    return await env.DB.prepare(`SELECT * FROM claims WHERE normalized_claim=? ORDER BY created_at ASC LIMIT 1`).bind(normalized).first();
+  } catch {
+    return null;
+  }
 }
 
 function confidenceLabel(snap) {
