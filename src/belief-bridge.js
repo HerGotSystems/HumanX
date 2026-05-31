@@ -82,7 +82,7 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
   const status = testability < 15 ? 'Untestable' : evidenceScore > 65 ? 'Plausible' : 'Weak Evidence';
   const normalizedClaim = normalizeClaim(statement);
 
-  const insertedWithKey = await tryInsertClaimWithNormalizedKey(env, {
+  await insertClaimWithNormalizedKey(env, {
     id,
     userId,
     statement,
@@ -96,12 +96,6 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
     now,
     normalizedClaim
   });
-
-  if (!insertedWithKey) {
-    await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-      .bind(id, userId, statement, cleanText(body.category || 'Belief', 80), type, status, evidenceScore, survivability, testability, pressure > 55 ? 1 : 0, now, now, 'review')
-      .run();
-  }
 
   await env.DB.prepare(`INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at) VALUES (?,?,?,?,?,?,?,?,?)`)
     .bind(makeId('evd'), id, userId, 'support', 'testimony', 'Belief snapshot origin', cleanText(snap.summary || 'Claim created from a personal belief snapshot.', 1200), '', now)
@@ -131,24 +125,15 @@ async function linkTruthToClaim(env, helpers, truthId, claimId, userId, note, no
   `).bind(makeId('tcl'), truthId, claimId, userId, cleanText(note, 400), now).run();
 }
 
-async function tryInsertClaimWithNormalizedKey(env, c) {
-  try {
-    await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state,normalized_claim) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-      .bind(c.id, c.userId, c.statement, c.category, c.type, c.status, c.evidenceScore, c.survivability, c.testability, c.contradictions, c.now, c.now, 'review', c.normalizedClaim)
-      .run();
-    return true;
-  } catch {
-    return false;
-  }
+async function insertClaimWithNormalizedKey(env, c) {
+  await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state,normalized_claim) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+    .bind(c.id, c.userId, c.statement, c.category, c.type, c.status, c.evidenceScore, c.survivability, c.testability, c.contradictions, c.now, c.now, 'review', c.normalizedClaim)
+    .run();
 }
 
 async function findExistingClaim(env, statement) {
   const normalized = normalizeClaim(statement);
-  try {
-    return await env.DB.prepare(`SELECT * FROM claims WHERE normalized_claim=? ORDER BY created_at ASC LIMIT 1`).bind(normalized).first();
-  } catch {
-    return null;
-  }
+  return await env.DB.prepare(`SELECT * FROM claims WHERE normalized_claim=? ORDER BY created_at ASC LIMIT 1`).bind(normalized).first();
 }
 
 function confidenceLabel(snap) {
