@@ -35,38 +35,52 @@ export async function createTruth(request, env, helpers) {
   const now = Date.now();
   const existing = await env.DB.prepare(`SELECT * FROM truths WHERE normalized_statement=?`).bind(normalized).first();
 
-  if (existing) {
-    await env.DB.prepare(`UPDATE truths SET repetition_score=repetition_score+1, updated_at=? WHERE id=?`).bind(now, existing.id).run();
-    const row = await env.DB.prepare(`SELECT t.*, u.handle FROM truths t LEFT JOIN users u ON u.id=t.user_id WHERE t.id=?`).bind(existing.id).first();
-    return json({ ok: true, repeated: true, truth: mapTruth(row) });
-  }
+  if (existing) return repeatExistingTruth(env, json, existing.id, now);
 
   const id = makeId('tru');
-  await env.DB.prepare(`
-    INSERT INTO truths (
-      id,user_id,statement,normalized_statement,category,origin,truth_type,
-      confidence_label,repetition_score,pressure_score,linked_claim_id,
-      created_at,updated_at,review_state
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-  `).bind(
-    id,
-    userId,
-    statement,
-    normalized,
-    cleanText(body.category || 'general', 80),
-    cleanText(body.origin || 'unknown', 120),
-    cleanText(body.truthType || body.truth_type || 'common', 60),
-    cleanText(body.confidenceLabel || body.confidence_label || 'claimed', 60),
-    1,
-    0,
-    cleanId(body.linkedClaimId || body.linked_claim_id || ''),
-    now,
-    now,
-    'review'
-  ).run();
+  try {
+    await env.DB.prepare(`
+      INSERT INTO truths (
+        id,user_id,statement,normalized_statement,category,origin,truth_type,
+        confidence_label,repetition_score,pressure_score,linked_claim_id,
+        created_at,updated_at,review_state
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    `).bind(
+      id,
+      userId,
+      statement,
+      normalized,
+      cleanText(body.category || 'general', 80),
+      cleanText(body.origin || 'unknown', 120),
+      cleanText(body.truthType || body.truth_type || 'common', 60),
+      cleanText(body.confidenceLabel || body.confidence_label || 'claimed', 60),
+      1,
+      0,
+      cleanId(body.linkedClaimId || body.linked_claim_id || ''),
+      now,
+      now,
+      'review'
+    ).run();
+  } catch (err) {
+    if (!isUniqueConstraintError(err)) throw err;
+    const raced = await env.DB.prepare(`SELECT id FROM truths WHERE normalized_statement=?`).bind(normalized).first();
+    if (!raced?.id) throw err;
+    return repeatExistingTruth(env, json, raced.id, now);
+  }
 
   const row = await env.DB.prepare(`SELECT t.*, u.handle FROM truths t LEFT JOIN users u ON u.id=t.user_id WHERE t.id=?`).bind(id).first();
   return json({ ok: true, truth: mapTruth(row) });
+}
+
+async function repeatExistingTruth(env, json, truthId, now = Date.now()) {
+  await env.DB.prepare(`UPDATE truths SET repetition_score=repetition_score+1, updated_at=? WHERE id=?`).bind(now, truthId).run();
+  const row = await env.DB.prepare(`SELECT t.*, u.handle FROM truths t LEFT JOIN users u ON u.id=t.user_id WHERE t.id=?`).bind(truthId).first();
+  return json({ ok: true, repeated: true, truth: mapTruth(row) });
+}
+
+function isUniqueConstraintError(err) {
+  const message = String(err && err.message ? err.message : err).toLowerCase();
+  return message.includes('unique') || message.includes('constraint') || message.includes('constraint failed');
 }
 
 function mapTruth(t) {
