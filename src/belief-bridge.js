@@ -69,6 +69,7 @@ async function promoteToTruth(env, json, helpers, userId, snap, statement, body)
     const raced = await env.DB.prepare(`SELECT * FROM truths WHERE normalized_statement=?`).bind(normalized).first();
     if (raced) {
       await env.DB.prepare(`UPDATE truths SET repetition_score=repetition_score+1, updated_at=? WHERE id=?`).bind(now, raced.id).run();
+      if (linkedClaim?.id) await linkTruthToClaim(env, helpers, raced.id, linkedClaim.id, userId, 'Raced belief truth matched to existing claim.', now);
       const row = await env.DB.prepare(`SELECT * FROM truths WHERE id=?`).bind(raced.id).first();
       return json({ ok: true, target: 'truth', existing: true, truth: mapTruth(row) });
     }
