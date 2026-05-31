@@ -59,7 +59,7 @@ export async function createTruth(request, env, helpers) {
     cleanId(body.linkedClaimId || body.linked_claim_id || ''),
     now,
     now,
-    'public'
+    'review'
   ).run();
 
   const row = await env.DB.prepare(`SELECT t.*, u.handle FROM truths t LEFT JOIN users u ON u.id=t.user_id WHERE t.id=?`).bind(id).first();
@@ -78,6 +78,7 @@ function mapTruth(t) {
     repetitionScore: t.repetition_score || 1,
     pressureScore: t.pressure_score || 0,
     linkedClaimId: t.linked_claim_id,
+    reviewState: t.review_state || 'review',
     createdAt: t.created_at,
     updatedAt: t.updated_at,
     handle: t.handle || 'anon'
