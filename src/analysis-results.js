@@ -7,7 +7,7 @@ export async function addAnalysisResult(request, env, helpers) {
 
   const raw = body.analysis || body.result || body.raw || body;
   const analysis = typeof raw === 'string' ? safeParse(raw) : raw;
-  if (!analysis || typeof analysis !== 'object') return json({ error: 'BAD_ANALYSIS_JSON' }, 400);
+  if (!analysis || typeof analysis !== 'object' || Array.isArray(analysis)) return json({ error: 'BAD_ANALYSIS_JSON' }, 400);
 
   const claim = await env.DB.prepare(`SELECT id FROM claims WHERE id=?`).bind(claimId).first();
   if (!claim) return json({ error: 'CLAIM_NOT_FOUND' }, 404);
@@ -26,6 +26,18 @@ export async function addAnalysisResult(request, env, helpers) {
   const strongestPressure = analysis.strongest_pressure ?? analysis.strongestPressure;
   const missingTests = analysis.missing_tests ?? analysis.missingTests;
   const plainLanguageSummary = analysis.plain_language_summary ?? analysis.plainLanguageSummary ?? '';
+
+  const hasMeaningfulAnalysis = Boolean(
+    verdict ||
+    analysis.evidence_score !== undefined || analysis.evidenceScore !== undefined ||
+    analysis.testability !== undefined ||
+    analysis.survivability !== undefined ||
+    strongestSupport !== undefined ||
+    strongestPressure !== undefined ||
+    missingTests !== undefined ||
+    plainLanguageSummary
+  );
+  if (!hasMeaningfulAnalysis) return json({ error: 'ANALYSIS_SHAPE_REQUIRED', message: 'Analysis must include verdict, scores, support, pressure, missing tests, or summary.' }, 400);
 
   await env.DB.prepare(`
     INSERT INTO analysis_results (
