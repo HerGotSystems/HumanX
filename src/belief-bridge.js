@@ -41,28 +41,39 @@ async function promoteToTruth(env, json, helpers, userId, snap, statement, body)
 
   const linkedClaim = await findExistingClaim(env, statement);
   const id = makeId('tru');
-  await env.DB.prepare(`
-    INSERT INTO truths (
-      id,user_id,statement,normalized_statement,category,origin,truth_type,
-      confidence_label,repetition_score,pressure_score,linked_claim_id,
-      created_at,updated_at,review_state
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-  `).bind(
-    id,
-    userId,
-    statement,
-    normalized,
-    cleanText(body.category || 'belief', 80),
-    cleanText(body.origin || snap.source || 'belief snapshot', 120),
-    cleanText(body.truthType || body.truth_type || 'personal-belief', 60),
-    confidenceLabel(snap),
-    1,
-    Number(snap.pressure_score || 0),
-    cleanId(body.linkedClaimId || body.linked_claim_id || linkedClaim?.id || ''),
-    now,
-    now,
-    'review'
-  ).run();
+  try {
+    await env.DB.prepare(`
+      INSERT INTO truths (
+        id,user_id,statement,normalized_statement,category,origin,truth_type,
+        confidence_label,repetition_score,pressure_score,linked_claim_id,
+        created_at,updated_at,review_state
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    `).bind(
+      id,
+      userId,
+      statement,
+      normalized,
+      cleanText(body.category || 'belief', 80),
+      cleanText(body.origin || snap.source || 'belief snapshot', 120),
+      cleanText(body.truthType || body.truth_type || 'personal-belief', 60),
+      confidenceLabel(snap),
+      1,
+      Number(snap.pressure_score || 0),
+      cleanId(body.linkedClaimId || body.linked_claim_id || linkedClaim?.id || ''),
+      now,
+      now,
+      'review'
+    ).run();
+  } catch (err) {
+    if (!isUniqueConstraintError(err)) throw err;
+    const raced = await env.DB.prepare(`SELECT * FROM truths WHERE normalized_statement=?`).bind(normalized).first();
+    if (raced) {
+      await env.DB.prepare(`UPDATE truths SET repetition_score=repetition_score+1, updated_at=? WHERE id=?`).bind(now, raced.id).run();
+      const row = await env.DB.prepare(`SELECT * FROM truths WHERE id=?`).bind(raced.id).first();
+      return json({ ok: true, target: 'truth', existing: true, truth: mapTruth(row) });
+    }
+    throw err;
+  }
 
   if (linkedClaim?.id) await linkTruthToClaim(env, helpers, id, linkedClaim.id, userId, 'Belief truth matched to existing claim.', now);
 
@@ -85,36 +96,53 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
   const status = testability < 15 ? 'Untestable' : evidenceScore > 65 ? 'Plausible' : 'Weak Evidence';
   const normalizedClaim = normalizeClaim(statement);
 
-  await insertClaimWithNormalizedKey(env, {
-    id,
-    userId,
-    statement,
-    category: cleanText(body.category || 'Belief', 80),
-    type,
-    status,
-    evidenceScore,
-    survivability,
-    testability,
-    contradictions: pressure > 55 ? 1 : 0,
-    now,
-    normalizedClaim
-  });
+  let claimId = id;
+  try {
+    await insertClaimWithNormalizedKey(env, {
+      id,
+      userId,
+      statement,
+      category: cleanText(body.category || 'Belief', 80),
+      type,
+      status,
+      evidenceScore,
+      survivability,
+      testability,
+      contradictions: pressure > 55 ? 1 : 0,
+      now,
+      normalizedClaim
+    });
+  } catch (err) {
+    if (!isUniqueConstraintError(err)) throw err;
+    const raced = await env.DB.prepare(`SELECT * FROM claims WHERE normalized_claim=? ORDER BY created_at ASC LIMIT 1`).bind(normalizedClaim).first();
+    if (!raced) throw err;
+    claimId = raced.id;
+    const matchingTruths = await env.DB.prepare(`SELECT id FROM truths WHERE normalized_statement=?`).bind(normalizeStatement(statement)).all();
+    await env.DB.prepare(`UPDATE truths SET linked_claim_id=?, updated_at=? WHERE normalized_statement=? AND (linked_claim_id IS NULL OR linked_claim_id='')`)
+      .bind(claimId, now, normalizeStatement(statement))
+      .run();
+    for (const truth of matchingTruths.results || []) {
+      await linkTruthToClaim(env, helpers, truth.id, claimId, userId, 'Belief claim promoted from matching truth statement.', now);
+    }
+    const racedRow = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(claimId).first();
+    return json({ ok: true, target: 'claim', existing: true, claimId, claim: mapClaim(racedRow) });
+  }
 
   await env.DB.prepare(`INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at) VALUES (?,?,?,?,?,?,?,?,?)`)
-    .bind(makeId('evd'), id, userId, 'support', 'testimony', 'Belief snapshot origin', cleanText(snap.summary || 'Claim created from a personal belief snapshot.', 1200), '', now)
+    .bind(makeId('evd'), claimId, userId, 'support', 'testimony', 'Belief snapshot origin', cleanText(snap.summary || 'Claim created from a personal belief snapshot.', 1200), '', now)
     .run();
 
   const matchingTruths = await env.DB.prepare(`SELECT id FROM truths WHERE normalized_statement=?`).bind(normalizeStatement(statement)).all();
   await env.DB.prepare(`UPDATE truths SET linked_claim_id=?, updated_at=? WHERE normalized_statement=? AND (linked_claim_id IS NULL OR linked_claim_id='')`)
-    .bind(id, now, normalizeStatement(statement))
+    .bind(claimId, now, normalizeStatement(statement))
     .run();
 
   for (const truth of matchingTruths.results || []) {
-    await linkTruthToClaim(env, helpers, truth.id, id, userId, 'Belief claim promoted from matching truth statement.', now);
+    await linkTruthToClaim(env, helpers, truth.id, claimId, userId, 'Belief claim promoted from matching truth statement.', now);
   }
 
-  const row = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(id).first();
-  return json({ ok: true, target: 'claim', existing: false, claimId: id, claim: mapClaim(row) });
+  const row = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(claimId).first();
+  return json({ ok: true, target: 'claim', existing: false, claimId, claim: mapClaim(row) });
 }
 
 async function linkTruthToClaim(env, helpers, truthId, claimId, userId, note, now = Date.now()) {
@@ -150,6 +178,11 @@ async function insertClaimWithNormalizedKey(env, c) {
 async function findExistingClaim(env, statement) {
   const normalized = normalizeClaim(statement);
   return await env.DB.prepare(`SELECT * FROM claims WHERE normalized_claim=? ORDER BY created_at ASC LIMIT 1`).bind(normalized).first();
+}
+
+function isUniqueConstraintError(err) {
+  const message = String(err && err.message ? err.message : err).toLowerCase();
+  return message.includes('unique') || message.includes('constraint') || message.includes('constraint failed');
 }
 
 async function safeRateLimit(request, env, rateKey, maxHits, windowMs) {
