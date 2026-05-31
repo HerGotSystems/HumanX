@@ -1,3 +1,5 @@
+import { meaningKey } from './meaning-key.js';
+
 export async function convertTruthToClaim(request, env, helpers) {
   const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
   const userId = requireUser(request);
@@ -111,15 +113,6 @@ async function findExistingClaim(env, truthId, truth) {
   return null;
 }
 
-function normalize(v) {
-  return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-}
-
 function normalizeClaim(v) {
-  return normalize(v)
-    .replace(/\bthis statement reflects reality consistently enough to survive evidence and repeatable pressure testing\b/g, '')
-    .replace(/\bx\b/g, '')
-    .replace(/\bclaim\b/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return meaningKey(v);
 }
