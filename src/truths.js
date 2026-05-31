@@ -1,3 +1,5 @@
+import { meaningKey } from './meaning-key.js';
+
 export async function listTruths(request, env, helpers) {
   const { json } = helpers;
   const url = new URL(request.url);
@@ -86,5 +88,5 @@ function mapTruth(t) {
 }
 
 function normalize(v) {
-  return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  return meaningKey(v);
 }
