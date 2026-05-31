@@ -54,6 +54,7 @@ export default {
       if (url.pathname === '/api/review' && request.method === 'GET') return reviewQueue(request, env);
       return json({ error: 'NOT_FOUND' }, 404);
     } catch (err) {
+      if (String(err && err.message ? err.message : err).includes('MISSING_PSEUDONYMOUS_USER')) return json({ error:'UNAUTHORIZED', message:'Missing x-humanx-user header.' },401);
       return json({ error: 'SERVER_ERROR', message: String(err && err.message ? err.message : err) }, 500);
     }
   }
