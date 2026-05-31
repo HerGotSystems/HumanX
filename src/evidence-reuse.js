@@ -41,13 +41,17 @@ export async function attachEvidenceToClaim(request, env, helpers) {
     now
   ).run();
 
+  // Fetch the actual row (may differ from generated id if insert was ignored)
+  const linkRow = await env.DB.prepare(`SELECT id FROM evidence_claim_links WHERE evidence_id=? AND claim_id=? LIMIT 1`).bind(evidenceId, claimId).first();
+  const actualLinkId = linkRow?.id || id;
+
   await recalcClaimScore(env, claimId);
   const updatedClaim = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(claimId).first();
 
   return json({
     ok: true,
     link: {
-      id,
+      id: actualLinkId,
       evidenceId,
       claimId,
       stance
