@@ -29,14 +29,23 @@ export async function convertTruthToClaim(request, env, helpers) {
   const generatedClaim = cleanText(body.claim || truth.statement, 1200);
   const normalizedClaim = normalizeClaim(generatedClaim);
 
-  await insertClaimWithNormalizedKey(env, {
-    claimId,
-    userId,
-    generatedClaim,
-    category: truth.category || 'truth-derived',
-    now,
-    normalizedClaim
-  });
+  try {
+    await insertClaimWithNormalizedKey(env, {
+      claimId,
+      userId,
+      generatedClaim,
+      category: truth.category || 'truth-derived',
+      now,
+      normalizedClaim
+    });
+  } catch (err) {
+    if (!isUniqueConstraintError(err)) throw err;
+    const raced = await findExistingClaimByNormalizedKey(env, normalizedClaim);
+    if (!raced) throw err;
+    const linkId = await ensureTruthClaimLink(env, helpers, truthId, raced.id, userId, body.bridgeNote || 'Matched raced claim during truth conversion.', now);
+    await syncTruthLinkState(env, truthId, raced.id, now);
+    return json({ ok: true, existing: true, raced: true, truth: { id: truth.id, statement: truth.statement }, claim: raced, bridge: { truthId, claimId: raced.id, linkId } });
+  }
 
   const linkId = await ensureTruthClaimLink(env, helpers, truthId, claimId, userId, body.bridgeNote || 'Converted from repeated truth statement into pressure-testable claim.', now);
   await syncTruthLinkState(env, truthId, claimId, now);
@@ -131,6 +140,10 @@ async function findExistingClaim(env, truthId, truth) {
   return null;
 }
 
+async function findExistingClaimByNormalizedKey(env, normalizedClaim) {
+  return await env.DB.prepare(`SELECT *, NULL AS link_id FROM claims WHERE normalized_claim=? ORDER BY created_at ASC LIMIT 1`).bind(normalizedClaim).first();
+}
+
 async function safeRateLimit(request, env, rateKey, maxHits, windowMs) {
   try {
     const now = Date.now();
@@ -150,6 +163,11 @@ async function safeRateLimit(request, env, rateKey, maxHits, windowMs) {
 
 function ip(request) {
   return request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
+}
+
+function isUniqueConstraintError(err) {
+  const message = String(err && err.message ? err.message : err).toLowerCase();
+  return message.includes('unique') || message.includes('constraint') || message.includes('constraint failed');
 }
 
 function normalizeClaim(v) {
