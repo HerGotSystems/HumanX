@@ -119,12 +119,25 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
 async function linkTruthToClaim(env, helpers, truthId, claimId, userId, note, now = Date.now()) {
   const { cleanText, makeId } = helpers;
   const existing = await env.DB.prepare(`SELECT id FROM truth_claim_links WHERE truth_id=? AND claim_id=? LIMIT 1`).bind(truthId, claimId).first();
-  if (existing) return;
+  if (!existing) {
+    await env.DB.prepare(`
+      INSERT OR IGNORE INTO truth_claim_links (
+        id,truth_id,claim_id,user_id,bridge_note,created_at
+      ) VALUES (?,?,?,?,?,?)
+    `).bind(makeId('tcl'), truthId, claimId, userId, cleanText(note, 400), now).run();
+  }
+  await syncTruthLinkState(env, truthId, claimId, now);
+}
+
+async function syncTruthLinkState(env, truthId, claimId, now) {
+  const countRow = await env.DB.prepare(`SELECT COUNT(*) AS n FROM truth_claim_links WHERE truth_id=?`).bind(truthId).first();
   await env.DB.prepare(`
-    INSERT OR IGNORE INTO truth_claim_links (
-      id,truth_id,claim_id,user_id,bridge_note,created_at
-    ) VALUES (?,?,?,?,?,?)
-  `).bind(makeId('tcl'), truthId, claimId, userId, cleanText(note, 400), now).run();
+    UPDATE truths
+    SET converted_claim_count=?,
+        linked_claim_id=COALESCE(linked_claim_id, ?),
+        updated_at=?
+    WHERE id=?
+  `).bind(countRow?.n || 0, claimId, now, truthId).run();
 }
 
 async function insertClaimWithNormalizedKey(env, c) {
