@@ -228,6 +228,7 @@ CREATE INDEX IF NOT EXISTS idx_truths_normalized_statement ON truths (normalized
 CREATE INDEX IF NOT EXISTS idx_truths_review_state ON truths (review_state);
 CREATE INDEX IF NOT EXISTS idx_truth_claim_links_truth_id ON truth_claim_links (truth_id);
 CREATE INDEX IF NOT EXISTS idx_truth_claim_links_claim_id ON truth_claim_links (claim_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_truth_claim_links_unique ON truth_claim_links (truth_id, claim_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_claim_links_unique ON evidence_claim_links (evidence_id, claim_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_claim_votes_unique ON claim_votes (claim_id, user_id);
 CREATE INDEX IF NOT EXISTS idx_belief_snapshots_user_id ON belief_snapshots (user_id);
