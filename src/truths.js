@@ -22,6 +22,7 @@ export async function listTruths(request, env, helpers) {
 export async function createTruth(request, env, helpers) {
   const { readJson, cleanText, cleanId, json, requireUser, makeId } = helpers;
   const userId = requireUser(request);
+  await safeRateLimit(request, env, `truth:${ip(request)}`, 12, 3600000);
   const body = await readJson(request);
   const statement = cleanText(body.statement || '', 500);
   if (statement.length < 4) return json({ error: 'TRUTH_TOO_SHORT' }, 400);
@@ -85,6 +86,27 @@ function mapTruth(t) {
     updatedAt: t.updated_at,
     handle: t.handle || 'anon'
   };
+}
+
+async function safeRateLimit(request, env, rateKey, maxHits, windowMs) {
+  try {
+    const now = Date.now();
+    const row = await env.DB.prepare(`SELECT hits, window_start FROM rate_limits WHERE "key"=?`).bind(rateKey).first();
+    if (!row || now - row.window_start > windowMs) {
+      await env.DB.prepare(`INSERT OR REPLACE INTO rate_limits ("key",hits,window_start) VALUES (?,?,?)`).bind(rateKey, 1, now).run();
+      return;
+    }
+    if (row.hits >= maxHits) throw new Error('RATE_LIMITED');
+    await env.DB.prepare(`UPDATE rate_limits SET hits=hits+1 WHERE "key"=?`).bind(rateKey).run();
+  } catch (err) {
+    const message = String(err && err.message ? err.message : err);
+    if (message.includes('RATE_LIMITED')) throw err;
+    throw new Error(`RATE_LIMIT_UNAVAILABLE: ${message}`);
+  }
+}
+
+function ip(request) {
+  return request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
 }
 
 function normalize(v) {
