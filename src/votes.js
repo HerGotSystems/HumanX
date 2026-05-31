@@ -55,6 +55,7 @@ export async function refreshClaimVoteCounts(env, claimId) {
 
 function cleanVote(v) {
   const x = String(v || '').toLowerCase().trim();
+  if (x === 'uncertain') return 'unsure';
   if (['believe','reject','unsure'].includes(x)) return x;
   return '';
 }
