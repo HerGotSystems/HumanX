@@ -61,6 +61,8 @@ async function promoteToTruth(env, json, helpers, userId, snap, statement, body)
     'review'
   ).run();
 
+  if (linkedClaim?.id) await linkTruthToClaim(env, helpers, id, linkedClaim.id, userId, 'Belief truth matched to existing claim.', now);
+
   const row = await env.DB.prepare(`SELECT * FROM truths WHERE id=?`).bind(id).first();
   return json({ ok: true, target: 'truth', existing: false, linkedClaimId: linkedClaim?.id || '', truth: mapTruth(row) });
 }
@@ -105,12 +107,26 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
     .bind(makeId('evd'), id, userId, 'support', 'testimony', 'Belief snapshot origin', cleanText(snap.summary || 'Claim created from a personal belief snapshot.', 1200), '', now)
     .run();
 
+  const matchingTruths = await env.DB.prepare(`SELECT id FROM truths WHERE normalized_statement=?`).bind(normalize(statement)).all();
   await env.DB.prepare(`UPDATE truths SET linked_claim_id=?, updated_at=? WHERE normalized_statement=? AND (linked_claim_id IS NULL OR linked_claim_id='')`)
     .bind(id, now, normalize(statement))
     .run();
 
+  for (const truth of matchingTruths.results || []) {
+    await linkTruthToClaim(env, helpers, truth.id, id, userId, 'Belief claim promoted from matching truth statement.', now);
+  }
+
   const row = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(id).first();
   return json({ ok: true, target: 'claim', existing: false, claimId: id, claim: mapClaim(row) });
+}
+
+async function linkTruthToClaim(env, helpers, truthId, claimId, userId, note, now = Date.now()) {
+  const { cleanText, makeId } = helpers;
+  await env.DB.prepare(`
+    INSERT OR IGNORE INTO truth_claim_links (
+      id,truth_id,claim_id,user_id,bridge_note,created_at
+    ) VALUES (?,?,?,?,?,?)
+  `).bind(makeId('tcl'), truthId, claimId, userId, cleanText(note, 400), now).run();
 }
 
 async function tryInsertClaimWithNormalizedKey(env, c) {
