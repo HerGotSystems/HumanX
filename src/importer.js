@@ -1,4 +1,5 @@
 import { HUMANX_SEED } from './seed-data.js';
+import { meaningKey } from './meaning-key.js';
 
 export async function importSeedData(env) {
   const now = Date.now();
@@ -137,8 +138,5 @@ export async function importSeedData(env) {
 }
 
 function normalize(v) {
-  return String(v || '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
+  return meaningKey(v);
 }
