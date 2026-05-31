@@ -23,7 +23,7 @@ export async function convertTruthToClaim(request, env, helpers) {
   const generatedClaim = cleanText(body.claim || truth.statement, 1200);
   const normalizedClaim = normalizeClaim(generatedClaim);
 
-  const insertedWithKey = await tryInsertClaimWithNormalizedKey(env, {
+  await insertClaimWithNormalizedKey(env, {
     claimId,
     userId,
     generatedClaim,
@@ -31,16 +31,6 @@ export async function convertTruthToClaim(request, env, helpers) {
     now,
     normalizedClaim
   });
-
-  if (!insertedWithKey) {
-    await env.DB.prepare(`
-      INSERT INTO claims (
-        id,user_id,claim,category,type,status,
-        evidence_score,survivability,testability,contradictions,
-        created_at,updated_at,review_state
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
-    `).bind(claimId, userId, generatedClaim, truth.category || 'truth-derived', 'Truth-Derived', 'Plausible', 5, 50, 50, 0, now, now, 'public').run();
-  }
 
   const linkId = makeId('tcl');
 
@@ -70,19 +60,14 @@ export async function convertTruthToClaim(request, env, helpers) {
   return json({ ok: true, existing: false, truth: { id: truth.id, statement: truth.statement }, claim, bridge: { truthId, claimId, linkId } });
 }
 
-async function tryInsertClaimWithNormalizedKey(env, c) {
-  try {
-    await env.DB.prepare(`
-      INSERT INTO claims (
-        id,user_id,claim,category,type,status,
-        evidence_score,survivability,testability,contradictions,
-        created_at,updated_at,review_state,normalized_claim
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-    `).bind(c.claimId, c.userId, c.generatedClaim, c.category, 'Truth-Derived', 'Plausible', 5, 50, 50, 0, c.now, c.now, 'public', c.normalizedClaim).run();
-    return true;
-  } catch {
-    return false;
-  }
+async function insertClaimWithNormalizedKey(env, c) {
+  await env.DB.prepare(`
+    INSERT INTO claims (
+      id,user_id,claim,category,type,status,
+      evidence_score,survivability,testability,contradictions,
+      created_at,updated_at,review_state,normalized_claim
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+  `).bind(c.claimId, c.userId, c.generatedClaim, c.category, 'Truth-Derived', 'Plausible', 5, 50, 50, 0, c.now, c.now, 'public', c.normalizedClaim).run();
 }
 
 async function findExistingClaim(env, truthId, truth) {
@@ -105,16 +90,14 @@ async function findExistingClaim(env, truthId, truth) {
   const legacyClaim = `${truth.statement} — this statement reflects reality consistently enough to survive evidence and repeatable pressure testing.`;
   const accidentalXClaim = `${truth.statement} — X`;
 
-  try {
-    const byKey = await env.DB.prepare(`
-      SELECT *, NULL AS link_id
-      FROM claims
-      WHERE normalized_claim=? AND type='Truth-Derived'
-      ORDER BY created_at ASC
-      LIMIT 1
-    `).bind(normalizeClaim(cleanClaim)).first();
-    if (byKey) return byKey;
-  } catch {}
+  const byKey = await env.DB.prepare(`
+    SELECT *, NULL AS link_id
+    FROM claims
+    WHERE normalized_claim=? AND type='Truth-Derived'
+    ORDER BY created_at ASC
+    LIMIT 1
+  `).bind(normalizeClaim(cleanClaim)).first();
+  if (byKey) return byKey;
 
   const sameText = await env.DB.prepare(`
     SELECT *, NULL AS link_id
