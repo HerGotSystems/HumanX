@@ -72,9 +72,9 @@ export function mapAnalysis(a) {
     claimId: a.claim_id,
     source: a.source,
     verdict: a.verdict,
-    evidenceScore: a.evidence_score || 0,
-    testability: a.testability || 0,
-    survivability: a.survivability || 0,
+    evidenceScore: a.evidence_score ?? 0,
+    testability: a.testability ?? 0,
+    survivability: a.survivability ?? 0,
     strongestSupport: safeParse(a.strongest_support_json) || [],
     strongestPressure: safeParse(a.strongest_pressure_json) || [],
     missingTests: safeParse(a.missing_tests_json) || [],
@@ -90,10 +90,12 @@ function safeParse(v) {
 }
 
 function asArray(v) {
-  return Array.isArray(v) ? v : [];
+  if (Array.isArray(v)) return v;
+  if (v === undefined || v === null || v === '') return [];
+  return [v];
 }
 
 function clampNum(v, min, max) {
-  const n = Number(v || 0);
+  const n = Number(v ?? 0);
   return Math.max(min, Math.min(max, Number.isFinite(n) ? n : 0));
 }
