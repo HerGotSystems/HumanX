@@ -3,6 +3,7 @@ import { meaningKey } from './meaning-key.js';
 export async function promoteBeliefSnapshot(request, env, helpers) {
   const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
   const userId = requireUser(request);
+  await safeRateLimit(request, env, `belief-promote:${ip(request)}`, 10, 3600000);
   const body = await readJson(request);
   const snapshotId = cleanId(body.snapshotId || body.snapshot_id || '');
   const target = cleanText(body.target || 'truth', 20).toLowerCase();
@@ -149,6 +150,27 @@ async function insertClaimWithNormalizedKey(env, c) {
 async function findExistingClaim(env, statement) {
   const normalized = normalizeClaim(statement);
   return await env.DB.prepare(`SELECT * FROM claims WHERE normalized_claim=? ORDER BY created_at ASC LIMIT 1`).bind(normalized).first();
+}
+
+async function safeRateLimit(request, env, rateKey, maxHits, windowMs) {
+  try {
+    const now = Date.now();
+    const row = await env.DB.prepare(`SELECT hits, window_start FROM rate_limits WHERE "key"=?`).bind(rateKey).first();
+    if (!row || now - row.window_start > windowMs) {
+      await env.DB.prepare(`INSERT OR REPLACE INTO rate_limits ("key",hits,window_start) VALUES (?,?,?)`).bind(rateKey, 1, now).run();
+      return;
+    }
+    if (row.hits >= maxHits) throw new Error('RATE_LIMITED');
+    await env.DB.prepare(`UPDATE rate_limits SET hits=hits+1 WHERE "key"=?`).bind(rateKey).run();
+  } catch (err) {
+    const message = String(err && err.message ? err.message : err);
+    if (message.includes('RATE_LIMITED')) throw err;
+    throw new Error(`RATE_LIMIT_UNAVAILABLE: ${message}`);
+  }
+}
+
+function ip(request) {
+  return request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
 }
 
 function confidenceLabel(snap) {
