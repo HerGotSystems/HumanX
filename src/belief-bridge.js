@@ -1,3 +1,5 @@
+import { meaningKey } from './meaning-key.js';
+
 export async function promoteBeliefSnapshot(request, env, helpers) {
   const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
   const userId = requireUser(request);
@@ -26,7 +28,7 @@ export async function promoteBeliefSnapshot(request, env, helpers) {
 
 async function promoteToTruth(env, json, helpers, userId, snap, statement, body) {
   const { cleanText, cleanId, makeId } = helpers;
-  const normalized = normalize(statement);
+  const normalized = normalizeStatement(statement);
   const now = Date.now();
   const existing = await env.DB.prepare(`SELECT * FROM truths WHERE normalized_statement=?`).bind(normalized).first();
 
@@ -101,9 +103,9 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
     .bind(makeId('evd'), id, userId, 'support', 'testimony', 'Belief snapshot origin', cleanText(snap.summary || 'Claim created from a personal belief snapshot.', 1200), '', now)
     .run();
 
-  const matchingTruths = await env.DB.prepare(`SELECT id FROM truths WHERE normalized_statement=?`).bind(normalize(statement)).all();
+  const matchingTruths = await env.DB.prepare(`SELECT id FROM truths WHERE normalized_statement=?`).bind(normalizeStatement(statement)).all();
   await env.DB.prepare(`UPDATE truths SET linked_claim_id=?, updated_at=? WHERE normalized_statement=? AND (linked_claim_id IS NULL OR linked_claim_id='')`)
-    .bind(id, now, normalize(statement))
+    .bind(id, now, normalizeStatement(statement))
     .run();
 
   for (const truth of matchingTruths.results || []) {
@@ -191,14 +193,10 @@ function safeParse(v) {
   try { return JSON.parse(v); } catch { return null; }
 }
 
-function normalize(v) {
-  return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+function normalizeStatement(v) {
+  return meaningKey(v);
 }
 
 function normalizeClaim(v) {
-  return normalize(v)
-    .replace(/\bthis statement reflects reality consistently enough to survive evidence and repeatable pressure testing\b/g, '')
-    .replace(/\bclaim\b/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return meaningKey(v);
 }
