@@ -58,7 +58,7 @@ async function promoteToTruth(env, json, helpers, userId, snap, statement, body)
     cleanId(body.linkedClaimId || body.linked_claim_id || linkedClaim?.id || ''),
     now,
     now,
-    'public'
+    'review'
   ).run();
 
   const row = await env.DB.prepare(`SELECT * FROM truths WHERE id=?`).bind(id).first();
@@ -97,7 +97,7 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
 
   if (!insertedWithKey) {
     await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-      .bind(id, userId, statement, cleanText(body.category || 'Belief', 80), type, status, evidenceScore, survivability, testability, pressure > 55 ? 1 : 0, now, now, 'public')
+      .bind(id, userId, statement, cleanText(body.category || 'Belief', 80), type, status, evidenceScore, survivability, testability, pressure > 55 ? 1 : 0, now, now, 'review')
       .run();
   }
 
@@ -116,7 +116,7 @@ async function promoteToClaim(env, json, helpers, userId, snap, statement, body)
 async function tryInsertClaimWithNormalizedKey(env, c) {
   try {
     await env.DB.prepare(`INSERT INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state,normalized_claim) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-      .bind(c.id, c.userId, c.statement, c.category, c.type, c.status, c.evidenceScore, c.survivability, c.testability, c.contradictions, c.now, c.now, 'public', c.normalizedClaim)
+      .bind(c.id, c.userId, c.statement, c.category, c.type, c.status, c.evidenceScore, c.survivability, c.testability, c.contradictions, c.now, c.now, 'review', c.normalizedClaim)
       .run();
     return true;
   } catch {
@@ -163,6 +163,7 @@ function mapTruth(t) {
     repetitionScore: t.repetition_score || 1,
     pressureScore: t.pressure_score || 0,
     linkedClaimId: t.linked_claim_id,
+    reviewState: t.review_state || 'review',
     createdAt: t.created_at,
     updatedAt: t.updated_at
   };
@@ -180,6 +181,7 @@ function mapClaim(c) {
     survivability: c.survivability,
     testability: c.testability,
     contradictions: c.contradictions,
+    reviewState: c.review_state || 'review',
     createdAt: c.created_at,
     updatedAt: c.updated_at
   };
