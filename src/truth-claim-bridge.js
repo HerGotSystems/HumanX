@@ -17,7 +17,10 @@ export async function convertTruthToClaim(request, env, helpers) {
 
   const existing = await findExistingClaim(env, truthId, truth);
   if (existing) {
-    return json({ ok: true, existing: true, truth: { id: truth.id, statement: truth.statement }, claim: existing, bridge: { truthId, claimId: existing.id, linkId: existing.link_id || null } });
+    const now = Date.now();
+    const linkId = await ensureTruthClaimLink(env, helpers, truthId, existing.id, userId, body.bridgeNote || 'Matched existing claim during truth conversion.', now);
+    await syncTruthLinkState(env, truthId, existing.id, now);
+    return json({ ok: true, existing: true, truth: { id: truth.id, statement: truth.statement }, claim: existing, bridge: { truthId, claimId: existing.id, linkId } });
   }
 
   const now = Date.now();
@@ -34,28 +37,8 @@ export async function convertTruthToClaim(request, env, helpers) {
     normalizedClaim
   });
 
-  const linkId = makeId('tcl');
-
-  await env.DB.prepare(`
-    INSERT OR IGNORE INTO truth_claim_links (
-      id,truth_id,claim_id,user_id,bridge_note,created_at
-    ) VALUES (?,?,?,?,?,?)
-  `).bind(
-    linkId,
-    truthId,
-    claimId,
-    userId,
-    cleanText(body.bridgeNote || 'Converted from repeated truth statement into pressure-testable claim.', 400),
-    now
-  ).run();
-
-  await env.DB.prepare(`
-    UPDATE truths
-    SET converted_claim_count=COALESCE(converted_claim_count,0)+1,
-        linked_claim_id=COALESCE(linked_claim_id, ?),
-        updated_at=?
-    WHERE id=?
-  `).bind(claimId, now, truthId).run();
+  const linkId = await ensureTruthClaimLink(env, helpers, truthId, claimId, userId, body.bridgeNote || 'Converted from repeated truth statement into pressure-testable claim.', now);
+  await syncTruthLinkState(env, truthId, claimId, now);
 
   const claim = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(claimId).first();
 
@@ -70,6 +53,40 @@ async function insertClaimWithNormalizedKey(env, c) {
       created_at,updated_at,review_state,normalized_claim
     ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `).bind(c.claimId, c.userId, c.generatedClaim, c.category, 'Truth-Derived', 'Plausible', 5, 50, 50, 0, c.now, c.now, 'review', c.normalizedClaim).run();
+}
+
+async function ensureTruthClaimLink(env, helpers, truthId, claimId, userId, note, now) {
+  const { cleanText, makeId } = helpers;
+  const existing = await env.DB.prepare(`SELECT id FROM truth_claim_links WHERE truth_id=? AND claim_id=? LIMIT 1`).bind(truthId, claimId).first();
+  if (existing?.id) return existing.id;
+
+  const linkId = makeId('tcl');
+  await env.DB.prepare(`
+    INSERT OR IGNORE INTO truth_claim_links (
+      id,truth_id,claim_id,user_id,bridge_note,created_at
+    ) VALUES (?,?,?,?,?,?)
+  `).bind(
+    linkId,
+    truthId,
+    claimId,
+    userId,
+    cleanText(note, 400),
+    now
+  ).run();
+
+  const row = await env.DB.prepare(`SELECT id FROM truth_claim_links WHERE truth_id=? AND claim_id=? LIMIT 1`).bind(truthId, claimId).first();
+  return row?.id || linkId;
+}
+
+async function syncTruthLinkState(env, truthId, claimId, now) {
+  const countRow = await env.DB.prepare(`SELECT COUNT(*) AS n FROM truth_claim_links WHERE truth_id=?`).bind(truthId).first();
+  await env.DB.prepare(`
+    UPDATE truths
+    SET converted_claim_count=?,
+        linked_claim_id=COALESCE(linked_claim_id, ?),
+        updated_at=?
+    WHERE id=?
+  `).bind(countRow?.n || 0, claimId, now, truthId).run();
 }
 
 async function findExistingClaim(env, truthId, truth) {
