@@ -1,6 +1,7 @@
 -- HumanX full schema safety migration
 -- Purpose: document the current Worker/D1 table surface and make fresh D1 rebuilds possible.
 -- Safe on existing databases: CREATE TABLE IF NOT EXISTS and CREATE INDEX IF NOT EXISTS only.
+-- Note: indexes are intentionally non-unique except bridge/vote uniqueness where runtime expects one user/link row.
 
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
@@ -216,14 +217,14 @@ CREATE TABLE IF NOT EXISTS home_tests (
   updated_at INTEGER
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_claims_normalized_claim ON claims (normalized_claim);
+CREATE INDEX IF NOT EXISTS idx_claims_normalized_claim ON claims (normalized_claim);
 CREATE INDEX IF NOT EXISTS idx_claims_review_state ON claims (review_state);
 CREATE INDEX IF NOT EXISTS idx_claims_created_at ON claims (created_at);
 CREATE INDEX IF NOT EXISTS idx_evidence_claim_id ON evidence (claim_id);
 CREATE INDEX IF NOT EXISTS idx_pressure_points_claim_id ON pressure_points (claim_id);
 CREATE INDEX IF NOT EXISTS idx_reports_target ON reports (target_type, target_id, status);
 CREATE INDEX IF NOT EXISTS idx_aip_packets_claim_id ON aip_packets (claim_id);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_truths_normalized_statement ON truths (normalized_statement);
+CREATE INDEX IF NOT EXISTS idx_truths_normalized_statement ON truths (normalized_statement);
 CREATE INDEX IF NOT EXISTS idx_truths_review_state ON truths (review_state);
 CREATE INDEX IF NOT EXISTS idx_truth_claim_links_truth_id ON truth_claim_links (truth_id);
 CREATE INDEX IF NOT EXISTS idx_truth_claim_links_claim_id ON truth_claim_links (claim_id);
