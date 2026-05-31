@@ -220,12 +220,15 @@ CREATE TABLE IF NOT EXISTS home_tests (
 CREATE INDEX IF NOT EXISTS idx_claims_normalized_claim ON claims (normalized_claim);
 CREATE INDEX IF NOT EXISTS idx_claims_review_state ON claims (review_state);
 CREATE INDEX IF NOT EXISTS idx_claims_created_at ON claims (created_at);
+CREATE INDEX IF NOT EXISTS idx_claims_review_updated ON claims (review_state, updated_at);
+CREATE INDEX IF NOT EXISTS idx_claims_report_updated ON claims (report_count, updated_at);
 CREATE INDEX IF NOT EXISTS idx_evidence_claim_id ON evidence (claim_id);
 CREATE INDEX IF NOT EXISTS idx_pressure_points_claim_id ON pressure_points (claim_id);
 CREATE INDEX IF NOT EXISTS idx_reports_target ON reports (target_type, target_id, status);
 CREATE INDEX IF NOT EXISTS idx_aip_packets_claim_id ON aip_packets (claim_id);
 CREATE INDEX IF NOT EXISTS idx_truths_normalized_statement ON truths (normalized_statement);
 CREATE INDEX IF NOT EXISTS idx_truths_review_state ON truths (review_state);
+CREATE INDEX IF NOT EXISTS idx_truths_review_updated ON truths (review_state, updated_at);
 CREATE INDEX IF NOT EXISTS idx_truth_claim_links_truth_id ON truth_claim_links (truth_id);
 CREATE INDEX IF NOT EXISTS idx_truth_claim_links_claim_id ON truth_claim_links (claim_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_truth_claim_links_unique ON truth_claim_links (truth_id, claim_id);
