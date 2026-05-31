@@ -69,7 +69,7 @@ async function insertClaimWithNormalizedKey(env, c) {
       evidence_score,survivability,testability,contradictions,
       created_at,updated_at,review_state,normalized_claim
     ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-  `).bind(c.claimId, c.userId, c.generatedClaim, c.category, 'Truth-Derived', 'Plausible', 5, 50, 50, 0, c.now, c.now, 'public', c.normalizedClaim).run();
+  `).bind(c.claimId, c.userId, c.generatedClaim, c.category, 'Truth-Derived', 'Plausible', 5, 50, 50, 0, c.now, c.now, 'review', c.normalizedClaim).run();
 }
 
 async function findExistingClaim(env, truthId, truth) {
