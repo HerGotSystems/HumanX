@@ -37,6 +37,11 @@ Concise known-good baseline after completing the full smoke-test chain: live fro
 **Read when:** at the start of any new HumanX session before choosing next work, or when checking what has already been tested and cleaned up.
 **Safety note:** Confirms migration 0004 must not be rerun, Wrangler/D1 must not be used casually, and live write smoke tests require explicit per-session approval.
 
+### `LOCAL_STATIC_CHECKS_USAGE.md`
+Simple usage guide for running the two local static check scripts before or after risky changes. Covers both `scripts/belief-engine-static-check.mjs` (24 hard checks) and `scripts/worker-route-static-check.mjs` (35 hard checks): exact run commands, safety properties, when to run each, what they do not prove, relationship to smoke tests, and stop conditions.
+**Read when:** before running either static check script, or before/after any Belief Engine or Worker route change.
+**Safety note:** Local file reads only. No network, no production calls, no D1/Wrangler, no mutation. Last known-good results: Belief Engine static check — 24 passed, 0 failed, 0 warnings. Worker route static check — 35 passed, 0 failed, 0 warnings.
+
 ---
 
 ## 2. Backend / API Safety
@@ -204,6 +209,10 @@ Node script that exercises public write endpoints. Defaults to dry-run mode; a m
 ## 7. Scripts and Diagnostics References
 
 These files are not in `docs/` but are referenced by docs in this folder.
+
+### `docs/LOCAL_STATIC_CHECKS_USAGE.md`
+Combined usage guide for both local static check scripts. Covers purpose, exact run commands, safety properties (local reads only — no network, no production, no D1/Wrangler, no mutation), when to run each script, what they do not prove, how they relate to smoke tests, and stop conditions. Known-good results: Belief Engine static check — 24 passed, 0 failed, 0 warnings; Worker route static check — 35 passed, 0 failed, 0 warnings.
+**Read when:** before running `scripts/belief-engine-static-check.mjs` or `scripts/worker-route-static-check.mjs`, or when deciding which static check applies to a pending change.
 
 ### `scripts/worker-route-static-check.mjs`
 Local static Worker route/docs consistency checker. Reads `src/worker.js`, `docs/API_ENDPOINT_INVENTORY.md`, and `docs/PUBLIC_WRITE_ENDPOINTS_RISK_MAP.md`; cross-references route strings against the inventory; confirms all high-risk and public-write routes are documented. 35 hard checks. No network, no Worker execution, no D1/Wrangler, no production mutation.
