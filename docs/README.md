@@ -132,6 +132,11 @@ Step-by-step instructions for running `scripts/write-endpoint-smoke-test.mjs`. D
 **Read when:** about to run the write smoke test, or troubleshooting a failed run.
 **Safety note:** Dry-run is the safe default. Explicit mutation mode requires a safety gate flag and must not be used against production without approval.
 
+### `docs/WRITE_SMOKE_DRY_RUN_RESULT.md`
+Records the confirmed dry-run behaviour of `scripts/write-endpoint-smoke-test.mjs` as observed on 2026-06-01. Proves that the script flags missing safety gates, prints generated payloads, makes no network requests, and exits 0 when mutation gates are absent.
+**Read when:** before approving any live write smoke test, or confirming what the dry-run baseline looked like.
+**Safety note:** Proves fail-safe dry-run behaviour only. Does not prove live write endpoint behaviour — no requests reached the Worker during this run.
+
 ### `scripts/read-endpoint-smoke-test.mjs`
 Node script that fires HTTP requests against every covered read endpoint and asserts status codes and response shape. Read-only — makes no mutations. Already passed live on 2026-06-01.
 **Use when:** verifying read endpoints after a Worker change. Safe to run without side effects.
