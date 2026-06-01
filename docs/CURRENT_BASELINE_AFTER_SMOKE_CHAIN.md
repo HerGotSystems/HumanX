@@ -23,6 +23,7 @@ starting any new work from this point.
 | Smoke claim approval | Not approved at any point |
 | Belief Engine static check | **24 passed, 0 failed, 0 warnings** — local/static only, no network, no production, no D1/Wrangler — see `docs/BELIEF_ENGINE_STATIC_CHECK_RESULT.md` |
 | Worker route static check | **35 passed, 0 failed, 0 warnings** — local/static only, no network, no production, no D1/Wrangler, no Worker execution; `/api/claim-vote` inventory gap found and fixed before this pass — see `docs/WORKER_ROUTE_STATIC_CHECK_RESULT.md` |
+| Add Test live verification | **Passed** — `/api/tests` write path confirmed working after schema fix; migration `0005_add_home_tests_updated_at.sql` applied manually via Cloudflare D1 console; test artefact `Sniff / Sniff Butt` appears in Study Tests and Claim Flow — see `docs/ADD_TEST_FIX_RESULT.md` |
 
 ---
 
@@ -60,6 +61,8 @@ Configured in `wrangler.toml`. Do not change the database ID.
 | `docs/WORKER_ROUTE_STATIC_CHECK_RESULT.md` | Known-good result of the local static Worker route/docs check (35/0/0, 2026-06-01) |
 | `docs/WORKER_ROUTE_STATIC_CHECK_SPEC.md` | Spec for the Worker route/docs static consistency check |
 | `scripts/worker-route-static-check.mjs` | Local static Worker route/docs checker (no network, no mutation, no Worker execution) |
+| `docs/ADD_TEST_FIX_RESULT.md` | Live verification result of the Add Test repair — D1 schema fix, frontend validation, and confirmed write path |
+| `migrations/0005_add_home_tests_updated_at.sql` | Migration that added `updated_at` to `home_tests`; applied manually via Cloudflare D1 console |
 
 ---
 
@@ -88,6 +91,9 @@ These are appropriate next steps from this baseline, in rough priority order:
 - **Plan-only work before Worker modular split** — produce a written plan and review it
   before writing any code. See `docs/WORKER_MODULAR_SPLIT_PLAN.md`. Do not refactor
   Worker routing speculatively.
+- **`/api/tests` is now a working baseline** — Add Test is confirmed working after the
+  schema fix. Any future change to test-route handling (Worker dispatch, schema, frontend
+  validation) should re-check Add Test manually and reference `docs/ADD_TEST_FIX_RESULT.md`.
 
 ---
 
@@ -95,6 +101,13 @@ These are appropriate next steps from this baseline, in rough priority order:
 
 - **Do not rerun migration 0004.** `migrations/0004_unique_normalized_content.sql` is
   already applied to production D1. Running it again will fail.
+- **Do not rerun migration 0005** unless you are certain the target database is missing
+  `home_tests.updated_at`. On production D1, this column now exists; rerunning will fail.
+- **Do not remove `updated_at` from `home_tests`** in code or schema. The production
+  table has this column and the backend INSERT depends on it.
+- **Do not delete `Sniff / Sniff Butt`** unless intentionally cleaning the smoke-test
+  artefact. It is a known, harmless test marker. Use the normal UI or admin process if
+  removal is desired; do not use D1/Wrangler unless explicitly requested.
 - **Do not run Wrangler or D1 commands** (`wrangler d1 execute`, `wrangler deploy`, or
   any variant) unless the user explicitly requests them in the current task.
 - **Do not change `src/worker.js`** without having smoke-test or hardening-test proof
