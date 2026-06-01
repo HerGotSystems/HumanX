@@ -114,9 +114,11 @@ Automated HTTP smoke tests against the live Worker. Read the spec before changin
 - Read smoke test passed live on 2026-06-01 — see `docs/LIVE_READ_SMOKE_RESULT.md`.
 - Write smoke dry-run passed safely on 2026-06-01 — see `docs/WRITE_SMOKE_DRY_RUN_RESULT.md`.
 - Write live smoke passed on 2026-06-01 — see `docs/LIVE_WRITE_SMOKE_RESULT.md`.
-- Live write smoke created claim `clm_54be6272abbc49d282` in `reviewState: 'review'`. That claim requires manual admin reject/delete — it has not been cleaned up automatically.
+- Live write smoke created claim `clm_54be6272abbc49d282` in `reviewState: 'review'`. Cleanup is pending — the claim must be manually rejected or deleted through the admin review process; it has not been cleaned up automatically.
+- Do not approve the smoke claim (`clm_54be6272abbc49d282`) — approval would make it publicly visible.
+- Do not use D1 or Wrangler commands for cleanup — use the HumanX Review/admin UI only.
 - Do not run additional write smoke tests against production unless explicitly approved in the current task.
-- Do not run Wrangler or D1 commands.
+- Do not run Wrangler or D1 commands for any other purpose.
 - Do not rerun migration 0004.
 
 ### `docs/READ_ENDPOINT_SMOKE_TEST_SPEC.md`
@@ -150,6 +152,11 @@ Records the confirmed dry-run behaviour of `scripts/write-endpoint-smoke-test.mj
 Records the explicitly approved live write smoke test run on 2026-06-01 against `https://humanx.rinkimirikata.com`. 4 checks passed, 0 failed. One smoke-test claim (`clm_54be6272abbc49d282`) was created and confirmed to land in `reviewState: 'review'` — not publicly visible. Manual admin reject/delete of that claim is still required.
 **Read when:** before changing claim submission, `reviewState` behaviour, any public write endpoint, or the write smoke scripts themselves.
 **Safety note:** One real D1 row was created during this run. Claim `clm_54be6272abbc49d282` must be rejected or deleted through the admin review process. Do not run additional live write smoke tests without explicit approval. Do not run Wrangler/D1. Do not rerun migration 0004.
+
+### `docs/SMOKE_CLAIM_ADMIN_CLEANUP.md`
+Manual admin cleanup note for smoke-test claim `clm_54be6272abbc49d282` created during the live write smoke test on 2026-06-01. Documents how to locate and reject/delete the claim through the HumanX Review/admin UI, what to verify afterwards, and what must not be done.
+**Read when:** before or while cleaning the pending smoke claim from the admin review queue.
+**Safety note:** Use the HumanX Review/admin UI only. Do not approve the smoke claim — that would make it publicly visible. Do not use D1 or Wrangler for cleanup. Do not rerun migration 0004.
 
 ### `scripts/read-endpoint-smoke-test.mjs`
 Node script that fires HTTP requests against every covered read endpoint and asserts status codes and response shape. Read-only — makes no mutations. Already passed live on 2026-06-01.
