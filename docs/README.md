@@ -32,6 +32,11 @@ Confirmed live deployment facts: Worker entrypoint, assets directory, D1 binding
 Human-runnable QA checklist for every view in the main app. Covers navigation, form flows, empty states, mobile layout, and the Belief Engine save bridge.
 **Read when:** before or after any change that could affect the visible frontend; required before deploying any Worker or frontend change.
 
+### `CURRENT_BASELINE_AFTER_SMOKE_CHAIN.md`
+Concise known-good baseline after completing the full smoke-test chain: live frontend QA (desktop and phone), read endpoint smoke (15 passed), write smoke dry-run, live write smoke (4 passed), and manual smoke-claim cleanup (rejected via Review UI). Includes active deployment facts, proof-file index, safe next work, and do-not-touch warnings.
+**Read when:** at the start of any new HumanX session before choosing next work, or when checking what has already been tested and cleaned up.
+**Safety note:** Confirms migration 0004 must not be rerun, Wrangler/D1 must not be used casually, and live write smoke tests require explicit per-session approval.
+
 ---
 
 ## 2. Backend / API Safety
