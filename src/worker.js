@@ -50,7 +50,7 @@ export default {
       if (url.pathname.match(/^\/api\/claims\/[^/]+$/) && request.method === 'GET') return getClaim(request, env, url.pathname.split('/').pop());
       if (url.pathname === '/api/evidence' && request.method === 'POST') return addEvidence(request, env);
       if (url.pathname === '/api/pressure' && request.method === 'POST') return addPressure(request, env);
-      if (url.pathname === '/api/tests' && request.method === 'POST') return addHomeTest(request, env);
+      if (url.pathname === '/api/tests' && request.method === 'POST') return await addHomeTest(request, env);
       if (url.pathname === '/api/report' && request.method === 'POST') return reportTarget(request, env);
       if (url.pathname === '/api/aip' && request.method === 'POST') return createAipPacket(request, env);
       if (url.pathname === '/api/runpack' && request.method === 'POST') return createAipPacket(request, env);
