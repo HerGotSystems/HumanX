@@ -110,6 +110,15 @@ Notes from an earlier patch cycle about the seed import route. Describes the sta
 
 Automated HTTP smoke tests against the live Worker. Read the spec before changing any covered endpoint; read the usage doc before running a script.
 
+**Standing status (as of 2026-06-01):**
+- Read smoke test passed live on 2026-06-01 — see `docs/LIVE_READ_SMOKE_RESULT.md`.
+- Write smoke dry-run passed safely on 2026-06-01 — see `docs/WRITE_SMOKE_DRY_RUN_RESULT.md`.
+- Write live smoke passed on 2026-06-01 — see `docs/LIVE_WRITE_SMOKE_RESULT.md`.
+- Live write smoke created claim `clm_54be6272abbc49d282` in `reviewState: 'review'`. That claim requires manual admin reject/delete — it has not been cleaned up automatically.
+- Do not run additional write smoke tests against production unless explicitly approved in the current task.
+- Do not run Wrangler or D1 commands.
+- Do not rerun migration 0004.
+
 ### `docs/READ_ENDPOINT_SMOKE_TEST_SPEC.md`
 Defines the full contract for the read-endpoint smoke test: which routes are covered, expected status codes, response shape assertions, and pass/fail criteria. No mutations — all requests are read-only.
 **Read when:** planning any change to a GET endpoint, interpreting a smoke-test failure, or auditing read-endpoint coverage.
@@ -136,6 +145,11 @@ Step-by-step instructions for running `scripts/write-endpoint-smoke-test.mjs`. D
 Records the confirmed dry-run behaviour of `scripts/write-endpoint-smoke-test.mjs` as observed on 2026-06-01. Proves that the script flags missing safety gates, prints generated payloads, makes no network requests, and exits 0 when mutation gates are absent.
 **Read when:** before approving any live write smoke test, or confirming what the dry-run baseline looked like.
 **Safety note:** Proves fail-safe dry-run behaviour only. Does not prove live write endpoint behaviour — no requests reached the Worker during this run.
+
+### `docs/LIVE_WRITE_SMOKE_RESULT.md`
+Records the explicitly approved live write smoke test run on 2026-06-01 against `https://humanx.rinkimirikata.com`. 4 checks passed, 0 failed. One smoke-test claim (`clm_54be6272abbc49d282`) was created and confirmed to land in `reviewState: 'review'` — not publicly visible. Manual admin reject/delete of that claim is still required.
+**Read when:** before changing claim submission, `reviewState` behaviour, any public write endpoint, or the write smoke scripts themselves.
+**Safety note:** One real D1 row was created during this run. Claim `clm_54be6272abbc49d282` must be rejected or deleted through the admin review process. Do not run additional live write smoke tests without explicit approval. Do not run Wrangler/D1. Do not rerun migration 0004.
 
 ### `scripts/read-endpoint-smoke-test.mjs`
 Node script that fires HTTP requests against every covered read endpoint and asserts status codes and response shape. Read-only — makes no mutations. Already passed live on 2026-06-01.
