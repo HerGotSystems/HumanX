@@ -73,6 +73,16 @@ Internal reference for the Belief Engine's scoring architecture. Covers the 9 co
 Practical test plan for the Belief Engine before any scoring, contradiction, profile, or bridge change. Documents the exact `isFullBeliefProfile` classification logic used by Drift, the three bridge payload fields that must not change (`source`, `engineVersion`, `label`), the scoring formulas for `stabilityScore`, `opennessScore`, and `pressureScore`, five manual test profiles with expected outputs, and a required-proof checklist before any scoring change.
 **Read when:** before any Belief Engine change — scoring, contradiction rules, bridge payload, or Drift integration.
 
+### `BELIEF_ENGINE_STATIC_CHECK_SPEC.md`
+Defines the local static marker check for the Belief Engine: which files are read, which nav links, bridge markers, questionnaire content, result section markers, and frontend secret/provider-call absence checks must pass. Includes expected output format, exit codes, limitations, and stop conditions. No network calls, no D1/Wrangler, no browser automation.
+**Read when:** before changing Belief Engine scoring, contradiction logic, result UI, bridge wiring, or `isFullBeliefProfile` Drift classification.
+**Safety note:** Spec is static and non-mutating. Does not replace manual Belief Engine QA or browser-based tests.
+
+### `BELIEF_ENGINE_STATIC_CHECK_RESULT.md`
+Records the known-good local static check result from 2026-06-01: 24 passed, 0 failed, 0 warnings, exit 0. Confirms all nav links, classifier markers, questionnaire and result section markers, bridge script tag, bridge payload strings, and absence of frontend secrets/provider-call URLs.
+**Read when:** before deciding whether Belief Engine static markers are currently known-good, or comparing a new run against this baseline.
+**Safety note:** Proves static markers only — does not prove questionnaire completion, scoring correctness, mobile layout, or bridge POST success.
+
 ---
 
 ## 4. Refactor Planning
@@ -179,6 +189,10 @@ Node script that exercises public write endpoints. Defaults to dry-run mode; a m
 ## 7. Scripts and Diagnostics References
 
 These files are not in `docs/` but are referenced by docs in this folder.
+
+### `scripts/belief-engine-static-check.mjs`
+Local static Belief Engine integrity checker. Reads `public/index.html`, `public/app-v10.js`, `public/apps/humanx-belief-engine/index.html`, and `humanx-bridge.js`; asserts nav links, Drift classifier markers, questionnaire and result section content, bridge script tag, bridge payload strings, and absence of frontend API key/provider-call markers. 24 hard checks. No network, no D1/Wrangler, no production mutation.
+**Use when:** before and after any Belief Engine scoring, contradiction, UI, bridge, or Drift-classification change. Run with `node scripts/belief-engine-static-check.mjs`. All 24 checks must pass.
 
 ### `scripts/hardening-smoke-test.mjs`
 **Run:** `node scripts/hardening-smoke-test.mjs`
