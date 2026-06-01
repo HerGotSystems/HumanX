@@ -21,6 +21,7 @@ starting any new work from this point.
 | Smoke claim cleanup | Completed manually through HumanX Review/admin UI |
 | Final smoke claim state | **Rejected** — confirmed by user via Review UI |
 | Smoke claim approval | Not approved at any point |
+| Belief Engine static check | **24 passed, 0 failed, 0 warnings** — local/static only, no network, no production, no D1/Wrangler — see `docs/BELIEF_ENGINE_STATIC_CHECK_RESULT.md` |
 
 ---
 
@@ -52,6 +53,9 @@ Configured in `wrangler.toml`. Do not change the database ID.
 | `docs/SMOKE_CLAIM_CLEANUP_RESULT.md` | Manual rejection of the smoke-test claim via Review UI |
 | `scripts/read-endpoint-smoke-test.mjs` | Read-only smoke script (safe to run at any time) |
 | `scripts/write-endpoint-smoke-test.mjs` | Write smoke script (dry-run default; live run requires explicit approval) |
+| `docs/BELIEF_ENGINE_STATIC_CHECK_RESULT.md` | Known-good result of the local static Belief Engine check (24/0/0, 2026-06-01) |
+| `docs/BELIEF_ENGINE_STATIC_CHECK_USAGE.md` | How to run the static check and interpret results |
+| `scripts/belief-engine-static-check.mjs` | Local static Belief Engine integrity checker (no network, no mutation) |
 
 ---
 
@@ -67,6 +71,10 @@ These are appropriate next steps from this baseline, in rough priority order:
 - **Read endpoint smoke after any backend change** — run
   `node scripts/read-endpoint-smoke-test.mjs https://humanx.rinkimirikata.com` to
   confirm the read baseline is intact. Compare against `docs/LIVE_READ_SMOKE_RESULT.md`.
+- **Belief Engine static check before and after Belief Engine or Drift-classification changes** —
+  run `node scripts/belief-engine-static-check.mjs` before and after any change to
+  scoring logic, contradiction rules, bridge wiring, result UI, or `isFullBeliefProfile`
+  classification. All 24 checks must pass. See `docs/BELIEF_ENGINE_STATIC_CHECK_USAGE.md`.
 - **Tests before changing Belief Engine scoring** — see `docs/BELIEF_ENGINE_SCORING_NOTES.md`
   and `docs/BELIEF_ENGINE_TEST_PLAN.md` before touching any scoring logic, contradiction
   rule, or `CHOICE_SCALE` value.
@@ -94,6 +102,14 @@ These are appropriate next steps from this baseline, in rough priority order:
 - **Do not change response shapes** used by `public/app-v10.js` casually — shape
   changes break the frontend silently. Check `docs/API_ENDPOINT_INVENTORY.md` before
   modifying any response.
+- **Do not change Belief Engine bridge/profile marker strings** (`source`,
+  `engineVersion`, `label` in `humanx-bridge.js`, or the marker strings inside
+  `isFullBeliefProfile` in `app-v10.js`) without updating both the Drift classification
+  expectations and the static check spec. The static check will fail immediately if
+  these strings drift out of sync.
+- **Do not remove the `humanx-bridge.js` script reference** from
+  `public/apps/humanx-belief-engine/index.html` without a replacement bridge plan in
+  place. Removing it silently breaks the Save to HumanX flow and the Drift feed.
 
 ---
 
