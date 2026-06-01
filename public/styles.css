@@ -51,4 +51,27 @@
 /* Empty states */
 .empty-state{padding:16px 14px;background:#09010b12;border:1px dashed var(--line);border-radius:10px;margin:8px 0}
 .empty-state p{margin:0 0 3px;font-size:12px;color:var(--text)}
+/* Investigation board */
+.inv-board-head{display:flex;align-items:center;gap:8px;margin:12px 0 4px;padding:0 2px}
+.inv-board-head span{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.inv-sec-head{margin-bottom:8px}
+.inv-sec-title{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.inv-sec-title h3{margin:0;font-size:13px;color:var(--text)}
+.inv-sec-purpose{margin:0 0 8px;font-size:9px;color:var(--muted);letter-spacing:.03em;line-height:1.4}
+.inv-item-head{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-bottom:4px}
+.inv-item-title{font-size:12px;color:var(--text);font-weight:700}
+/* Test items vs form */
+.test-add-form{background:#080b12;border:1px solid var(--line);border-radius:10px;padding:8px;margin:6px 0;display:grid;gap:5px}
+.test-form-row{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.test-item{background:linear-gradient(135deg,rgba(57,255,159,.05),rgba(8,11,18,.9));border:1px solid #39ff9f33;border-radius:10px;padding:10px;margin:6px 0}
+/* Analysis result cards */
+.analysis-save-form{background:#080b12;border:1px solid var(--line);border-radius:10px;padding:8px;margin:6px 0}
+.analysis-result-card{background:linear-gradient(135deg,rgba(87,184,255,.07),rgba(8,11,18,.9));border:1px solid #57b8ff33;border-radius:10px;padding:10px;margin:6px 0}
+.analysis-details{margin-top:6px}
+.analysis-details summary{font-size:9px;text-transform:uppercase;color:var(--blue);cursor:pointer;letter-spacing:.06em}
+.analysis-detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.analysis-detail-grid h4{font-size:9px;text-transform:uppercase;color:var(--muted);margin:0 0 4px;letter-spacing:.06em}
+.analysis-detail-grid ul{margin:0;padding-left:14px}
+.analysis-detail-grid li{font-size:10px;color:var(--muted);margin:2px 0;line-height:1.4}
+@media(max-width:600px){.analysis-detail-grid{grid-template-columns:1fr}.test-form-row{grid-template-columns:1fr}}
 .empty-state p.small{font-size:10px;color:var(--muted);margin:0}
