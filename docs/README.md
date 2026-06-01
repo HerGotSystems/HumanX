@@ -1,0 +1,130 @@
+# HumanX Docs Index
+
+Quick reference for all documentation in this folder.
+Read the relevant file before starting any task that touches the area it covers.
+
+---
+
+## ⚠ Standing Warnings
+
+These apply to every task in this repo unless the user explicitly overrides them.
+
+| Warning | Detail |
+|---|---|
+| **Active Worker entrypoint** | `src/worker.js` — do not remove or rename without a deployment change |
+| **Active frontend** | `public/index.html`, `public/app-v10.js`, `public/styles.css` — response shape changes will break these silently |
+| **Belief Engine** | `public/apps/humanx-belief-engine/index.html` — standalone app, navigated to by hard redirect from the main frontend |
+| **Do not rerun migration 0004** | `migrations/0004_unique_normalized_content.sql` is already applied to production D1. Running it again will fail. |
+| **Do not run Wrangler or D1 commands** | `wrangler d1 execute`, `wrangler deploy`, and all variants are off-limits unless the user explicitly requests them in the task. |
+| **Keep tasks small and branch-based** | One branch per task. Show diff before committing. Stop after commit — do not push. The user pushes and merges manually. |
+
+---
+
+## 1. Current Status / Baseline
+
+Read these first when starting a new session or returning after time away.
+
+### `OPERATIONAL_STATUS.md`
+Confirmed live deployment facts: Worker entrypoint, assets directory, D1 binding and database name, all hardening work done before PR #13, migration 0004 status, and current working rules for all tasks.
+**Read when:** starting any task, confirming what is live, or checking whether a hardening step has already been done.
+
+### `MANUAL_FRONTEND_SMOKE_CHECKLIST.md`
+Human-runnable QA checklist for every view in the main app. Covers navigation, form flows, empty states, mobile layout, and the Belief Engine save bridge.
+**Read when:** before or after any change that could affect the visible frontend; required before deploying any Worker or frontend change.
+
+---
+
+## 2. Backend / API Safety
+
+Read before touching any route, write endpoint, duplicate handling, or rate limiting logic.
+
+### `API_ENDPOINT_INVENTORY.md`
+A descriptive table of every `/api/...` route in `src/worker.js`, grouped by area. Includes method, path, purpose, visibility, D1 tables touched, and risk notes for each endpoint. Marks module-delegated routes as uncertain where the source of truth is a separate file.
+**Read when:** planning any Worker change, auditing the API surface, or checking which tables a route touches.
+
+### `PUBLIC_WRITE_ENDPOINTS_RISK_MAP.md`
+Risk map for every public and semi-public mutating endpoint. Covers current protection (rate limits, auth requirements), main abuse risk, duplicate/race risk, and required test coverage per endpoint. Includes a do-not-touch warning list.
+**Read when:** before changing any write endpoint, its rate limit, its response shape, or its auth requirement.
+
+### `BACKEND_SMOKE_TEST_PLAN.md`
+Defines the minimum backend proof required before any Worker routing change or module split. Documents what the existing `scripts/hardening-smoke-test.mjs` actually tests (pure functions and mock DB only — no HTTP, no live D1), what it does not cover, and what future test groups should be added. Includes a full behaviour checklist.
+**Read when:** before starting the Worker modular split, before changing any endpoint handler, or before adding new automated tests.
+
+### `D1_DUPLICATE_CLEANUP.md`
+Explains why migration 0004 may fail on a database with duplicate `normalized_statement` or `normalized_claim` values, how to diagnose duplicates using the diagnostics SQL, and the safe manual cleanup sequence (mark before delete, re-point child rows, never blindly delete).
+**Read when:** investigating a failed migration 0004 run, cleaning up duplicate claim or truth rows, or understanding the `normalized_claim` / `normalized_statement` unique index constraints.
+
+---
+
+## 3. Belief Engine
+
+Read before touching scoring logic, contradiction rules, the bridge script, or the Drift page.
+
+### `BELIEF_ENGINE_SCORING_NOTES.md`
+Internal reference for the Belief Engine's scoring architecture. Covers the 9 core dimensions vs 10 forensic dimensions, `CHOICE_SCALE` calibration and why changing it silently shifts all scenario-weighted scores, choice-index contradiction risk (reordering choices breaks contradiction checks silently), the Timeline optional-answer limitation, coherence score penalty weights, and safe change rules.
+**Read when:** before touching any scoring logic, contradiction rule, question weight, or `CHOICE_SCALE` value in `public/apps/humanx-belief-engine/index.html`.
+
+### `BELIEF_ENGINE_TEST_PLAN.md`
+Practical test plan for the Belief Engine before any scoring, contradiction, profile, or bridge change. Documents the exact `isFullBeliefProfile` classification logic used by Drift, the three bridge payload fields that must not change (`source`, `engineVersion`, `label`), the scoring formulas for `stabilityScore`, `opennessScore`, and `pressureScore`, five manual test profiles with expected outputs, and a required-proof checklist before any scoring change.
+**Read when:** before any Belief Engine change — scoring, contradiction rules, bridge payload, or Drift integration.
+
+---
+
+## 4. Refactor Planning
+
+Read before proposing or beginning any structural change to the Worker or frontend.
+
+### `WORKER_MODULAR_SPLIT_PLAN.md`
+Controlled plan for a future safe split of `src/worker.js` into smaller modules. Documents current known facts (entrypoint, D1 binding, migration state, active frontend files), the proposed module layout (proposal only), the required safe migration sequence (8 numbered steps), highest-risk areas, required proof before implementation, and stop conditions.
+**Read when:** considering any refactor of Worker routing, before extracting any helper into a module, or before starting the first implementation PR for the split.
+
+---
+
+## 5. Reference / Architecture Background
+
+Older context documents. Useful for understanding design decisions but not required reading before routine tasks.
+
+### `HUMANX_ARCHITECTURE.md`
+High-level architecture document describing HumanX as a shared adversarial truth-pressure system: pseudonymous identity, no free public AI inference, BYO-AI via RunPack packets, and the core design constraints that shape the API.
+**Read when:** onboarding to the project or questioning a design decision about auth, AI usage, or data model.
+
+### `HUMANX_STRUCTURE.md`
+Describes the umbrella structure of HumanX — Belief Engine, Claims, Truths, Evidence Vault, Drift, and RunPack — and how the layers relate to each other.
+**Read when:** understanding how the major subsystems fit together, or planning a feature that touches multiple layers.
+
+### `AIP-HUMANX.md`
+Explains the AIP (Analysis in Packet) / RunPack-first mode: why the owner's API budget is not used for public inference, how the packet generation and paste-back flow works, and why `GET /api/ai/analyse` intentionally returns HTTP 402.
+**Read when:** investigating the `RUNPACK_MODE` error, understanding why the AI analysis endpoint is blocked, or planning anything that involves AI inference.
+
+### `FRONTEND_SPLIT_PLAN.md`
+Earlier plan for splitting the large single-file frontend. Superseded in practice by the current `public/app-v10.js` structure but retains useful context about what motivated the split and what the growth pressure points were.
+**Read when:** investigating frontend file size, planning a future frontend module split, or understanding why the app is structured the way it is.
+
+### `NEXT_PATCH_IMPORT_SEED.md`
+Notes from an earlier patch cycle about the seed import route. Describes the state before `src/importer.js` and `GET /api/import-seed` were added. Largely superseded by the current Worker; retained as a historical reference.
+**Read when:** investigating the seed/import route history or understanding what was added in early patching.
+
+---
+
+## 6. Scripts and Diagnostics References
+
+These files are not in `docs/` but are referenced by docs in this folder.
+
+### `scripts/hardening-smoke-test.mjs`
+**Run:** `node scripts/hardening-smoke-test.mjs`
+16 unit tests (no HTTP, no live D1) covering: `isUniqueConstraintError` pure function, `meaningKey` normalisation stability, mock `attachEvidenceToClaim` INSERT OR IGNORE id fix, and `safeRateLimit` fail-closed behaviour.
+**Use when:** confirming hardening logic is intact after any change to `src/worker.js` or before a Worker refactor. Note: the inlined helper copies in this script may drift from `src/worker.js` during a refactor — check they still match.
+
+### `scripts/backfill-normalized-content.mjs`
+Backfill script for claim and truth rows with missing `normalized_claim` / `normalized_statement` values. Must be run before migration 0004 if the column exists but has NULL values for existing rows.
+**Use when:** preparing for migration 0004 on a database that predates the normalization column, or recovering from a failed migration caused by NULL values. Only run on explicit user instruction.
+
+### `migrations/diagnostics_duplicate_normalized_content.sql`
+Read-only SQL diagnostics for finding duplicate `normalized_statement` and `normalized_claim` values before migration 0004. Does not mutate data.
+**Use when:** investigating whether a database has duplicate rows that would block migration 0004. Run via `wrangler d1 execute` only on explicit user instruction. See `docs/D1_DUPLICATE_CLEANUP.md` for the full procedure.
+
+---
+
+## Maintenance Rule
+
+Update this index whenever a new doc is added to `docs/`, an existing doc is removed or renamed, or a doc's purpose materially changes. Keep descriptions to one or two sentences and the "when to read" note to one line.
