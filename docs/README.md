@@ -78,6 +78,11 @@ Defines the local static marker check for the Belief Engine: which files are rea
 **Read when:** before changing Belief Engine scoring, contradiction logic, result UI, bridge wiring, or `isFullBeliefProfile` Drift classification.
 **Safety note:** Spec is static and non-mutating. Does not replace manual Belief Engine QA or browser-based tests.
 
+### `BELIEF_ENGINE_STATIC_CHECK_USAGE.md`
+Step-by-step guide for running `scripts/belief-engine-static-check.mjs`. Covers what the script checks (route/link markers, Drift classifier strings, questionnaire content, result markers, bridge script tag, bridge payload strings, secret/provider-URL absence), what it does not check, the exact run command, the expected known-good output, safety properties, when to run, and stop conditions.
+**Read when:** before running the static check manually, or before/after any Belief Engine scoring, contradiction, UI, bridge, or Drift-classification change.
+**Safety note:** Local file reads only. No network, no production calls, no D1/Wrangler, no mutation. Last known-good result: 24 passed, 0 failed, 0 warnings.
+
 ### `BELIEF_ENGINE_STATIC_CHECK_RESULT.md`
 Records the known-good local static check result from 2026-06-01: 24 passed, 0 failed, 0 warnings, exit 0. Confirms all nav links, classifier markers, questionnaire and result section markers, bridge script tag, bridge payload strings, and absence of frontend secrets/provider-call URLs.
 **Read when:** before deciding whether Belief Engine static markers are currently known-good, or comparing a new run against this baseline.
