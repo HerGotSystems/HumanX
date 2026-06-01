@@ -15,6 +15,7 @@ These apply to every task in this repo unless the user explicitly overrides them
 | **Active frontend** | `public/index.html`, `public/app-v10.js`, `public/styles.css` — response shape changes will break these silently |
 | **Belief Engine** | `public/apps/humanx-belief-engine/index.html` — standalone app, navigated to by hard redirect from the main frontend |
 | **Do not rerun migration 0004** | `migrations/0004_unique_normalized_content.sql` is already applied to production D1. Running it again will fail. |
+| **Do not rerun migration 0005** | `migrations/0005_add_home_tests_updated_at.sql` was applied manually via Cloudflare D1 console. Do not rerun it unless the target database is known to be missing `home_tests.updated_at`. |
 | **Do not run Wrangler or D1 commands** | `wrangler d1 execute`, `wrangler deploy`, and all variants are off-limits unless the user explicitly requests them in the task. |
 | **Keep tasks small and branch-based** | One branch per task. Show diff before committing. Stop after commit — do not push. The user pushes and merges manually. |
 
@@ -36,6 +37,11 @@ Human-runnable QA checklist for every view in the main app. Covers navigation, f
 Concise known-good baseline after completing the full smoke-test chain: live frontend QA (desktop and phone), read endpoint smoke (15 passed), write smoke dry-run, live write smoke (4 passed), and manual smoke-claim cleanup (rejected via Review UI). Includes active deployment facts, proof-file index, safe next work, and do-not-touch warnings.
 **Read when:** at the start of any new HumanX session before choosing next work, or when checking what has already been tested and cleaned up.
 **Safety note:** Confirms migration 0004 must not be rerun, Wrangler/D1 must not be used casually, and live write smoke tests require explicit per-session approval.
+
+### `ADD_TEST_FIX_RESULT.md`
+Records the completed Add Test repair and live verification. Covers the original failure (`D1_ERROR: table home_tests has no column named updated_at`), root cause (production D1 table predated the schema column), the fix path (await dispatch fix, migration 0005, manual D1 console apply), and confirmed live results: title `Sniff`, instructions `Sniff Butt`, appearing in Study Tests and Claim Flow.
+**Read when:** before changing `/api/tests`, `home_tests` schema, Study Claim Tests UI, or test display in the Claim Flow.
+**Safety note:** Migration `0005_add_home_tests_updated_at.sql` was applied manually through the Cloudflare D1 console; do not rerun it unless the target database is known to be missing `home_tests.updated_at`. Known artefact: `Sniff / Sniff Butt` exists as a visible smoke-test marker in production — leave it unless intentionally cleaning it through the normal UI or admin process.
 
 ### `LOCAL_STATIC_CHECKS_USAGE.md`
 Simple usage guide for running the two local static check scripts before or after risky changes. Covers both `scripts/belief-engine-static-check.mjs` (24 hard checks) and `scripts/worker-route-static-check.mjs` (35 hard checks): exact run commands, safety properties, when to run each, what they do not prove, relationship to smoke tests, and stop conditions.
@@ -230,6 +236,10 @@ Local static Belief Engine integrity checker. Reads `public/index.html`, `public
 ### `scripts/backfill-normalized-content.mjs`
 Backfill script for claim and truth rows with missing `normalized_claim` / `normalized_statement` values. Must be run before migration 0004 if the column exists but has NULL values for existing rows.
 **Use when:** preparing for migration 0004 on a database that predates the normalization column, or recovering from a failed migration caused by NULL values. Only run on explicit user instruction.
+
+### `migrations/0005_add_home_tests_updated_at.sql`
+Adds the `updated_at` column to `home_tests` via `ALTER TABLE`. Applied manually through the Cloudflare D1 console on the production database. The column is now present on production; do not rerun this migration against any database where `home_tests.updated_at` already exists.
+**Use when:** reviewing the Add Test schema fix, or understanding why the migration was applied manually rather than via Wrangler. See `docs/ADD_TEST_FIX_RESULT.md` for full context.
 
 ### `migrations/diagnostics_duplicate_normalized_content.sql`
 Read-only SQL diagnostics for finding duplicate `normalized_statement` and `normalized_claim` values before migration 0004. Does not mutate data.
