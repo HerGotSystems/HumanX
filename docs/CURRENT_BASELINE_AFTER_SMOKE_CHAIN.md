@@ -22,6 +22,7 @@ starting any new work from this point.
 | Final smoke claim state | **Rejected** — confirmed by user via Review UI |
 | Smoke claim approval | Not approved at any point |
 | Belief Engine static check | **24 passed, 0 failed, 0 warnings** — local/static only, no network, no production, no D1/Wrangler — see `docs/BELIEF_ENGINE_STATIC_CHECK_RESULT.md` |
+| Worker route static check | **35 passed, 0 failed, 0 warnings** — local/static only, no network, no production, no D1/Wrangler, no Worker execution; `/api/claim-vote` inventory gap found and fixed before this pass — see `docs/WORKER_ROUTE_STATIC_CHECK_RESULT.md` |
 
 ---
 
@@ -56,6 +57,9 @@ Configured in `wrangler.toml`. Do not change the database ID.
 | `docs/BELIEF_ENGINE_STATIC_CHECK_RESULT.md` | Known-good result of the local static Belief Engine check (24/0/0, 2026-06-01) |
 | `docs/BELIEF_ENGINE_STATIC_CHECK_USAGE.md` | How to run the static check and interpret results |
 | `scripts/belief-engine-static-check.mjs` | Local static Belief Engine integrity checker (no network, no mutation) |
+| `docs/WORKER_ROUTE_STATIC_CHECK_RESULT.md` | Known-good result of the local static Worker route/docs check (35/0/0, 2026-06-01) |
+| `docs/WORKER_ROUTE_STATIC_CHECK_SPEC.md` | Spec for the Worker route/docs static consistency check |
+| `scripts/worker-route-static-check.mjs` | Local static Worker route/docs checker (no network, no mutation, no Worker execution) |
 
 ---
 
@@ -78,6 +82,9 @@ These are appropriate next steps from this baseline, in rough priority order:
 - **Tests before changing Belief Engine scoring** — see `docs/BELIEF_ENGINE_SCORING_NOTES.md`
   and `docs/BELIEF_ENGINE_TEST_PLAN.md` before touching any scoring logic, contradiction
   rule, or `CHOICE_SCALE` value.
+- **Worker route static check before and after any Worker route, endpoint inventory, public write risk map, or modular split change** —
+  run `node scripts/worker-route-static-check.mjs` before and after any such change.
+  All 35 checks must pass. See `docs/WORKER_ROUTE_STATIC_CHECK_RESULT.md`.
 - **Plan-only work before Worker modular split** — produce a written plan and review it
   before writing any code. See `docs/WORKER_MODULAR_SPLIT_PLAN.md`. Do not refactor
   Worker routing speculatively.
@@ -110,6 +117,14 @@ These are appropriate next steps from this baseline, in rough priority order:
 - **Do not remove the `humanx-bridge.js` script reference** from
   `public/apps/humanx-belief-engine/index.html` without a replacement bridge plan in
   place. Removing it silently breaks the Save to HumanX flow and the Drift feed.
+- **Do not rename or remove any `/api/...` route** without updating
+  `docs/API_ENDPOINT_INVENTORY.md`, `docs/PUBLIC_WRITE_ENDPOINTS_RISK_MAP.md` (where
+  applicable), and re-running `node scripts/worker-route-static-check.mjs`. A route
+  present in code but absent from the inventory is a hard failure.
+- **Do not begin the Worker modular split** until the Worker route static check,
+  read endpoint smoke, and all relevant backend docs (`docs/API_ENDPOINT_INVENTORY.md`,
+  `docs/WORKER_MODULAR_SPLIT_PLAN.md`) are current and passing. The route check must
+  pass after each module extraction step.
 
 ---
 
