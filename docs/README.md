@@ -59,6 +59,16 @@ Defines the minimum backend proof required before any Worker routing change or m
 Explains why migration 0004 may fail on a database with duplicate `normalized_statement` or `normalized_claim` values, how to diagnose duplicates using the diagnostics SQL, and the safe manual cleanup sequence (mark before delete, re-point child rows, never blindly delete).
 **Read when:** investigating a failed migration 0004 run, cleaning up duplicate claim or truth rows, or understanding the `normalized_claim` / `normalized_statement` unique index constraints.
 
+### `WORKER_ROUTE_STATIC_CHECK_SPEC.md`
+Defines the local static route/docs consistency check for Worker API routes. Specifies how `/api/...` route strings are extracted from `src/worker.js` and cross-referenced against `docs/API_ENDPOINT_INVENTORY.md` and `docs/PUBLIC_WRITE_ENDPOINTS_RISK_MAP.md`. Includes high-risk route list, hard-failure vs warning criteria, limitations, and stop conditions. No Worker execution, no network, no D1/Wrangler.
+**Read when:** before changing `src/worker.js` route handling, the endpoint inventory, the public write risk map, or beginning any Worker modular split step.
+**Safety note:** Local/static only. Does not execute the Worker or prove endpoint behaviour.
+
+### `WORKER_ROUTE_STATIC_CHECK_RESULT.md`
+Records the successful post-inventory-fix static route check from 2026-06-01: 35 passed, 0 failed, 0 warnings, exit 0. Confirms all high-risk and public-write routes are aligned between `src/worker.js` and `docs/API_ENDPOINT_INVENTORY.md`, including `/api/claim-vote` which was missing from the inventory prior to this fix.
+**Read when:** before deciding whether route docs are currently aligned with the Worker source, or comparing a new run against this baseline.
+**Safety note:** Proves static route/docs alignment only — does not prove endpoint behaviour, response shapes, rate-limit enforcement, or live deployment state.
+
 ---
 
 ## 3. Belief Engine
@@ -194,6 +204,10 @@ Node script that exercises public write endpoints. Defaults to dry-run mode; a m
 ## 7. Scripts and Diagnostics References
 
 These files are not in `docs/` but are referenced by docs in this folder.
+
+### `scripts/worker-route-static-check.mjs`
+Local static Worker route/docs consistency checker. Reads `src/worker.js`, `docs/API_ENDPOINT_INVENTORY.md`, and `docs/PUBLIC_WRITE_ENDPOINTS_RISK_MAP.md`; cross-references route strings against the inventory; confirms all high-risk and public-write routes are documented. 35 hard checks. No network, no Worker execution, no D1/Wrangler, no production mutation.
+**Use when:** before and after any Worker route addition/removal/rename, endpoint inventory update, public write risk map update, or Worker modular split step. Run with `node scripts/worker-route-static-check.mjs`. All 35 checks must pass.
 
 ### `scripts/belief-engine-static-check.mjs`
 Local static Belief Engine integrity checker. Reads `public/index.html`, `public/app-v10.js`, `public/apps/humanx-belief-engine/index.html`, and `humanx-bridge.js`; asserts nav links, Drift classifier markers, questionnaire and result section content, bridge script tag, bridge payload strings, and absence of frontend API key/provider-call markers. 24 hard checks. No network, no D1/Wrangler, no production mutation.
