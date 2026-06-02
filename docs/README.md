@@ -21,6 +21,32 @@ These apply to every task in this repo unless the user explicitly overrides them
 
 ---
 
+## Known-good checks
+
+Run these locally before and after any change. All must pass with exit 0.
+
+```sh
+node --check public/app-v10.js
+node scripts/hardening-smoke-test.mjs
+node scripts/belief-engine-static-check.mjs
+node scripts/worker-route-static-check.mjs
+```
+
+Expected results:
+
+| Script | Expected |
+|---|---|
+| `node --check public/app-v10.js` | no output, exit 0 |
+| `hardening-smoke-test.mjs` | `64 passed, 0 failed` |
+| `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
+| `worker-route-static-check.mjs` | `35 passed, 0 failed (35 hard checks)` |
+
+**Note:** A `MODULE_TYPELESS_PACKAGE_JSON` warning may appear during `hardening-smoke-test.mjs`. This is non-blocking and does not affect the pass count.
+
+**Live write smoke tests require explicit per-session user approval before running.** Do not run them routinely.
+
+---
+
 ## 1. Current Status / Baseline
 
 Read these first when starting a new session or returning after time away.
@@ -241,8 +267,8 @@ Local static Belief Engine integrity checker. Reads `public/index.html`, `public
 
 ### `scripts/hardening-smoke-test.mjs`
 **Run:** `node scripts/hardening-smoke-test.mjs`
-16 unit tests (no HTTP, no live D1) covering: `isUniqueConstraintError` pure function, `meaningKey` normalisation stability, mock `attachEvidenceToClaim` INSERT OR IGNORE id fix, and `safeRateLimit` fail-closed behaviour.
-**Use when:** confirming hardening logic is intact after any change to `src/worker.js` or before a Worker refactor. Note: the inlined helper copies in this script may drift from `src/worker.js` during a refactor — check they still match.
+64 checks (no HTTP, no live D1) covering: `isUniqueConstraintError` pure function, `meaningKey` normalisation stability, mock `attachEvidenceToClaim` INSERT OR IGNORE id fix, `safeRateLimit` fail-closed behaviour, `convertTruthToClaim` atomicity, `createTruth` linked_claim_id NULL guard, `ensureUser` SELECT-first pattern, `reviewCleanup` validation, `reviewQueue` archived metadata, belief-bridge FK safety, and `reviewStatusBadge` frontend coverage.
+**Use when:** confirming hardening logic is intact after any change to `src/worker.js`, `public/app-v10.js`, or before a Worker refactor. Note: the inlined helper copies in this script may drift from `src/worker.js` during a refactor — check they still match.
 
 ### `scripts/backfill-normalized-content.mjs`
 Backfill script for claim and truth rows with missing `normalized_claim` / `normalized_statement` values. Must be run before migration 0004 if the column exists but has NULL values for existing rows.
