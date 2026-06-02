@@ -192,6 +192,27 @@
 .review-audit-stat-archived .review-audit-n{color:#d4a84899}
 .review-audit-archived-note{font-size:10px;color:var(--muted);font-style:italic;margin:0}
 @media(max-width:600px){.review-audit-stats{gap:4px}.review-audit-stat{min-width:48px;padding:4px 6px}.review-audit-n{font-size:13px}}
+/* Review desktop density — desktop only, mobile unaffected */
+@media(min-width:601px){
+  .review-page{gap:7px}
+  #reviewList.grid{gap:5px}
+  #reviewList .card{padding:8px 10px}
+  .review-card-meta{margin-bottom:1px}
+  .review-card-date{margin-bottom:5px}
+  .review-actions{margin-top:5px;gap:4px}
+  .review-actions button{padding:5px 6px;font-size:10px}
+  .review-filter-bar{padding:5px 0 3px}
+  .review-filter-chip{padding:5px 10px}
+  .review-filter-chips{gap:5px}
+  .review-card-rejected{opacity:.42;filter:saturate(.22)}
+  .review-card-rejected:hover{opacity:.68;filter:saturate(.48)}
+  .review-card-public{background:linear-gradient(180deg,rgba(57,255,159,.07),rgba(16,19,29,.86))}
+  .review-audit-bar{padding:5px 9px}
+  .review-audit-body{margin-top:6px;padding-top:6px}
+  .review-audit-stats{gap:4px}
+  .review-audit-stat{padding:4px 8px;min-width:54px}
+  .review-audit-n{font-size:14px}
+}
 /* Review context archived chip */
 .review-ctx-archived{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin:6px 0;padding:6px 8px;border:1px solid #7b5c1a33;border-radius:8px;background:rgba(42,30,6,.5);opacity:.85}
 .review-ctx-archived-label{font-size:10px;font-weight:600;color:#d4a84899;text-transform:uppercase;letter-spacing:.04em}
