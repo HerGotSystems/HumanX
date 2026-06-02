@@ -101,10 +101,23 @@
 .review-card-title{margin:0 0 4px;font-size:14px;line-height:1.4;font-weight:600}
 .review-card-meta{margin:0 0 2px}
 .review-card-date{margin:0 0 8px}
-.review-card-pending{border-color:#ffd16666}
-.review-card-public{border-color:#39ff9f55;opacity:.75}
-.review-card-rejected{border-color:#ff3b5c44;opacity:.6}
+.review-card-pending{border-left:3px solid #ffd166aa}
+.review-card-public{border-left:3px solid #39ff9faa;background:linear-gradient(180deg,rgba(57,255,159,.04),rgba(16,19,29,.86))}
+.review-card-rejected{border-left:3px solid #ff3b5c55;opacity:.55;filter:saturate(.35)}
+.review-card-rejected:hover{opacity:.75;filter:saturate(.55)}
 .review-card-duplicate{opacity:.5}
+/* Filter bar help text */
+.review-filter-chips{display:flex;gap:6px;flex-wrap:wrap}
+.review-filter-help{margin:5px 0 0;font-size:10px;color:var(--muted);line-height:1.4}
+/* Empty state */
+.review-empty-state{background:rgba(8,11,18,.5);border-style:dashed}
+/* Inspect panel state bar */
+.review-inspect-state-bar{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:rgba(8,11,18,.6);border:1px solid var(--line);margin-bottom:10px;flex-wrap:wrap}
+.review-inspect-state-label{font-size:11px;color:var(--text);font-weight:500}
+.review-state-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.review-state-dot-pending{background:var(--yellow);box-shadow:0 0 4px #ffd16688}
+.review-state-dot-public{background:var(--green);box-shadow:0 0 4px #39ff9f88}
+.review-state-dot-rejected{background:#555;box-shadow:none}
 .review-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .review-actions button{flex:1;min-width:90px;padding:8px 6px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer}
 .btn-approve{background:linear-gradient(135deg,#00622c,#003d1a);border:1px solid #39ff9f55;color:#5fff9f}
