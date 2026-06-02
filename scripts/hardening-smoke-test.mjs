@@ -503,6 +503,57 @@ test('reviewCleanup checks CLEANUP_REQUIRES_TEST_ARTEFACT', () => {
   assert.ok(cleanupBody.includes('CLEANUP_REQUIRES_TEST_ARTEFACT'), 'reviewCleanup must reject non-artefact items');
 });
 
+// ── 10. reviewQueue archived metadata ────────────────────────────────────────
+
+console.log('\n10. reviewQueue archived metadata');
+
+// Use the already-loaded workerSrc from section 9.
+const reviewQueueMatch = workerSrc.match(/async function reviewQueue[\s\S]*?\n(?=async function )/);
+const reviewQueueBody = reviewQueueMatch ? reviewQueueMatch[0] : '';
+
+test('reviewQueue function exists in worker.js', () => {
+  assert.ok(reviewQueueBody.length > 0, 'reviewQueue not found in src/worker.js');
+});
+
+test('reviewQueue excludes archived from claims list query', () => {
+  assert.ok(reviewQueueBody.includes("'archived'") && reviewQueueBody.includes("!='archived'") || reviewQueueBody.includes('NOT IN') && reviewQueueBody.includes("'archived'"), 'reviewQueue claims query must exclude archived state');
+});
+
+test('reviewQueue excludes archived from truths list query', () => {
+  assert.ok(reviewQueueBody.includes("NOT IN ('public','archived')") || (reviewQueueBody.includes("'archived'") && reviewQueueBody.includes('NOT IN')), 'reviewQueue truths query must exclude archived state');
+});
+
+test('reviewQueue includes archived_total in response metadata', () => {
+  assert.ok(reviewQueueBody.includes('archived_total'), 'reviewQueue must return archived_total metadata');
+});
+
+test('reviewQueue archived count query is wrapped in try/catch (non-fatal)', () => {
+  assert.ok(reviewQueueBody.includes('try') && reviewQueueBody.includes('catch'), 'archived count query must have try/catch fallback');
+});
+
+test('reviewQueue returns archived_claims and archived_truths', () => {
+  assert.ok(reviewQueueBody.includes('archived_claims') && reviewQueueBody.includes('archived_truths'), 'reviewQueue must return per-type archived counts');
+});
+
+// Frontend: archived cards and filter must not be added.
+const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+
+test('frontend loadReviewQueue stores archived_total from response', () => {
+  assert.ok(appSrc.includes('archived_total:data.archived_total'), 'loadReviewQueue must propagate archived_total');
+});
+
+test('frontend audit summary references archived_total', () => {
+  assert.ok(appSrc.includes('reviewQueue.archived_total'), 'renderReviewAuditSummary must read archived_total from reviewQueue');
+});
+
+test('frontend does NOT render archived filter chip', () => {
+  // The filter bar only has: review, public, rejected, reported, all
+  const filterDefsMatch = appSrc.match(/\['\w+','[\w ]+'\].*?\['\w+','[\w ]+'\].*?\['\w+','[\w ]+'\]/);
+  // Simpler check: 'archived' must not appear in the filter defs array near setReviewFilter
+  const filterSection = appSrc.match(/const defs=\[[\s\S]*?\];/)?.[0] || '';
+  assert.ok(!filterSection.includes("'archived'"), 'archived must not appear as a filter chip in the review filter bar');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
