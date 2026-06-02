@@ -554,6 +554,79 @@ test('frontend does NOT render archived filter chip', () => {
   assert.ok(!filterSection.includes("'archived'"), 'archived must not appear as a filter chip in the review filter bar');
 });
 
+// ── 11. belief-bridge promoteToTruth FK safety ───────────────────────────────
+
+console.log('\n11. belief-bridge promoteToTruth FK safety');
+
+const bridgeSrc = readFileSync(path.join(__dirname, '../src/belief-bridge.js'), 'utf8');
+
+// Extract promoteToTruth body for targeted assertions.
+const promoteToTruthMatch = bridgeSrc.match(/async function promoteToTruth[\s\S]*?\n(?=async function )/);
+const promoteToTruthBody = promoteToTruthMatch ? promoteToTruthMatch[0] : '';
+
+test('promoteToTruth function exists in belief-bridge.js', () => {
+  assert.ok(promoteToTruthBody.length > 0, 'promoteToTruth not found in src/belief-bridge.js');
+});
+
+test('promoteToTruth null-guards linked_claim_id with || null', () => {
+  // Must have the null-guard so empty cleanId() becomes NULL, not ''
+  assert.ok(
+    promoteToTruthBody.includes("cleanId(body.linkedClaimId || body.linked_claim_id || linkedClaim?.id || '') || null"),
+    'promoteToTruth must apply || null to linked_claim_id to avoid FK violation with empty string'
+  );
+});
+
+// Verify the fixed isUniqueConstraintError in belief-bridge excludes FK errors.
+const bridgeIsUniqueMatch = bridgeSrc.match(/function isUniqueConstraintError[\s\S]*?\n\}/);
+const bridgeIsUniqueBody = bridgeIsUniqueMatch ? bridgeIsUniqueMatch[0] : '';
+
+test('belief-bridge isUniqueConstraintError excludes foreign key errors', () => {
+  assert.ok(
+    bridgeIsUniqueBody.includes("foreign key"),
+    'isUniqueConstraintError in belief-bridge.js must exclude FK errors with foreign key guard'
+  );
+});
+
+test('belief-bridge isUniqueConstraintError: FK message returns false (inline simulation)', () => {
+  // Inline the fixed function to verify behaviour without importing the module.
+  function isUniqueConstraintErrorFixed(err) {
+    const message = String(err && err.message ? err.message : err).toLowerCase();
+    if (message.includes('foreign key')) return false;
+    return message.includes('unique') || message.includes('constraint failed');
+  }
+  assert.equal(
+    isUniqueConstraintErrorFixed(new Error('D1_ERROR: FOREIGN KEY constraint failed: SQLITE_CONSTRAINT')),
+    false,
+    'FK error must not be classified as unique constraint error'
+  );
+});
+
+test('belief-bridge isUniqueConstraintError: unique message returns true (inline simulation)', () => {
+  function isUniqueConstraintErrorFixed(err) {
+    const message = String(err && err.message ? err.message : err).toLowerCase();
+    if (message.includes('foreign key')) return false;
+    return message.includes('unique') || message.includes('constraint failed');
+  }
+  assert.equal(
+    isUniqueConstraintErrorFixed(new Error('UNIQUE constraint failed: truths.normalized_statement')),
+    true,
+    'Unique constraint error must still be classified correctly'
+  );
+});
+
+test('belief-bridge isUniqueConstraintError: generic constraint failed returns true (inline simulation)', () => {
+  function isUniqueConstraintErrorFixed(err) {
+    const message = String(err && err.message ? err.message : err).toLowerCase();
+    if (message.includes('foreign key')) return false;
+    return message.includes('unique') || message.includes('constraint failed');
+  }
+  assert.equal(
+    isUniqueConstraintErrorFixed(new Error('constraint failed')),
+    true,
+    'Generic constraint failed must still be classified as unique error'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

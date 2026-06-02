@@ -59,7 +59,7 @@ async function promoteToTruth(env, json, helpers, userId, snap, statement, body)
       confidenceLabel(snap),
       1,
       Number(snap.pressure_score || 0),
-      cleanId(body.linkedClaimId || body.linked_claim_id || linkedClaim?.id || ''),
+      cleanId(body.linkedClaimId || body.linked_claim_id || linkedClaim?.id || '') || null,
       now,
       now,
       'review'
@@ -183,7 +183,8 @@ async function findExistingClaim(env, statement) {
 
 function isUniqueConstraintError(err) {
   const message = String(err && err.message ? err.message : err).toLowerCase();
-  return message.includes('unique') || message.includes('constraint') || message.includes('constraint failed');
+  if (message.includes('foreign key')) return false;
+  return message.includes('unique') || message.includes('constraint failed');
 }
 
 async function safeRateLimit(request, env, rateKey, maxHits, windowMs) {
