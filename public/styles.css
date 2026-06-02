@@ -117,3 +117,10 @@
 .vault-card-body{margin:0 0 6px;line-height:1.45}
 .vault-card-claim{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;background:#080b12;border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin:6px 0}
 .vault-card-date{margin:2px 0 4px}
+/* Evidence attach modal */
+.attach-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,5,7,.8);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.attach-modal-inner{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;width:100%;max-width:420px;display:grid;gap:10px;box-shadow:0 16px 48px #000a}
+.attach-modal-inner h3{margin:0;font-size:15px}
+.attach-stance-row{display:flex;gap:8px;flex-wrap:wrap}
+.attach-stance-row button{flex:1;min-width:80px;padding:9px 8px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer}
+@media(max-width:480px){.attach-stance-row{flex-direction:column}}
