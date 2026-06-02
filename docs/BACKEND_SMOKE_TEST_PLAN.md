@@ -284,7 +284,7 @@ test harness that is not currently part of this codebase.
 
 The recommended sequence before any Worker structural change:
 
-1. Run `node scripts/hardening-smoke-test.mjs` — confirm 16/16 pass.
+1. Run `node scripts/hardening-smoke-test.mjs` — confirm 64/64 pass.
 2. Run any new automated endpoint tests added under the groups in section 6.
 3. Run `docs/MANUAL_FRONTEND_SMOKE_CHECKLIST.md` in a browser against the deployed Worker.
 4. Only then proceed with the structural change.
