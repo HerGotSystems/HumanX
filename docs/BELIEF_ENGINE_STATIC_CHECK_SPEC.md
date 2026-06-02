@@ -140,24 +140,34 @@ from coarsest to most specific so failures are easy to triage.
 ```
 Belief Engine Static Check
 --------------------------
-  PASS: public/apps/humanx-belief-engine/index.html exists
-  PASS: public/index.html exists
-  PASS: public/app-v10.js exists
+  PASS: public/index.html exists and is readable
+  PASS: public/app-v10.js exists and is readable
+  PASS: public/apps/humanx-belief-engine/index.html exists and is readable
+  PASS: public/apps/humanx-belief-engine/humanx-bridge.js exists and is readable
   PASS: main app nav contains tab-belief
   PASS: main app nav links to /apps/humanx-belief-engine/
-  PASS: isFullBeliefProfile defined in app-v10.js
-  PASS: isFullBeliefProfile checks standalone-humanx-belief-engine (source)
-  PASS: isFullBeliefProfile checks humanx-belief-engine (engineVersion)
-  PASS: isFullBeliefProfile checks Belief Engine Profile (label)
-  PASS: Belief Engine title contains "Belief Engine"
-  PASS: Belief Engine heading present
-  PASS: Questionnaire dimension markers present
-  PASS: Result/profile section markers present
-  PASS: humanx-bridge.js script tag present
-  PASS: No raw API key strings detected
-  PASS: No direct provider endpoint strings detected
+  PASS: app-v10.js Drift classifier contains expected full-profile marker string(s)
+  PASS: app-v10.js contains isFullBeliefProfile function
+  PASS: app-v10.js home tile links to /apps/humanx-belief-engine/
+  PASS: Belief Engine HTML contains "Belief Engine" identity marker
+  PASS: Belief Engine HTML contains questionnaire marker: "Reality & Existence"
+  PASS: Belief Engine HTML contains questionnaire marker: "Truth & Evidence"
+  PASS: Belief Engine HTML contains questionnaire marker: "Authority & Order"
+  PASS: Belief Engine HTML contains result marker: "Your Belief Architecture"
+  PASS: Belief Engine HTML contains result marker: "Profile Snapshot"
+  PASS: Belief Engine HTML references humanx-bridge.js via script tag
+  PASS: Belief Engine HTML does not contain API key marker: "sk-ant-"
+  PASS: Belief Engine HTML does not contain API key marker: "sk-proj-"
+  PASS: Belief Engine HTML does not contain API key marker: "ANTHROPIC_API_KEY"
+  PASS: Belief Engine HTML does not contain API key marker: "OPENAI_API_KEY"
+  PASS: Belief Engine HTML does not contain API key marker: "Bearer "
+  PASS: Belief Engine HTML does not contain provider API URL: "api.anthropic.com"
+  PASS: Belief Engine HTML does not contain provider API URL: "api.openai.com"
+  PASS: humanx-bridge.js contains bridge/profile marker(s): "standalone-humanx-belief-engine", "humanx-belief-engine", "Belief Engine Profile", "/api/belief-snapshots"
 --------------------------
-  16 passed, 0 failed
+  24 passed, 0 failed (24 hard checks)
+
+  All hard checks passed.
 ```
 
 | Condition | Exit code |
