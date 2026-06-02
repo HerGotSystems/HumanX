@@ -627,6 +627,36 @@ test('belief-bridge isUniqueConstraintError: generic constraint failed returns t
   );
 });
 
+// ── 12. reviewStatusBadge coverage ───────────────────────────────────────────
+
+console.log('\n12. reviewStatusBadge coverage');
+
+const cssSrc = readFileSync(path.join(__dirname, '../public/styles.css'), 'utf8');
+
+test('app-v10.js contains function reviewStatusBadge', () => {
+  assert.ok(appSrc.includes('function reviewStatusBadge'), 'reviewStatusBadge helper must exist in app-v10.js');
+});
+
+test('studyReviewBadge delegates to reviewStatusBadge', () => {
+  assert.ok(appSrc.includes('function studyReviewBadge') && appSrc.includes('return reviewStatusBadge(c,true)'), 'studyReviewBadge must call reviewStatusBadge with withNote=true');
+});
+
+test('claim card rendering calls reviewStatusBadge(c)', () => {
+  assert.ok(appSrc.includes('reviewStatusBadge(c)'), 'claim card (card function) must call reviewStatusBadge(c)');
+});
+
+test('truth card rendering calls reviewStatusBadge(t)', () => {
+  assert.ok(appSrc.includes('reviewStatusBadge(t)'), 'truthCard must call reviewStatusBadge(t)');
+});
+
+test('CSS contains .review-badge-block', () => {
+  assert.ok(cssSrc.includes('.review-badge-block'), 'styles.css must define .review-badge-block for list-card badge layout');
+});
+
+test('CSS contains .study-review-state', () => {
+  assert.ok(cssSrc.includes('.study-review-state'), 'styles.css must define .study-review-state for Study badge+note layout');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
