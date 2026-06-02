@@ -238,6 +238,9 @@
 .runpack-visible-data-toggle p{margin:4px 0}
 .runpack-visible-data-toggle .actions{margin-top:4px}
 @media(max-width:600px){.runpack-actions{flex-direction:column}.runpack-export-output{max-height:260px}}
+/* RunPack side-panel status */
+.runpack-side-status{padding:6px 8px;background:#080b12;border:1px solid var(--line);border-radius:8px;line-height:1.5;color:var(--muted);margin-top:4px;font-style:italic}
+.runpack-side-status-ready{color:var(--green);border-color:#39ff9f33;font-style:normal}
 /* Review-first pipeline notes */
 .review-first-note{margin:5px 0 0;font-style:italic;opacity:.75}
 /* Study context panel polish */
