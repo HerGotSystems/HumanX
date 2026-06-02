@@ -191,6 +191,12 @@
 .review-audit-stat-archived .review-audit-n{color:#d4a84899}
 .review-audit-archived-note{font-size:10px;color:var(--muted);font-style:italic;margin:0}
 @media(max-width:600px){.review-audit-stats{gap:4px}.review-audit-stat{min-width:48px;padding:4px 6px}.review-audit-n{font-size:13px}}
+/* Review context archived chip */
+.review-ctx-archived{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin:6px 0;padding:6px 8px;border:1px solid #7b5c1a33;border-radius:8px;background:rgba(42,30,6,.5);opacity:.85}
+.review-ctx-archived-label{font-size:10px;font-weight:600;color:#d4a84899;text-transform:uppercase;letter-spacing:.04em}
+.review-ctx-archived-n{font-size:14px;font-weight:700;color:#d4a848cc}
+.review-ctx-archived-detail{font-size:10px;color:var(--muted);flex-basis:100%}
+.review-ctx-archived-note{font-size:10px;color:var(--muted);font-style:italic;flex-basis:100%}
 /* Evidence attach modal */
 .attach-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,5,7,.8);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .attach-modal-inner{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;width:100%;max-width:420px;display:grid;gap:10px;box-shadow:0 16px 48px #000a}
