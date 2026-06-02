@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `64 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `70 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `35 passed, 0 failed (35 hard checks)` |
 
@@ -267,7 +267,7 @@ Local static Belief Engine integrity checker. Reads `public/index.html`, `public
 
 ### `scripts/hardening-smoke-test.mjs`
 **Run:** `node scripts/hardening-smoke-test.mjs`
-64 checks (no HTTP, no live D1) covering: `isUniqueConstraintError` pure function, `meaningKey` normalisation stability, mock `attachEvidenceToClaim` INSERT OR IGNORE id fix, `safeRateLimit` fail-closed behaviour, `convertTruthToClaim` atomicity, `createTruth` linked_claim_id NULL guard, `ensureUser` SELECT-first pattern, `reviewCleanup` validation, `reviewQueue` archived metadata, belief-bridge FK safety, and `reviewStatusBadge` frontend coverage.
+70 checks (no HTTP, no live D1) covering: `isUniqueConstraintError` pure function, `meaningKey` normalisation stability, mock `attachEvidenceToClaim` INSERT OR IGNORE id fix, `safeRateLimit` fail-closed behaviour, `convertTruthToClaim` atomicity, `createTruth` linked_claim_id NULL guard, `ensureUser` SELECT-first pattern, `reviewCleanup` validation, `reviewQueue` archived metadata, belief-bridge FK safety, `reviewStatusBadge` frontend coverage, and known-good docs block integrity.
 **Use when:** confirming hardening logic is intact after any change to `src/worker.js`, `public/app-v10.js`, or before a Worker refactor. Note: the inlined helper copies in this script may drift from `src/worker.js` during a refactor — check they still match.
 
 ### `scripts/backfill-normalized-content.mjs`

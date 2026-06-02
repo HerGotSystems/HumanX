@@ -348,7 +348,7 @@ not interchangeable.
 
 The recommended sequence before any Worker structural change remains:
 
-1. Run `node scripts/hardening-smoke-test.mjs` — confirm 64/64 pass (pure function tests)
+1. Run `node scripts/hardening-smoke-test.mjs` — confirm 70/70 pass (pure function tests)
 2. Run `node scripts/read-endpoint-smoke-test.mjs` — confirm all read endpoint checks pass
 3. Run `docs/MANUAL_FRONTEND_SMOKE_CHECKLIST.md` in a browser
 4. Only then proceed with the structural change

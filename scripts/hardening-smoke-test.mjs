@@ -667,8 +667,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
   assert.ok(readmeSrc.includes('Known-good checks'), 'docs/README.md must contain a "Known-good checks" section');
 });
 
-test('docs/README.md documents hardening smoke count: 64 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('64 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 64');
+test('docs/README.md documents hardening smoke count: 70 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('70 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 70');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
