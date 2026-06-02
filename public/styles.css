@@ -226,6 +226,18 @@
 .attach-stance-row{display:flex;gap:8px;flex-wrap:wrap}
 .attach-stance-row button{flex:1;min-width:80px;padding:9px 8px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer}
 @media(max-width:480px){.attach-stance-row{flex-direction:column}}
+/* RunPack export page */
+.runpack-actions{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 6px}
+.runpack-actions button{font-size:11px;padding:7px 10px}
+.runpack-export-output{min-height:120px;max-height:440px;font-size:9px;line-height:1.55;font-family:monospace;margin-top:8px}
+.runpack-visible-data-toggle{margin:2px 0 6px;font-size:10px;color:var(--muted)}
+.runpack-visible-data-toggle summary{cursor:pointer;list-style:none;padding:4px 0;opacity:.6}
+.runpack-visible-data-toggle summary:hover{opacity:.9}
+.runpack-visible-data-toggle summary::before{content:'▸ '}
+.runpack-visible-data-toggle[open] summary::before{content:'▾ '}
+.runpack-visible-data-toggle p{margin:4px 0}
+.runpack-visible-data-toggle .actions{margin-top:4px}
+@media(max-width:600px){.runpack-actions{flex-direction:column}.runpack-export-output{max-height:260px}}
 /* Review-first pipeline notes */
 .review-first-note{margin:5px 0 0;font-style:italic;opacity:.75}
 /* Study context panel polish */
