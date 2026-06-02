@@ -106,7 +106,30 @@
 .btn-keep:hover{border-color:var(--blue);color:var(--text)}
 .btn-reject{background:linear-gradient(135deg,#44000e,#2c0008);border:1px solid #ff3b5c55;color:#ff8ca0}
 .btn-reject:hover{background:linear-gradient(135deg,#5c0012,#44000e)}
-@media(max-width:600px){.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}}
+/* Inspect button inside review cards */
+.btn-inspect{background:#0b0e16;border:1px solid #57b8ff44;color:var(--blue);flex-shrink:0}
+.btn-inspect:hover{border-color:var(--blue);background:#0e1520}
+.btn-inspect-active{background:rgba(87,184,255,.12);border-color:var(--blue);color:var(--blue)}
+/* Selected review card highlight */
+.review-card-selected{border-color:var(--blue)!important;box-shadow:0 0 0 1px #57b8ff33}
+/* Review inspection panel */
+.review-inspect-panel{background:linear-gradient(135deg,rgba(87,184,255,.07),rgba(16,19,29,.97));border:1px solid #57b8ff55;border-radius:14px;padding:14px;margin-bottom:6px}
+.review-inspect-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.review-inspect-title-row{display:flex;align-items:flex-start;gap:8px;flex:1;min-width:0;flex-wrap:wrap}
+.review-inspect-title{margin:0;font-size:14px;line-height:1.4;font-weight:600;word-break:break-word;flex:1;min-width:0}
+.btn-close-inspect{flex-shrink:0;background:transparent;border:1px solid var(--line);color:var(--muted);padding:5px 10px;font-size:11px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.btn-close-inspect:hover{border-color:var(--red);color:var(--red)}
+.review-inspect-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:5px;margin-bottom:12px}
+.review-inspect-field{background:rgba(8,11,18,.7);border:1px solid var(--line);border-radius:8px;padding:7px 9px;display:flex;flex-direction:column;gap:3px}
+.review-inspect-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.review-inspect-val{font-size:11px;color:var(--text);word-break:break-word;line-height:1.35}
+.review-inspect-id{font-family:monospace;font-size:10px;color:var(--muted);letter-spacing:.03em}
+.review-inspect-actions{display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
+.review-inspect-actions button{padding:8px 12px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:#0b0e16;color:var(--text)}
+.btn-study-review{background:linear-gradient(135deg,var(--red),var(--purple));border:0!important;color:#fff!important}
+.review-inspect-reject{border-color:#ff3b5c55!important;color:#ff8ca0!important;background:linear-gradient(135deg,#44000e,#2c0008)!important}
+.btn-link-small{background:transparent;border:none;padding:0;color:var(--blue);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+@media(max-width:600px){.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}}
 /* Evidence Vault readability */
 .vault-header{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86);margin-bottom:4px}
 .vault-header-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
