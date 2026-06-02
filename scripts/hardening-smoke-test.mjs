@@ -667,6 +667,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
   assert.ok(readmeSrc.includes('Known-good checks'), 'docs/README.md must contain a "Known-good checks" section');
 });
 
+// Self-reference: when new checks are added to this file, update docs/README.md
+// Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 70 passed, 0 failed', () => {
   assert.ok(readmeSrc.includes('70 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 70');
 });
