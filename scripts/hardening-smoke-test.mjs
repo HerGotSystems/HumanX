@@ -324,6 +324,83 @@ await testAsync('when link insert succeeds, claim is NOT deleted', async () => {
   assert.equal(linkErr, null, 'no link error expected');
 });
 
+// ── 7. createTruth linked_claim_id NULL guard ────────────────────────────────
+
+console.log('\n7. createTruth linked_claim_id NULL guard');
+
+// Simulates cleanId + null-guard logic used in createTruth.
+function cleanId(v) { return String(v || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80); }
+
+test('cleanId of empty string + null-guard produces null (safe for FK column)', () => {
+  const result = cleanId('') || null;
+  assert.equal(result, null, 'empty string should become null, not ""');
+});
+
+test('cleanId of undefined + null-guard produces null', () => {
+  const result = cleanId(undefined) || null;
+  assert.equal(result, null);
+});
+
+test('cleanId of valid id + null-guard preserves the id', () => {
+  const result = cleanId('clm_abc123') || null;
+  assert.equal(result, 'clm_abc123');
+});
+
+test('cleanId of whitespace-only + null-guard produces null', () => {
+  const result = cleanId('   ') || null;
+  assert.equal(result, null);
+});
+
+// ── 8. ensureUser SELECT-first pattern ───────────────────────────────────────
+
+console.log('\n8. ensureUser SELECT-first pattern');
+
+// Simulates the SELECT-first pattern used in createTruth and convertTruthToClaim.
+async function simulateEnsureUser(env, userId) {
+  const existingUser = await env.DB.prepare(`SELECT id FROM users WHERE id=?`).bind(userId).first();
+  if (!existingUser) {
+    await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`)
+      .bind(userId, `anon-${userId.slice(-6)}`, Date.now())
+      .run();
+    return 'inserted';
+  }
+  return 'already-existed';
+}
+
+await testAsync('ensureUser inserts user when not found', async () => {
+  const inserts = [];
+  const mockEnv = {
+    DB: {
+      prepare: (sql) => ({
+        bind: (...args) => ({
+          first: async () => null,      // user not found
+          run: async () => { inserts.push(sql); return {}; },
+        }),
+      }),
+    },
+  };
+  const result = await simulateEnsureUser(mockEnv, 'usr_test123');
+  assert.equal(result, 'inserted');
+  assert.ok(inserts.some(s => s.includes('INSERT OR IGNORE INTO users')), 'should have attempted user insert');
+});
+
+await testAsync('ensureUser skips insert when user already exists', async () => {
+  const inserts = [];
+  const mockEnv = {
+    DB: {
+      prepare: (sql) => ({
+        bind: (...args) => ({
+          first: async () => ({ id: 'usr_test123' }), // user found
+          run: async () => { inserts.push(sql); return {}; },
+        }),
+      }),
+    },
+  };
+  const result = await simulateEnsureUser(mockEnv, 'usr_test123');
+  assert.equal(result, 'already-existed');
+  assert.equal(inserts.length, 0, 'should NOT attempt insert when user already exists');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
