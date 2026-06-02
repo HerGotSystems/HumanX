@@ -166,6 +166,24 @@
 .vault-card-body{margin:0 0 6px;line-height:1.45}
 .vault-card-claim{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;background:#080b12;border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin:6px 0}
 .vault-card-date{margin:2px 0 4px}
+/* Review audit summary */
+.review-audit-bar{background:rgba(8,11,18,.45);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:11px}
+.review-audit-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.review-audit-toggle{background:transparent;border:none;color:var(--muted);padding:0;font-size:11px;cursor:pointer;font-weight:600;letter-spacing:.02em}
+.review-audit-toggle:hover{color:var(--text)}
+.review-audit-total{font-size:10px;color:var(--muted);margin-left:auto}
+.review-audit-body{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.review-audit-stats{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.review-audit-stat{background:#0a0d15;border:1px solid var(--line);border-radius:8px;padding:5px 9px;text-align:center;min-width:58px}
+.review-audit-n{display:block;font-size:15px;font-weight:700;color:var(--text);line-height:1}
+.review-audit-label{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:3px;line-height:1.2}
+.review-audit-stat-yellow .review-audit-n{color:var(--yellow)}
+.review-audit-stat-green .review-audit-n{color:var(--green)}
+.review-audit-stat-red .review-audit-n{color:var(--red)}
+.review-audit-stat-smoke{border-color:#ffd16633}
+.review-audit-stat-smoke .review-audit-n{color:#ffd16699}
+.review-audit-note{font-size:10px;color:var(--muted);font-style:italic;margin:0}
+@media(max-width:600px){.review-audit-stats{gap:4px}.review-audit-stat{min-width:48px;padding:4px 6px}.review-audit-n{font-size:13px}}
 /* Evidence attach modal */
 .attach-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,5,7,.8);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .attach-modal-inner{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;width:100%;max-width:420px;display:grid;gap:10px;box-shadow:0 16px 48px #000a}
