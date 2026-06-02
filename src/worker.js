@@ -40,7 +40,7 @@ export default {
       if (url.pathname === '/api/evidence-vault' && request.method === 'GET') return listEvidenceVault(request, env, { json });
       if (url.pathname === '/api/truths' && request.method === 'GET') return listTruths(request, env, { json });
       if (url.pathname === '/api/truths' && request.method === 'POST') return createTruth(request, env, { readJson, cleanText, cleanId, json, requireUser, makeId });
-      if (url.pathname === '/api/truth-to-claim' && request.method === 'POST') return convertTruthToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
+      if (url.pathname === '/api/truth-to-claim' && request.method === 'POST') return await convertTruthToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
       if (url.pathname === '/api/evidence-attach' && request.method === 'POST') return attachEvidenceToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
       if (url.pathname === '/api/graph-status' && request.method === 'GET') return graphStatus(request, env, { json });
       if (url.pathname === '/api/analysis' && request.method === 'POST') return addAnalysisResult(request, env, { readJson, cleanId, cleanText, json, requireUser, makeId });
