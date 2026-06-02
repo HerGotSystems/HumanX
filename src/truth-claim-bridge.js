@@ -47,8 +47,14 @@ export async function convertTruthToClaim(request, env, helpers) {
     return json({ ok: true, existing: true, raced: true, truth: { id: truth.id, statement: truth.statement }, claim: raced, bridge: { truthId, claimId: raced.id, linkId } });
   }
 
-  const linkId = await ensureTruthClaimLink(env, helpers, truthId, claimId, userId, body.bridgeNote || 'Converted from repeated truth statement into pressure-testable claim.', now);
-  await syncTruthLinkState(env, truthId, claimId, now);
+  let linkId;
+  try {
+    linkId = await ensureTruthClaimLink(env, helpers, truthId, claimId, userId, body.bridgeNote || 'Converted from repeated truth statement into pressure-testable claim.', now);
+    await syncTruthLinkState(env, truthId, claimId, now);
+  } catch (linkErr) {
+    await env.DB.prepare(`DELETE FROM claims WHERE id=?`).bind(claimId).run().catch(() => {});
+    return json({ error: 'TRUTH_LINK_FAILED', message: String(linkErr && linkErr.message ? linkErr.message : linkErr) }, 500);
+  }
 
   const claim = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(claimId).first();
 
@@ -167,7 +173,8 @@ function ip(request) {
 
 function isUniqueConstraintError(err) {
   const message = String(err && err.message ? err.message : err).toLowerCase();
-  return message.includes('unique') || message.includes('constraint') || message.includes('constraint failed');
+  if (message.includes('foreign key')) return false;
+  return message.includes('unique') || message.includes('constraint failed');
 }
 
 function normalizeClaim(v) {

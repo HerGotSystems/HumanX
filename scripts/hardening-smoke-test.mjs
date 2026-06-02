@@ -42,7 +42,8 @@ async function testAsync(name, fn) {
 // Inline copy for testing — does not import from src to avoid Worker globals.
 function isUniqueConstraintError(err) {
   const message = String(err && err.message ? err.message : err).toLowerCase();
-  return message.includes('unique') || message.includes('constraint') || message.includes('constraint failed');
+  if (message.includes('foreign key')) return false;
+  return message.includes('unique') || message.includes('constraint failed');
 }
 
 console.log('\n1. isUniqueConstraintError');
@@ -245,6 +246,82 @@ await testAsync('throws RATE_LIMITED (not RATE_LIMIT_UNAVAILABLE) when limit exc
       `Should not be RATE_LIMIT_UNAVAILABLE, got: ${err.message}`
     );
   }
+});
+
+// ── 5. isUniqueConstraintError FK exclusion ──────────────────────────────────
+
+console.log('\n5. isUniqueConstraintError FK exclusion');
+
+test('FOREIGN KEY constraint failed is NOT treated as unique constraint error', () => {
+  assert.equal(isUniqueConstraintError(new Error('FOREIGN KEY constraint failed: SQLITE_CONSTRAINT')), false);
+});
+
+test('UNIQUE constraint failed is treated as unique constraint error', () => {
+  assert.equal(isUniqueConstraintError(new Error('UNIQUE constraint failed: claims.normalized_claim')), true);
+});
+
+test('constraint failed (generic) without foreign key prefix is treated as unique constraint error', () => {
+  assert.equal(isUniqueConstraintError(new Error('constraint failed')), true);
+});
+
+// ── 6. convertTruthToClaim atomicity (mock) ──────────────────────────────────
+
+console.log('\n6. convertTruthToClaim atomicity (mock)');
+
+// Simulates the guarded new-claim path: claim insert succeeds, link insert fails → claim is deleted.
+async function simulateConvertAtomicity({ linkShouldFail }) {
+  const deleted = [];
+  const inserted = [];
+
+  const mockDb = {
+    prepare: (sql) => ({
+      bind: (...args) => ({
+        run: async () => {
+          if (sql.includes('INSERT INTO claims')) {
+            inserted.push(args[0]);
+            return {};
+          }
+          if (sql.includes('INSERT OR IGNORE INTO truth_claim_links') && linkShouldFail) {
+            throw new Error('FOREIGN KEY constraint failed: SQLITE_CONSTRAINT');
+          }
+          if (sql.includes('DELETE FROM claims')) {
+            deleted.push(args[0]);
+            return {};
+          }
+          return {};
+        },
+        first: async () => null,
+      }),
+    }),
+  };
+
+  const claimId = 'clm_test_atomicity';
+  let linkErr = null;
+  try {
+    await mockDb.prepare('INSERT INTO claims (id) VALUES (?)').bind(claimId).run();
+    try {
+      await mockDb.prepare('INSERT OR IGNORE INTO truth_claim_links (id) VALUES (?)').bind('tcl_x').run();
+    } catch (err) {
+      await mockDb.prepare('DELETE FROM claims WHERE id=?').bind(claimId).run().catch(() => {});
+      linkErr = err;
+    }
+  } catch (_) {}
+
+  return { inserted, deleted, linkErr };
+}
+
+await testAsync('when link insert fails with FK error, orphan claim is deleted', async () => {
+  const { inserted, deleted, linkErr } = await simulateConvertAtomicity({ linkShouldFail: true });
+  assert.ok(inserted.includes('clm_test_atomicity'), 'claim should have been inserted first');
+  assert.ok(deleted.includes('clm_test_atomicity'), 'orphan claim should be deleted on link failure');
+  assert.ok(linkErr !== null, 'link error should have been captured');
+});
+
+await testAsync('when link insert succeeds, claim is NOT deleted', async () => {
+  const { inserted, deleted, linkErr } = await simulateConvertAtomicity({ linkShouldFail: false });
+  assert.ok(inserted.includes('clm_test_atomicity'), 'claim should have been inserted');
+  assert.equal(deleted.length, 0, 'no deletion should occur on success');
+  assert.equal(linkErr, null, 'no link error expected');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
