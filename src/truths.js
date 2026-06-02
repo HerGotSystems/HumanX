@@ -27,9 +27,12 @@ export async function createTruth(request, env, helpers) {
   const statement = cleanText(body.statement || '', 500);
   if (statement.length < 4) return json({ error: 'TRUTH_TOO_SHORT' }, 400);
 
-  await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`)
-    .bind(userId, `anon-${userId.slice(-6)}`, Date.now())
-    .run();
+  const existingUser = await env.DB.prepare(`SELECT id FROM users WHERE id=?`).bind(userId).first();
+  if (!existingUser) {
+    await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`)
+      .bind(userId, `anon-${userId.slice(-6)}`, Date.now())
+      .run();
+  }
 
   const normalized = normalize(statement);
   const now = Date.now();
@@ -56,7 +59,7 @@ export async function createTruth(request, env, helpers) {
       cleanText(body.confidenceLabel || body.confidence_label || 'claimed', 60),
       1,
       0,
-      cleanId(body.linkedClaimId || body.linked_claim_id || ''),
+      cleanId(body.linkedClaimId || body.linked_claim_id || '') || null,
       now,
       now,
       'review'
@@ -80,7 +83,8 @@ async function repeatExistingTruth(env, json, truthId, now = Date.now()) {
 
 function isUniqueConstraintError(err) {
   const message = String(err && err.message ? err.message : err).toLowerCase();
-  return message.includes('unique') || message.includes('constraint') || message.includes('constraint failed');
+  if (message.includes('foreign key')) return false;
+  return message.includes('unique') || message.includes('constraint failed');
 }
 
 function mapTruth(t) {

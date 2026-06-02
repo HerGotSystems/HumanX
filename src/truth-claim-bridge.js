@@ -12,9 +12,12 @@ export async function convertTruthToClaim(request, env, helpers) {
   const truth = await env.DB.prepare(`SELECT * FROM truths WHERE id=?`).bind(truthId).first();
   if (!truth) return json({ error: 'TRUTH_NOT_FOUND' }, 404);
 
-  await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`)
-    .bind(userId, `anon-${userId.slice(-6)}`, Date.now())
-    .run();
+  const existingUser = await env.DB.prepare(`SELECT id FROM users WHERE id=?`).bind(userId).first();
+  if (!existingUser) {
+    await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`)
+      .bind(userId, `anon-${userId.slice(-6)}`, Date.now())
+      .run();
+  }
 
   const existing = await findExistingClaim(env, truthId, truth);
   if (existing) {
