@@ -81,3 +81,29 @@
 .searchbar select{width:auto;min-width:130px;flex-shrink:0}
 @media(max-width:900px){.tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;margin-bottom:4px;gap:4px}.tabs::-webkit-scrollbar{display:none}.tab{padding:6px 9px;font-size:11px;white-space:nowrap;flex-shrink:0}.statusline{margin-top:0}.searchbar input{padding:6px 8px}.searchbar select{min-width:110px;padding:6px 8px}}
 @media(max-width:600px){main{padding:6px;gap:5px}.tab{padding:5px 8px;font-size:10px}.brand strong{font-size:13px}}
+/* Review queue polish */
+.review-page{display:flex;flex-direction:column;gap:10px;padding-bottom:24px}
+.review-header{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86)}
+.review-header-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.review-header h2{margin:0;font-size:18px}
+.review-token-panel{padding:10px}
+.review-token-form{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.review-token-form input{flex:1;min-width:180px}
+.review-token-form button{flex-shrink:0;white-space:nowrap}
+.review-card-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.review-card-title{margin:0 0 4px;font-size:14px;line-height:1.4;font-weight:600}
+.review-card-meta{margin:0 0 2px}
+.review-card-date{margin:0 0 8px}
+.review-card-pending{border-color:#ffd16666}
+.review-card-public{border-color:#39ff9f55;opacity:.75}
+.review-card-rejected{border-color:#ff3b5c44;opacity:.6}
+.review-card-duplicate{opacity:.5}
+.review-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.review-actions button{flex:1;min-width:90px;padding:8px 6px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer}
+.btn-approve{background:linear-gradient(135deg,#00622c,#003d1a);border:1px solid #39ff9f55;color:#5fff9f}
+.btn-approve:hover{background:linear-gradient(135deg,#007f38,#00622c)}
+.btn-keep{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
+.btn-keep:hover{border-color:var(--blue);color:var(--text)}
+.btn-reject{background:linear-gradient(135deg,#44000e,#2c0008);border:1px solid #ff3b5c55;color:#ff8ca0}
+.btn-reject:hover{background:linear-gradient(135deg,#5c0012,#44000e)}
+@media(max-width:600px){.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}}
