@@ -88,8 +88,9 @@ It does not propose changes. It does not define new endpoints.
 
 | Method | Path | Purpose | Visibility | D1 tables touched | Risk notes |
 |---|---|---|---|---|---|
-| GET | `/api/review` | Returns review queue: claims not in `public` state, or with reports; plus truths not in `public` state | Admin only (`x-humanx-admin`) | `claims`, `truths` | Returns up to 100 claims + 100 truths. Leaks non-public content — admin token is the only gate |
+| GET | `/api/review` | Returns review queue: claims not in `public` or `archived` state (or with reports); plus truths not in `public` or `archived` state | Admin only (`x-humanx-admin`) | `claims`, `truths` | Returns up to 100 claims + 100 truths. Archived items are excluded — they remain in the DB for audit but are removed from the active queue. Leaks non-public content — admin token is the only gate |
 | POST | `/api/review/decision` | Approves, rejects, or re-queues a claim or truth by ID | Admin only (`x-humanx-admin`) | `claims` or `truths`, `reports` | Mutates `review_state` on claims or truths. Also closes or rejects related open reports. Irreversible without a new decision call |
+| POST | `/api/review/cleanup` | Archives a single already-rejected smoke or test artefact by exact target_type + target_id. Sets `review_state='archived'` — no hard delete. Enforces three gates: (1) admin token, (2) item must be in `rejected` state, (3) item text must match smoke/test heuristic. Returns JSON summary of action taken. | Admin only (`x-humanx-admin`) | `claims` or `truths` | Non-destructive — no rows are deleted. `archived` state removes item from queue display but preserves the DB row for audit. No cascading side effects. |
 | POST | `/api/report` | Submits a report against a claim or other target | Public (requires `x-humanx-user`) | `reports`, `claims`, `users`, `rate_limits` | Rate-limited (20/hr per IP). Auto-escalates claim to `review_state='review'` when report count reaches 2 |
 
 ### AI / Analysis

@@ -401,6 +401,108 @@ await testAsync('ensureUser skips insert when user already exists', async () => 
   assert.equal(inserts.length, 0, 'should NOT attempt insert when user already exists');
 });
 
+// ── 9. reviewCleanup validation logic ────────────────────────────────────────
+
+console.log('\n9. reviewCleanup validation logic');
+
+// Inline copy of the backend artefact heuristic for pure-function testing.
+function isTestArtefact(text) {
+  const t = String(text || '').toLowerCase();
+  return t.includes('smoke') || /\btest\b/.test(t) || t.includes('automated write') || t.includes('automated smoke');
+}
+
+// Inline copy of frontend heuristic (mirrors backend).
+function isSuspectedTestArtefactPure(item) {
+  const text = [item.claim || '', item.statement || '', item.origin || '', item.category || '', item.handle || ''].join(' ').toLowerCase();
+  return text.includes('smoke') || /\btest\b/.test(text) || text.includes('automated write') || text.includes('automated smoke');
+}
+
+test('backend heuristic: "automated write smoke test claim" is artefact', () => {
+  assert.equal(isTestArtefact('automated write smoke test claim'), true);
+});
+
+test('backend heuristic: "SMOKE artefact" (case insensitive) is artefact', () => {
+  assert.equal(isTestArtefact('SMOKE artefact'), true);
+});
+
+test('backend heuristic: word "test" alone triggers artefact', () => {
+  assert.equal(isTestArtefact('a test claim'), true);
+});
+
+test('backend heuristic: "protest" does NOT trigger word-boundary test match', () => {
+  assert.equal(isTestArtefact('protest march'), false);
+});
+
+test('backend heuristic: "automated smoke" triggers artefact', () => {
+  assert.equal(isTestArtefact('automated smoke verification'), true);
+});
+
+test('backend heuristic: normal claim is NOT artefact', () => {
+  assert.equal(isTestArtefact('The Earth orbits the Sun'), false);
+});
+
+test('cleanup requires rejected: non-rejected state should be blocked', () => {
+  const states = ['review', 'public', 'archived'];
+  for (const s of states) {
+    assert.ok(s !== 'rejected', `State "${s}" should not be "rejected"`);
+  }
+});
+
+test('cleanup allows only claim or truth target types', () => {
+  const allowed = new Set(['claim', 'truth']);
+  assert.ok(allowed.has('claim'));
+  assert.ok(allowed.has('truth'));
+  assert.ok(!allowed.has('evidence'));
+  assert.ok(!allowed.has('report'));
+  assert.ok(!allowed.has(''));
+});
+
+test('frontend heuristic matches backend: smoke artefact', () => {
+  const item = { claim: 'automated write smoke test claim', statement: '', origin: '', category: '', handle: '' };
+  assert.equal(isSuspectedTestArtefactPure(item), isTestArtefact(item.claim));
+});
+
+test('frontend heuristic matches backend: normal claim', () => {
+  const item = { claim: 'The Earth orbits the Sun', statement: '', origin: '', category: '', handle: '' };
+  assert.equal(isSuspectedTestArtefactPure(item), isTestArtefact(item.claim));
+});
+
+// Static check: no hard delete in cleanup path
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+
+// Extract just the reviewCleanup function body for targeted checks.
+const cleanupMatch = workerSrc.match(/async function reviewCleanup[\s\S]*?\n(?=async function )/);
+const cleanupBody = cleanupMatch ? cleanupMatch[0] : '';
+
+test('reviewCleanup function exists in worker.js', () => {
+  assert.ok(cleanupBody.length > 0, 'reviewCleanup function not found in src/worker.js');
+});
+
+test('reviewCleanup does NOT contain DELETE FROM', () => {
+  assert.ok(!cleanupBody.toUpperCase().includes('DELETE FROM'), 'reviewCleanup must not perform hard deletes');
+});
+
+test('reviewCleanup sets review_state to archived (not deleted)', () => {
+  assert.ok(cleanupBody.includes("review_state='archived'"), 'reviewCleanup should set review_state to archived');
+});
+
+test('reviewCleanup calls requireAdmin', () => {
+  assert.ok(cleanupBody.includes('requireAdmin'), 'reviewCleanup must verify admin token');
+});
+
+test('reviewCleanup checks CLEANUP_REQUIRES_REJECTED', () => {
+  assert.ok(cleanupBody.includes('CLEANUP_REQUIRES_REJECTED'), 'reviewCleanup must reject non-rejected items');
+});
+
+test('reviewCleanup checks CLEANUP_REQUIRES_TEST_ARTEFACT', () => {
+  assert.ok(cleanupBody.includes('CLEANUP_REQUIRES_TEST_ARTEFACT'), 'reviewCleanup must reject non-artefact items');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

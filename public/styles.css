@@ -154,6 +154,7 @@
 .review-inspect-actions button{padding:8px 12px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:#0b0e16;color:var(--text)}
 .btn-study-review{background:linear-gradient(135deg,var(--red),var(--purple));border:0!important;color:#fff!important}
 .review-inspect-reject{border-color:#ff3b5c55!important;color:#ff8ca0!important;background:linear-gradient(135deg,#44000e,#2c0008)!important}
+.review-inspect-cleanup{border-color:#7b5c1a55!important;color:#d4a848!important;background:linear-gradient(135deg,#2a1e06,#1a1206)!important}
 .btn-link-small{background:transparent;border:none;padding:0;color:var(--blue);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 @media(max-width:600px){.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}}
 /* Evidence Vault readability */
