@@ -112,6 +112,12 @@
 .btn-keep{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
 .btn-keep:hover{border-color:var(--blue);color:var(--text)}
 .btn-reject{background:linear-gradient(135deg,#44000e,#2c0008);border:1px solid #ff3b5c55;color:#ff8ca0}
+/* Reject confirmation state */
+.review-card-reject-pending{border-color:#ff3b5c88!important;box-shadow:0 0 0 1px #ff3b5c22}
+.review-reject-confirm-msg{font-size:11px;font-weight:600;color:var(--red);display:flex;align-items:center;flex:1 1 100%;padding:2px 0}
+.btn-reject-confirm{background:linear-gradient(135deg,#7a0018,#44000e);border:1px solid #ff3b5c88!important;color:#ff8ca0;font-weight:700}
+.btn-reject-confirm:hover{background:linear-gradient(135deg,#a0001e,#7a0018)}
+.btn-reject-cancel{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
 .btn-reject:hover{background:linear-gradient(135deg,#5c0012,#44000e)}
 /* Inspect button inside review cards */
 .btn-inspect{background:#0b0e16;border:1px solid #57b8ff44;color:var(--blue);flex-shrink:0}
