@@ -111,7 +111,18 @@ Records the known-good local static check result from 2026-06-01: 24 passed, 0 f
 
 ---
 
-## 4. Refactor Planning
+## 4. Review Queue
+
+Read before adding any cleanup, archive, or delete action to the Review UI or backend.
+
+### `REVIEW_CLEANUP_POLICY.md`
+Policy governing when and how Review queue items may be cleaned up, archived, or hard-deleted. Covers the non-destructive first principle, safe vs unsafe cleanup categories, required UI and backend safeguards, and the five implementation phases. Phase 1 (audit summary) is done; all cleanup actions are not yet implemented.
+**Read when:** before implementing any archive, hide, bulk-cleanup, or delete feature in the Review UI or Worker; before adding any admin cleanup endpoint.
+**Safety note:** Default action is archive/soft-mark, not hard delete. Hard delete is blocked until a backup/export mechanism exists. No bulk cleanup until single-item cleanup is proven safe in production.
+
+---
+
+## 5. Refactor Planning
 
 Read before proposing or beginning any structural change to the Worker or frontend.
 
@@ -121,7 +132,7 @@ Controlled plan for a future safe split of `src/worker.js` into smaller modules.
 
 ---
 
-## 5. Reference / Architecture Background
+## 6. Reference / Architecture Background
 
 Older context documents. Useful for understanding design decisions but not required reading before routine tasks.
 
@@ -147,7 +158,7 @@ Notes from an earlier patch cycle about the seed import route. Describes the sta
 
 ---
 
-## 6. Smoke Testing
+## 7. Smoke Testing
 
 Automated HTTP smoke tests against the live Worker. Read the spec before changing any covered endpoint; read the usage doc before running a script.
 
@@ -212,7 +223,7 @@ Node script that exercises public write endpoints. Defaults to dry-run mode; a m
 
 ---
 
-## 7. Scripts and Diagnostics References
+## 8. Scripts and Diagnostics References
 
 These files are not in `docs/` but are referenced by docs in this folder.
 
