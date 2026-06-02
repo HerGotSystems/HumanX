@@ -657,6 +657,39 @@ test('CSS contains .study-review-state', () => {
   assert.ok(cssSrc.includes('.study-review-state'), 'styles.css must define .study-review-state for Study badge+note layout');
 });
 
+// ── 13. Known-good docs block ─────────────────────────────────────────────────
+
+console.log('\n13. Known-good docs block');
+
+const readmeSrc = readFileSync(path.join(__dirname, '../docs/README.md'), 'utf8');
+
+test('docs/README.md contains "Known-good checks" section', () => {
+  assert.ok(readmeSrc.includes('Known-good checks'), 'docs/README.md must contain a "Known-good checks" section');
+});
+
+test('docs/README.md documents hardening smoke count: 64 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('64 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 64');
+});
+
+test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('24 passed, 0 failed'), 'docs/README.md must document belief engine static check expected count of 24');
+});
+
+test('docs/README.md documents worker route count: 35 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('35 passed, 0 failed'), 'docs/README.md must document worker route static check expected count of 35');
+});
+
+test('docs/README.md mentions MODULE_TYPELESS_PACKAGE_JSON as non-blocking', () => {
+  assert.ok(readmeSrc.includes('MODULE_TYPELESS_PACKAGE_JSON'), 'docs/README.md must mention MODULE_TYPELESS_PACKAGE_JSON warning');
+});
+
+test('docs/README.md states live write tests require explicit approval', () => {
+  assert.ok(
+    readmeSrc.includes('live write') && readmeSrc.includes('explicit'),
+    'docs/README.md must state that live write smoke tests require explicit approval'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
