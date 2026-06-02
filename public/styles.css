@@ -107,3 +107,13 @@
 .btn-reject{background:linear-gradient(135deg,#44000e,#2c0008);border:1px solid #ff3b5c55;color:#ff8ca0}
 .btn-reject:hover{background:linear-gradient(135deg,#5c0012,#44000e)}
 @media(max-width:600px){.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}}
+/* Evidence Vault readability */
+.vault-header{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86);margin-bottom:4px}
+.vault-header-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.vault-header h2{margin:0;font-size:18px}
+.vault-card-head{margin-bottom:6px}
+.vault-card-title{display:block;font-size:13px;color:var(--text);font-weight:700;margin-bottom:4px;word-break:break-word;line-height:1.3}
+.vault-card-badges{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.vault-card-body{margin:0 0 6px;line-height:1.45}
+.vault-card-claim{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;background:#080b12;border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin:6px 0}
+.vault-card-date{margin:2px 0 4px}
