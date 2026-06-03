@@ -246,6 +246,8 @@
 /* RunPack side-panel status */
 .runpack-side-status{padding:6px 8px;background:#080b12;border:1px solid var(--line);border-radius:8px;line-height:1.5;color:var(--muted);margin-top:4px;font-style:italic}
 .runpack-side-status-ready{color:var(--green);border-color:#39ff9f33;font-style:normal}
+.runpack-side-status-fallback{color:var(--yellow);border-color:#ffd16655;font-style:normal}
+.runpack-fallback-warn{color:var(--yellow);border:1px solid #ffd16655;background:#1a1400;border-radius:8px;padding:6px 8px;margin:6px 0 4px}
 /* Review-first pipeline notes */
 .review-first-note{margin:5px 0 0;font-style:italic;opacity:.75}
 /* Study context panel polish */
