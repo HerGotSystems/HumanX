@@ -233,6 +233,16 @@
 .vault-card-body{margin:0 0 6px;line-height:1.45}
 .vault-card-claim{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;background:#080b12;border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin:6px 0}
 .vault-card-date{margin:2px 0 4px}
+/* Evidence Vault grouping */
+.vault-groups{display:flex;flex-direction:column;gap:12px}
+.vault-group{border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.6);overflow:hidden}
+.vault-group-unlinked{border-style:dashed;opacity:.82}
+.vault-group-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);background:rgba(8,11,18,.5)}
+.vault-group-title{font-size:12px;font-weight:600;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vault-group-meta{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.vault-group-counts{font-size:10px;color:var(--muted)}
+.vault-group-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;padding:8px}
+@media(max-width:600px){.vault-group-grid{grid-template-columns:1fr}}
 /* Evidence card stance borders */
 .evidence-card-support{border-left:3px solid #39ff9f44}
 .evidence-card-support:hover{border-left-color:#39ff9f88}
