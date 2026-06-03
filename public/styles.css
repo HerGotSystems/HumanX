@@ -99,6 +99,12 @@
 .searchbar{display:flex;gap:6px;align-items:center}
 .searchbar input{flex:1;min-width:0}
 .searchbar select{width:auto;min-width:130px;flex-shrink:0}
+/* Workspace-aware chrome — hide searchbar, filter, or sidebar based on active mode */
+.mode-home .searchbar,.mode-submit .searchbar,.mode-export .searchbar,.mode-review .searchbar,.mode-drift .searchbar,.study-mode .searchbar{display:none}
+.mode-home main,.mode-submit main,.mode-export main,.mode-review main,.mode-drift main{grid-template-rows:auto 1fr}
+.mode-vault #filter,.mode-truths #filter{display:none}
+.mode-home .sidepanel,.mode-submit .sidepanel,.mode-export .sidepanel{display:none}
+.mode-home .layout,.mode-submit .layout,.mode-export .layout{grid-template-columns:1fr}
 @media(max-width:900px){.tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;margin-bottom:4px;gap:4px}.tabs::-webkit-scrollbar{display:none}.tab{padding:6px 9px;font-size:11px;white-space:nowrap;flex-shrink:0}.statusline{margin-top:0}.searchbar input{padding:6px 8px}.searchbar select{min-width:110px;padding:6px 8px}}
 @media(max-width:600px){main{padding:6px;gap:5px}.tab{padding:5px 8px;font-size:10px}.brand strong{font-size:13px}}
 /* Review queue polish */
