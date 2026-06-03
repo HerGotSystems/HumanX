@@ -249,6 +249,10 @@
 .evidence-card-pressure{border-left:3px solid #ff3b5c44}
 .evidence-card-pressure:hover{border-left-color:#ff3b5c88}
 .evidence-card-neutral{border-left:3px solid var(--line)}
+/* Study evidence/pressure sub-group headers */
+.study-sub-head{display:flex;align-items:center;gap:6px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 0 3px;border-top:1px solid var(--line);margin-top:4px}
+.study-sub-reused{color:var(--blue)}
+.study-sub-high{color:var(--red)}
 /* Evidence body text readability */
 .ev-body-text{margin:0 0 6px;line-height:1.45}
 .ev-json-body{margin:4px 0 6px}
