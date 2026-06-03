@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-03 after Batch C-9.
+Last updated: 2026-06-03 after Batch C-11.
 
 ---
 
@@ -71,7 +71,7 @@ All flows confirmed working (code audit + static checks):
 
 ---
 
-## Batch history (A-2 → C-9)
+## Batch history (A-2 → C-11)
 
 | Batch | Commit | Change |
 |-------|--------|--------|
@@ -95,6 +95,8 @@ All flows confirmed working (code audit + static checks):
 | C-7 | `d6eb287` | Evidence Vault scanability — stance borders, split quality/media badges, claim block guard, reuse chip |
 | C-8 | `41b5c17` | RunPack export clarity — three-state layout, claim context box, Browse Claims CTA, button tooltips |
 | C-9 | `0563a94` | Submit and Add Truth form clarity — better placeholders, field-type labels, removed duplicate notes |
+| C-10 | `87f7752` | Docs checkpoint — batch history A-2 → C-9, next-steps updated (pushed to origin) |
+| C-11 | `b9918a0` | Modal hardening — replaced native `window.prompt` in report flow with `hxModal` in-app modal |
 
 ---
 
@@ -109,7 +111,7 @@ All flows confirmed working (code audit + static checks):
 
 Immediate:
 
-1. **Push local commits to origin** — C-1 through C-9 are committed locally; push to `origin main` when ready.
+1. **Push local commits to origin** — C-11 (`b9918a0`) is committed locally and not yet pushed; run `git push` when ready.
 2. **Optional live visual QA** — load the live app and spot-check: Claims browser cards, Truths form, Evidence Vault stance borders, RunPack export states, Submit Claim form placeholders.
 
 After that, if desired:
