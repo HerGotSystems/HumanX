@@ -131,6 +131,16 @@
 .review-card-duplicate{opacity:.5}
 /* Truth-type review cards — subtle amber tint so truth vs claim is scannable */
 .review-card-truth{background:linear-gradient(180deg,rgba(255,209,102,.04),rgba(16,19,29,.86));border-left-color:#ffd16688!important}
+/* Truth cards in Truths workspace */
+.truth-card{border-left:3px solid #ffd16644}
+.truth-card:hover{border-left-color:var(--yellow)}
+.truth-card-head{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.truth-title{font-size:14px;line-height:1.4;margin:2px 0 4px;font-weight:600;color:var(--text)}
+.truth-meta{margin:0 0 5px}
+.truth-linked-chip{margin-left:2px}
+.truth-stats{display:flex;gap:8px;margin:5px 0;flex-wrap:wrap}
+.truth-stat{font-size:10px;color:var(--muted)}
+.truth-stat-pressure{color:var(--red)!important}
 /* Filter bar help text */
 .review-filter-chips{display:flex;gap:6px;flex-wrap:wrap}
 .review-filter-help{margin:5px 0 0;font-size:10px;color:var(--muted);line-height:1.4}
