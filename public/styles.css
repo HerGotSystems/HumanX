@@ -299,6 +299,8 @@
 .hx-form{display:grid;gap:5px}
 .hx-form button.primary{margin-top:3px}
 .hx-form .review-first-note{margin:0}
+.hx-form-head{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 4px;font-weight:600}
+.hx-form-field-hint{font-size:9px;color:var(--muted);margin:3px 0 0;opacity:.8;line-height:1.4}
 /* Evidence attach modal */
 .attach-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,5,7,.8);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .attach-modal-inner{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;width:100%;max-width:420px;display:grid;gap:10px;box-shadow:0 16px 48px #000a}
