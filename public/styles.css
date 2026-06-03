@@ -384,6 +384,12 @@
 .runpack-actions{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 6px}
 .runpack-actions button{font-size:11px;padding:7px 10px}
 .runpack-export-output{min-height:120px;max-height:440px;font-size:9px;line-height:1.55;font-family:monospace;margin-top:8px}
+/* D-9C investigation packet return section */
+.rp-return-section{margin:10px 0 4px;border:1px solid #57b8ff22;border-radius:9px;overflow:hidden}
+.rp-return-head{display:flex;align-items:center;gap:6px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);padding:8px 10px;cursor:pointer;list-style:none;background:rgba(87,184,255,.04);user-select:none}
+.rp-return-head::-webkit-details-marker{display:none}
+.rp-return-body{padding:8px 10px 10px}
+.rp-return-body textarea{width:100%;min-height:72px;font-size:10px;padding:6px 8px;resize:vertical}
 .runpack-visible-data-toggle{margin:2px 0 6px;font-size:10px;color:var(--muted)}
 .runpack-visible-data-toggle summary{cursor:pointer;list-style:none;padding:4px 0;opacity:.6}
 .runpack-visible-data-toggle summary:hover{opacity:.9}
@@ -425,8 +431,15 @@
 #casefile{padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:2px}
 #casefile p.small:first-child b{color:var(--text);font-size:11px}
 #side-tools{display:flex;flex-direction:column;gap:0}
-#side-tools h2{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin:12px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
-#side-tools>h2:first-child{margin-top:6px;border-top:none;padding-top:0}
+/* D-9B investigation dock */
+.dock-context-head{padding:8px 0 4px}
+.dock-context-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700}
+.dock-section{border-top:1px solid var(--line);margin:0}
+.dock-section-head{display:flex;justify-content:space-between;align-items:center;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;padding:9px 0 8px;cursor:pointer;list-style:none;user-select:none}
+.dock-section-head::-webkit-details-marker{display:none}
+.dock-section-head::after{content:'›';font-size:12px;color:var(--line);display:inline-block;transition:transform .15s}
+details[open]>.dock-section-head::after{transform:rotate(90deg)}
+.dock-section-body{padding-bottom:8px}
 #side-tools input,#side-tools select{font-size:11px;padding:6px 8px}
 #side-tools textarea{font-size:11px;padding:6px 8px;min-height:50px}
 #side-tools .claimbox{gap:5px}
