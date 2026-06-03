@@ -231,6 +231,14 @@
 .review-ctx-archived-n{font-size:14px;font-weight:700;color:#d4a848cc}
 .review-ctx-archived-detail{font-size:10px;color:var(--muted);flex-basis:100%}
 .review-ctx-archived-note{font-size:10px;color:var(--muted);font-style:italic;flex-basis:100%}
+/* Drift workspace */
+.drift-header{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.drift-header h2{margin:0;font-size:18px}
+.drift-section-head{display:flex;align-items:center;gap:8px;margin:12px 0 6px}
+.drift-section-head h3{margin:0;font-size:14px;font-weight:600}
+.drift-compare-panel{padding:8px 12px;margin-bottom:6px}
+.drift-compare-label{margin:0 0 5px}
+.drift-empty-panel{margin-bottom:4px}
 /* Evidence attach modal */
 .attach-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,5,7,.8);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .attach-modal-inner{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;width:100%;max-width:420px;display:grid;gap:10px;box-shadow:0 16px 48px #000a}
