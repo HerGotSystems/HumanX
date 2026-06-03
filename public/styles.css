@@ -253,11 +253,23 @@
 /* Drift workspace */
 .drift-header{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .drift-header h2{margin:0;font-size:18px}
-.drift-section-head{display:flex;align-items:center;gap:8px;margin:12px 0 6px}
+.drift-section-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:12px 0 6px}
 .drift-section-head h3{margin:0;font-size:14px;font-weight:600}
-.drift-compare-panel{padding:8px 12px;margin-bottom:6px}
+.drift-section-note{font-size:9px;color:var(--muted);letter-spacing:.03em;font-style:italic;flex-basis:100%;margin:0;line-height:1.4}
+.drift-compare-panel{padding:8px 12px;margin-bottom:6px;border-left:2px solid #57b8ff33}
 .drift-compare-label{margin:0 0 5px}
 .drift-empty-panel{margin-bottom:4px}
+/* Drift empty type heading (when full profiles missing but quick records exist) */
+.drift-empty-type-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.drift-empty-type-head h3{margin:0;font-size:14px;font-weight:600}
+/* Drift belief snapshot cards — full vs quick visual distinction */
+.belief-card-full{border-left:3px solid #57b8ff55;background:linear-gradient(180deg,rgba(87,184,255,.04),rgba(16,19,29,.86))}
+.belief-card-quick{border-left:3px solid #ffd16644}
+.belief-card-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:5px}
+/* Review-first note under promote actions */
+.drift-promote-note{margin:5px 0 0;font-style:italic;opacity:.65;font-size:9px}
+/* Single-profile baseline note */
+.drift-baseline-note{margin:0 0 8px;font-style:italic;opacity:.6;font-size:10px;color:var(--muted)}
 /* Section header layout (shared across Claims, Truths, Study panels) */
 .section-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;margin:0 0 10px}
 .section-head h2{margin:0;font-size:18px}
