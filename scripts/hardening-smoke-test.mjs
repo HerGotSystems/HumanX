@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 76 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('76 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 76');
+test('docs/README.md documents hardening smoke count: 77 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('77 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 77');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -733,6 +733,15 @@ test('promoteBelief claim path activates tab-arena', () => {
 
 test('convertTruth activates tab-arena before navigating to study', () => {
   assert.ok(convertTruthBody.includes("'tab-arena'"), 'convertTruth must activate the Claims tab when navigating to study view');
+});
+
+test('evidenceCard date fallback includes e.createdAt (evidence-vault contract)', () => {
+  // evidence-vault.js maps row.created_at → createdAt (camelCase).
+  // The date chain must include e.createdAt or vault card dates silently disappear.
+  assert.ok(
+    evidenceCardBody.includes('e.createdAt'),
+    'evidenceCard date chain must include e.createdAt — listEvidenceVault returns createdAt not created_at'
+  );
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
