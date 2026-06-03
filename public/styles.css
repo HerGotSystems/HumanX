@@ -118,6 +118,8 @@
 .review-card-rejected{border-left:3px solid #ff3b5c55;opacity:.55;filter:saturate(.35)}
 .review-card-rejected:hover{opacity:.75;filter:saturate(.55)}
 .review-card-duplicate{opacity:.5}
+/* Truth-type review cards — subtle amber tint so truth vs claim is scannable */
+.review-card-truth{background:linear-gradient(180deg,rgba(255,209,102,.04),rgba(16,19,29,.86));border-left-color:#ffd16688!important}
 /* Filter bar help text */
 .review-filter-chips{display:flex;gap:6px;flex-wrap:wrap}
 .review-filter-help{margin:5px 0 0;font-size:10px;color:var(--muted);line-height:1.4}
@@ -131,8 +133,12 @@
 .review-state-dot-pending{background:var(--yellow);box-shadow:0 0 4px #ffd16688}
 .review-state-dot-public{background:var(--green);box-shadow:0 0 4px #39ff9f88}
 .review-state-dot-rejected{background:#555;box-shadow:none}
-.review-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.review-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
 .review-actions button{flex:1;min-width:90px;padding:8px 6px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer}
+/* Inspect is a toggle, not a decision — keep compact and separated from Approve/Reject */
+.review-actions .btn-inspect{flex:0;min-width:auto;margin-right:auto;white-space:nowrap;padding-left:10px;padding-right:10px}
+/* Approve is the primary decision — heavier weight */
+.review-actions .btn-approve{font-weight:800}
 .btn-approve{background:linear-gradient(135deg,#00622c,#003d1a);border:1px solid #39ff9f55;color:#5fff9f}
 .btn-approve:hover{background:linear-gradient(135deg,#007f38,#00622c)}
 .btn-keep{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
@@ -166,10 +172,13 @@
 .review-inspect-actions{display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
 .review-inspect-actions button{padding:8px 12px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:#0b0e16;color:var(--text)}
 .btn-study-review{background:linear-gradient(135deg,var(--red),var(--purple));border:0!important;color:#fff!important}
+/* Approve button inside inspect panel — needs green gradient regardless of panel context */
+.review-inspect-actions .review-inspect-approve{background:linear-gradient(135deg,#00622c,#003d1a);border:1px solid #39ff9f55!important;color:#5fff9f!important;font-weight:800}
+.review-inspect-actions .review-inspect-approve:hover{background:linear-gradient(135deg,#007f38,#00622c)}
 .review-inspect-reject{border-color:#ff3b5c55!important;color:#ff8ca0!important;background:linear-gradient(135deg,#44000e,#2c0008)!important}
 .review-inspect-cleanup{border-color:#7b5c1a55!important;color:#d4a848!important;background:linear-gradient(135deg,#2a1e06,#1a1206)!important}
 .btn-link-small{background:transparent;border:none;padding:0;color:var(--blue);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-@media(max-width:600px){.review-admin-bar{flex-direction:column;align-items:stretch}.review-header-left{justify-content:space-between}.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}}
+@media(max-width:600px){.review-admin-bar{flex-direction:column;align-items:stretch}.review-header-left{justify-content:space-between}.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-actions .btn-inspect{margin-right:0;flex:1}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}}
 /* Evidence Vault readability */
 .vault-header{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86);margin-bottom:4px}
 .vault-header-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
@@ -213,6 +222,7 @@
   .review-card-date{margin-bottom:5px}
   .review-actions{margin-top:5px;gap:4px}
   .review-actions button{padding:5px 6px;font-size:10px}
+  .review-actions .btn-inspect{padding:5px 9px}
   .review-filter-bar{padding:5px 0 3px}
   .review-filter-chip{padding:5px 10px}
   .review-filter-chips{gap:5px}
