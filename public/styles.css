@@ -95,9 +95,12 @@
 .review-header{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86)}
 .review-header-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
 .review-header h2{margin:0;font-size:18px}
+.review-admin-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:10px 14px}
+.review-header-left{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.review-admin-bar h2{margin:0;font-size:17px}
 .review-token-panel{padding:10px}
-.review-token-form{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.review-token-form input{flex:1;min-width:180px}
+.review-token-form{display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex:1;min-width:0}
+.review-token-form input{flex:1;min-width:160px}
 .review-token-form button{flex-shrink:0;white-space:nowrap}
 /* Review state filter bar */
 .review-filter-bar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0 4px}
@@ -166,7 +169,7 @@
 .review-inspect-reject{border-color:#ff3b5c55!important;color:#ff8ca0!important;background:linear-gradient(135deg,#44000e,#2c0008)!important}
 .review-inspect-cleanup{border-color:#7b5c1a55!important;color:#d4a848!important;background:linear-gradient(135deg,#2a1e06,#1a1206)!important}
 .btn-link-small{background:transparent;border:none;padding:0;color:var(--blue);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-@media(max-width:600px){.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}}
+@media(max-width:600px){.review-admin-bar{flex-direction:column;align-items:stretch}.review-header-left{justify-content:space-between}.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}}
 /* Evidence Vault readability */
 .vault-header{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86);margin-bottom:4px}
 .vault-header-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
