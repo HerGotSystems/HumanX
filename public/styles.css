@@ -51,6 +51,8 @@
 .claim-votes{display:flex;gap:10px;margin:5px 0;font-size:10px;color:var(--muted)}
 .claim-card .meters{margin:5px 0}
 .claim-card .meter{padding:4px 5px}
+.meter-val{font-size:9px;font-weight:700;color:var(--text)}
+.claim-pressure-chip{color:var(--red)!important}
 /* Study header */
 .study h2{margin:4px 0 6px}
 .study-header{padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--line)}
