@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-03 after Batch C-11.
+Last updated: 2026-06-03 after D-series (D-1 → D-5C).
 
 ---
 
@@ -44,7 +44,7 @@ All flows confirmed working (code audit + static checks):
 
 | Flow | State |
 |------|-------|
-| Submit Claim | → enters Review, not public until approved |
+| Submit Claim | → enters Review; duplicate claims surfaced correctly (D-5B) |
 | Add Truth | → enters Review |
 | Truth → Claim Review | converts truth to a pressure-testable claim in Review |
 | Drift promote Truth | → enters Review |
@@ -71,7 +71,7 @@ All flows confirmed working (code audit + static checks):
 
 ---
 
-## Batch history (A-2 → C-11)
+## Batch history (A-2 → D-5C)
 
 | Batch | Commit | Change |
 |-------|--------|--------|
@@ -97,6 +97,14 @@ All flows confirmed working (code audit + static checks):
 | C-9 | `0563a94` | Submit and Add Truth form clarity — better placeholders, field-type labels, removed duplicate notes |
 | C-10 | `87f7752` | Docs checkpoint — batch history A-2 → C-9, next-steps updated (pushed to origin) |
 | C-11 | `b9918a0` | Modal hardening — replaced native `window.prompt` in report flow with `hxModal` in-app modal |
+| D-1 | `53d3879` | Workspace-aware layout — sidebar context/casefile text now reflects the active mode in every workspace |
+| D-2 | `437cbc3` | RunPack builder state — three-state layout (no claim / claim selected / pack generated) made explicit |
+| D-3 | `e393512` | Evidence readability — JSON/object evidence body values rendered as readable text, not `[object Object]` |
+| D-4 | — | Report reason visibility audit — confirmed `reports.reason` exists in schema; identified review queue gap |
+| D-4B | `dd5a903` | Report reasons in review queue — correlated subquery adds `latest_report_reason` to both claims and truths queries; rendered in `reviewCard` and `renderReviewInspectPanel` (branch → PR #77 → merged) |
+| D-5 | — | Claim normalization / intake audit — full audit of `renderSubmit`, `saveClaim`, `meaningKey`, duplicate detection; identified `data.existing` silent-lie bug and UX gaps |
+| D-5B-1 | `5eb54d6` | Duplicate claim response fix — `saveClaim` now handles `data.existing: true` correctly; shows "already exists" panel with Study link instead of false "submitted for Review" |
+| D-5C | `6ce3fb2` | Claim-writing guidance — collapsible writing-tips section (good/avoid examples), category suggestion chips, claim-type live hint below select |
 
 ---
 
@@ -111,16 +119,18 @@ All flows confirmed working (code audit + static checks):
 
 Immediate:
 
-1. **Push local commits to origin** — C-11 (`b9918a0`) is committed locally and not yet pushed; run `git push` when ready.
-2. **Optional live visual QA** — load the live app and spot-check: Claims browser cards, Truths form, Evidence Vault stance borders, RunPack export states, Submit Claim form placeholders.
+1. **Push and live visual QA** — push D-series commits to origin, then spot-check the live app: Submit Claim writing-tips panel, category chips, type hints, duplicate-claim redirect, review queue report reasons in card and inspect panel.
 
 After that, if desired:
 
-3. **Backend Review History / Audit Trail** — add a `/api/review/history` endpoint and a Review log UI. Do this on a branch with a PR; do not merge directly to main.
-4. **Static check count increase** — if new frontend logic is added, extend `hardening-smoke-test.mjs` to cover it.
-5. **Frontend-only polish** — any remaining card or form UX issues; touch `public/app-v10.js` or `public/styles.css` only.
+2. **Evidence grouping in Study view** — group support vs pressure evidence visually; frontend-only, touch `app-v10.js` / `styles.css` only.
+3. **RunPack import / analysis return flow** — after a user pastes AI output back, parse and display it in the Study view. Frontend-only prototype first.
+4. **Backend near-duplicate detection** — activate `meaningMatch` (80% word-overlap) server-side in `createClaim`; must be done on a branch with a PR, not directly on main. Include a static check covering the new path.
+5. **Claim merge / duplicate queue** — admin review decision for "duplicate" state + merge-to UI. Backend + admin frontend; branch + PR required.
+6. **Static check count increase** — extend `hardening-smoke-test.mjs` to cover any new frontend logic added.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
 - Rerun migration 0004 or 0005 (see Backend / D1 safety rules above).
 - Run live write smoke tests without explicit per-session approval.
+- Merge backend duplicate/near-duplicate work directly to main — always use a branch and PR.
