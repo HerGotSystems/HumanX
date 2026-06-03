@@ -305,6 +305,14 @@
 .attach-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,5,7,.8);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .attach-modal-inner{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;width:100%;max-width:420px;display:grid;gap:10px;box-shadow:0 16px 48px #000a}
 .attach-modal-inner h3{margin:0;font-size:15px}
+/* App modal — replaces native prompt/confirm/alert */
+.hx-modal-overlay{position:fixed;inset:0;background:rgba(5,5,7,.84);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px}
+.hx-modal-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;width:100%;max-width:400px;box-shadow:0 16px 48px #000c;display:grid;gap:10px}
+.hx-modal-title{margin:0;font-size:15px;font-weight:700;color:var(--text)}
+.hx-modal-body{font-size:12px;color:var(--muted);line-height:1.5}
+.hx-modal-body textarea{margin-top:6px}
+.hx-modal-actions{display:flex;gap:6px;justify-content:flex-end}
+@media(max-width:480px){.hx-modal-panel{padding:12px}.hx-modal-actions{flex-direction:column-reverse}}
 .attach-stance-row{display:flex;gap:8px;flex-wrap:wrap}
 .attach-stance-row button{flex:1;min-width:80px;padding:9px 8px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer}
 @media(max-width:480px){.attach-stance-row{flex-direction:column}}
