@@ -44,14 +44,17 @@
 .claim-title{font-size:14px;line-height:1.4;margin:2px 0 4px;font-weight:600;color:var(--text)}
 .claim-meta{margin:0 0 5px}
 .claim-votes{display:flex;gap:10px;margin:5px 0;font-size:10px;color:var(--muted)}
+.claim-card .meters{margin:5px 0}
+.claim-card .meter{padding:4px 5px}
 /* Study header */
-.study-header{padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--line)}
-.study-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-.study-meta{margin:0 0 8px}
+.study h2{margin:4px 0 6px}
+.study-header{padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.study-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.study-meta{margin:0 0 6px}
 .review-badge-block{margin:2px 0 4px}
 .study-review-state{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
 .study-review-note{margin:0;color:var(--muted,#888);font-size:10px}
-.study-vote-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px}
+.study-vote-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:6px}
 .study-votes{display:flex;gap:6px;flex-wrap:wrap}
 .study-actions{display:flex;gap:6px}
 /* Empty states */
@@ -251,6 +254,11 @@
 .runpack-side-status-ready{color:var(--green);border-color:#39ff9f33;font-style:normal}
 .runpack-side-status-fallback{color:var(--yellow);border-color:#ffd16655;font-style:normal}
 .runpack-fallback-warn{color:var(--yellow);border:1px solid #ffd16655;background:#1a1400;border-radius:8px;padding:6px 8px;margin:6px 0 4px}
+/* Casefile operator panel */
+.casefile-claim-name{margin:0 0 5px;font-weight:600;color:var(--text);font-size:10px;line-height:1.4}
+.casefile-badge-row{margin:0 0 6px}
+.casefile-counts{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 4px}
+.casefile-counts span{font-size:9px;color:var(--muted);background:rgba(8,11,18,.8);border:1px solid var(--line);border-radius:5px;padding:2px 6px;line-height:1.4}
 /* Review-first pipeline notes */
 .review-first-note{margin:5px 0 0;font-style:italic;opacity:.75}
 /* Study context panel polish */
