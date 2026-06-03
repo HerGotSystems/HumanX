@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 70 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('70 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 70');
+test('docs/README.md documents hardening smoke count: 76 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('76 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 76');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -690,6 +690,49 @@ test('docs/README.md states live write tests require explicit approval', () => {
     readmeSrc.includes('live write') && readmeSrc.includes('explicit'),
     'docs/README.md must state that live write smoke tests require explicit approval'
   );
+});
+
+// ── 14. Frontend navigation wiring (B-1 fixes) ────────────────────────────────
+
+console.log('\n14. Frontend navigation wiring (B-1 fixes)');
+
+// appSrc already loaded in section 10.
+
+// Extract function bodies for scoped assertions.
+const pbIdx = appSrc.indexOf('async function promoteBelief(');
+const promoteBeliefBody = pbIdx >= 0 ? appSrc.slice(pbIdx, pbIdx + 900) : '';
+
+const ctIdx = appSrc.indexOf('async function convertTruth(');
+const convertTruthBody = ctIdx >= 0 ? appSrc.slice(ctIdx, ctIdx + 500) : '';
+
+const evIdx = appSrc.indexOf('function evidenceCard(');
+const evidenceCardBody = evIdx >= 0 ? appSrc.slice(evIdx, evIdx + 2000) : '';
+
+test('studyFromVault function is defined in app-v10.js', () => {
+  assert.ok(appSrc.includes('function studyFromVault('), 'studyFromVault helper must be defined so vault→study→back returns to the correct tab');
+});
+
+test('studyFromVault is exposed on window', () => {
+  assert.ok(appSrc.includes('window.studyFromVault=studyFromVault'), 'studyFromVault must be assigned to window for inline onclick use in evidenceCard');
+});
+
+test('evidenceCard Study Linked Claim button calls studyFromVault not selectClaim directly', () => {
+  assert.ok(
+    evidenceCardBody.includes("studyFromVault('") || evidenceCardBody.includes('studyFromVault(`'),
+    'evidenceCard Study Linked Claim button must use studyFromVault so Back navigates to Claims, not stuck in vault mode'
+  );
+});
+
+test('promoteBelief truth path activates tab-truths', () => {
+  assert.ok(promoteBeliefBody.includes("'tab-truths'"), 'promoteBelief truth path must activate the Truths tab to keep tab highlight in sync');
+});
+
+test('promoteBelief claim path activates tab-arena', () => {
+  assert.ok(promoteBeliefBody.includes("'tab-arena'"), 'promoteBelief claim path must activate the Claims tab to keep tab highlight in sync');
+});
+
+test('convertTruth activates tab-arena before navigating to study', () => {
+  assert.ok(convertTruthBody.includes("'tab-arena'"), 'convertTruth must activate the Claims tab when navigating to study view');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
