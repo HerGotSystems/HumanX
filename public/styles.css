@@ -210,6 +210,12 @@
 .vault-card-body{margin:0 0 6px;line-height:1.45}
 .vault-card-claim{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;background:#080b12;border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin:6px 0}
 .vault-card-date{margin:2px 0 4px}
+/* Evidence card stance borders */
+.evidence-card-support{border-left:3px solid #39ff9f44}
+.evidence-card-support:hover{border-left-color:#39ff9f88}
+.evidence-card-pressure{border-left:3px solid #ff3b5c44}
+.evidence-card-pressure:hover{border-left-color:#ff3b5c88}
+.evidence-card-neutral{border-left:3px solid var(--line)}
 /* Review audit summary */
 .review-audit-bar{background:rgba(8,11,18,.45);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:11px}
 .review-audit-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
