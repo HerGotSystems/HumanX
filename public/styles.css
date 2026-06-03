@@ -307,6 +307,10 @@
 .attach-stance-row button{flex:1;min-width:80px;padding:9px 8px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer}
 @media(max-width:480px){.attach-stance-row{flex-direction:column}}
 /* RunPack export page */
+.runpack-claim-ctx{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;background:#080b12;border:1px solid #57b8ff33;border-radius:8px;padding:8px 10px;margin:8px 0 4px}
+.runpack-claim-name{margin:0;font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;word-break:break-word}
+.runpack-no-claim-state{margin:8px 0}
+.runpack-ready-hint{margin:6px 0 2px;font-size:10px;color:var(--muted);line-height:1.5}
 .runpack-actions{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 6px}
 .runpack-actions button{font-size:11px;padding:7px 10px}
 .runpack-export-output{min-height:120px;max-height:440px;font-size:9px;line-height:1.55;font-family:monospace;margin-top:8px}
