@@ -177,6 +177,7 @@
 .btn-reject-confirm{background:linear-gradient(135deg,#7a0018,#44000e);border:1px solid #ff3b5c88!important;color:#ff8ca0;font-weight:700}
 .btn-reject-confirm:hover{background:linear-gradient(135deg,#a0001e,#7a0018)}
 .btn-reject-cancel{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
+.review-reason-tag{font-size:11px;color:var(--muted);margin:0 0 5px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .btn-reject:hover{background:linear-gradient(135deg,#5c0012,#44000e)}
 /* Inspect button inside review cards */
 .btn-inspect{background:#0b0e16;border:1px solid #57b8ff44;color:var(--blue);flex-shrink:0}
