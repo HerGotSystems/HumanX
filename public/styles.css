@@ -239,12 +239,17 @@
 .drift-compare-panel{padding:8px 12px;margin-bottom:6px}
 .drift-compare-label{margin:0 0 5px}
 .drift-empty-panel{margin-bottom:4px}
+/* Section header layout (shared across Claims, Truths, Study panels) */
+.section-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;margin:0 0 10px}
+.section-head h2{margin:0;font-size:18px}
+.section-head h3{margin:0;font-size:14px;font-weight:600}
+.section-head>.graph-status{flex-basis:100%;margin:4px 0 0}
 /* HumanX shared input form system */
 .form-panel{max-width:520px}
 .compact-form{padding:10px 14px}
 .hx-form{display:grid;gap:5px}
-.hx-form button.primary{margin-top:3px;align-self:start}
-.hx-form .review-first-note{margin:2px 0 0}
+.hx-form button.primary{margin-top:3px}
+.hx-form .review-first-note{margin:0}
 /* Evidence attach modal */
 .attach-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,5,7,.8);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .attach-modal-inner{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;width:100%;max-width:420px;display:grid;gap:10px;box-shadow:0 16px 48px #000a}
