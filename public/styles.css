@@ -263,6 +263,19 @@
 .ev-body-details summary:hover{opacity:1}
 .ev-body-full{font-size:9px;white-space:pre-wrap;max-height:180px;overflow:auto;background:#060911;border:1px solid var(--line);border-radius:6px;padding:6px;margin-top:4px;line-height:1.5;color:var(--muted)}
 .ev-row-reused{background:linear-gradient(90deg,rgba(87,184,255,.04),rgba(8,11,18,.92));border-left:2px solid #57b8ff33}
+/* D-9A reused evidence compression */
+.reused-collapse-outer{margin:6px 0;border:1px solid #57b8ff22;border-radius:8px;overflow:hidden}
+.reused-collapse-head{display:flex;align-items:center;gap:7px;font-size:10px;padding:7px 10px;cursor:pointer;list-style:none;background:rgba(87,184,255,.05);user-select:none}
+.reused-collapse-head::-webkit-details-marker,.reused-source-head::-webkit-details-marker{display:none}
+.reused-collapse-hint{color:var(--muted);font-size:9px}
+.reused-collapse-body{padding:4px 6px 6px}
+.reused-source-group{margin:3px 0;border-radius:7px;background:rgba(8,11,18,.5);overflow:hidden}
+.reused-source-head{display:flex;align-items:center;gap:6px;font-size:10px;padding:5px 8px;cursor:pointer;list-style:none;background:rgba(87,184,255,.04);user-select:none}
+.reused-source-label{flex:1;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reused-source-items{padding:2px 0}
+.reused-item-compact{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px;padding:5px 8px;border-bottom:1px solid var(--line);font-size:11px}
+.reused-item-compact:last-child{border-bottom:none}
+.reused-item-note{color:var(--muted);font-style:italic;font-size:10px;flex-basis:100%}
 /* Review audit summary */
 .review-audit-bar{background:rgba(8,11,18,.45);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:11px}
 .review-audit-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
