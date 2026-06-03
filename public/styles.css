@@ -178,6 +178,22 @@
 .btn-reject-confirm:hover{background:linear-gradient(135deg,#a0001e,#7a0018)}
 .btn-reject-cancel{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
 .review-reason-tag{font-size:11px;color:var(--muted);margin:0 0 5px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+/* Submit Claim writing guide */
+.claim-guide{border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin-bottom:6px;background:rgba(8,11,18,.5)}
+.claim-guide summary{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);cursor:pointer;user-select:none}
+.claim-guide-body{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.claim-guide-col{min-width:0}
+.claim-guide-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin:0 0 4px}
+.claim-guide-good{color:var(--green)}
+.claim-guide-bad{color:var(--red)}
+.claim-guide-list{margin:0;padding-left:14px;font-size:11px;color:var(--muted);line-height:1.55}
+.claim-guide-list em{font-style:italic;color:var(--text);opacity:.7}
+/* Category chips */
+.cat-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:2px}
+.cat-chip{background:rgba(87,184,255,.07);border:1px solid var(--line);border-radius:20px;padding:2px 9px;font-size:10px;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}
+.cat-chip:hover{background:rgba(87,184,255,.16);color:var(--blue)}
+.cat-chip-active{background:rgba(87,184,255,.18);border-color:var(--blue);color:var(--blue)}
+@media(max-width:600px){.claim-guide-body{grid-template-columns:1fr}}
 .btn-reject:hover{background:linear-gradient(135deg,#5c0012,#44000e)}
 /* Inspect button inside review cards */
 .btn-inspect{background:#0b0e16;border:1px solid #57b8ff44;color:var(--blue);flex-shrink:0}
