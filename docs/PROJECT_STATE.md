@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-03 after Batch B-5.
+Last updated: 2026-06-03 after Batch C-9.
 
 ---
 
@@ -71,21 +71,30 @@ All flows confirmed working (code audit + static checks):
 
 ---
 
-## Batch history (A-2 → B-5)
+## Batch history (A-2 → C-9)
 
-| Batch | Change |
-|-------|--------|
-| A-2 | Home command center simplified — hero copy, pipeline banner, action cards |
-| A-3 | Claims/Study workspace streamlined — card layout, Study sections, Claim Flow |
-| A-4 | Review admin workspace + context panel deduplication |
-| A-5 | Drift workspace streamlined — profile vs quick record split, drift compare panel |
-| A-6 | Submit/Truth/Evidence input forms polished |
-| A-7 | Live visual QA fixes — spacing, badge alignment, empty states |
-| B-1 | Functional flow audit — fixed mode/tab wiring bugs in `promoteBelief`, `convertTruth`, `studyFromVault` |
-| B-2 | Static checks added for navigation wiring (hardening smoke section 14) |
-| B-3 | Frontend ↔ Worker contract audit — fixed Evidence Vault `createdAt` field mismatch in `evidenceCard` |
-| B-4 | Static check added for Evidence Vault `createdAt` contract; hardening smoke 76 → 77 |
-| B-5 | Read-only smoke attempted — all local static checks passed; live read smoke blocked by local environment (see Known limitations) |
+| Batch | Commit | Change |
+|-------|--------|--------|
+| A-2 | — | Home command center simplified — hero copy, pipeline banner, action cards |
+| A-3 | — | Claims/Study workspace streamlined — card layout, Study sections, Claim Flow |
+| A-4 | — | Review admin workspace + context panel deduplication |
+| A-5 | — | Drift workspace streamlined — profile vs quick record split, drift compare panel |
+| A-6 | — | Submit/Truth/Evidence input forms polished |
+| A-7 | `15b654e` | Live visual QA fixes — spacing, badge alignment, empty states |
+| B-1 | `d3c4f40` | Functional flow audit — fixed mode/tab wiring bugs in `promoteBelief`, `convertTruth`, `studyFromVault` |
+| B-2 | `f073942` | Static checks added for navigation wiring (hardening smoke section 14) |
+| B-3 | `d5a3207` | Frontend ↔ Worker contract audit — fixed Evidence Vault `createdAt` field mismatch in `evidenceCard` |
+| B-4 | `6c8ffd7` | Static check added for Evidence Vault `createdAt` contract; hardening smoke 76 → 77 |
+| B-5 | `52db796` | Read-only smoke attempted — all local static checks passed; live read smoke blocked by local environment (see Known limitations) |
+| C-1 | `601d3d0` | Public clarity pass — README, noscript, Truths terminology, empty states, Home framing |
+| C-2 | `33a9669` | Review queue admin scanability — filter chips, inspect panel, state labels, audit summary |
+| C-3 | `f0f950f` | Study view clarity — Claim Flow section, investigation board headers, section purpose lines |
+| C-4 | `6d65ad5` | Drift workspace scanability — full-profile vs quick-record split, drift compare, badge labels |
+| C-5 | `8dde730` | Claims browser scanability — meter numeric values, pressure chip, Study Claim button, empty state CTA |
+| C-6 | `d834379` | Truths workspace scanability — split badges, stats row (↻/⊘), linked-claim chip, amber left border |
+| C-7 | `d6eb287` | Evidence Vault scanability — stance borders, split quality/media badges, claim block guard, reuse chip |
+| C-8 | `41b5c17` | RunPack export clarity — three-state layout, claim context box, Browse Claims CTA, button tooltips |
+| C-9 | `0563a94` | Submit and Add Truth form clarity — better placeholders, field-type labels, removed duplicate notes |
 
 ---
 
@@ -98,9 +107,18 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-- Frontend-only polish (copy, badge labels, empty states) — touch `public/app-v10.js` or `public/styles.css` only
-- Add static checks to hardening smoke or the other check scripts
-- Docs additions
-- Backend route additions in new `src/` modules (follow existing module pattern, add Worker route, update route static check)
+Immediate:
 
-**Do not** speculatively refactor `src/worker.js` routing without a written plan reviewed first.
+1. **Push local commits to origin** — C-1 through C-9 are committed locally; push to `origin main` when ready.
+2. **Optional live visual QA** — load the live app and spot-check: Claims browser cards, Truths form, Evidence Vault stance borders, RunPack export states, Submit Claim form placeholders.
+
+After that, if desired:
+
+3. **Backend Review History / Audit Trail** — add a `/api/review/history` endpoint and a Review log UI. Do this on a branch with a PR; do not merge directly to main.
+4. **Static check count increase** — if new frontend logic is added, extend `hardening-smoke-test.mjs` to cover it.
+5. **Frontend-only polish** — any remaining card or form UX issues; touch `public/app-v10.js` or `public/styles.css` only.
+
+**Do not:**
+- Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
+- Rerun migration 0004 or 0005 (see Backend / D1 safety rules above).
+- Run live write smoke tests without explicit per-session approval.

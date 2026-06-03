@@ -52,7 +52,7 @@ Expected results:
 Read these first when starting a new session or returning after time away.
 
 ### `PROJECT_STATE.md`
-Single-page checkpoint updated after Batch B-5. Covers current functional state, known-good check counts, batch history A-2 → B-5, backend/D1 safety rules, and known limitations (Windows schannel live smoke).
+Single-page checkpoint updated after Batch C-9. Covers current functional state, known-good check counts, batch history A-2 → C-9, backend/D1 safety rules, and known limitations (Windows schannel live smoke).
 **Read when:** starting any new session, picking up after a gap, or orienting before any frontend or backend task.
 
 ### `OPERATIONAL_STATUS.md`
