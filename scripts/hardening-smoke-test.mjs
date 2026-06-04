@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 87 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('87 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 87');
+test('docs/README.md documents hardening smoke count: 89 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('89 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 89');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -758,11 +758,11 @@ test('meaningMatch: "Moon landing" matches "Humans landed on the Moon"', () => {
   );
 });
 
-test('meaningMatch: "Humans landed on the Moon" matches "Humans didnt land on moon"', () => {
+test('meaningMatch: "Humans landed on the Moon" does NOT match "Humans didnt land on moon"', () => {
   assert.strictEqual(
     meaningMatch('Humans landed on the Moon', 'Humans didnt land on moon'),
-    true,
-    'contraction normalisation should make these match'
+    false,
+    'opposite-polarity claims: affirmation vs negation must not be flagged as near-duplicates'
   );
 });
 
@@ -803,6 +803,22 @@ test('meaningMatch: "Power corrupts" does NOT match "Money corrupts"', () => {
     meaningMatch('Power corrupts', 'Money corrupts'),
     false,
     'single shared word (corrupt) below minimum overlap threshold — must not match'
+  );
+});
+
+test('meaningMatch: "God exists" does NOT match "God does not exist"', () => {
+  assert.strictEqual(
+    meaningMatch('God exists', 'God does not exist'),
+    false,
+    'un-negated claim must not match its negation — negation polarity check must fire'
+  );
+});
+
+test('meaningMatch: "Moon landing happened" does NOT match "Moon landing was faked"', () => {
+  assert.strictEqual(
+    meaningMatch('Moon landing happened', 'Moon landing was faked'),
+    false,
+    'shared topic words alone must not satisfy threshold when predicate is entirely different'
   );
 });
 
