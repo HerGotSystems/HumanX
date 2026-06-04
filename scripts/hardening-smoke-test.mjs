@@ -8,7 +8,7 @@
  */
 
 import assert from 'node:assert/strict';
-import { meaningKey } from '../src/meaning-key.js';
+import { meaningKey, meaningMatch } from '../src/meaning-key.js';
 
 let passed = 0;
 let failed = 0;
@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 77 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('77 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 77');
+test('docs/README.md documents hardening smoke count: 89 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('89 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 89');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -741,6 +741,105 @@ test('evidenceCard date fallback includes e.createdAt (evidence-vault contract)'
   assert.ok(
     evidenceCardBody.includes('e.createdAt'),
     'evidenceCard date chain must include e.createdAt — listEvidenceVault returns createdAt not created_at'
+  );
+});
+
+// ── 15. meaningMatch near-duplicate detection (D-10C) ────────────────────────
+
+console.log('\n15. meaningMatch near-duplicate detection');
+
+// appSrc is already loaded above (line ~539)
+
+test('meaningMatch: "Moon landing" matches "Humans landed on the Moon"', () => {
+  assert.strictEqual(
+    meaningMatch('Moon landing', 'Humans landed on the Moon'),
+    true,
+    'suffix normalisation and threshold should flag these as similar'
+  );
+});
+
+test('meaningMatch: "Humans landed on the Moon" does NOT match "Humans didnt land on moon"', () => {
+  assert.strictEqual(
+    meaningMatch('Humans landed on the Moon', 'Humans didnt land on moon'),
+    false,
+    'opposite-polarity claims: affirmation vs negation must not be flagged as near-duplicates'
+  );
+});
+
+test('meaningMatch: "Human really landed on Moon" matches "Humans landed on the Moon"', () => {
+  assert.strictEqual(
+    meaningMatch('Human really landed on Moon', 'Humans landed on the Moon'),
+    true,
+    'plural suffix and adverb stopword should produce same key'
+  );
+});
+
+test('meaningMatch: "God doesnt exist" matches "God does not exist"', () => {
+  assert.strictEqual(
+    meaningMatch('God doesnt exist', 'God does not exist'),
+    true,
+    'contraction stripping and "not"/"does" as stopwords should unify these'
+  );
+});
+
+test('meaningMatch: "Vaccines cause autism" matches "The MMR vaccine causes autism"', () => {
+  assert.strictEqual(
+    meaningMatch('Vaccines cause autism', 'The MMR vaccine causes autism'),
+    true,
+    'plural suffix normalisation should match vaccines/vaccine and causes/cause'
+  );
+});
+
+test('meaningMatch: "The Earth is flat" does NOT match "The Moon is round"', () => {
+  assert.strictEqual(
+    meaningMatch('The Earth is flat', 'The Moon is round'),
+    false,
+    'unrelated claims must not produce false positive'
+  );
+});
+
+test('meaningMatch: "Power corrupts" does NOT match "Money corrupts"', () => {
+  assert.strictEqual(
+    meaningMatch('Power corrupts', 'Money corrupts'),
+    false,
+    'single shared word (corrupt) below minimum overlap threshold — must not match'
+  );
+});
+
+test('meaningMatch: "God exists" does NOT match "God does not exist"', () => {
+  assert.strictEqual(
+    meaningMatch('God exists', 'God does not exist'),
+    false,
+    'un-negated claim must not match its negation — negation polarity check must fire'
+  );
+});
+
+test('meaningMatch: "Moon landing happened" does NOT match "Moon landing was faked"', () => {
+  assert.strictEqual(
+    meaningMatch('Moon landing happened', 'Moon landing was faked'),
+    false,
+    'shared topic words alone must not satisfy threshold when predicate is entirely different'
+  );
+});
+
+test('reviewCard references item.near_duplicate_of (snake_case from D1 raw row)', () => {
+  assert.ok(
+    appSrc.includes('item.near_duplicate_of'),
+    'reviewCard must read near_duplicate_of from raw D1 row (snake_case)'
+  );
+});
+
+test('renderReviewInspectPanel references near_duplicate_of for inspect field', () => {
+  assert.ok(
+    appSrc.includes('nearDup=item.near_duplicate_of'),
+    'renderReviewInspectPanel must read near_duplicate_of to populate inspect field'
+  );
+});
+
+test('meaningMatch is exported from meaning-key.js', () => {
+  assert.ok(
+    typeof meaningMatch === 'function',
+    'meaningMatch must be exported and importable from src/meaning-key.js'
   );
 });
 

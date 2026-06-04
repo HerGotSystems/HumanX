@@ -10,6 +10,14 @@ export function meaningKey(input) {
   s = s.replace(/\bexperts\b/g, 'expert');
   s = s.replace(/\bpays\b/g, 'pay');
   s = s.replace(/\bhard work\b/g, 'work');
+  // contractions → "not" — preserves negation polarity as a real token
+  s = s.replace(/\b(doesnt|didnt|dont|wont|isnt|arent|wasnt|werent|hasnt|hadnt|cant|shouldnt|wouldnt|couldnt)\b/g, 'not');
+  // additional function words — "not" intentionally excluded so negation survives
+  s = s.replace(/\b(on|in|no|does|did|do|will|would|could|should|has|have|had)\b/g, ' ');
+  // simple suffix normalisation — -s first so "landings" → "landing" → "land"
+  s = s.replace(/(\w{4,})s\b/g, '$1');
+  s = s.replace(/(\w{4,})ing\b/g, '$1');
+  s = s.replace(/(\w{4,})ed\b/g, '$1');
   s = s.replace(/\s+/g, ' ').trim();
   return s;
 }
@@ -21,9 +29,14 @@ export function meaningMatch(a, b) {
   if (ka === kb) return true;
   const aw = new Set(ka.split(' ').filter(Boolean));
   const bw = new Set(kb.split(' ').filter(Boolean));
-  if (!aw.size || !bw.size) return false;
+  if (aw.size < 2 || bw.size < 2) return false;
+  // negation-aware: one negated and one un-negated claim are never near-duplicates
+  if (aw.has('not') !== bw.has('not')) return false;
   let overlap = 0;
   for (const w of aw) if (bw.has(w)) overlap++;
-  const ratio = overlap / Math.min(aw.size, bw.size);
-  return ratio >= 0.8 && overlap >= 2;
+  const minSize = Math.min(aw.size, bw.size);
+  const ratio = overlap / minSize;
+  // for 3+ token claims require 3 shared tokens, not 2 — prevents topic-word false positives
+  const minOverlap = Math.min(3, minSize);
+  return ratio >= 0.65 && overlap >= minOverlap;
 }
