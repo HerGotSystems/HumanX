@@ -299,6 +299,10 @@
 .review-audit-stat-archived{border-color:#7b5c1a33!important}
 .review-audit-stat-archived .review-audit-n{color:#d4a84899}
 .review-audit-archived-note{font-size:10px;color:var(--muted);font-style:italic;margin:0}
+.review-audit-stat-similar .review-audit-n{color:#f0a83a}
+.b-similar{color:#f0a83a;border-color:#f0a83a55}
+.review-card-similar{border-left-color:#f0a83a88!important}
+.review-similar-note{display:flex;align-items:flex-start;gap:8px;background:rgba(240,168,58,.06);border:1px solid rgba(240,168,58,.2);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:10px;color:var(--muted);line-height:1.5;flex-wrap:wrap}
 @media(max-width:600px){.review-audit-stats{gap:4px}.review-audit-stat{min-width:48px;padding:4px 6px}.review-audit-n{font-size:13px}}
 /* Review desktop density — desktop only, mobile unaffected */
 @media(min-width:601px){
