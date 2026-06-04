@@ -10,6 +10,14 @@ export function meaningKey(input) {
   s = s.replace(/\bexperts\b/g, 'expert');
   s = s.replace(/\bpays\b/g, 'pay');
   s = s.replace(/\bhard work\b/g, 'work');
+  // written contractions (apostrophes already stripped above)
+  s = s.replace(/\b(doesnt|didnt|dont|wont|isnt|arent|wasnt|werent|hasnt|hadnt|cant|shouldnt|wouldnt|couldnt)\b/g, ' ');
+  // additional function words and prepositions
+  s = s.replace(/\b(on|in|not|no|does|did|do|will|would|could|should|has|have|had)\b/g, ' ');
+  // simple suffix normalisation — -s first so "landings" → "landing" → "land"
+  s = s.replace(/(\w{4,})s\b/g, '$1');
+  s = s.replace(/(\w{4,})ing\b/g, '$1');
+  s = s.replace(/(\w{4,})ed\b/g, '$1');
   s = s.replace(/\s+/g, ' ').trim();
   return s;
 }
@@ -25,5 +33,5 @@ export function meaningMatch(a, b) {
   let overlap = 0;
   for (const w of aw) if (bw.has(w)) overlap++;
   const ratio = overlap / Math.min(aw.size, bw.size);
-  return ratio >= 0.8 && overlap >= 2;
+  return ratio >= 0.65 && overlap >= 2;
 }
