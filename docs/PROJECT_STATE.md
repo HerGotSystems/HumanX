@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-04 after D-10 near-duplicate work.
+Last updated: 2026-06-05 after D-11 review moderation clarity.
 
 ---
 
@@ -114,6 +114,8 @@ All flows confirmed working (code audit + static checks):
 | D-10B | `74b390c` (PR #78) | Near-duplicate suggestions Phase 1 — `meaningMatch` wired into `createClaim`; bounded 200-candidate scan; `near_duplicate_of` written on new claim only; `saveClaim` soft warning; `reviewCard` similar badge; inspect panel field |
 | D-10C | `dcf4696` (PR #79) | Near-duplicate tuning — suffix normalisation (`-s`/`-ing`/`-ed`), contraction normalisation, additional stopwords; threshold 0.8 → 0.65; 10 new smoke checks (77 → 87) |
 | D-10D | `dcf4696` | Negation/contradiction safety fix — contractions now normalise to `"not"` (not stripped); `"not"` kept as real token; negation-polarity guard in `meaningMatch`; min-overlap raised for 3-token claims; 2 new D-10D smoke checks (87 → 89) |
+| D-11 | `1b41992` | Review moderation clarity — `~Similar` filter chip; amber `b-similar` badge; `review-card-similar` left-border; `~Similar` audit summary stat replaces always-zero Duplicates; `Similar claim (advisory)` inspect field label; advisory note banner in inspect panel; filter help and empty-state text for similar; no merge UI |
+| D-11B | `b5fef36` | Fix review similar filter regression — `nearDup` was declared inside `else { }` block (D-11) but used in `return` template outside that scope; runtime `ReferenceError` silently broke all inspect, filter, and audit-toggle interactions; hoisted to function scope; 2 new smoke checks (89 → 91) |
 
 ---
 
@@ -126,14 +128,13 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-10 near-duplicate infrastructure is merged and live. Near-duplicate detection is suggestion-only: no auto-merge, no `duplicate_of` writes, no `review_state='duplicate'`. Moderator retains full control via existing Approve / Reject / Keep Pending actions.
+D-11 review moderation clarity is live and confirmed working. The ~Similar filter, inspect panel, and audit summary toggle all function correctly after the D-11B regression fix. Similar is advisory only — no merge UI, no `duplicate_of` writes, no `review_state='duplicate'`. Moderator retains full control via existing Approve / Reject / Keep Pending actions.
 
 Next work:
 
-1. **Live QA of D-10** — submit a claim with similar wording to an existing public claim; confirm the `similar exists` badge appears on submission and the yellow `similar` badge appears in the Review queue card. Check the inspect panel `Near duplicate of` field links correctly.
-2. **Moderator merge UI** (only after live QA + usage audit) — a "Mark as duplicate of" action in the review inspect panel that writes `duplicate_of` and sets `review_state='duplicate'`. Backend + frontend; **branch + PR required**. Do not implement speculatively.
-3. **RunPack provenance / versioning** (optional) — stamp generated packets with a claim snapshot hash and timestamp so AI analysis can be traced back to the state of the claim at generation time.
-4. **Study dock refinements** (optional, after more use) — collect real usage feedback before further structural changes.
+1. **Moderator merge UI** (only after extended usage audit) — a "Mark as duplicate of" action in the review inspect panel that writes `duplicate_of` and sets `review_state='duplicate'`. Backend + frontend; **branch + PR required**. Do not implement speculatively.
+2. **RunPack provenance / versioning** (optional) — stamp generated packets with a claim snapshot hash and timestamp so AI analysis can be traced back to the state of the claim at generation time.
+3. **Study dock refinements** (optional, after more use) — collect real usage feedback before further structural changes.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
