@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-04 after D-series (D-1 → D-9C).
+Last updated: 2026-06-04 after D-10 near-duplicate work.
 
 ---
 
@@ -44,7 +44,7 @@ All flows confirmed working (code audit + static checks):
 
 | Flow | State |
 |------|-------|
-| Submit Claim | → enters Review; duplicate claims surfaced correctly (D-5B) |
+| Submit Claim | → enters Review; exact duplicates return existing claim; near-duplicates submit with soft warning and `similar` badge in Review (D-10B/C/D) |
 | Add Truth | → enters Review |
 | Truth → Claim Review | converts truth to a pressure-testable claim in Review |
 | Drift promote Truth | → enters Review |
@@ -66,12 +66,13 @@ All flows confirmed working (code audit + static checks):
 |------|--------|
 | Do not rerun migration 0004 | `migrations/0004_unique_normalized_content.sql` already applied to production. Rerunning will fail. |
 | Do not rerun migration 0005 | `migrations/0005_add_home_tests_updated_at.sql` was manually applied via Cloudflare D1 console. Do not rerun unless the target DB is confirmed missing `home_tests.updated_at`. |
+| `claims.near_duplicate_of` is live | Column added manually via Cloudflare D1 dashboard (D-10A). `idx_claims_near_duplicate_of` index also applied. Do not attempt to re-add either. |
 | No Wrangler / D1 commands | `wrangler d1 execute`, `wrangler deploy`, and all variants are off-limits unless the user explicitly requests them. |
 | No live write smoke | `scripts/write-endpoint-smoke-test.mjs` requires explicit per-session user approval. Do not run routinely. |
 
 ---
 
-## Batch history (A-2 → D-5C)
+## Batch history (A-2 → D-10D)
 
 | Batch | Commit | Change |
 |-------|--------|--------|
@@ -109,6 +110,10 @@ All flows confirmed working (code audit + static checks):
 | D-9B | `7277f98` | Study evidence/pressure grouping — Study dock groups evidence and pressure blocks by linked claim for faster scanning |
 | D-9B+ | `9044a07` | Evidence Vault grouping — Vault groups entries by linked claim with claim-level headers |
 | D-9C | `1951f09` | Investigation Packet / RunPack workflow clarity — dock redesigned with explicit packet framing, AI-return parsing flow, and RunPack terminology consistency |
+| D-10A | `579a783` | Near-duplicate migration plan — `docs/D10_NEAR_DUPLICATE_PLAN.md` created; manual D1 SQL documented; implementation plan for D-10B written |
+| D-10B | `74b390c` (PR #78) | Near-duplicate suggestions Phase 1 — `meaningMatch` wired into `createClaim`; bounded 200-candidate scan; `near_duplicate_of` written on new claim only; `saveClaim` soft warning; `reviewCard` similar badge; inspect panel field |
+| D-10C | `dcf4696` (PR #79) | Near-duplicate tuning — suffix normalisation (`-s`/`-ing`/`-ed`), contraction normalisation, additional stopwords; threshold 0.8 → 0.65; 10 new smoke checks (77 → 87) |
+| D-10D | `dcf4696` | Negation/contradiction safety fix — contractions now normalise to `"not"` (not stripped); `"not"` kept as real token; negation-polarity guard in `meaningMatch`; min-overlap raised for 3-token claims; 2 new D-10D smoke checks (87 → 89) |
 
 ---
 
@@ -121,16 +126,18 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Live QA passed after D-9A/B/C. The Study dock, Evidence Vault grouping, and Investigation Packet flow are confirmed working in the live app.
+D-10 near-duplicate infrastructure is merged and live. Near-duplicate detection is suggestion-only: no auto-merge, no `duplicate_of` writes, no `review_state='duplicate'`. Moderator retains full control via existing Approve / Reject / Keep Pending actions.
 
 Next work:
 
-1. **D-10 semantic duplicate infrastructure** — activate `meaningMatch` (80% word-overlap) server-side in `createClaim`; **must use a branch + PR, not direct main**. Include a static check covering the new path.
-2. **RunPack provenance / versioning** (optional) — stamp generated packets with a claim snapshot hash and timestamp so AI analysis can be traced back to the state of the claim at generation time.
-3. **Study dock refinements** (optional, after more use) — collect real usage feedback on the grouped Study view before further structural changes.
+1. **Live QA of D-10** — submit a claim with similar wording to an existing public claim; confirm the `similar exists` badge appears on submission and the yellow `similar` badge appears in the Review queue card. Check the inspect panel `Near duplicate of` field links correctly.
+2. **Moderator merge UI** (only after live QA + usage audit) — a "Mark as duplicate of" action in the review inspect panel that writes `duplicate_of` and sets `review_state='duplicate'`. Backend + frontend; **branch + PR required**. Do not implement speculatively.
+3. **RunPack provenance / versioning** (optional) — stamp generated packets with a claim snapshot hash and timestamp so AI analysis can be traced back to the state of the claim at generation time.
+4. **Study dock refinements** (optional, after more use) — collect real usage feedback before further structural changes.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
-- Rerun migration 0004 or 0005 (see Backend / D1 safety rules above).
+- Rerun migration 0004, 0005, or re-add `near_duplicate_of` column/index (see Backend / D1 safety rules above).
 - Run live write smoke tests without explicit per-session approval.
-- Merge backend duplicate/near-duplicate work directly to main — always use a branch and PR.
+- Merge any backend duplicate/near-duplicate work directly to main — always use a branch and PR.
+- Write `duplicate_of` or set `review_state='duplicate'` without a dedicated moderator UI in place.
