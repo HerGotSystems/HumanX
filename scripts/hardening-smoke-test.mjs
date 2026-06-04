@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 89 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('89 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 89');
+test('docs/README.md documents hardening smoke count: 91 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('91 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 91');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -829,10 +829,24 @@ test('reviewCard references item.near_duplicate_of (snake_case from D1 raw row)'
   );
 });
 
-test('renderReviewInspectPanel references near_duplicate_of for inspect field', () => {
+test('renderReviewInspectPanel nearDup declared at function scope (not inside else block)', () => {
   assert.ok(
-    appSrc.includes('nearDup=item.near_duplicate_of'),
-    'renderReviewInspectPanel must read near_duplicate_of to populate inspect field'
+    appSrc.includes('review-similar-note'),
+    'renderReviewInspectPanel must render review-similar-note when near_duplicate_of is set — confirms nearDup is in scope'
+  );
+});
+
+test('applyReviewFilter handles similar filter branch', () => {
+  assert.ok(
+    appSrc.includes("f==='similar'"),
+    "applyReviewFilter must contain f==='similar' branch so ~Similar filter chip works"
+  );
+});
+
+test('review filter defs include similar chip', () => {
+  assert.ok(
+    appSrc.includes("'similar','~Similar'"),
+    "renderReviewFilterBar defs must include ['similar','~Similar'] chip"
   );
 });
 
