@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-03 after D-series (D-1 → D-5C).
+Last updated: 2026-06-04 after D-series (D-1 → D-9C).
 
 ---
 
@@ -105,6 +105,10 @@ All flows confirmed working (code audit + static checks):
 | D-5 | — | Claim normalization / intake audit — full audit of `renderSubmit`, `saveClaim`, `meaningKey`, duplicate detection; identified `data.existing` silent-lie bug and UX gaps |
 | D-5B-1 | `5eb54d6` | Duplicate claim response fix — `saveClaim` now handles `data.existing: true` correctly; shows "already exists" panel with Study link instead of false "submitted for Review" |
 | D-5C | `6ce3fb2` | Claim-writing guidance — collapsible writing-tips section (good/avoid examples), category suggestion chips, claim-type live hint below select |
+| D-9A | `0430a88` | Reused-evidence compression — Study view collapses repeated evidence entries under a single source-claim header, eliminating redundant rows |
+| D-9B | `7277f98` | Study evidence/pressure grouping — Study dock groups evidence and pressure blocks by linked claim for faster scanning |
+| D-9B+ | `9044a07` | Evidence Vault grouping — Vault groups entries by linked claim with claim-level headers |
+| D-9C | `1951f09` | Investigation Packet / RunPack workflow clarity — dock redesigned with explicit packet framing, AI-return parsing flow, and RunPack terminology consistency |
 
 ---
 
@@ -117,17 +121,13 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Immediate:
+Live QA passed after D-9A/B/C. The Study dock, Evidence Vault grouping, and Investigation Packet flow are confirmed working in the live app.
 
-1. **Push and live visual QA** — push D-series commits to origin, then spot-check the live app: Submit Claim writing-tips panel, category chips, type hints, duplicate-claim redirect, review queue report reasons in card and inspect panel.
+Next work:
 
-After that, if desired:
-
-2. **Evidence grouping in Study view** — group support vs pressure evidence visually; frontend-only, touch `app-v10.js` / `styles.css` only.
-3. **RunPack import / analysis return flow** — after a user pastes AI output back, parse and display it in the Study view. Frontend-only prototype first.
-4. **Backend near-duplicate detection** — activate `meaningMatch` (80% word-overlap) server-side in `createClaim`; must be done on a branch with a PR, not directly on main. Include a static check covering the new path.
-5. **Claim merge / duplicate queue** — admin review decision for "duplicate" state + merge-to UI. Backend + admin frontend; branch + PR required.
-6. **Static check count increase** — extend `hardening-smoke-test.mjs` to cover any new frontend logic added.
+1. **D-10 semantic duplicate infrastructure** — activate `meaningMatch` (80% word-overlap) server-side in `createClaim`; **must use a branch + PR, not direct main**. Include a static check covering the new path.
+2. **RunPack provenance / versioning** (optional) — stamp generated packets with a claim snapshot hash and timestamp so AI analysis can be traced back to the state of the claim at generation time.
+3. **Study dock refinements** (optional, after more use) — collect real usage feedback on the grouped Study view before further structural changes.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
