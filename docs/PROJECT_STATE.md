@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-05 after D-15 review inspect navigation.
+Last updated: 2026-06-05 after D-16 reused study evidence compression.
 
 ---
 
@@ -120,6 +120,7 @@ All flows confirmed working (code audit + static checks):
 | D-13 | `21e411a` | Advisory claim quality hints — frontend-only `claimQualityHints()` heuristic flags too-short, opinion-opener, absolute universal, common-knowledge, slogan/vague-framing, broad-actor, moral-label, and universal-scope patterns; live hints shown under claim input in Submit form; soft "needs sharpening" badge on Review cards; full hint list in Inspect panel; no blocking, no score changes, no backend/API changes |
 | D-14 | `a12f394` | Review quality filter — `~Quality` filter chip and `~Quality first` sort option added to Review queue; both use `claimQualityHints()` to surface claims with advisory hints; chip count shown; help text and empty state added; advisory only — no blocking, no score changes, no backend/API changes |
 | D-15 | `49db60b` | Review inspect navigation — position indicator (`N of M · X hints`) + Prev/Next buttons added below inspect panel close button; compact Approve/Keep Pending/Reject action bar added before the fields block; bottom action row preserved; no moderation behaviour changed; rejected: bulk actions, auto-advance, keyboard shortcuts, sticky panel, merge/suppress similar |
+| D-16 | `5fd1b0a` | Study reused evidence compression — outer-collapse threshold lowered 10→4 (any 4+ reused items collapse into a closed `<details>` by default); ≤3 reused items switch from full `evidenceItem()` to compact rows inside `.reused-block`; `.study-sub-reused` styled muted/italic to read as secondary framing; D-16C (side panel grouping) deferred — patch functions use fragile selectors |
 
 ---
 
@@ -132,7 +133,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-15 review inspect navigation is live. The inspect panel now shows a position indicator (`N of M`, or `N of M · X hints` when quality hints exist) with Prev/Next buttons that navigate within the current filtered+sorted list. A compact Approve/Keep Pending/Reject bar sits before the fields block so moderators can decide without scrolling to the bottom. The bottom action row is preserved. No moderation behaviour was changed.
+D-16 reused evidence compression is live. Claims with 4+ reused vault items now collapse into a closed `<details>` by default (was 10+). Claims with 1–3 reused items render compact rows inside a visually distinct `.reused-block` container instead of full-density `evidenceItem()` cards. Direct evidence remains primary; reused vault lineage is secondary and scanable. D-16C (side panel grouping) deferred.
 
 Next work:
 
