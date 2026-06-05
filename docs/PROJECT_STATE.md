@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-20 study dock refinement.
+Last updated: 2026-06-06 after D-21 visual QA audit (no regressions found).
 
 ---
 
@@ -125,6 +125,7 @@ All flows confirmed working (code audit + static checks):
 | D-18 | `9dd1668` | Study tool dock clarity — dock audit performed; safe text-only renames in `index.html`: "RunPack" section → "Investigation Packet", "Generate RunPack" → "Build RunPack", "Copy RunPack" → "Copy Packet"; CSS: Evidence & Pressure section head highlighted blue in study mode; patch functions unchanged; fragile selectors documented |
 | D-19 | `18cf5c9` | Sidepanel patch stabilization — moved `#evidence-kind-hint`, `#evidence-attach-note`, `#runpack-side-note` from dynamic injection to static HTML; replaced `<pre id="aip">` with `<div id="aip-status">` (stable container); rewrote `patchRunPackPanel()` to target `#aip-status` directly (fixes re-render staleness bug) and removed dead textContent rename + fragile `querySelector('.actions')` injection; removed dead `getElementById('aip')` fallback from `generateRunPack()`; `patchEvidencePanel()` is now a graceful no-op |
 | D-20 | `b2f53ee` | Study dock refinement — renamed "Evidence & Pressure" section to "Attach Evidence / Pressure" (D-20A); added static microcopy to Report section (D-20A); added `min-height:32px` to `.runpack-side-status` to prevent layout jump between states (D-20C); added `#side-tools .actions{flex-direction:column}` + `button{width:100%}` at `max-width:900px` for clean narrow-width stacking (D-20D); no IDs, function names, or JS logic changed |
+| D-21 | docs-only | Visual QA audit of D-15 → D-20 — all five focus areas pass; no regressions found; no code changes; full checklist in `docs/D21_VISUAL_QA.md` |
 
 ---
 
@@ -137,7 +138,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-20 study dock refinement is live. Evidence section renamed to "Attach Evidence / Pressure". Report section now has static microcopy. `#aip-status` no longer jumps in height between states. Side-tools action buttons stack cleanly at narrow width. No JS or behaviour changes.
+D-21 visual QA audit complete. All five focus areas (review inspect panel, study evidence sections, RunPack page/panel, study side dock, mobile/narrow layout) passed — no regressions from D-15 through D-20. Full checklist in `docs/D21_VISUAL_QA.md`. Static check counts unchanged at 91/24/35.
 
 Next work:
 
