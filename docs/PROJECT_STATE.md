@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-19 sidepanel patch stabilization.
+Last updated: 2026-06-06 after D-20 study dock refinement.
 
 ---
 
@@ -124,6 +124,7 @@ All flows confirmed working (code audit + static checks):
 | D-17 | `77129c7` | Investigation Packet workflow clarity — compact 4-step workflow guide (Create → Paste into AI → Copy response → Load below) added above action buttons; "Download" → "Download Packet"; "Import AI analysis return" → "Load AI Analysis Return"; AI return textarea placeholder updated; ready-hint references "Create Investigation Packet"; raw JSON output wrapped in collapsible `<details class="rp-json-details">` labelled "Technical packet JSON" |
 | D-18 | `9dd1668` | Study tool dock clarity — dock audit performed; safe text-only renames in `index.html`: "RunPack" section → "Investigation Packet", "Generate RunPack" → "Build RunPack", "Copy RunPack" → "Copy Packet"; CSS: Evidence & Pressure section head highlighted blue in study mode; patch functions unchanged; fragile selectors documented |
 | D-19 | `18cf5c9` | Sidepanel patch stabilization — moved `#evidence-kind-hint`, `#evidence-attach-note`, `#runpack-side-note` from dynamic injection to static HTML; replaced `<pre id="aip">` with `<div id="aip-status">` (stable container); rewrote `patchRunPackPanel()` to target `#aip-status` directly (fixes re-render staleness bug) and removed dead textContent rename + fragile `querySelector('.actions')` injection; removed dead `getElementById('aip')` fallback from `generateRunPack()`; `patchEvidencePanel()` is now a graceful no-op |
+| D-20 | `b2f53ee` | Study dock refinement — renamed "Evidence & Pressure" section to "Attach Evidence / Pressure" (D-20A); added static microcopy to Report section (D-20A); added `min-height:32px` to `.runpack-side-status` to prevent layout jump between states (D-20C); added `#side-tools .actions{flex-direction:column}` + `button{width:100%}` at `max-width:900px` for clean narrow-width stacking (D-20D); no IDs, function names, or JS logic changed |
 
 ---
 
@@ -136,13 +137,12 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-19 sidepanel patch stabilization is live. All previously-injected static notes are now in `index.html`. `patchRunPackPanel` now directly targets the stable `#aip-status` container and updates it on every `renderStudy()` call — fixing a pre-existing staleness bug where the sidebar status text was not updated after navigating between claims. `patchEvidencePanel` is a graceful no-op. No user-visible change.
+D-20 study dock refinement is live. Evidence section renamed to "Attach Evidence / Pressure". Report section now has static microcopy. `#aip-status` no longer jumps in height between states. Side-tools action buttons stack cleanly at narrow width. No JS or behaviour changes.
 
 Next work:
 
 1. **Moderator merge UI** (only after extended usage audit) — a "Mark as duplicate of" action in the review inspect panel that writes `duplicate_of` and sets `review_state='duplicate'`. Backend + frontend; **branch + PR required**. Do not implement speculatively.
 2. **RunPack provenance / versioning** (optional) — stamp generated packets with a claim snapshot hash and timestamp so AI analysis can be traced back to the state of the claim at generation time.
-3. **Study dock refinements** (optional, after more use) — collect real usage feedback before further structural changes.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
