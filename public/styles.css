@@ -480,6 +480,8 @@
 .dock-section-head::after{content:'›';font-size:12px;color:var(--line);display:inline-block;transition:transform .15s}
 details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .dock-section-body{padding-bottom:8px}
+/* Study mode: highlight active Evidence section head */
+.study-mode details.dock-section:first-child>.dock-section-head{color:var(--blue)}
 #side-tools input,#side-tools select{font-size:11px;padding:6px 8px}
 #side-tools textarea{font-size:11px;padding:6px 8px;min-height:50px}
 #side-tools .claimbox{gap:5px}
