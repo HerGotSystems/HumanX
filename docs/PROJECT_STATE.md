@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-05 after D-12 review queue scaling controls.
+Last updated: 2026-06-05 after D-13 advisory claim quality hints.
 
 ---
 
@@ -117,6 +117,7 @@ All flows confirmed working (code audit + static checks):
 | D-11 | `1b41992` | Review moderation clarity — `~Similar` filter chip; amber `b-similar` badge; `review-card-similar` left-border; `~Similar` audit summary stat replaces always-zero Duplicates; `Similar claim (advisory)` inspect field label; advisory note banner in inspect panel; filter help and empty-state text for similar; no merge UI |
 | D-11B | `b5fef36` | Fix review similar filter regression — `nearDup` was declared inside `else { }` block (D-11) but used in `return` template outside that scope; runtime `ReferenceError` silently broke all inspect, filter, and audit-toggle interactions; hoisted to function scope; 2 new smoke checks (89 → 91) |
 | D-12 | `004f0b0` | Review queue scale/quality pass — sort controls (newest / oldest / reported first / ~similar first) added to filter bar; relative age display (`reviewAge`: "3d ago", "2h ago") replaces static date on review cards; no merge UI, no `duplicate_of` writes, no `review_state='duplicate'` |
+| D-13 | `21e411a` | Advisory claim quality hints — frontend-only `claimQualityHints()` heuristic flags too-short, opinion-opener, absolute universal, common-knowledge, slogan/vague-framing, broad-actor, moral-label, and universal-scope patterns; live hints shown under claim input in Submit form; soft "needs sharpening" badge on Review cards; full hint list in Inspect panel; no blocking, no score changes, no backend/API changes |
 
 ---
 
@@ -129,7 +130,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-12 review queue scaling controls are live. The filter bar now has a sort select (newest / oldest / reported first / ~similar first) and review cards show relative age ("3d ago", "2h ago") instead of a static locale date. All filters, inspect panel, and audit summary continue to work. Similar remains advisory only — no merge UI, no `duplicate_of` writes, no `review_state='duplicate'`.
+D-13 advisory claim quality hints are live. `claimQualityHints()` is a pure frontend heuristic — no AI calls, no score changes, no backend writes. Live hints appear under the claim input in Submit as you type; a soft "needs sharpening" badge appears on Review cards (tooltip lists all hints); the full hint list appears in the Inspect panel between the fields and actions. Nothing is blocked; submitters and moderators retain full control.
 
 Next work:
 
