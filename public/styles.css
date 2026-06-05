@@ -222,7 +222,7 @@
 .review-inspect-reject{border-color:#ff3b5c55!important;color:#ff8ca0!important;background:linear-gradient(135deg,#44000e,#2c0008)!important}
 .review-inspect-cleanup{border-color:#7b5c1a55!important;color:#d4a848!important;background:linear-gradient(135deg,#2a1e06,#1a1206)!important}
 .btn-link-small{background:transparent;border:none;padding:0;color:var(--blue);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-@media(max-width:600px){.review-admin-bar{flex-direction:column;align-items:stretch}.review-header-left{justify-content:space-between}.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-actions .btn-inspect{margin-right:0;flex:1}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}}
+@media(max-width:600px){.review-admin-bar{flex-direction:column;align-items:stretch}.review-header-left{justify-content:space-between}.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-actions .btn-inspect{margin-right:0;flex:1}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-top-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}}
 /* Evidence Vault readability */
 .vault-header{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86);margin-bottom:4px}
 .vault-header-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
@@ -309,6 +309,15 @@
 .cq-hint-advisory{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
 .cq-hint-list{margin:0;padding-left:14px;font-size:11px;color:var(--muted);line-height:1.6}
 /* Claim quality hints — review inspect panel */
+/* Review inspect nav — position indicator + prev/next */
+.review-inspect-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px;padding:5px 0}
+.review-nav-btn{flex-shrink:0;background:transparent;border:1px solid var(--line);color:var(--muted);padding:4px 10px;font-size:11px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.review-nav-btn:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.review-nav-btn:disabled{opacity:.3;cursor:default}
+.review-nav-pos{font-size:10px;color:var(--muted);text-align:center;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Review inspect top action bar — compact quick-decide row before fields */
+.review-inspect-top-actions{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
+.review-inspect-top-actions button{padding:6px 10px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:#0b0e16;color:var(--text)}
 .review-inspect-quality{margin:8px 0 4px;background:rgba(196,164,96,.06);border:1px solid rgba(196,164,96,.18);border-radius:8px;padding:8px 10px}
 .review-quality-label{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:#c4a460;font-weight:700;margin:0 0 4px}
 .review-quality-advisory{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
