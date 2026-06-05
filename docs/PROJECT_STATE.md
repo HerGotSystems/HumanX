@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-05 after D-13 advisory claim quality hints.
+Last updated: 2026-06-05 after D-14 Review quality filter.
 
 ---
 
@@ -118,6 +118,7 @@ All flows confirmed working (code audit + static checks):
 | D-11B | `b5fef36` | Fix review similar filter regression — `nearDup` was declared inside `else { }` block (D-11) but used in `return` template outside that scope; runtime `ReferenceError` silently broke all inspect, filter, and audit-toggle interactions; hoisted to function scope; 2 new smoke checks (89 → 91) |
 | D-12 | `004f0b0` | Review queue scale/quality pass — sort controls (newest / oldest / reported first / ~similar first) added to filter bar; relative age display (`reviewAge`: "3d ago", "2h ago") replaces static date on review cards; no merge UI, no `duplicate_of` writes, no `review_state='duplicate'` |
 | D-13 | `21e411a` | Advisory claim quality hints — frontend-only `claimQualityHints()` heuristic flags too-short, opinion-opener, absolute universal, common-knowledge, slogan/vague-framing, broad-actor, moral-label, and universal-scope patterns; live hints shown under claim input in Submit form; soft "needs sharpening" badge on Review cards; full hint list in Inspect panel; no blocking, no score changes, no backend/API changes |
+| D-14 | `a12f394` | Review quality filter — `~Quality` filter chip and `~Quality first` sort option added to Review queue; both use `claimQualityHints()` to surface claims with advisory hints; chip count shown; help text and empty state added; advisory only — no blocking, no score changes, no backend/API changes |
 
 ---
 
@@ -130,7 +131,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-13 advisory claim quality hints are live. `claimQualityHints()` is a pure frontend heuristic — no AI calls, no score changes, no backend writes. Live hints appear under the claim input in Submit as you type; a soft "needs sharpening" badge appears on Review cards (tooltip lists all hints); the full hint list appears in the Inspect panel between the fields and actions. Nothing is blocked; submitters and moderators retain full control.
+D-14 Review quality filter is live. The `~Quality` filter chip surfaces claims where `claimQualityHints()` returns at least one advisory hint (vague, slogan-like, or unfalsifiable wording). The `~Quality first` sort option orders the full queue by hint count descending. Both are advisory only — approve, keep, or reject actions are unchanged, nothing is blocked, no scores are changed, no backend calls are made.
 
 Next work:
 
