@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-05 after D-14 Review quality filter.
+Last updated: 2026-06-05 after D-15 review inspect navigation.
 
 ---
 
@@ -119,6 +119,7 @@ All flows confirmed working (code audit + static checks):
 | D-12 | `004f0b0` | Review queue scale/quality pass — sort controls (newest / oldest / reported first / ~similar first) added to filter bar; relative age display (`reviewAge`: "3d ago", "2h ago") replaces static date on review cards; no merge UI, no `duplicate_of` writes, no `review_state='duplicate'` |
 | D-13 | `21e411a` | Advisory claim quality hints — frontend-only `claimQualityHints()` heuristic flags too-short, opinion-opener, absolute universal, common-knowledge, slogan/vague-framing, broad-actor, moral-label, and universal-scope patterns; live hints shown under claim input in Submit form; soft "needs sharpening" badge on Review cards; full hint list in Inspect panel; no blocking, no score changes, no backend/API changes |
 | D-14 | `a12f394` | Review quality filter — `~Quality` filter chip and `~Quality first` sort option added to Review queue; both use `claimQualityHints()` to surface claims with advisory hints; chip count shown; help text and empty state added; advisory only — no blocking, no score changes, no backend/API changes |
+| D-15 | `49db60b` | Review inspect navigation — position indicator (`N of M · X hints`) + Prev/Next buttons added below inspect panel close button; compact Approve/Keep Pending/Reject action bar added before the fields block; bottom action row preserved; no moderation behaviour changed; rejected: bulk actions, auto-advance, keyboard shortcuts, sticky panel, merge/suppress similar |
 
 ---
 
@@ -131,7 +132,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-14 Review quality filter is live. The `~Quality` filter chip surfaces claims where `claimQualityHints()` returns at least one advisory hint (vague, slogan-like, or unfalsifiable wording). The `~Quality first` sort option orders the full queue by hint count descending. Both are advisory only — approve, keep, or reject actions are unchanged, nothing is blocked, no scores are changed, no backend calls are made.
+D-15 review inspect navigation is live. The inspect panel now shows a position indicator (`N of M`, or `N of M · X hints` when quality hints exist) with Prev/Next buttons that navigate within the current filtered+sorted list. A compact Approve/Keep Pending/Reject bar sits before the fields block so moderators can decide without scrolling to the bottom. The bottom action row is preserved. No moderation behaviour was changed.
 
 Next work:
 
