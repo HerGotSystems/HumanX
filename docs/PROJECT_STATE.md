@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-18 study tool dock clarity.
+Last updated: 2026-06-06 after D-19 sidepanel patch stabilization.
 
 ---
 
@@ -123,6 +123,7 @@ All flows confirmed working (code audit + static checks):
 | D-16 | `5fd1b0a` | Study reused evidence compression — outer-collapse threshold lowered 10→4 (any 4+ reused items collapse into a closed `<details>` by default); ≤3 reused items switch from full `evidenceItem()` to compact rows inside `.reused-block`; `.study-sub-reused` styled muted/italic to read as secondary framing; D-16C (side panel grouping) deferred — patch functions use fragile selectors |
 | D-17 | `77129c7` | Investigation Packet workflow clarity — compact 4-step workflow guide (Create → Paste into AI → Copy response → Load below) added above action buttons; "Download" → "Download Packet"; "Import AI analysis return" → "Load AI Analysis Return"; AI return textarea placeholder updated; ready-hint references "Create Investigation Packet"; raw JSON output wrapped in collapsible `<details class="rp-json-details">` labelled "Technical packet JSON" |
 | D-18 | `9dd1668` | Study tool dock clarity — dock audit performed; safe text-only renames in `index.html`: "RunPack" section → "Investigation Packet", "Generate RunPack" → "Build RunPack", "Copy RunPack" → "Copy Packet"; CSS: Evidence & Pressure section head highlighted blue in study mode; patch functions unchanged; fragile selectors documented |
+| D-19 | `18cf5c9` | Sidepanel patch stabilization — moved `#evidence-kind-hint`, `#evidence-attach-note`, `#runpack-side-note` from dynamic injection to static HTML; replaced `<pre id="aip">` with `<div id="aip-status">` (stable container); rewrote `patchRunPackPanel()` to target `#aip-status` directly (fixes re-render staleness bug) and removed dead textContent rename + fragile `querySelector('.actions')` injection; removed dead `getElementById('aip')` fallback from `generateRunPack()`; `patchEvidencePanel()` is now a graceful no-op |
 
 ---
 
@@ -135,7 +136,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-18 study tool dock clarity is live. Dock section and button labels updated in `index.html` (text-only, no IDs/selectors changed). The dock is now fully mapped — safe anchors and fragile selectors are documented. The `patchEvidencePanel` and `patchRunPackPanel` functions remain unchanged and safe.
+D-19 sidepanel patch stabilization is live. All previously-injected static notes are now in `index.html`. `patchRunPackPanel` now directly targets the stable `#aip-status` container and updates it on every `renderStudy()` call — fixing a pre-existing staleness bug where the sidebar status text was not updated after navigating between claims. `patchEvidencePanel` is a graceful no-op. No user-visible change.
 
 Next work:
 
