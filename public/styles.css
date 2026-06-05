@@ -455,7 +455,7 @@
 /* Evidence panel hints */
 .evidence-kind-hint{margin:1px 0 2px}
 /* RunPack side-panel status */
-.runpack-side-status{padding:6px 8px;background:#080b12;border:1px solid var(--line);border-radius:8px;line-height:1.5;color:var(--muted);margin-top:4px;font-style:italic}
+.runpack-side-status{padding:6px 8px;background:#080b12;border:1px solid var(--line);border-radius:8px;line-height:1.5;color:var(--muted);margin-top:4px;font-style:italic;min-height:32px}
 .runpack-side-status-ready{color:var(--green);border-color:#39ff9f33;font-style:normal}
 .runpack-side-status-fallback{color:var(--yellow);border-color:#ffd16655;font-style:normal}
 .runpack-fallback-warn{color:var(--yellow);border:1px solid #ffd16655;background:#1a1400;border-radius:8px;padding:6px 8px;margin:6px 0 4px}
@@ -488,4 +488,4 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 #side-tools .actions{gap:5px;margin-top:4px}
 #side-tools .actions button{font-size:10px;padding:6px 8px}
 #aip{min-height:48px;max-height:100px;font-size:9px;margin-top:4px}
-@media(max-width:900px){#casefile{border-bottom:none;padding-bottom:4px}#side-tools h2{margin-top:10px;padding-top:8px}}
+@media(max-width:900px){#casefile{border-bottom:none;padding-bottom:4px}#side-tools h2{margin-top:10px;padding-top:8px}#side-tools .actions{flex-direction:column}#side-tools .actions button{width:100%}}
