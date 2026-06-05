@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-05 after D-16 reused study evidence compression.
+Last updated: 2026-06-06 after D-17 investigation packet workflow clarity.
 
 ---
 
@@ -121,6 +121,7 @@ All flows confirmed working (code audit + static checks):
 | D-14 | `a12f394` | Review quality filter — `~Quality` filter chip and `~Quality first` sort option added to Review queue; both use `claimQualityHints()` to surface claims with advisory hints; chip count shown; help text and empty state added; advisory only — no blocking, no score changes, no backend/API changes |
 | D-15 | `49db60b` | Review inspect navigation — position indicator (`N of M · X hints`) + Prev/Next buttons added below inspect panel close button; compact Approve/Keep Pending/Reject action bar added before the fields block; bottom action row preserved; no moderation behaviour changed; rejected: bulk actions, auto-advance, keyboard shortcuts, sticky panel, merge/suppress similar |
 | D-16 | `5fd1b0a` | Study reused evidence compression — outer-collapse threshold lowered 10→4 (any 4+ reused items collapse into a closed `<details>` by default); ≤3 reused items switch from full `evidenceItem()` to compact rows inside `.reused-block`; `.study-sub-reused` styled muted/italic to read as secondary framing; D-16C (side panel grouping) deferred — patch functions use fragile selectors |
+| D-17 | `77129c7` | Investigation Packet workflow clarity — compact 4-step workflow guide (Create → Paste into AI → Copy response → Load below) added above action buttons; "Download" → "Download Packet"; "Import AI analysis return" → "Load AI Analysis Return"; AI return textarea placeholder updated; ready-hint references "Create Investigation Packet"; raw JSON output wrapped in collapsible `<details class="rp-json-details">` labelled "Technical packet JSON" |
 
 ---
 
@@ -133,7 +134,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-16 reused evidence compression is live. Claims with 4+ reused vault items now collapse into a closed `<details>` by default (was 10+). Claims with 1–3 reused items render compact rows inside a visually distinct `.reused-block` container instead of full-density `evidenceItem()` cards. Direct evidence remains primary; reused vault lineage is secondary and scanable. D-16C (side panel grouping) deferred.
+D-17 investigation packet workflow clarity is live. The RunPack export page now shows a compact 4-step loop guide (Create → Paste into AI → Copy response → Load below) above the action buttons. Key button/label renames: "Download Packet", "Load AI Analysis Return". Raw JSON is now in a collapsed `<details>` ("Technical packet JSON") so it doesn't dominate the page. All packet generation, copy, download, and import flows are unchanged.
 
 Next work:
 
