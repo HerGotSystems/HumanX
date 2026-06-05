@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-05 after D-11 review moderation clarity.
+Last updated: 2026-06-05 after D-12 review queue scaling controls.
 
 ---
 
@@ -116,6 +116,7 @@ All flows confirmed working (code audit + static checks):
 | D-10D | `dcf4696` | Negation/contradiction safety fix — contractions now normalise to `"not"` (not stripped); `"not"` kept as real token; negation-polarity guard in `meaningMatch`; min-overlap raised for 3-token claims; 2 new D-10D smoke checks (87 → 89) |
 | D-11 | `1b41992` | Review moderation clarity — `~Similar` filter chip; amber `b-similar` badge; `review-card-similar` left-border; `~Similar` audit summary stat replaces always-zero Duplicates; `Similar claim (advisory)` inspect field label; advisory note banner in inspect panel; filter help and empty-state text for similar; no merge UI |
 | D-11B | `b5fef36` | Fix review similar filter regression — `nearDup` was declared inside `else { }` block (D-11) but used in `return` template outside that scope; runtime `ReferenceError` silently broke all inspect, filter, and audit-toggle interactions; hoisted to function scope; 2 new smoke checks (89 → 91) |
+| D-12 | `004f0b0` | Review queue scale/quality pass — sort controls (newest / oldest / reported first / ~similar first) added to filter bar; relative age display (`reviewAge`: "3d ago", "2h ago") replaces static date on review cards; no merge UI, no `duplicate_of` writes, no `review_state='duplicate'` |
 
 ---
 
@@ -128,7 +129,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-11 review moderation clarity is live and confirmed working. The ~Similar filter, inspect panel, and audit summary toggle all function correctly after the D-11B regression fix. Similar is advisory only — no merge UI, no `duplicate_of` writes, no `review_state='duplicate'`. Moderator retains full control via existing Approve / Reject / Keep Pending actions.
+D-12 review queue scaling controls are live. The filter bar now has a sort select (newest / oldest / reported first / ~similar first) and review cards show relative age ("3d ago", "2h ago") instead of a static locale date. All filters, inspect panel, and audit summary continue to work. Similar remains advisory only — no merge UI, no `duplicate_of` writes, no `review_state='duplicate'`.
 
 Next work:
 
