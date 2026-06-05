@@ -407,6 +407,20 @@
 .runpack-claim-name{margin:0;font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;word-break:break-word}
 .runpack-no-claim-state{margin:8px 0}
 .runpack-ready-hint{margin:6px 0 2px;font-size:10px;color:var(--muted);line-height:1.5}
+/* RunPack workflow guide — compact step flow */
+.rp-workflow-guide{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;margin:6px 0 4px;padding:7px 10px;background:rgba(87,184,255,.04);border:1px solid #57b8ff18;border-radius:8px}
+.rp-wf-step{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);white-space:nowrap}
+.rp-wf-n{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#57b8ff22;color:var(--blue);font-size:9px;font-weight:700;flex-shrink:0}
+.rp-wf-arr{font-size:9px;color:#57b8ff44}
+/* RunPack JSON output — collapsible technical area */
+.rp-json-details{margin:6px 0 2px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.rp-json-summary{display:flex;align-items:center;gap:6px;font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:6px 10px;cursor:pointer;list-style:none;background:rgba(8,11,18,.6);user-select:none;opacity:.7}
+.rp-json-summary:hover{opacity:1}
+.rp-json-details::-webkit-details-marker,.rp-json-summary::-webkit-details-marker{display:none}
+.rp-json-summary::before{content:'▸ '}
+.rp-json-details[open] .rp-json-summary::before{content:'▾ '}
+.rp-json-details .rp-json-label{margin:6px 10px 2px}
+.rp-json-details .runpack-export-output{margin:0 0 0;border-radius:0;border-left:none;border-right:none;border-bottom:none}
 .runpack-actions{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 6px}
 .runpack-actions button{font-size:11px;padding:7px 10px}
 .runpack-export-output{min-height:120px;max-height:440px;font-size:9px;line-height:1.55;font-family:monospace;margin-top:8px}
@@ -423,7 +437,7 @@
 .runpack-visible-data-toggle[open] summary::before{content:'▾ '}
 .runpack-visible-data-toggle p{margin:4px 0}
 .runpack-visible-data-toggle .actions{margin-top:4px}
-@media(max-width:600px){.runpack-actions{flex-direction:column}.runpack-export-output{max-height:260px}}
+@media(max-width:600px){.runpack-actions{flex-direction:column}.runpack-export-output{max-height:260px}.rp-workflow-guide{gap:3px 4px}.rp-wf-arr{display:none}}
 /* RunPack summary panel */
 .rp-summary{background:#080b12;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:4px 0 6px;display:grid;gap:7px}
 .rp-summary-row{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline}
