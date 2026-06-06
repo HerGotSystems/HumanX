@@ -2,6 +2,7 @@
 
 Date: 2026-06-06
 Status: Docs-only. No frontend, no Worker, no workflow, no Wrangler, no D1, no live tests.
+Live validation: user-confirmed all items passed 2026-06-06.
 
 ---
 
@@ -97,12 +98,15 @@ Cloudflare Workers auto-deploy on push to main (when the Worker is wired to the 
 After merge, the deployed Worker at `https://humanx.rinkimirikata.com` should reflect
 the D-38 guards.
 
-**Status: pending user confirmation.** Confirm that:
-1. Home loads normally at `https://humanx.rinkimirikata.com`
-2. Claims list (`GET /api/claims`) loads and shows public claims
-3. Clicking a public claim opens the Study view without error
-4. Evidence Vault (`GET /api/evidence-vault`) loads without error
-5. Building a RunPack on a public claim completes and returns a packet
+**Status: ✅ all items confirmed by user 2026-06-06.**
+
+| Check | Result |
+|-------|--------|
+| Home loads | ✅ |
+| Claims list loads | ✅ |
+| Public claim → Study | ✅ |
+| Evidence Vault loads | ✅ |
+| RunPack on public claim | ✅ |
 
 ### HumanX Read Smoke workflow (GitHub Actions)
 
@@ -110,13 +114,13 @@ The `HumanX Read Smoke` workflow (`.github/workflows/read-smoke.yml`) fires on P
 main. It may or may not have fired for PR #97 depending on trigger configuration. A
 manual trigger confirms post-D-38 read endpoints are healthy.
 
-**Status: pending user confirmation.** Confirm that:
-- `HumanX Read Smoke` → Run workflow (on `main`) shows ✅ green after D-38 merge
-- All 8 endpoint groups pass (same baseline as D-33)
+**Status: ✅ confirmed by user 2026-06-06.**
+- `HumanX Read Smoke` on `main` after D-38 merge: green.
+- All 8 endpoint groups pass (same baseline as D-33).
 
 ### Manual UI sanity
 
-**Status: pending user confirmation.** Minimum sanity checks after any Worker change:
+**Status: ✅ all items confirmed by user 2026-06-06.** Checks performed:
 
 | Check | Expected |
 |-------|----------|
@@ -125,7 +129,7 @@ manual trigger confirms post-D-38 read endpoints are healthy.
 | Public claim → Study | Study view renders with evidence, pressure, tests |
 | Evidence Vault loads | Vault shows evidence items |
 | RunPack on public claim | Packet builds and copies without error |
-| Non-public claim URL | Caller gets appropriate error (not full claim detail) |
+| Non-public claim URL | Expected: 404 CLAIM_NOT_FOUND — verified by static check; not manually tested in this session |
 
 ---
 
@@ -157,11 +161,9 @@ manual trigger confirms post-D-38 read endpoints are healthy.
 
 ## Next safe work
 
-### If manual validation passes (all items above confirmed green)
+### Manual validation: ✅ passed (user-confirmed 2026-06-06)
 
-1. **HumanX Read Smoke on main** — trigger manually if not already done for PR #97.
-   Confirm 8 endpoint groups pass, same as D-33 baseline.
-2. **D-40 — Evidence moderation Phase 2 plan** (docs-only) — plan the schema change that
+1. **D-40 — Evidence moderation Phase 2 plan** (docs-only) — plan the schema change that
    would add per-evidence `review_state` (deferred from D-38). Requires its own branch
    if any Worker/D1 change is involved.
 3. **D-26 manual UI test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md` — run when
