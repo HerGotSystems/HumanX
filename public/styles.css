@@ -221,6 +221,8 @@
 .review-inspect-actions .review-inspect-approve:hover{background:linear-gradient(135deg,#007f38,#00622c)}
 .review-inspect-reject{border-color:#ff3b5c55!important;color:#ff8ca0!important;background:linear-gradient(135deg,#44000e,#2c0008)!important}
 .review-inspect-cleanup{border-color:#7b5c1a55!important;color:#d4a848!important;background:linear-gradient(135deg,#2a1e06,#1a1206)!important}
+.review-inspect-markdup{border-color:#6b3f8a55!important;color:#c084fc!important;background:linear-gradient(135deg,#1e0a2e,#12051a)!important}
+.review-inspect-resolvesim{border-color:#2a4a6a55!important;color:#7cb3e0!important;background:linear-gradient(135deg,#0d1a2a,#070f1a)!important}
 .btn-link-small{background:transparent;border:none;padding:0;color:var(--blue);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 @media(max-width:600px){.review-admin-bar{flex-direction:column;align-items:stretch}.review-header-left{justify-content:space-between}.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-actions .btn-inspect{margin-right:0;flex:1}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-top-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}}
 /* Evidence Vault readability */

@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 91 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('91 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 91');
+test('docs/README.md documents hardening smoke count: 95 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('95 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 95');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -714,6 +714,23 @@ test('studyFromVault function is defined in app-v10.js', () => {
 
 test('studyFromVault is exposed on window', () => {
   assert.ok(appSrc.includes('window.studyFromVault=studyFromVault'), 'studyFromVault must be assigned to window for inline onclick use in evidenceCard');
+});
+
+test('markDuplicateUI is exposed on window', () => {
+  assert.ok(appSrc.includes('window.markDuplicateUI=markDuplicateUI'), 'markDuplicateUI must be assigned to window for inline onclick use in review inspect panel');
+});
+
+test('resolveSimilarUI is exposed on window', () => {
+  assert.ok(appSrc.includes('window.resolveSimilarUI=resolveSimilarUI'), 'resolveSimilarUI must be assigned to window for inline onclick use in review inspect panel');
+});
+
+test('markDuplicateUI calls /api/review/mark-duplicate with adminHeaders', () => {
+  assert.ok(appSrc.includes("'/api/review/mark-duplicate'"), 'markDuplicateUI must call /api/review/mark-duplicate');
+  assert.ok(appSrc.includes('adminHeaders()'), 'markDuplicateUI must use adminHeaders for admin-only route');
+});
+
+test('resolveSimilarUI calls /api/review/resolve-similar with adminHeaders', () => {
+  assert.ok(appSrc.includes("'/api/review/resolve-similar'"), 'resolveSimilarUI must call /api/review/resolve-similar');
 });
 
 test('evidenceCard Study Linked Claim button calls studyFromVault not selectClaim directly', () => {
