@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-37 public visibility security audit.
+Last updated: 2026-06-06 after D-38 public visibility guards (branch + PR).
 
 ---
 
@@ -30,7 +30,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `100 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `103 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `39 passed, 0 failed (39 hard checks)` |
 
@@ -134,6 +134,7 @@ All flows confirmed working (code audit + static checks):
 | D-24F | docs+migration | Near-duplicate migration proposal — `migrations/0006_add_near_duplicate_of.sql` created: `ALTER TABLE claims ADD COLUMN near_duplicate_of TEXT` + `CREATE INDEX IF NOT EXISTS idx_claims_near_duplicate_of`; closes schema gap documented in D-24C; safe for fresh D1 rebuilds only; production must not reapply (column already exists — would fail with "duplicate column"); `PRAGMA table_info(claims)` guard documented; D-24C audit schema-gaps table updated to mark all three gaps as closed; Backend/D1 safety rule added to PROJECT_STATE.md; no code changes, no Wrangler, no D1 commands |
 | D-24E | `5dc33e4` | Moderator duplicate resolution frontend controls — `renderReviewInspectPanel` gains `dupSection` with "Mark Duplicate..." and "Dismiss ~Similar" buttons for claim items; both are context-aware (markdup hidden for archived/duplicate state; resolvesim hidden when no advisory); `markDuplicateUI(claimId)` opens hxModal with target claim ID + optional reason input, calls `POST /api/review/mark-duplicate` via `adminHeaders()`, clears inspect panel and reloads queue on success; `resolveSimilarUI(claimId)` opens hxModal for confirm, calls `POST /api/review/resolve-similar`, reloads queue; both functions exposed on `window`; CSS adds muted purple (markdup) and muted steel-blue (resolvesim) button styles distinct from primary Approve/Reject; 4 new hardening smoke checks (91→95); no backend/D1/Worker/migration changes |
 | D-24D | `f2def3b` (PR #86) | Moderator duplicate-resolution backend routes — `POST /api/review/mark-duplicate` (writes `duplicate_of` + `review_state='duplicate'`; validates both claims exist; rejects self-duplicates and ineligible sources; source preserved) and `POST /api/review/resolve-similar` (clears `near_duplicate_of`; no-op guard; returns previous value for audit); `mapClaim` now exposes `duplicateOf` field; `reviewQueue` SQL excludes `review_state='duplicate'` alongside `archived`; `duplicate_total` added to queue metadata; both routes added to `HIGH_RISK_ROUTES`; worker-route-static-check 35→39 hard checks; no migrations, no frontend changes |
+| D-38 | `security/d38-public-visibility-guards` (branch + PR) | Public visibility guards — Fix A: `src/evidence-vault.js` adds `COALESCE(c.review_state,'public')='public'` filter to vault query; Fix B-1: `createClaim` tail decoupled from `getClaim` HTTP handler (uses `claimDetail`+`claimLineage` directly); Fix B-2: `getClaim` HTTP handler adds `review_state` public guard; Fix C: `createAipPacket` adds `reviewState` public guard before building RunPack; 3 new hardening smoke checks (100→103); `docs/README.md` and `docs/PROJECT_STATE.md` updated to 103; `docs/API_ENDPOINT_INVENTORY.md` and `docs/PUBLIC_WRITE_ENDPOINTS_RISK_MAP.md` updated; `docs/D38_PUBLIC_VISIBILITY_GUARDS.md` created; no D1 migrations, no schema changes, no frontend changes, no moderation logic changes; static checks 103/24/39 |
 | D-37 | docs-only | Public visibility security audit — confirmed three gaps: (1) `GET /api/evidence-vault` returns evidence on non-public claims (no `review_state` filter on joined claims table); (2) `GET /api/claims/:id` exposes non-public claims by direct ID (no `review_state` guard); (3) `POST /api/runpack` builds and stores packets for non-public claims and is fully unauthenticated (no `requireUser`, no state check); all three fixable without schema migration; Phase 1 fix design documented (Fix A: vault filter, Fix B: RunPack auth+guard, Fix C: getClaim guard + createClaim decoupling); Phase 2 evidence-level moderation schema deferred; 3 new static checks specified for D-38; full audit in `docs/D37_PUBLIC_VISIBILITY_SECURITY_AUDIT.md`; static checks 100/24/39 |
 | D-36 | docs-only | Stale "70 checks" fix — updated `docs/READ_ENDPOINT_SMOKE_TEST_USAGE.md` and `docs/WRITE_ENDPOINT_SMOKE_TEST_USAGE.md` hardening smoke step from `(70 checks)` to `(baseline: 100 passed, 0 failed)`; both are current-facing recommended-sequence docs, not historical records; deferred items from D-35 now resolved; `docs/D35_DOCS_DRIFT_AUDIT.md` follow-up section updated to reflect completion; static checks 100/24/39 |
 | D-35 | docs-only | Docs drift audit — searched all docs/scripts/.github for stale current-status references; fixed `docs/README.md` PROJECT_STATE description (was "updated after D-30", now D-34); identified two deferred "(70 checks)" references in usage docs (fixed in D-36); all historical batch rows confirmed intentionally accurate; full findings in `docs/D35_DOCS_DRIFT_AUDIT.md`; static checks 100/24/39 |
@@ -163,10 +164,9 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-All implementation batches through D-37 are complete. D-37 confirmed three public visibility gaps — Evidence Vault, getClaim by ID, and RunPack — all fixable without schema migration. D-38 is the next implementation batch.
+All implementation batches through D-38 are complete. D-38 closed the three visibility gaps identified in D-37: Evidence Vault now filters non-public claims, getClaim returns 404 for non-public, and RunPack refuses non-public claims. Hardening smoke is at 103/24/39.
 
-1. **D-38 — Public visibility guard (branch + PR)** — implement the three fixes from `docs/D37_PUBLIC_VISIBILITY_SECURITY_AUDIT.md` section 7: Fix A (Evidence Vault claim filter), Fix B (RunPack requireUser + public guard), Fix C (getClaim guard + createClaim decoupling). Worker route changes → branch + PR mandatory. Add 3 new hardening smoke checks (100→103). No D1 migration. No frontend changes.
-2. **Run D-26 manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md` covers RunPack provenance (section 8), duplicate-resolution (section 6), Study continuity (section 7), and more. Execute when the user is ready to open a browser session against `humanx.rinkimirikata.com`. Use `HX_TEST_D26_` prefix for all test claims. Requires explicit per-session approval for any **[WRITE]** steps.
+1. **Run D-26 manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md` covers RunPack provenance (section 8), duplicate-resolution (section 6), Study continuity (section 7), and more. Execute when the user is ready to open a browser session against `humanx.rinkimirikata.com`. Use `HX_TEST_D26_` prefix for all test claims. Requires explicit per-session approval for any **[WRITE]** steps.
 3. **AI-return packet linkage (optional, Approach A)** — if linkage ever becomes operationally needed, implement in the safe sequence from D-31 section 7. Do not implement speculatively.
 4. **No live write smoke** without explicit per-session approval.
 5. **No production migration 0006 apply** unless `PRAGMA table_info(claims)` first confirms `near_duplicate_of` is absent.

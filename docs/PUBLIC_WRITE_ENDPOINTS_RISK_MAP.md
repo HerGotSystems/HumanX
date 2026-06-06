@@ -60,8 +60,8 @@ The following files were read to produce this document:
 | POST | `/api/analysis` | Public — requires `x-humanx-user` | `analysis_results`, `users` | Delegates to `analysis-results.js` — rate limiting status uncertain from `worker.js` alone. No server-side AI call — caller supplies payload | Arbitrary analysis payload injection; no server validation visible in this file | Yes — empty payload, malformed payload, confirm rate limit active in module |
 | POST | `/api/belief-snapshots` | Public — requires `x-humanx-user` | `belief_snapshots`, `users` | Delegates to `belief-snapshots.js` — rate limiting and payload size validation uncertain from `worker.js` alone | Large snapshot payloads; snapshot spam | Yes — large payload, missing user, confirm rate limit active in module |
 | POST | `/api/belief-promote` | Public — requires `x-humanx-user` | `belief_snapshots`, downstream (`claims` or `truths`) | Delegates to `belief-bridge.js` — rate limiting uncertain; duplicate handling confirmed in `OPERATIONAL_STATUS.md` | Cross-system write; promoting a snapshot into claims/truths has downstream effects on scores and lineage | Yes — double-promote, promote nonexistent snapshot, confirm rate limit active in module |
-| POST | `/api/runpack` | Public — **no auth, no rate limit** | `aip_packets`, reads `claims`, `evidence`, `pressure_points`, `home_tests`, `analysis_results` | None | Any caller can trigger full claim-detail read and DB write; no rate limit means no burst protection | Yes — nonexistent claim ID, repeated calls, confirm aip_packets does not grow unboundedly |
-| POST | `/api/aip` | Public — **no auth, no rate limit** | Same as `/api/runpack` (alias) | None | Same as `/api/runpack` — legacy route name, identical handler | Yes — same as `/api/runpack` |
+| POST | `/api/runpack` | Public — **no auth, no rate limit** | `aip_packets`, reads `claims`, `evidence`, `pressure_points`, `home_tests`, `analysis_results` | D-38: `review_state='public'` guard — non-public claims return `CLAIM_NOT_FOUND` before packet is built. No rate limit, no auth. | Before D-38 any caller could export a full RunPack for a non-public claim. D-38 closes that gap. No auth gate added (by design for this batch). | Yes — confirm non-public claim returns 404; confirm public claim returns packet; confirm aip_packets does not grow unboundedly |
+| POST | `/api/aip` | Public — **no auth, no rate limit** | Same as `/api/runpack` (alias) | Same D-38 guard as `/api/runpack` | Legacy route name, identical handler, same risk profile | Same as `/api/runpack` |
 | GET | `/api/seed` | Semi-public — **no admin token required** | `claims`, `users` | Returns early if claims table is non-empty (soft guard only) | Writes to DB if called on empty database; no auth gate | Uncertain — behaviour depends on whether DB is empty |
 | GET | `/api/debug` | Semi-public — **no admin token required** | None (read-only) | None | Exposes full table row counts and 5 most recent claims without any auth. Not a write risk but a data exposure risk | Yes — confirm this is not served publicly or add admin gate |
 
@@ -123,7 +123,9 @@ is in `src/belief-bridge.js`.
 No authentication. No rate limit. Any caller can trigger a full multi-table read and a write
 to `aip_packets`. This is intentional (RunPack-first mode — callers need the packet to run
 with their own AI), but it means `aip_packets` can grow without bound and there is no burst
-protection. Consider monitoring this table's row count.
+protection. D-38: a `review_state='public'` guard was added — calls for non-public claims now
+return `CLAIM_NOT_FOUND` before any DB read or packet write. Consider monitoring this table's
+row count.
 
 ### `GET /api/seed` / `GET /api/debug`
 Neither requires an admin token. `seed` is write-capable (on an empty database). `debug` is
