@@ -128,13 +128,13 @@ Same issue as above in the write smoke usage guide. **Deferred.** Correct value:
 | Node 20 deprecation | Resolved in D-34 — workflow now on Node 24 |
 | Live write smoke | Deferred — requires explicit per-session approval |
 | D-26 manual UI test | Deferred — requires explicit per-session browser session approval |
-| Hardening smoke check count | 100 (updated through D-29; usage docs still say 70 — deferred fix) |
+| Hardening smoke check count | 100 (usage docs updated in D-36 — no longer stale) |
 
 ---
 
-## Follow-up items (not fixed in D-35)
+## Follow-up items — resolved in D-36
 
-1. **`docs/READ_ENDPOINT_SMOKE_TEST_USAGE.md:197`** — update "(70 checks)" to "(100 checks)"
-2. **`docs/WRITE_ENDPOINT_SMOKE_TEST_USAGE.md:275`** — update "(70 checks)" to "(100 checks)"
+1. **`docs/READ_ENDPOINT_SMOKE_TEST_USAGE.md:197`** — `(70 checks)` → `(baseline: 100 passed, 0 failed)` ✅ Fixed in D-36
+2. **`docs/WRITE_ENDPOINT_SMOKE_TEST_USAGE.md:275`** — `(70 checks)` → `(baseline: 100 passed, 0 failed)` ✅ Fixed in D-36
 
-Both are single-character count updates in usage guides. Low risk; direct main acceptable when addressed.
+Both usage docs are now accurate. No remaining known stale references in current-facing docs.

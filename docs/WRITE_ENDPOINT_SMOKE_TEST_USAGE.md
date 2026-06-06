@@ -272,7 +272,7 @@ Those require `docs/MANUAL_FRONTEND_SMOKE_CHECKLIST.md` run by a human in a brow
 
 **Recommended sequence before any Worker structural change:**
 
-1. `node scripts/hardening-smoke-test.mjs` — pure function tests, no network (70 checks)
+1. `node scripts/hardening-smoke-test.mjs` — pure function tests, no network (baseline: 100 passed, 0 failed)
 2. `node scripts/read-endpoint-smoke-test.mjs https://YOUR-URL` — read endpoint baseline
 3. `HUMANX_ALLOW_WRITE_SMOKE_TEST=1 node scripts/write-endpoint-smoke-test.mjs https://YOUR-URL --i-understand-this-mutates-data` — write smoke (only when approved)
 4. `docs/MANUAL_FRONTEND_SMOKE_CHECKLIST.md` — human QA in a browser

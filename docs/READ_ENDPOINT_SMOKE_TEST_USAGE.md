@@ -194,7 +194,7 @@ top-level key presence. They do not confirm:
 
 The recommended sequence before any Worker structural change:
 
-1. `node scripts/hardening-smoke-test.mjs` — pure function tests, no network (70 checks)
+1. `node scripts/hardening-smoke-test.mjs` — pure function tests, no network (baseline: 100 passed, 0 failed)
 2. `node scripts/read-endpoint-smoke-test.mjs https://YOUR-URL` — read endpoint checks
 3. `docs/MANUAL_FRONTEND_SMOKE_CHECKLIST.md` — human QA in a browser
 4. Only then proceed with the structural change
