@@ -1,10 +1,10 @@
 export async function recalcClaimScore(env, claimId) {
-  const directEvidence = await env.DB.prepare(`SELECT quality, stance FROM evidence WHERE claim_id=?`).bind(claimId).all();
+  const directEvidence = await env.DB.prepare(`SELECT quality, stance FROM evidence WHERE claim_id=? AND COALESCE(review_state,'public')='public'`).bind(claimId).all();
   const reusedEvidence = await env.DB.prepare(`
     SELECT e.quality, l.stance
     FROM evidence_claim_links l
     JOIN evidence e ON e.id=l.evidence_id
-    WHERE l.claim_id=?
+    WHERE l.claim_id=? AND COALESCE(e.review_state,'public')='public'
   `).bind(claimId).all();
   const pressure = await env.DB.prepare(`SELECT severity FROM pressure_points WHERE claim_id=?`).bind(claimId).all();
   const claim = await env.DB.prepare(`SELECT type,testability FROM claims WHERE id=?`).bind(claimId).first();
