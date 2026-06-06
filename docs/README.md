@@ -110,6 +110,14 @@ Records the successful post-inventory-fix static route check from 2026-06-01: 35
 **Read when:** before deciding whether route docs are currently aligned with the Worker source, or comparing a new run against this baseline.
 **Safety note:** Proves static route/docs alignment only — does not prove endpoint behaviour, response shapes, rate-limit enforcement, or live deployment state.
 
+### `D40_EVIDENCE_MODERATION_PHASE2_PLAN.md`
+Full design plan for evidence-level moderation. Covers proposed schema (`evidence.review_state`, `evidence.report_count`), backfill strategy (Option A — existing evidence stays public), backend route changes (6 functions), frontend review UI changes, abuse/risk model, and D-41 → D-44 implementation sequence. No code changes — planning only.
+**Read when:** starting D-42 backend implementation, reviewing the evidence moderation design, or checking what is in and out of scope for Phase 2.
+
+### `D41_EVIDENCE_REVIEW_MIGRATION_PROPOSAL.md`
+Documents `migrations/0007_add_evidence_review_state.sql`. Explains why `DEFAULT 'public'` was chosen, what the migration does and does not do, SQLite-specific hazards (no `ADD COLUMN IF NOT EXISTS`, no transactional DDL rollback), and the production safety checklist. Migration is **not applied to production**.
+**Read when:** before applying migration 0007 to any database, or before starting D-42. Run `PRAGMA table_info(evidence)` first — always.
+
 ---
 
 ## 3. Belief Engine
@@ -281,6 +289,10 @@ Backfill script for claim and truth rows with missing `normalized_claim` / `norm
 ### `migrations/0005_add_home_tests_updated_at.sql`
 Adds the `updated_at` column to `home_tests` via `ALTER TABLE`. Applied manually through the Cloudflare D1 console on the production database. The column is now present on production; do not rerun this migration against any database where `home_tests.updated_at` already exists.
 **Use when:** reviewing the Add Test schema fix, or understanding why the migration was applied manually rather than via Wrangler. See `docs/ADD_TEST_FIX_RESULT.md` for full context.
+
+### `migrations/0007_add_evidence_review_state.sql`
+Proposal — **not yet applied to production**. Adds `review_state TEXT DEFAULT 'public'` and `report_count INTEGER DEFAULT 0` to the `evidence` table, plus two indexes. `DEFAULT 'public'` preserves visibility of all existing evidence; the D-42 Worker INSERT will pass `'review'` explicitly for new submissions. SQLite has no `ADD COLUMN IF NOT EXISTS` — duplicate-column failure is non-recoverable without a rebuild. Run `PRAGMA table_info(evidence)` first. Production apply requires explicit per-session user approval.
+**Use when:** applying evidence-level moderation schema to a fresh D1 rebuild or to production after explicit approval. See `docs/D41_EVIDENCE_REVIEW_MIGRATION_PROPOSAL.md` for full safety checklist.
 
 ### `migrations/diagnostics_duplicate_normalized_content.sql`
 Read-only SQL diagnostics for finding duplicate `normalized_statement` and `normalized_claim` values before migration 0004. Does not mutate data.

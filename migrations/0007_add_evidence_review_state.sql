@@ -1,0 +1,85 @@
+-- Migration 0007: add review_state and report_count columns to evidence table.
+--
+-- PURPOSE
+-- -------
+-- Enables evidence-level moderation as planned in docs/D40_EVIDENCE_MODERATION_PHASE2_PLAN.md.
+-- Without these columns every evidence item submitted to a public claim is immediately
+-- publicly visible.  After D-42 (backend branch + PR) new evidence will be inserted with
+-- review_state='review' and will not be shown publicly until an admin approves it.
+--
+-- PRODUCTION SAFETY
+-- -----------------
+-- !! DO NOT RUN THIS MIGRATION AGAINST THE PRODUCTION DATABASE !!
+-- Production apply requires:
+--   1. Explicit per-session user approval in the current task.
+--   2. PRAGMA check confirming the columns are absent (see below).
+--   3. D-42 backend Worker changes to be staged and ready to deploy immediately after.
+--
+-- SQLite does NOT support ALTER TABLE ... ADD COLUMN IF NOT EXISTS.
+-- If review_state or report_count already exist on the evidence table, each ALTER TABLE
+-- statement will fail with "duplicate column name".  That failure is non-recoverable
+-- in a running D1 transaction — stop and diagnose before retrying.
+--
+-- Before applying to ANY database, run:
+--   PRAGMA table_info(evidence);
+-- If 'review_state' or 'report_count' appear in the output, skip this migration entirely.
+-- The column is already present and no action is needed.
+--
+-- APPLIES TO
+-- ----------
+-- Fresh D1 databases and any staging/recovery environment where evidence.review_state
+-- is confirmed absent via PRAGMA table_info(evidence).
+-- NOT for the production database until explicitly approved.
+--
+-- ROLLBACK NOTE
+-- -------------
+-- SQLite does not support DROP COLUMN on all versions.  D1 (SQLite 3.44+) supports it,
+-- but using it in production is high-risk — it triggers an internal table rebuild.
+-- If this migration is applied in error, contact the DB owner for a restore from backup.
+-- Do not attempt to roll back by running DROP COLUMN without an explicit recovery plan.
+--
+-- WHAT IT DOES
+-- ------------
+-- 1. Adds evidence.review_state TEXT DEFAULT 'public'
+--    DEFAULT 'public' is chosen deliberately:
+--      - SQLite ALTER TABLE fills all existing rows with the column default.
+--      - 'public' means existing evidence on production remains publicly visible after
+--        the migration.  No existing content is suppressed.
+--      - New evidence inserted by D-42 must pass review_state='review' EXPLICITLY in the
+--        INSERT statement — the column default is not used at insert time in that path.
+--      - COALESCE(e.review_state,'public')='public' in query filters is a safety net for
+--        any row that somehow has NULL (e.g. created before this migration applied).
+--
+-- 2. Adds evidence.report_count INTEGER DEFAULT 0
+--    Enables /api/report to count evidence reports and auto-escalate to review at
+--    threshold (matching the existing claims pattern).
+--
+-- 3. Creates idx_evidence_review_state index
+--    Needed for the reviewQueue query that filters by evidence.review_state.
+--    Without it that query is a full evidence table scan.
+--
+-- 4. Creates idx_evidence_report_count index
+--    Supports efficient queue queries for evidence with non-zero report counts.
+--
+-- DOES NOT DO
+-- -----------
+-- - Does not add a CHECK constraint on review_state.  A CHECK constraint in SQLite
+--   requires a table rebuild (no ALTER TABLE ADD CONSTRAINT).  Phase 2 keeps the schema
+--   permissive; the Worker layer enforces the allowed set of state values.
+-- - Does not add updated_at to evidence.  Deferred to a later migration if the review
+--   queue needs ordering by last-modified time.
+-- - Does not backfill or migrate existing evidence states.  All existing rows receive
+--   'public' via the column default — no data changes are needed.
+-- - Does not delete or modify any existing evidence rows.
+-- - Does not touch any other table.
+--
+-- APPLIED IN PRODUCTION
+-- ---------------------
+-- Not yet applied.  Status: proposal only (D-41, 2026-06-06).
+-- Update this header when production apply is confirmed.
+
+ALTER TABLE evidence ADD COLUMN review_state TEXT DEFAULT 'public';
+ALTER TABLE evidence ADD COLUMN report_count INTEGER DEFAULT 0;
+
+CREATE INDEX IF NOT EXISTS idx_evidence_review_state ON evidence (review_state);
+CREATE INDEX IF NOT EXISTS idx_evidence_report_count ON evidence (report_count);
