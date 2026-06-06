@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-24D backend duplicate-resolution routes (PR #86 merged).
+Last updated: 2026-06-06 after D-24E moderator duplicate resolution frontend controls.
 
 ---
 
@@ -30,7 +30,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `91 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `95 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `39 passed, 0 failed (39 hard checks)` |
 
@@ -130,6 +130,7 @@ All flows confirmed working (code audit + static checks):
 | D-23 | docs-only | Planning — D-23A: RunPack provenance (packet_id, generated_at, evidence count snapshot, stale detection, AI return linkage, v1.2 schema); D-23B: investigation graph nav audit (5 context-loss points, priority-ranked fixes, `lastModeBeforeStudy` approach); D-23C: backend moderation tooling plan (mark-duplicate, resolve-similar, hard constraints, D1 audit prerequisite) |
 | D-24A | `4aef4e5` | Study navigation context preservation — added `lastModeBeforeStudy` and `lastInspectedReviewItemId` state; `setMode` resets origin on explicit nav; `studyFromVault` sets vault origin; `openReviewClaimStudy` sets review origin + saves inspected item ID; `backToArena` routes back to correct mode and restores `inspectedReviewItem` from queue; `renderStudy` shows context-aware back button ("← Back to Review" / "← Back to Vault" / "← Back"); no backend changes, no moderation behaviour changed |
 | D-24B | `16fa131` | RunPack provenance Phase 1 — added `lastPacketMeta` state; `generatePacketId`, `simpleClaimHash`, `buildProvenanceMeta`, `detectPacketStaleness` helpers; all generated packets now include `packet_id`, `runpack_version:'1.2'`, `generated_at`, `source_claim_id`, `source_snapshot_hash`, `evidence_count`, `pressure_count`, `test_count`, `humanx_app_version`, `is_fallback`; `runPackSummary` shows advisory "Possibly stale" chip when counts or age drift; `saveAnalysisResult` shows non-blocking advisory toast on `packet_id` mismatch; no backend changes, no blocking logic, no schema migration |
+| D-24E | `5dc33e4` | Moderator duplicate resolution frontend controls — `renderReviewInspectPanel` gains `dupSection` with "Mark Duplicate..." and "Dismiss ~Similar" buttons for claim items; both are context-aware (markdup hidden for archived/duplicate state; resolvesim hidden when no advisory); `markDuplicateUI(claimId)` opens hxModal with target claim ID + optional reason input, calls `POST /api/review/mark-duplicate` via `adminHeaders()`, clears inspect panel and reloads queue on success; `resolveSimilarUI(claimId)` opens hxModal for confirm, calls `POST /api/review/resolve-similar`, reloads queue; both functions exposed on `window`; CSS adds muted purple (markdup) and muted steel-blue (resolvesim) button styles distinct from primary Approve/Reject; 4 new hardening smoke checks (91→95); no backend/D1/Worker/migration changes |
 | D-24D | `f2def3b` (PR #86) | Moderator duplicate-resolution backend routes — `POST /api/review/mark-duplicate` (writes `duplicate_of` + `review_state='duplicate'`; validates both claims exist; rejects self-duplicates and ineligible sources; source preserved) and `POST /api/review/resolve-similar` (clears `near_duplicate_of`; no-op guard; returns previous value for audit); `mapClaim` now exposes `duplicateOf` field; `reviewQueue` SQL excludes `review_state='duplicate'` alongside `archived`; `duplicate_total` added to queue metadata; both routes added to `HIGH_RISK_ROUTES`; worker-route-static-check 35→39 hard checks; no migrations, no frontend changes |
 | D-24C | docs-only | Backend moderation D1 audit — confirmed `duplicate_of` in schema (unwritten); `near_duplicate_of` live but absent from migrations (schema gap documented); `review_state` constraint-free (TEXT, no CHECK); `'duplicate'` value exists in frontend but no backend write path; `reviewDecision` allowed set is `public/review/rejected` only; `reviewQueue` needs `'duplicate'` exclusion before implementation; safe 5-step implementation sequence documented; all constraints from D-23C confirmed intact; full findings in `docs/D24C_BACKEND_MODERATION_D1_AUDIT.md` |
 
@@ -153,10 +154,9 @@ No code changes in D-23. Static checks held at 91/24/35.
 
 Next work:
 
-1. **D-24E — Frontend moderator UI for duplicate resolution** — Add UI to the review inspect panel for `POST /api/review/mark-duplicate` (claim ID input + two-step confirm) and `POST /api/review/resolve-similar` (dismiss advisory button). Display `duplicateOf` field from `mapClaim` in the inspect panel. Frontend-only → direct main. No new backend changes needed; D-24D routes are already live.
-2. **Migration 0006 documentation** — Document the `near_duplicate_of` schema gap identified in D-24C: write `docs/migration-0006-proposal.md` with the ALTER TABLE and index SQL. Do not apply — document only. Required before any fresh D1 rebuild from migrations.
-3. **Deferred from D-24A/B** — Claims list scroll restoration (`#main.scrollTop` save/restore on arena→study→back); RunPack Phase 2 backend provenance (worker-side `packet_id` generation). Both frontend-only; low risk.
-4. **Manual live testing** — Any live write test against the new endpoints requires explicit per-session user approval. Do not run `wrangler`, `wrangler d1 execute`, or live smoke tests without explicit instruction.
+1. **Migration 0006 documentation** — Document the `near_duplicate_of` schema gap identified in D-24C: write `docs/migration-0006-proposal.md` with the ALTER TABLE and index SQL. Do not apply — document only. Required before any fresh D1 rebuild from migrations.
+2. **Deferred from D-24A/B** — Claims list scroll restoration (`#main.scrollTop` save/restore on arena→study→back); RunPack Phase 2 backend provenance (worker-side `packet_id` generation). Both frontend-only; low risk.
+3. **Manual live testing of D-24D/E** — Any live write test against the new endpoints requires explicit per-session user approval. Do not run `wrangler`, `wrangler d1 execute`, or live smoke tests without explicit instruction.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
