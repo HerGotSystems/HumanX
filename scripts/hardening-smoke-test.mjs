@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 110 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('110 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 110');
+test('docs/README.md documents hardening smoke count: 113 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('113 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 113');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1024,6 +1024,33 @@ test("renderReviewInspectPanel hides duplicate controls for evidence (D-43)", ()
   assert.ok(
     appSrc.includes("isEvidence?(item.claim_id?"),
     "renderReviewInspectPanel studyBtn must link to parent claim for evidence"
+  );
+});
+
+// ── 25. D-50: Score filters only public evidence ───────────────────────────────
+
+console.log('\n25. D-50: Score filters only public evidence');
+
+const scoringSrc = readFileSync(path.join(__dirname, '../src/claim-scoring.js'), 'utf8');
+
+test("recalcClaimScore direct evidence query filters by COALESCE(review_state,'public')='public' (D-50)", () => {
+  assert.ok(
+    scoringSrc.includes("COALESCE(review_state,'public')='public'"),
+    "direct evidence query must filter to public review_state only"
+  );
+});
+
+test("recalcClaimScore reused evidence query filters by COALESCE(e.review_state,'public')='public' (D-50)", () => {
+  assert.ok(
+    scoringSrc.includes("COALESCE(e.review_state,'public')='public'"),
+    "reused evidence join query must filter to public review_state on evidence table"
+  );
+});
+
+test("reviewDecision evidence branch calls recalcClaimScore after decision (D-50)", () => {
+  assert.ok(
+    workerSrc.includes("if (row.claim_id) await recalcClaimScore(env, row.claim_id).catch(()=>null);"),
+    "reviewDecision evidence branch must call recalcClaimScore after updating review_state"
   );
 });
 
