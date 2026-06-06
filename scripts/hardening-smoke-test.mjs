@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 108 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('108 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 108');
+test('docs/README.md documents hardening smoke count: 110 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('110 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 110');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -998,6 +998,32 @@ test("reviewDecision handles targetType 'evidence' and returns ok response (D-42
   assert.ok(
     workerSrc.includes("allowed:['claim','truth','evidence']"),
     "reviewDecision BAD_REVIEW_TARGET allowed list must include 'evidence'"
+  );
+});
+
+// ── 24. D-43: Evidence review UI frontend guards ──────────────────────────────
+
+console.log('\n24. D-43: Evidence review UI frontend guards');
+
+test("reviewCard handles target_type 'evidence' — isEvidence branch present (D-43)", () => {
+  assert.ok(
+    appSrc.includes("const isEvidence=type==='evidence';"),
+    "reviewCard must declare isEvidence from type"
+  );
+  assert.ok(
+    appSrc.includes("isEvidence?(item.title||'Evidence')"),
+    "reviewCard must use item.title as title for evidence items"
+  );
+});
+
+test("renderReviewInspectPanel hides duplicate controls for evidence (D-43)", () => {
+  assert.ok(
+    appSrc.includes("(!isTruth&&!isEvidence)?((canMarkDup?"),
+    "renderReviewInspectPanel dupSection must be hidden for evidence"
+  );
+  assert.ok(
+    appSrc.includes("isEvidence?(item.claim_id?"),
+    "renderReviewInspectPanel studyBtn must link to parent claim for evidence"
   );
 });
 

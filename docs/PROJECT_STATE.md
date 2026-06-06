@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-42B evidence moderation backend branch.
+Last updated: 2026-06-06 after D-43 evidence review frontend polish.
 
 ---
 
@@ -173,10 +173,11 @@ All flows confirmed working (code audit + static checks):
 
 Migration 0007 applied (D-42A). Static baseline 103/24/39. Backend evidence moderation code may now reference `evidence.review_state` and `evidence.report_count`.
 
-1. **D-42B — ✅ COMPLETE (branch open, not merged)** — `feature/d42b-evidence-moderation-backend`. Static checks 108/24/39. Awaiting PR review and merge.
-2. **D-43 — Frontend review UI for evidence** — `reviewCard` and `renderReviewInspectPanel` handle `target_type='evidence'`. Prerequisite: D-42B merged and Cloudflare deployed.
-3. **Run read-smoke CI** after D-42B merge + deploy — trigger GitHub Actions `HumanX Read Smoke` manually to confirm live endpoints unaffected.
-4. **D-44 — Validation record (docs-only, direct main)** — record static/live/manual results after D-42B+D-43+deploy. Expected baseline 108/24/39.
+1. **D-42B — ✅ COMPLETE** — merged PR #98 (`faa91af`). Backend evidence moderation. Static checks 108/24/39.
+2. **D-43 — ✅ COMPLETE (not yet pushed)** — direct main. `reviewCard`, `renderReviewInspectPanel`, `applyReviewFilter`, `renderReviewFilterBar` all handle `target_type='evidence'`. `.b-purple` CSS badge class added. Static checks 110/24/39.
+3. **Push D-43** — user to confirm push after reviewing commit.
+4. **Run read-smoke CI** after D-43 push + Cloudflare deploy — trigger GitHub Actions `HumanX Read Smoke` manually to confirm live endpoints unaffected.
+5. **D-44 — Validation record (docs-only, direct main)** — record static/live/manual results after D-42B+D-43+deploy. Expected baseline 110/24/39.
 5. **Run D-26 manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. When ready to open a browser session. Requires explicit per-session approval for any **[WRITE]** steps.
 6. **No live write smoke** without explicit per-session approval.
 7. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
