@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 95 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('95 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 95');
+test('docs/README.md documents hardening smoke count: 99 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('99 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 99');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -871,6 +871,40 @@ test('meaningMatch is exported from meaning-key.js', () => {
   assert.ok(
     typeof meaningMatch === 'function',
     'meaningMatch must be exported and importable from src/meaning-key.js'
+  );
+});
+
+// ── 20. D-28: Worker-side RunPack provenance (Phase 2) ────────────────────────
+
+console.log('\n20. D-28: Worker-side RunPack provenance (Phase 2)');
+
+test('workerSnapshotHash function defined in worker.js', () => {
+  assert.ok(
+    workerSrc.includes('function workerSnapshotHash(detail)'),
+    'workerSnapshotHash must be defined in src/worker.js'
+  );
+});
+
+test('buildRunPack accepts provenance param and spreads it', () => {
+  assert.ok(
+    workerSrc.includes('function buildRunPack(detail, provenance)') &&
+    workerSrc.includes('...(provenance||{})'),
+    'buildRunPack must accept provenance param and spread it into the packet'
+  );
+});
+
+test('createAipPacket stamps packet_id and runpack_version 1.2', () => {
+  assert.ok(
+    workerSrc.includes("runpack_version:'1.2'") &&
+    workerSrc.includes('packet_id:packetId'),
+    'createAipPacket must stamp packet_id and runpack_version:1.2 in provenance'
+  );
+});
+
+test('createAipPacket stamps humanx_worker_version v1', () => {
+  assert.ok(
+    workerSrc.includes("humanx_worker_version:'v1'"),
+    'createAipPacket provenance must include humanx_worker_version:v1'
   );
 });
 
