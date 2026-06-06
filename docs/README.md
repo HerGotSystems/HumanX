@@ -52,7 +52,7 @@ Expected results:
 Read these first when starting a new session or returning after time away.
 
 ### `PROJECT_STATE.md`
-Single-page checkpoint updated after D-30. Covers current functional state, known-good check counts (100/24/39), full batch history A-2 → D-30, backend/D1 safety rules, and known limitations (Windows schannel live smoke).
+Single-page checkpoint updated after D-34. Covers current functional state, known-good check counts (100/24/39), full batch history A-2 → D-34, backend/D1 safety rules, and known limitations (Windows schannel local TLS — mitigated by D-32 CI workflow, first run confirmed green in D-33, updated to Node 24 in D-34).
 **Read when:** starting any new session, picking up after a gap, or orienting before any frontend or backend task.
 
 ### `OPERATIONAL_STATUS.md`
