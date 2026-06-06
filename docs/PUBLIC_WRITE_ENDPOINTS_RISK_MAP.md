@@ -20,9 +20,10 @@ modify state, or have meaningful abuse or race risk. It does not cover every API
 Read-only endpoints (`GET /api/claims`, `GET /api/truths`, `GET /api/health`, etc.) are out
 of scope here. See `docs/API_ENDPOINT_INVENTORY.md` for the full route list.
 
-Admin-only write endpoints (`POST /api/review/decision`, `GET /api/import-seed`,
-`GET /api/import-truths`) are noted briefly for completeness but are lower public-abuse risk
-because they require `HUMANX_ADMIN_TOKEN`.
+Admin-only write endpoints (`POST /api/review/decision`, `POST /api/review/cleanup`,
+`POST /api/review/mark-duplicate`, `POST /api/review/resolve-similar`,
+`GET /api/import-seed`, `GET /api/import-truths`) are noted briefly for completeness
+but are lower public-abuse risk because they require `HUMANX_ADMIN_TOKEN`.
 
 ---
 
@@ -156,6 +157,16 @@ Before making any change to a public write endpoint, confirm these smoke/test it
 - [ ] **Review approve/reject** — via `/api/review/decision` with admin token; confirm
       `review_state` changes; confirm open reports are closed; confirm claim appears or
       disappears from public list accordingly
+- [ ] **Mark duplicate** — via `/api/review/mark-duplicate` with admin token; confirm
+      `duplicate_of` is written and `review_state='duplicate'` is set; confirm source claim
+      is not deleted; confirm self-duplicate is rejected with `SELF_DUPLICATE_NOT_ALLOWED`;
+      confirm nonexistent target returns `DUPLICATE_TARGET_NOT_FOUND`;
+      confirm already-archived/duplicate source returns `CLAIM_NOT_ELIGIBLE`;
+      confirm `duplicate_total` in `reviewQueue` response increments;
+      confirm claim no longer appears in public `GET /api/claims` or review queue
+- [ ] **Resolve similar** — via `/api/review/resolve-similar` with admin token; confirm
+      `near_duplicate_of` is cleared (set to NULL); confirm `previous_near_duplicate_of`
+      is returned; confirm `NO_SIMILAR_ADVISORY` error when advisory is already null
 - [ ] **Duplicate claim unique-index race** — simulate concurrent identical claim submissions;
       confirm only one row is created and both responses return the same claim id
 - [ ] **Rate limit fail-closed** — if `rate_limits` table is unavailable, confirm write

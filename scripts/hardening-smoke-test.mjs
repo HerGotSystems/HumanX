@@ -677,8 +677,8 @@ test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => 
   assert.ok(readmeSrc.includes('24 passed, 0 failed'), 'docs/README.md must document belief engine static check expected count of 24');
 });
 
-test('docs/README.md documents worker route count: 35 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('35 passed, 0 failed'), 'docs/README.md must document worker route static check expected count of 35');
+test('docs/README.md documents worker route count: 39 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('39 passed, 0 failed'), 'docs/README.md must document worker route static check expected count of 39');
 });
 
 test('docs/README.md mentions MODULE_TYPELESS_PACKAGE_JSON as non-blocking', () => {
