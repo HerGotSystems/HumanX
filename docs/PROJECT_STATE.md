@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-07 after D-66 B-4 smoking/lung cancer source research.
+Last updated: 2026-06-07 after D-67 B-5 Holocaust source research.
 
 ---
 
@@ -214,16 +214,17 @@ Evidence moderation stack complete and green (D-50–D-52). Seed launch prep in 
 23. **D-64 — ✅ COMPLETE** — docs-only, direct main. Batch B source research attempted (B-4 smoking-cancer, B-5 Holocaust); search returned Wikipedia, news summaries, mirrors, and general overview pages — all rejected per D-56/D-63 rules; no candidate URLs verified; all D-61 fields remain TODO_FIND_SOURCE; direct official-site navigation targets specified for each blocked slot; D-62 gate delta confirmed unchanged (0/18 slots cleared); next step: D-65 direct official-source pass. Full record in `docs/D64_SOURCE_RESEARCH_BLOCKED_STATUS.md`.
 24. **D-65 — ✅ COMPLETE** — docs-only, direct main. Direct official source target map: 8 direct-navigation rules; 6 Batch B source targets specified (B-4 slot 1 BMJ/PubMed Doll&Hill, B-4 slot 2 surgeongeneral.gov 1964 report, B-4 slot 3 NCI SEER/Cancer Research UK, B-5 slot 1 Yale Avalon Nuremberg, B-5 slot 2 yadvashem.org research, B-5 pressure USHMM Holocaust Encyclopedia); acceptance/rejection tests per slot; 8-step manual research workflow; D-66 output template (4 sections). No URLs inserted. Full map in `docs/D65_DIRECT_OFFICIAL_SOURCE_TARGET_MAP.md`.
 25. **D-66 — ✅ COMPLETE** — docs-only, direct main. B-4 smoking/lung cancer source research: CDC "Smoking and Cancer" (cdc.gov, `documented`, score 84, VERIFIED); NCI "Harms of Cigarette Smoking" (cancer.gov, `documented`, score 86, VERIFIED); HHS Surgeon General tobacco index (hhs.gov, CANDIDATE_FOUND — specific 1964 report document page still needed); D-61 worksheet update table recorded for slots 1 and 2; D-62 gate delta: B-4 slots 1–2 cleared, slot 3 and all other claims still TODO_FIND_SOURCE; pressure source for B-4 confirmed as definitional (no external URL required). Full record in `docs/D66_B4_SMOKING_LUNG_CANCER_SOURCE_RESEARCH.md`.
-26. **D-67 — B-5 Holocaust official-source research** — human URL research. Open yadvashem.org, ushmm.org, and avalon.law.yale.edu directly; locate specific research/document pages; complete D-63 citation records; no seed file edits; no import. Gated on human direct-navigation research.
-27. **D-68 — Source insertion draft** — docs-only. After sufficient verified sources across full launch pack: update D-61 worksheet and D-57 JSON draft with all VERIFIED URLs; evidence_body text finalized; readiness gates checked. No import yet.
-28. **D-69 — Gated dry-run import** — after D-68 complete. Call `GET /api/import-seed?mode=dry-run` and `GET /api/import-truths?mode=dry-run`; review structured report; confirm `source_needed_blocked: 0`. Requires explicit per-session approval.
-29. **D-70 — Gated production apply** — after D-69 dry-run reviewed. Call `?mode=apply`; moderate all new `review_state='review'` content in admin Review queue. Requires separate explicit per-session D1/write approval.
-30. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
-31. **Optional score backfill** — batch `recalcClaimScore` across all affected claims. Requires explicit per-session D1 approval + controlled script. Scores self-correct on next trigger.
-32. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
-33. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
-34. **No live write smoke** without explicit per-session approval.
-35. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
+26. **D-67 — ✅ COMPLETE** — docs-only, direct main. B-5 Holocaust source research: Wannsee Protocol (avalon.law.yale.edu, `documented`, score 85, VERIFIED — Nuremberg prosecution evidence); USHMM "How Many People did the Nazis Murder?" (encyclopedia.ushmm.org, `documented`, score 82, VERIFIED — six million figure with Nazi-document and demographic methodology); USHMM "Antisemitism: An Introduction" pressure slot (encyclopedia.ushmm.org, `documented`, score 78, VERIFIED — dedicated Holocaust denial/distortion section); Yad Vashem 403-blocked (alternative used per D-65 fallback); USHMM denial article 404 (antisemitism article alternative adequate). B-5 fully resolved: slots 1–2 + pressure VERIFIED. D-61 worksheet update table recorded. D-62 gate delta: Batch B now 4 of 5 slots VERIFIED; B-4 slot 3 (Doll&Hill / 1964 SG report) still TODO; Batches A/C/D/E all zero sources. Full record in `docs/D67_B5_HOLOCAUST_SOURCE_RESEARCH.md`.
+27. **D-68 — Batch A source research** — WebFetch + docs-only. A-1 vaccines/autism (Cochrane/PubMed meta-analysis, Wakefield retraction), A-4 CO₂ climate (IPCC AR6, NASA GISS). Direct institutional navigation. No seed file edits. No import.
+28. **D-70 — Source insertion draft** — docs-only. After sufficient verified sources across full launch pack: update D-61 worksheet and D-57 JSON draft with all VERIFIED URLs; evidence_body text finalized; readiness gates checked. No import yet.
+30. **D-71 — Gated dry-run import** — after D-70 complete. Call `GET /api/import-seed?mode=dry-run` and `GET /api/import-truths?mode=dry-run`; review structured report; confirm `source_needed_blocked: 0`. Requires explicit per-session approval.
+31. **D-72 — Gated production apply** — after D-71 dry-run reviewed. Call `?mode=apply`; moderate all new `review_state='review'` content in admin Review queue. Requires separate explicit per-session D1/write approval.
+32. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
+33. **Optional score backfill** — batch `recalcClaimScore` across all affected claims. Requires explicit per-session D1 approval + controlled script. Scores self-correct on next trigger.
+34. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
+35. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
+36. **No live write smoke** without explicit per-session approval.
+37. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
