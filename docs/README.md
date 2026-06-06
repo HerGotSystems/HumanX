@@ -39,7 +39,7 @@ Expected results:
 | `node --check public/app-v10.js` | no output, exit 0 |
 | `hardening-smoke-test.mjs` | `91 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
-| `worker-route-static-check.mjs` | `35 passed, 0 failed (35 hard checks)` |
+| `worker-route-static-check.mjs` | `39 passed, 0 failed (39 hard checks)` |
 
 **Note:** A `MODULE_TYPELESS_PACKAGE_JSON` warning may appear during `hardening-smoke-test.mjs`. This is non-blocking and does not affect the pass count.
 
@@ -76,7 +76,7 @@ Records the completed Add Test repair and live verification. Covers the original
 ### `LOCAL_STATIC_CHECKS_USAGE.md`
 Simple usage guide for running the two local static check scripts before or after risky changes. Covers both `scripts/belief-engine-static-check.mjs` (24 hard checks) and `scripts/worker-route-static-check.mjs` (35 hard checks): exact run commands, safety properties, when to run each, what they do not prove, relationship to smoke tests, and stop conditions.
 **Read when:** before running either static check script, or before/after any Belief Engine or Worker route change.
-**Safety note:** Local file reads only. No network, no production calls, no D1/Wrangler, no mutation. Last known-good results: Belief Engine static check — 24 passed, 0 failed, 0 warnings. Worker route static check — 35 passed, 0 failed, 0 warnings.
+**Safety note:** Local file reads only. No network, no production calls, no D1/Wrangler, no mutation. Last known-good results: Belief Engine static check — 24 passed, 0 failed, 0 warnings. Worker route static check — 39 passed, 0 failed, 0 warnings.
 
 ---
 
@@ -258,7 +258,7 @@ Node script that exercises public write endpoints. Defaults to dry-run mode; a m
 These files are not in `docs/` but are referenced by docs in this folder.
 
 ### `docs/LOCAL_STATIC_CHECKS_USAGE.md`
-Combined usage guide for both local static check scripts. Covers purpose, exact run commands, safety properties (local reads only — no network, no production, no D1/Wrangler, no mutation), when to run each script, what they do not prove, how they relate to smoke tests, and stop conditions. Known-good results: Belief Engine static check — 24 passed, 0 failed, 0 warnings; Worker route static check — 35 passed, 0 failed, 0 warnings.
+Combined usage guide for both local static check scripts. Covers purpose, exact run commands, safety properties (local reads only — no network, no production, no D1/Wrangler, no mutation), when to run each script, what they do not prove, how they relate to smoke tests, and stop conditions. Known-good results: Belief Engine static check — 24 passed, 0 failed, 0 warnings; Worker route static check — 39 passed, 0 failed, 0 warnings.
 **Read when:** before running `scripts/belief-engine-static-check.mjs` or `scripts/worker-route-static-check.mjs`, or when deciding which static check applies to a pending change.
 
 ### `scripts/worker-route-static-check.mjs`

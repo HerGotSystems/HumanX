@@ -151,6 +151,8 @@ const HIGH_RISK_ROUTES = [
   '/api/belief-promote',
   '/api/review',
   '/api/review/decision',
+  '/api/review/mark-duplicate',
+  '/api/review/resolve-similar',
   '/api/ai/analyse',
 ];
 

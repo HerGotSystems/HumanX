@@ -91,6 +91,8 @@ It does not propose changes. It does not define new endpoints.
 | GET | `/api/review` | Returns review queue: claims not in `public` or `archived` state (or with reports); plus truths not in `public` or `archived` state | Admin only (`x-humanx-admin`) | `claims`, `truths` | Returns up to 100 claims + 100 truths. Archived items are excluded — they remain in the DB for audit but are removed from the active queue. Leaks non-public content — admin token is the only gate |
 | POST | `/api/review/decision` | Approves, rejects, or re-queues a claim or truth by ID | Admin only (`x-humanx-admin`) | `claims` or `truths`, `reports` | Mutates `review_state` on claims or truths. Also closes or rejects related open reports. Irreversible without a new decision call |
 | POST | `/api/review/cleanup` | Archives a single already-rejected smoke or test artefact by exact target_type + target_id. Sets `review_state='archived'` — no hard delete. Enforces three gates: (1) admin token, (2) item must be in `rejected` state, (3) item text must match smoke/test heuristic. Returns JSON summary of action taken. | Admin only (`x-humanx-admin`) | `claims` or `truths` | Non-destructive — no rows are deleted. `archived` state removes item from queue display but preserves the DB row for audit. No cascading side effects. |
+| POST | `/api/review/mark-duplicate` | Marks a claim as a duplicate of another claim. Sets `duplicate_of` and `review_state='duplicate'` on the source claim. Source is not deleted. Both claims must exist; self-duplicate is rejected. Source must not already be `archived` or `duplicate`. | Admin only (`x-humanx-admin`) | `claims` | Non-destructive — source claim is preserved. `duplicate` state removes claim from review queue and public list. `mapClaim` now returns `duplicateOf` field. Optional `reason` field accepted but not persisted (for admin logging only). |
+| POST | `/api/review/resolve-similar` | Clears the `near_duplicate_of` advisory on a claim (dismisses the similarity flag without merging or deleting). Returns `previous_near_duplicate_of` for audit. No-op guard: returns error if `near_duplicate_of` is already null. | Admin only (`x-humanx-admin`) | `claims` | Non-destructive — no merges, no deletes, no `review_state` change. Only clears `near_duplicate_of`. |
 | POST | `/api/report` | Submits a report against a claim or other target | Public (requires `x-humanx-user`) | `reports`, `claims`, `users`, `rate_limits` | Rate-limited (20/hr per IP). Auto-escalates claim to `review_state='review'` when report count reaches 2 |
 
 ### AI / Analysis
@@ -155,6 +157,9 @@ Requests without a valid token receive HTTP 403.
 |---|---|
 | `GET /api/review` | View moderation queue |
 | `POST /api/review/decision` | Approve / reject / re-queue a claim or truth |
+| `POST /api/review/cleanup` | Archive a rejected smoke/test artefact |
+| `POST /api/review/mark-duplicate` | Mark a claim as a duplicate of another claim |
+| `POST /api/review/resolve-similar` | Clear the near-duplicate advisory on a claim |
 | `GET /api/import-seed` | Seed claims from importer |
 | `GET /api/import-truths` | Seed truths from truth-seed module |
 
@@ -166,6 +171,8 @@ Requests without a valid token receive HTTP 403.
 |---|---|
 | `POST /api/claims` | Duplicate detection uses `normalized_claim` unique index. Race condition handled but review carefully before schema or index changes |
 | `POST /api/review/decision` | Mutates `review_state` on claims and truths. Also closes open reports. No undo — decisions must be re-issued to reverse |
+| `POST /api/review/mark-duplicate` | Writes `duplicate_of` and sets `review_state='duplicate'`. Source claim is preserved but removed from queue and public list. Both claim IDs must be validated before the UPDATE. Self-duplicate rejected. Cannot mark already-archived or already-duplicate claims |
+| `POST /api/review/resolve-similar` | Clears `near_duplicate_of` (sets to NULL). Non-destructive. Returns `previous_near_duplicate_of` for audit. Guard: returns error if advisory is not set |
 | `POST /api/truth-to-claim` | Writes to two tables (`claims` + `truth_claim_links`). Partial failure behaviour depends on `truth-claim-bridge.js` |
 | `POST /api/belief-promote` | Promotes snapshot data across systems. Side effects depend on `belief-bridge.js` |
 | `GET /api/debug` | Exposes full table row counts and recent claim data with no authentication. Should not be public in production |
