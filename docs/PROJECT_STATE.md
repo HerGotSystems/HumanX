@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-21 visual QA audit (no regressions found).
+Last updated: 2026-06-06 after D-22 D-series stabilization release checkpoint.
 
 ---
 
@@ -126,6 +126,7 @@ All flows confirmed working (code audit + static checks):
 | D-19 | `18cf5c9` | Sidepanel patch stabilization — moved `#evidence-kind-hint`, `#evidence-attach-note`, `#runpack-side-note` from dynamic injection to static HTML; replaced `<pre id="aip">` with `<div id="aip-status">` (stable container); rewrote `patchRunPackPanel()` to target `#aip-status` directly (fixes re-render staleness bug) and removed dead textContent rename + fragile `querySelector('.actions')` injection; removed dead `getElementById('aip')` fallback from `generateRunPack()`; `patchEvidencePanel()` is now a graceful no-op |
 | D-20 | `b2f53ee` | Study dock refinement — renamed "Evidence & Pressure" section to "Attach Evidence / Pressure" (D-20A); added static microcopy to Report section (D-20A); added `min-height:32px` to `.runpack-side-status` to prevent layout jump between states (D-20C); added `#side-tools .actions{flex-direction:column}` + `button{width:100%}` at `max-width:900px` for clean narrow-width stacking (D-20D); no IDs, function names, or JS logic changed |
 | D-21 | docs-only | Visual QA audit of D-15 → D-20 — all five focus areas pass; no regressions found; no code changes; full checklist in `docs/D21_VISUAL_QA.md` |
+| D-22 | docs-only | D-series stabilization release checkpoint — full D-1 → D-21 summary, safety boundaries recorded, known-good checks confirmed at 91/24/35; full release note in `docs/D22_D_SERIES_STABILIZATION_RELEASE.md` |
 
 ---
 
@@ -138,7 +139,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-21 visual QA audit complete. All five focus areas (review inspect panel, study evidence sections, RunPack page/panel, study side dock, mobile/narrow layout) passed — no regressions from D-15 through D-20. Full checklist in `docs/D21_VISUAL_QA.md`. Static check counts unchanged at 91/24/35.
+D-22 D-series stabilization release checkpoint is complete. Full D-1 → D-21 batch summary, safety boundaries, and known-good check results (91/24/35) are recorded in `docs/D22_D_SERIES_STABILIZATION_RELEASE.md`. No code changes in D-22.
 
 Next work:
 
