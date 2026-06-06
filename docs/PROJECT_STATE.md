@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-24B RunPack provenance Phase 1.
+Last updated: 2026-06-06 after D-24C Backend Moderation D1 Audit.
 
 ---
 
@@ -130,6 +130,7 @@ All flows confirmed working (code audit + static checks):
 | D-23 | docs-only | Planning — D-23A: RunPack provenance (packet_id, generated_at, evidence count snapshot, stale detection, AI return linkage, v1.2 schema); D-23B: investigation graph nav audit (5 context-loss points, priority-ranked fixes, `lastModeBeforeStudy` approach); D-23C: backend moderation tooling plan (mark-duplicate, resolve-similar, hard constraints, D1 audit prerequisite) |
 | D-24A | `4aef4e5` | Study navigation context preservation — added `lastModeBeforeStudy` and `lastInspectedReviewItemId` state; `setMode` resets origin on explicit nav; `studyFromVault` sets vault origin; `openReviewClaimStudy` sets review origin + saves inspected item ID; `backToArena` routes back to correct mode and restores `inspectedReviewItem` from queue; `renderStudy` shows context-aware back button ("← Back to Review" / "← Back to Vault" / "← Back"); no backend changes, no moderation behaviour changed |
 | D-24B | `16fa131` | RunPack provenance Phase 1 — added `lastPacketMeta` state; `generatePacketId`, `simpleClaimHash`, `buildProvenanceMeta`, `detectPacketStaleness` helpers; all generated packets now include `packet_id`, `runpack_version:'1.2'`, `generated_at`, `source_claim_id`, `source_snapshot_hash`, `evidence_count`, `pressure_count`, `test_count`, `humanx_app_version`, `is_fallback`; `runPackSummary` shows advisory "Possibly stale" chip when counts or age drift; `saveAnalysisResult` shows non-blocking advisory toast on `packet_id` mismatch; no backend changes, no blocking logic, no schema migration |
+| D-24C | docs-only | Backend moderation D1 audit — confirmed `duplicate_of` in schema (unwritten); `near_duplicate_of` live but absent from migrations (schema gap documented); `review_state` constraint-free (TEXT, no CHECK); `'duplicate'` value exists in frontend but no backend write path; `reviewDecision` allowed set is `public/review/rejected` only; `reviewQueue` needs `'duplicate'` exclusion before implementation; safe 5-step implementation sequence documented; all constraints from D-23C confirmed intact; full findings in `docs/D24C_BACKEND_MODERATION_D1_AUDIT.md` |
 
 ---
 
@@ -151,8 +152,8 @@ No code changes in D-23. Static checks held at 91/24/35.
 
 Next work:
 
-1. **D-24C — Backend moderation** — D1 audit first, then branch + PR for `POST /api/review/mark-duplicate` and `POST /api/review/resolve-similar` as designed in D-23C.
-2. **Deferred from D-24A/B** — Claims list scroll restoration (`#main.scrollTop` save/restore on arena→study→back); RunPack Phase 2 backend provenance (worker-side `packet_id` generation). Both are frontend-only and can be addressed in a follow-up batch.
+1. **D-24D — Backend moderation implementation** — D1 audit (D-24C) is complete. Branch + PR for `POST /api/review/mark-duplicate` and `POST /api/review/resolve-similar` per the 5-step sequence in `docs/D24C_BACKEND_MODERATION_D1_AUDIT.md` (Q9). Must also update `reviewQueue` query to exclude `'duplicate'` and update `mapClaim` to surface `duplicate_of`. Requires migration doc for `near_duplicate_of` schema gap before any fresh D1 build.
+2. **Deferred from D-24A/B** — Claims list scroll restoration (`#main.scrollTop` save/restore on arena→study→back); RunPack Phase 2 backend provenance (worker-side `packet_id` generation). Both can be addressed in a follow-up batch.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
