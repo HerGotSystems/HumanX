@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-24G Claims/Arena scroll restoration.
+Last updated: 2026-06-06 after D-25 D-24 operational moderation checkpoint.
 
 ---
 
@@ -134,6 +134,7 @@ All flows confirmed working (code audit + static checks):
 | D-24F | docs+migration | Near-duplicate migration proposal — `migrations/0006_add_near_duplicate_of.sql` created: `ALTER TABLE claims ADD COLUMN near_duplicate_of TEXT` + `CREATE INDEX IF NOT EXISTS idx_claims_near_duplicate_of`; closes schema gap documented in D-24C; safe for fresh D1 rebuilds only; production must not reapply (column already exists — would fail with "duplicate column"); `PRAGMA table_info(claims)` guard documented; D-24C audit schema-gaps table updated to mark all three gaps as closed; Backend/D1 safety rule added to PROJECT_STATE.md; no code changes, no Wrangler, no D1 commands |
 | D-24E | `5dc33e4` | Moderator duplicate resolution frontend controls — `renderReviewInspectPanel` gains `dupSection` with "Mark Duplicate..." and "Dismiss ~Similar" buttons for claim items; both are context-aware (markdup hidden for archived/duplicate state; resolvesim hidden when no advisory); `markDuplicateUI(claimId)` opens hxModal with target claim ID + optional reason input, calls `POST /api/review/mark-duplicate` via `adminHeaders()`, clears inspect panel and reloads queue on success; `resolveSimilarUI(claimId)` opens hxModal for confirm, calls `POST /api/review/resolve-similar`, reloads queue; both functions exposed on `window`; CSS adds muted purple (markdup) and muted steel-blue (resolvesim) button styles distinct from primary Approve/Reject; 4 new hardening smoke checks (91→95); no backend/D1/Worker/migration changes |
 | D-24D | `f2def3b` (PR #86) | Moderator duplicate-resolution backend routes — `POST /api/review/mark-duplicate` (writes `duplicate_of` + `review_state='duplicate'`; validates both claims exist; rejects self-duplicates and ineligible sources; source preserved) and `POST /api/review/resolve-similar` (clears `near_duplicate_of`; no-op guard; returns previous value for audit); `mapClaim` now exposes `duplicateOf` field; `reviewQueue` SQL excludes `review_state='duplicate'` alongside `archived`; `duplicate_total` added to queue metadata; both routes added to `HIGH_RISK_ROUTES`; worker-route-static-check 35→39 hard checks; no migrations, no frontend changes |
+| D-25 | docs-only | D-24 operational moderation checkpoint — full D-24A → D-24G summary; what is now operational vs advisory-only vs forbidden; static checks confirmed 95/24/39; manual/live testing deferred; safe-next-work documented; full record in `docs/D25_D24_OPERATIONAL_MODERATION_CHECKPOINT.md` |
 | D-24G | `969dfea` | Claims/Arena scroll restoration — `lastArenaScrollTop` state variable saves `#main.scrollTop` in `selectClaim` when origin is arena; `backToArena` restores it immediately after `setMode('arena')` (synchronous render path, no rAF needed); null-guard on `#main`; 3 insertions, 2 deletions; all static checks held at 95/24/39 |
 | D-24C | docs-only | Backend moderation D1 audit — confirmed `duplicate_of` in schema (unwritten); `near_duplicate_of` live but absent from migrations (schema gap documented); `review_state` constraint-free (TEXT, no CHECK); `'duplicate'` value exists in frontend but no backend write path; `reviewDecision` allowed set is `public/review/rejected` only; `reviewQueue` needs `'duplicate'` exclusion before implementation; safe 5-step implementation sequence documented; all constraints from D-23C confirmed intact; full findings in `docs/D24C_BACKEND_MODERATION_D1_AUDIT.md` |
 
@@ -157,9 +158,10 @@ No code changes in D-23. Static checks held at 91/24/35.
 
 Next work:
 
-1. **Deferred from D-24A/B** — RunPack Phase 2 backend provenance (worker-side `packet_id` generation, branch + PR). Claims/Arena scroll restoration is done (D-24G).
-2. **Manual live testing of D-24D/E** — Any live write test against the new duplicate-resolution endpoints requires explicit per-session user approval. Do not run `wrangler`, `wrangler d1 execute`, or live smoke tests without explicit instruction.
-3. **D-24C schema gaps all closed** — All three gaps are resolved: `near_duplicate_of` migration (D-24F), `duplicate_of` in `mapClaim` (D-24D), `review_state='duplicate'` excluded from `reviewQueue` (D-24D). No outstanding schema debt from D-24C.
+1. **Manual live UI testing** — when the user is ready to open a browser session against `humanx.rinkimirikata.com` and manually exercise the new duplicate-resolution buttons (Mark Duplicate, Dismiss ~Similar). Requires explicit per-session approval for any write.
+2. **RunPack provenance Phase 2** — worker-side `packet_id` generation (branch + PR); plan in `docs/D23_RUNPACK_PROVENANCE_PLAN.md`.
+3. **Live read smoke** — `scripts/read-endpoint-smoke-test.mjs` from a non-Windows-sandbox environment (CI or WSL) to verify public endpoints without write risk.
+4. **D-24C schema gaps all closed** — All three gaps are resolved: `near_duplicate_of` migration (D-24F), `duplicate_of` in `mapClaim` (D-24D), `review_state='duplicate'` excluded from `reviewQueue` (D-24D). No outstanding schema debt.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
