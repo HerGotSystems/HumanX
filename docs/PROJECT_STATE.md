@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-50 claim scoring evidence review state fix (branch + PR).
+Last updated: 2026-06-06 after D-51 D-50 scoring validation checkpoint.
 
 ---
 
@@ -135,6 +135,7 @@ All flows confirmed working (code audit + static checks):
 | D-24F | docs+migration | Near-duplicate migration proposal — `migrations/0006_add_near_duplicate_of.sql` created: `ALTER TABLE claims ADD COLUMN near_duplicate_of TEXT` + `CREATE INDEX IF NOT EXISTS idx_claims_near_duplicate_of`; closes schema gap documented in D-24C; safe for fresh D1 rebuilds only; production must not reapply (column already exists — would fail with "duplicate column"); `PRAGMA table_info(claims)` guard documented; D-24C audit schema-gaps table updated to mark all three gaps as closed; Backend/D1 safety rule added to PROJECT_STATE.md; no code changes, no Wrangler, no D1 commands |
 | D-24E | `5dc33e4` | Moderator duplicate resolution frontend controls — `renderReviewInspectPanel` gains `dupSection` with "Mark Duplicate..." and "Dismiss ~Similar" buttons for claim items; both are context-aware (markdup hidden for archived/duplicate state; resolvesim hidden when no advisory); `markDuplicateUI(claimId)` opens hxModal with target claim ID + optional reason input, calls `POST /api/review/mark-duplicate` via `adminHeaders()`, clears inspect panel and reloads queue on success; `resolveSimilarUI(claimId)` opens hxModal for confirm, calls `POST /api/review/resolve-similar`, reloads queue; both functions exposed on `window`; CSS adds muted purple (markdup) and muted steel-blue (resolvesim) button styles distinct from primary Approve/Reject; 4 new hardening smoke checks (91→95); no backend/D1/Worker/migration changes |
 | D-24D | `f2def3b` (PR #86) | Moderator duplicate-resolution backend routes — `POST /api/review/mark-duplicate` (writes `duplicate_of` + `review_state='duplicate'`; validates both claims exist; rejects self-duplicates and ineligible sources; source preserved) and `POST /api/review/resolve-similar` (clears `near_duplicate_of`; no-op guard; returns previous value for audit); `mapClaim` now exposes `duplicateOf` field; `reviewQueue` SQL excludes `review_state='duplicate'` alongside `archived`; `duplicate_total` added to queue metadata; both routes added to `HIGH_RISK_ROUTES`; worker-route-static-check 35→39 hard checks; no migrations, no frontend changes |
+| D-51 | docs-only (direct main) | D-50 scoring validation checkpoint — confirmed commit `8ce32a8` / PR #100 landed on main; score filter changes documented (direct + reused evidence queries); `reviewDecision` and `reportTarget` evidence recalc hooks documented; gap scenarios A–D confirmed closed; no algorithm change; no migration; no production backfill performed (scores self-correct on next scoring trigger; optional batch backfill is a separate D requiring explicit D1 approval); static checks 113/24/39 confirmed on main; live scoring behavior unverified until D-47 executes; full record in `docs/D51_D50_SCORING_VALIDATION_CHECKPOINT.md` |
 | D-50 | branch + PR (`fix/d50-score-public-evidence-only`) | Score filter fix — `src/claim-scoring.js`: added `COALESCE(review_state,'public')='public'` to direct evidence query and `COALESCE(e.review_state,'public')='public'` to reused evidence join; `src/worker.js`: added `recalcClaimScore(env, row.claim_id)` after `reviewDecision` evidence branch (covers approve / reject / re-queue); added `evRow` lookup + `recalcClaimScore` in `reportTarget` evidence branch on first escalation (report_count+1===2); `addEvidence` recalc call preserved (now safe no-op for pending); 3 new hardening smoke checks (section 25, 110→113); `docs/D50_SCORE_PUBLIC_EVIDENCE_ONLY.md` created; no schema changes, no migration, no frontend changes; static checks 113/24/39 |
 | D-49 | docs-only (direct main) | Claim scoring evidence review state audit — audited `src/claim-scoring.js` `recalcClaimScore`: both direct and reused evidence queries lack `review_state` filter; all evidence rows counted regardless of state; four gap scenarios: (A) new pending evidence immediately inflates score (addEvidence calls recalc without filter), (B) approval doesn't trigger recalc, (C) rejection leaves rejected evidence in score, (D) report-escalated evidence stays in score; risk: low–medium, advisory scores only, no access-control impact; D-50 fix proposal: add `COALESCE(review_state,'public')='public'` to both queries in claim-scoring.js; add recalcClaimScore call after reviewDecision evidence branch (uses row.claim_id); add recalcClaimScore call in reportTarget evidence branch (query claim_id then recalc); no migration needed; 2 new hardening checks planned (110→112); no batch backfill without explicit approval; full audit in `docs/D49_SCORE_RECALC_EVIDENCE_REVIEW_AUDIT.md` |
 | D-48 | docs-only (direct main) | Evidence moderation platform checkpoint — structured record of D-40→D-47 sequence; implementation status: migration 0007 live, insertEvidence→review, claimDetail/getClaim/vault/RunPack filter pending evidence, reportTarget evidence branch, reviewQueue evidence items, reviewDecision evidence branch, frontend reviewCard/inspect/decision all evidence-aware; verified: migration PRAGMA, static checks 110/24/39, node --check, Cloudflare deploy, Read Smoke; unverified: full live-write evidence lifecycle (D-47 not executed), browser admin session post-D-43, RunPack live exclusion test; known limitations: recalcClaimScore counts all evidence regardless of review_state (score inflation risk, low severity, future branch+PR fix), evidence report UI path uncertain, Node 20 annotation cosmetic; safety boundaries confirmed; full record in `docs/D48_EVIDENCE_MODERATION_PLATFORM_CHECKPOINT.md` |
@@ -179,7 +180,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Evidence moderation scoring fix complete (D-50). Static baseline **113 / 24 / 39**. Branch `fix/d50-score-public-evidence-only` open as PR. Not yet merged.
+Evidence moderation scoring fix complete and merged (D-50). Scoring validation checkpoint recorded (D-51). Static baseline **113 / 24 / 39**. PR #100 merged at `619fdce`.
 
 1. **D-42B — ✅ COMPLETE** — merged PR #98 (`faa91af`). Backend evidence moderation. Static checks 108/24/39.
 2. **D-43 — ✅ COMPLETE** — `975129a` direct main. Evidence review UI. Static checks 110/24/39. Live green.
@@ -189,14 +190,15 @@ Evidence moderation scoring fix complete (D-50). Static baseline **113 / 24 / 39
 6. **D-47 — ✅ COMPLETE** — docs-only, direct main. Evidence moderation manual test plan written. Not yet executed.
 7. **D-48 — ✅ COMPLETE** — docs-only, direct main. Evidence moderation platform checkpoint. Full D-40→D-47 status recorded.
 8. **D-49 — ✅ COMPLETE** — docs-only, direct main. `recalcClaimScore` audit: both evidence queries lack `review_state` filter; four gap scenarios documented; D-50 fix proposed.
-9. **D-50 — ✅ PR OPEN** — branch `fix/d50-score-public-evidence-only`. Both evidence queries in `claim-scoring.js` now filter `COALESCE(review_state,'public')='public'`; `reviewDecision` evidence branch adds recalc; `reportTarget` evidence branch adds claim_id lookup + recalc on first escalation; 3 new hardening checks (110→113); `docs/D50_SCORE_PUBLIC_EVIDENCE_ONLY.md` created. **Do not merge without review.**
-10. **Merge D-50 PR** — after review passes CI; then confirm Read Smoke green post-merge.
-11. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. Best run after D-50 lands so score behavior is correct during testing. `HX_TEST_D47_` prefix.
-12. **D-51 — After D-47 execution** — docs-only record of test pass/fail, evidence IDs, cleanup status.
-13. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
-14. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
-15. **No live write smoke** without explicit per-session approval.
-16. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
+9. **D-50 — ✅ COMPLETE** — merged PR #100 (`8ce32a8`). Both evidence queries in `claim-scoring.js` filter `COALESCE(review_state,'public')='public'`; `reviewDecision` evidence branch adds recalc; `reportTarget` adds claim_id lookup + recalc on first escalation; 3 new hardening checks (110→113).
+10. **D-51 — ✅ COMPLETE** — docs-only, direct main. D-50 scoring validation checkpoint. Gap scenarios A–D confirmed closed. Static checks 113/24/39 confirmed on main. No production backfill performed.
+11. **Run HumanX Read Smoke** — confirm green after D-50 deploy. Trigger via GitHub Actions → HumanX Read Smoke → Run workflow, or wait for next PR.
+12. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. Best run now that scoring is correct. `HX_TEST_D47_` prefix.
+13. **Optional score backfill** — batch `recalcClaimScore` across all affected claims to correct stale scores from the D-42B → D-50 gap period. Requires explicit per-session D1 approval + controlled script. Not planned; scores self-correct on next trigger.
+14. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
+15. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
+16. **No live write smoke** without explicit per-session approval.
+17. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
