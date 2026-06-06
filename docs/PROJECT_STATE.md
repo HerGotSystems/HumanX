@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-24A study navigation context preservation.
+Last updated: 2026-06-06 after D-24B RunPack provenance Phase 1.
 
 ---
 
@@ -129,6 +129,7 @@ All flows confirmed working (code audit + static checks):
 | D-22 | docs-only | D-series stabilization release checkpoint — full D-1 → D-21 summary, safety boundaries recorded, known-good checks confirmed at 91/24/35; full release note in `docs/D22_D_SERIES_STABILIZATION_RELEASE.md` |
 | D-23 | docs-only | Planning — D-23A: RunPack provenance (packet_id, generated_at, evidence count snapshot, stale detection, AI return linkage, v1.2 schema); D-23B: investigation graph nav audit (5 context-loss points, priority-ranked fixes, `lastModeBeforeStudy` approach); D-23C: backend moderation tooling plan (mark-duplicate, resolve-similar, hard constraints, D1 audit prerequisite) |
 | D-24A | `4aef4e5` | Study navigation context preservation — added `lastModeBeforeStudy` and `lastInspectedReviewItemId` state; `setMode` resets origin on explicit nav; `studyFromVault` sets vault origin; `openReviewClaimStudy` sets review origin + saves inspected item ID; `backToArena` routes back to correct mode and restores `inspectedReviewItem` from queue; `renderStudy` shows context-aware back button ("← Back to Review" / "← Back to Vault" / "← Back"); no backend changes, no moderation behaviour changed |
+| D-24B | `16fa131` | RunPack provenance Phase 1 — added `lastPacketMeta` state; `generatePacketId`, `simpleClaimHash`, `buildProvenanceMeta`, `detectPacketStaleness` helpers; all generated packets now include `packet_id`, `runpack_version:'1.2'`, `generated_at`, `source_claim_id`, `source_snapshot_hash`, `evidence_count`, `pressure_count`, `test_count`, `humanx_app_version`, `is_fallback`; `runPackSummary` shows advisory "Possibly stale" chip when counts or age drift; `saveAnalysisResult` shows non-blocking advisory toast on `packet_id` mismatch; no backend changes, no blocking logic, no schema migration |
 
 ---
 
@@ -150,9 +151,8 @@ No code changes in D-23. Static checks held at 91/24/35.
 
 Next work:
 
-1. **D-24B — RunPack provenance Phase 1** — add provenance fields and stale-detection to `generateRunPack()` as designed in D-23A. Frontend-only, direct main.
-2. **D-24C — Backend moderation** — D1 audit first, then branch + PR for `POST /api/review/mark-duplicate` and `POST /api/review/resolve-similar` as designed in D-23C.
-3. **D-24A deferred** — Claims scroll restoration (save/restore `#main.scrollTop` when entering/leaving Study from arena) was intentionally deferred from D-24A. Implement in a follow-up batch.
+1. **D-24C — Backend moderation** — D1 audit first, then branch + PR for `POST /api/review/mark-duplicate` and `POST /api/review/resolve-similar` as designed in D-23C.
+2. **Deferred from D-24A/B** — Claims list scroll restoration (`#main.scrollTop` save/restore on arena→study→back); RunPack Phase 2 backend provenance (worker-side `packet_id` generation). Both are frontend-only and can be addressed in a follow-up batch.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
