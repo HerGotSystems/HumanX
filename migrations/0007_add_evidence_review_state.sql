@@ -75,8 +75,14 @@
 --
 -- APPLIED IN PRODUCTION
 -- ---------------------
--- Not yet applied.  Status: proposal only (D-41, 2026-06-06).
--- Update this header when production apply is confirmed.
+-- Applied: 2026-06-06 via Cloudflare D1 Console (manual apply, D-42A).
+-- Preflight PRAGMA confirmed review_state and report_count absent before apply.
+-- Post-apply PRAGMA confirmed both columns present with correct defaults.
+-- Post-apply PRAGMA index_list confirmed idx_evidence_review_state and
+--   idx_evidence_report_count present.
+-- Spot-check of 5 existing evidence rows confirmed review_state='public',
+--   report_count=0 on all rows (column default correctly applied).
+-- Database: humanx (f68709d8-b93a-4e5b-8a0e-5b58cc357125)
 
 ALTER TABLE evidence ADD COLUMN review_state TEXT DEFAULT 'public';
 ALTER TABLE evidence ADD COLUMN report_count INTEGER DEFAULT 0;

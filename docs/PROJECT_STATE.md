@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-42 backend evidence moderation preflight.
+Last updated: 2026-06-06 after D-42A migration 0007 applied to production.
 
 ---
 
@@ -70,7 +70,7 @@ All flows confirmed working (code audit + static checks):
 | Do not rerun migration 0006 against production | `migrations/0006_add_near_duplicate_of.sql` is for **fresh D1 rebuilds only**. Production already has the column and index. Applying on production will fail with "duplicate column" and "already exists" errors. Always run `PRAGMA table_info(claims)` to confirm `near_duplicate_of` is absent before executing. |
 | No Wrangler / D1 commands | `wrangler d1 execute`, `wrangler deploy`, and all variants are off-limits unless the user explicitly requests them. |
 | No live write smoke | `scripts/write-endpoint-smoke-test.mjs` requires explicit per-session user approval. Do not run routinely. |
-| Do not run migration 0007 without approval | `migrations/0007_add_evidence_review_state.sql` is a proposal only. Do not apply to production until: (1) user gives explicit per-session approval, (2) `PRAGMA table_info(evidence)` confirms `review_state` and `report_count` are absent, (3) D-42 backend changes are staged and ready to deploy. SQLite has no `ADD COLUMN IF NOT EXISTS` — a duplicate-column failure is non-recoverable without a table rebuild. |
+| Migration 0007 applied — do not re-apply | `migrations/0007_add_evidence_review_state.sql` was applied to production on 2026-06-06 (D-42A). `evidence.review_state` and `evidence.report_count` now exist in production. Running the migration again will fail with "duplicate column name". Do not re-apply. |
 
 ---
 
@@ -171,8 +171,8 @@ All flows confirmed working (code audit + static checks):
 
 D-42 preflight complete — exact implementation plan for evidence moderation backend recorded in `docs/D42_EVIDENCE_MODERATION_BACKEND_PREFLIGHT.md`. Static baseline 103/24/39.
 
-1. **D-42A — Apply migration 0007 (manual, requires explicit approval)** — run `PRAGMA table_info(evidence)` to confirm columns absent; apply `migrations/0007_add_evidence_review_state.sql` via Cloudflare D1 console or Wrangler; re-run PRAGMA to verify. No git commit. Requires in-session explicit approval.
-2. **D-42B — Backend evidence moderation (branch + PR)** — branch `feature/d42-evidence-moderation-backend`; Worker/module changes per `docs/D42_EVIDENCE_MODERATION_BACKEND_PREFLIGHT.md` sections 3.1–3.9; 5 new hardening smoke checks (103→108). Prerequisite: D-42A confirmed.
+1. **D-42A — ✅ COMPLETE** — Migration 0007 applied to production 2026-06-06. Both columns confirmed present. Both indexes confirmed present. 5 existing rows spot-checked: all `review_state='public'`, `report_count=0`. Migration file header updated.
+2. **D-42B — Backend evidence moderation (branch + PR)** — branch `feature/d42-evidence-moderation-backend`; Worker/module changes per `docs/D42_EVIDENCE_MODERATION_BACKEND_PREFLIGHT.md` sections 3.1–3.9; 5 new hardening smoke checks (103→108). Ready to start now.
 3. **D-43 — Frontend review UI for evidence (branch or direct main)** — `reviewCard` and `renderReviewInspectPanel` handle `target_type='evidence'`. Prerequisite: D-42B merged.
 4. **D-44 — Validation record (docs-only, direct main)** — record static/live/manual results after D-42B+D-43. Expected baseline 108+/24/39.
 5. **Run D-26 manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. When ready to open a browser session. Use `HX_TEST_D26_` prefix. Requires explicit per-session approval for any **[WRITE]** steps.
