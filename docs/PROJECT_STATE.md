@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-64 source research blocked/pending status.
+Last updated: 2026-06-06 after D-65 direct official source target map.
 
 ---
 
@@ -187,7 +187,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Evidence moderation stack complete and green (D-50–D-52). Seed launch prep and import route hardening complete (D-53–D-64): inventory, quality audit, source checklist, JSON draft, safety plan, implementation (merged PR #101), post-merge checkpoint, source URL worksheet, readiness gate, research protocol, blocked research status. D-64 Batch B research attempt returned noisy/indirect sources — no URLs verified; gate remains BLOCKED. Next: D-65 direct official-source research pass (open official pages directly, not via search). D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
+Evidence moderation stack complete and green (D-50–D-52). Seed launch prep and import route hardening complete (D-53–D-65): inventory, quality audit, source checklist, JSON draft, safety plan, implementation (merged PR #101), post-merge checkpoint, source URL worksheet, readiness gate, research protocol, blocked research status, direct source target map. Gate still BLOCKED — no URLs verified. Next: D-66 direct official-source research execution using D-65 target map (open bmj.com, surgeongeneral.gov, seer.cancer.gov, avalon.law.yale.edu, yadvashem.org, ushmm.org directly). D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
 
 1. **D-42B — ✅ COMPLETE** — merged PR #98 (`faa91af`). Backend evidence moderation. Static checks 108/24/39.
 2. **D-43 — ✅ COMPLETE** — `975129a` direct main. Evidence review UI. Static checks 110/24/39. Live green.
@@ -212,15 +212,16 @@ Evidence moderation stack complete and green (D-50–D-52). Seed launch prep and
 21. **D-62 — ✅ COMPLETE** — docs-only, direct main. Final launch seed pack readiness gate: 10 hard blockers defined (HB-1 through HB-10); current gate status BLOCKED on HB-1 through HB-8 (all 18 evidence slots TODO_FIND_SOURCE, all evidence unverified, SOURCE_NEEDED guard blocks apply); 11-claim readiness checklist with per-slot status; 12-truth framing checklist; 10 draft-to-final JSON conversion rules; 12-step pre-import dry-run gate sequence; future path D-63 → D-66 defined. Full gate in `docs/D62_FINAL_LAUNCH_SEED_PACK_READINESS_GATE.md`.
 22. **D-63 — ✅ COMPLETE** — docs-only, direct main. Source research execution protocol: 5 research batches defined (A science, B history, C civic, D behaviour, E belief); per-batch minimum source counts, preferred domains/source classes, pressure source requirements, and stop conditions; 9-criteria source acceptance test; 14-field citation record format; 5-section research output format (accepted, candidate, rejected tables + unresolved blockers + readiness delta); 7 safety rules; execution order recommendation (start Batch B history, end Batch E belief); future path D-64 → D-67 defined. Full protocol in `docs/D63_SOURCE_RESEARCH_EXECUTION_PROTOCOL.md`.
 23. **D-64 — ✅ COMPLETE** — docs-only, direct main. Batch B source research attempted (B-4 smoking-cancer, B-5 Holocaust); search returned Wikipedia, news summaries, mirrors, and general overview pages — all rejected per D-56/D-63 rules; no candidate URLs verified; all D-61 fields remain TODO_FIND_SOURCE; direct official-site navigation targets specified for each blocked slot; D-62 gate delta confirmed unchanged (0/18 slots cleared); next step: D-65 direct official-source pass. Full record in `docs/D64_SOURCE_RESEARCH_BLOCKED_STATUS.md`.
-24. **D-65 — Direct official-source research pass** — human URL research. Researcher opens official institutional pages directly (bmj.com, surgeongeneral.gov / cdc.gov, cancerresearchuk.org / seer.cancer.gov, avalon.law.yale.edu, yadvashem.org, ushmm.org) using D-64 navigation targets; completes D-63 citation records; no search-engine-surfaced Wikipedia/news accepted; no seed file edits; no import. Gated on human direct-navigation research.
-25. **D-66 — Gated dry-run import** — after D-65. Call `GET /api/import-seed?mode=dry-run` and `GET /api/import-truths?mode=dry-run`; review structured report; confirm `source_needed_blocked: 0` and counts. Requires explicit per-session approval.
-26. **D-67 — Gated production apply** — after D-66 dry-run reviewed. Call `?mode=apply`; moderate all new `review_state='review'` content in admin Review queue. Requires separate explicit per-session D1/write approval.
-27. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
-28. **Optional score backfill** — batch `recalcClaimScore` across all affected claims. Requires explicit per-session D1 approval + controlled script. Scores self-correct on next trigger.
-29. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
-30. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
-31. **No live write smoke** without explicit per-session approval.
-32. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
+24. **D-65 — ✅ COMPLETE** — docs-only, direct main. Direct official source target map: 8 direct-navigation rules; 6 Batch B source targets specified (B-4 slot 1 BMJ/PubMed Doll&Hill, B-4 slot 2 surgeongeneral.gov 1964 report, B-4 slot 3 NCI SEER/Cancer Research UK, B-5 slot 1 Yale Avalon Nuremberg, B-5 slot 2 yadvashem.org research, B-5 pressure USHMM Holocaust Encyclopedia); acceptance/rejection tests per slot; 8-step manual research workflow; D-66 output template (4 sections). No URLs inserted. Full map in `docs/D65_DIRECT_OFFICIAL_SOURCE_TARGET_MAP.md`.
+25. **D-66 — Direct official-source research execution** — human URL research. Researcher opens each D-65 target institution directly in a browser; navigates to the specific document/data page; runs 6 D-63 acceptance criteria; completes citation records; enters VERIFIED records into D-61 worksheet; no seed file edits; no import. Gated on human direct-navigation research.
+26. **D-67 — Gated dry-run import** — after all D-61 slots VERIFIED. Call `GET /api/import-seed?mode=dry-run` and `GET /api/import-truths?mode=dry-run`; review structured report; confirm `source_needed_blocked: 0` and counts. Requires explicit per-session approval.
+27. **D-68 — Gated production apply** — after D-67 dry-run reviewed. Call `?mode=apply`; moderate all new `review_state='review'` content in admin Review queue. Requires separate explicit per-session D1/write approval.
+28. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
+29. **Optional score backfill** — batch `recalcClaimScore` across all affected claims. Requires explicit per-session D1 approval + controlled script. Scores self-correct on next trigger.
+30. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
+31. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
+32. **No live write smoke** without explicit per-session approval.
+33. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
