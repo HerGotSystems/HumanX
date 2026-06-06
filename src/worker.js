@@ -30,9 +30,9 @@ export default {
       if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
       if (!env.DB) return fallbackApi(request, url);
       if (url.pathname === '/api/debug' && request.method === 'GET') return debugState(request, env);
-      if (url.pathname === '/api/seed' && request.method === 'GET') return seedDemoClaims(request, env);
-      if (url.pathname === '/api/import-seed' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return json(await importSeedData(env)); }
-      if (url.pathname === '/api/import-truths' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return json(await importTruthSeeds(env)); }
+      if (url.pathname === '/api/seed' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return seedDemoClaims(request, env); }
+      if (url.pathname === '/api/import-seed' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; const mode = url.searchParams.get('mode') || 'dry-run'; if (mode !== 'dry-run' && mode !== 'apply') return json({ error:'INVALID_MODE', message:"mode must be 'dry-run' or 'apply'" },400); return json(await importSeedData(env, { dryRun: mode !== 'apply' })); }
+      if (url.pathname === '/api/import-truths' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; const mode = url.searchParams.get('mode') || 'dry-run'; if (mode !== 'dry-run' && mode !== 'apply') return json({ error:'INVALID_MODE', message:"mode must be 'dry-run' or 'apply'" },400); return json(await importTruthSeeds(env, { dryRun: mode !== 'apply' })); }
       if (url.pathname === '/api/claim-vote' && request.method === 'POST') return await voteClaim(request, env, { readJson, cleanId, json, requireUser, makeId });
       if (url.pathname === '/api/session' && request.method === 'POST') return await createOrGetUser(request, env);
       if (url.pathname === '/api/claims' && request.method === 'GET') return await listClaims(request, env);
