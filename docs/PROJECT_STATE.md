@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-29 frontend RunPack provenance de-duplication.
+Last updated: 2026-06-06 after D-30 canonical RunPack provenance checkpoint.
 
 ---
 
@@ -134,6 +134,7 @@ All flows confirmed working (code audit + static checks):
 | D-24F | docs+migration | Near-duplicate migration proposal — `migrations/0006_add_near_duplicate_of.sql` created: `ALTER TABLE claims ADD COLUMN near_duplicate_of TEXT` + `CREATE INDEX IF NOT EXISTS idx_claims_near_duplicate_of`; closes schema gap documented in D-24C; safe for fresh D1 rebuilds only; production must not reapply (column already exists — would fail with "duplicate column"); `PRAGMA table_info(claims)` guard documented; D-24C audit schema-gaps table updated to mark all three gaps as closed; Backend/D1 safety rule added to PROJECT_STATE.md; no code changes, no Wrangler, no D1 commands |
 | D-24E | `5dc33e4` | Moderator duplicate resolution frontend controls — `renderReviewInspectPanel` gains `dupSection` with "Mark Duplicate..." and "Dismiss ~Similar" buttons for claim items; both are context-aware (markdup hidden for archived/duplicate state; resolvesim hidden when no advisory); `markDuplicateUI(claimId)` opens hxModal with target claim ID + optional reason input, calls `POST /api/review/mark-duplicate` via `adminHeaders()`, clears inspect panel and reloads queue on success; `resolveSimilarUI(claimId)` opens hxModal for confirm, calls `POST /api/review/resolve-similar`, reloads queue; both functions exposed on `window`; CSS adds muted purple (markdup) and muted steel-blue (resolvesim) button styles distinct from primary Approve/Reject; 4 new hardening smoke checks (91→95); no backend/D1/Worker/migration changes |
 | D-24D | `f2def3b` (PR #86) | Moderator duplicate-resolution backend routes — `POST /api/review/mark-duplicate` (writes `duplicate_of` + `review_state='duplicate'`; validates both claims exist; rejects self-duplicates and ineligible sources; source preserved) and `POST /api/review/resolve-similar` (clears `near_duplicate_of`; no-op guard; returns previous value for audit); `mapClaim` now exposes `duplicateOf` field; `reviewQueue` SQL excludes `review_state='duplicate'` alongside `archived`; `duplicate_total` added to queue metadata; both routes added to `HIGH_RISK_ROUTES`; worker-route-static-check 35→39 hard checks; no migrations, no frontend changes |
+| D-30 | docs-only | Canonical RunPack provenance checkpoint — confirms D-24B/D-28/D-29 provenance chain complete; documents all D-23A gaps closed; current v1.2 packet shape; checks 100/24/39; remaining optional work: AI-return packet_id D1 linkage (low priority), D-26 manual UI test; full record in `docs/D30_CANONICAL_RUNPACK_PROVENANCE_CHECKPOINT.md` |
 | D-29 | direct main | Frontend RunPack provenance de-duplication — `generateRunPack` now checks `data.packet.packet_id`; if Worker already stamped canonical provenance, only `humanx_app_version:'v10'` is merged on top (preserving server `packet_id`, `runpack_version:'1.2'`, `source_snapshot_hash`, etc.); fallback packets (catch path) unchanged — still use full `buildProvenanceMeta` with `is_fallback:true`; legacy v1.1 packets (no `packet_id` from Worker) still receive full frontend provenance; 1 new hardening smoke check (99→100); no backend/D1 changes |
 | D-28 | `be1f528` (PR #94) | Worker-side RunPack provenance — `workerSnapshotHash(detail)` hashes 8 stable fields (claim id/updated_at + sorted evidence/pressure/test ids+timestamps); `buildRunPack(detail, provenance)` accepts and spreads provenance; `createAipPacket` generates server-canonical `packet_id` via `makeId('rp')`, stamps `runpack_version:'1.2'`, `generated_at`, `source_claim_id`, `source_snapshot_hash`, counts, `humanx_worker_version:'v1'`, `is_fallback:false`; `claimDetail` queries enriched with `id`/`created_at` for evidence/pressure/tests; 4 new hardening smoke checks (95→99); no D1 migrations, no schema changes, no frontend changes |
 | D-27 | docs-only | RunPack provenance Phase 2 worker plan — documents Phase 1 behavior (D-24B); defines Worker-side `packet_id` generation via `makeId`, `workerSnapshotHash` (8-field hash: claim id/updated_at + evidence/pressure/test ids+timestamps sorted), server-stamped `runpack_version:'1.2'` and `generated_at`; compatibility analysis for Phase 1 packets, fallback packets, legacy v1.1, AI-return matching; maps `createAipPacket`, `buildRunPack`, `claimDetail`, and new `workerSnapshotHash` changes; testing plan with new smoke check targets; PR checklist; branch `feature/d27-runpack-provenance-worker`; no D1 migration required; full plan in `docs/D27_RUNPACK_PROVENANCE_PHASE2_WORKER_PLAN.md` |
@@ -153,19 +154,13 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-23 planning is complete. Three planning documents added:
-- `docs/D23_RUNPACK_PROVENANCE_PLAN.md` — packet_id, generated_at, evidence count snapshot, stale detection, AI return linkage, v1.2 schema; Phase 1 frontend-only, Phase 2 worker branch+PR
-- `docs/D23_INVESTIGATION_GRAPH_NAV_AUDIT.md` — 5 context-loss points identified and priority-ranked; `lastModeBeforeStudy` approach for back-navigation; scroll restoration plan
-- `docs/D23_BACKEND_MODERATION_PLAN.md` — mark-duplicate and resolve-similar endpoints; hard constraints (no auto-dedup, no silent merge, ancestry preserved, admin-only, branch+PR required); D1 audit prerequisite documented
+The D-23 planning chain and all implementation batches through D-30 are complete. The canonical RunPack provenance system (D-24B + D-28 + D-29) is fully operational. The D-24 moderation chain (D-24A → D-24G) is fully operational. Static checks hold at 100/24/39.
 
-No code changes in D-23. Static checks held at 91/24/35.
-
-Next work:
-
-1. **Run D-26 manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md` is ready. Execute when the user is ready to open a browser session against `humanx.rinkimirikata.com`. Use `HX_TEST_D26_` prefix for all test claims. Requires explicit per-session approval for any **[WRITE]** steps.
-2. **Live read smoke** — `scripts/read-endpoint-smoke-test.mjs` from a non-Windows-sandbox environment (CI or WSL) to verify public endpoints without write risk.
-3. **No live write smoke** without explicit per-session approval.
-4. **No production migration 0006 apply** unless `PRAGMA table_info(claims)` first confirms `near_duplicate_of` is absent.
+1. **Run D-26 manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md` covers RunPack provenance (section 8), duplicate-resolution (section 6), Study continuity (section 7), and more. Execute when the user is ready to open a browser session against `humanx.rinkimirikata.com`. Use `HX_TEST_D26_` prefix for all test claims. Requires explicit per-session approval for any **[WRITE]** steps.
+2. **AI-return `packet_id` D1 linkage** (optional, low priority) — extend `saveAnalysisResult` to extract and store `packet_id` alongside the saved analysis JSON. No schema migration needed; advisory toast already works without this.
+3. **Live read smoke** — `scripts/read-endpoint-smoke-test.mjs` from a non-Windows-sandbox environment (CI or WSL) to verify public endpoints without write risk.
+4. **No live write smoke** without explicit per-session approval.
+5. **No production migration 0006 apply** unless `PRAGMA table_info(claims)` first confirms `near_duplicate_of` is absent.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.

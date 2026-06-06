@@ -52,7 +52,7 @@ Expected results:
 Read these first when starting a new session or returning after time away.
 
 ### `PROJECT_STATE.md`
-Single-page checkpoint updated after Batch C-9. Covers current functional state, known-good check counts, batch history A-2 → C-9, backend/D1 safety rules, and known limitations (Windows schannel live smoke).
+Single-page checkpoint updated after D-30. Covers current functional state, known-good check counts (100/24/39), full batch history A-2 → D-30, backend/D1 safety rules, and known limitations (Windows schannel live smoke).
 **Read when:** starting any new session, picking up after a gap, or orienting before any frontend or backend task.
 
 ### `OPERATIONAL_STATUS.md`
@@ -271,7 +271,7 @@ Local static Belief Engine integrity checker. Reads `public/index.html`, `public
 
 ### `scripts/hardening-smoke-test.mjs`
 **Run:** `node scripts/hardening-smoke-test.mjs`
-70 checks (no HTTP, no live D1) covering: `isUniqueConstraintError` pure function, `meaningKey` normalisation stability, mock `attachEvidenceToClaim` INSERT OR IGNORE id fix, `safeRateLimit` fail-closed behaviour, `convertTruthToClaim` atomicity, `createTruth` linked_claim_id NULL guard, `ensureUser` SELECT-first pattern, `reviewCleanup` validation, `reviewQueue` archived metadata, belief-bridge FK safety, `reviewStatusBadge` frontend coverage, and known-good docs block integrity.
+100 checks (no HTTP, no live D1) covering: `isUniqueConstraintError` pure function, `meaningKey` normalisation stability, mock `attachEvidenceToClaim` INSERT OR IGNORE id fix, `safeRateLimit` fail-closed behaviour, `convertTruthToClaim` atomicity, `createTruth` linked_claim_id NULL guard, `ensureUser` SELECT-first pattern, `reviewCleanup` validation, `reviewQueue` archived metadata, belief-bridge FK safety, `reviewStatusBadge` frontend coverage, near-duplicate (`meaningMatch`) correctness, review moderation controls (mark-duplicate, resolve-similar), Worker RunPack provenance stamping (D-28), frontend provenance de-duplication guard (D-29), and known-good docs block integrity.
 **Use when:** confirming hardening logic is intact after any change to `src/worker.js`, `public/app-v10.js`, or before a Worker refactor. Note: the inlined helper copies in this script may drift from `src/worker.js` during a refactor — check they still match.
 
 ### `scripts/backfill-normalized-content.mjs`
