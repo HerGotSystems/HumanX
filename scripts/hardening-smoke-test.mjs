@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 103 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('103 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 103');
+test('docs/README.md documents hardening smoke count: 108 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('108 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 108');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -946,6 +946,58 @@ test('createAipPacket checks review_state public before buildRunPack (D-38)', ()
     workerSrc.includes("(detail.claim.reviewState||'public')!=='public'") &&
     workerSrc.includes('createAipPacket'),
     'createAipPacket must guard against non-public claims before building RunPack'
+  );
+});
+
+// ── 23. D-42B: Evidence moderation backend guards ────────────────────────────
+
+console.log('\n23. D-42B: Evidence moderation backend guards');
+
+test("insertEvidence INSERT includes review_state column and default param (D-42B)", () => {
+  assert.ok(
+    workerSrc.includes("INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at,review_state)"),
+    "insertEvidence INSERT must include review_state column"
+  );
+  assert.ok(
+    workerSrc.includes("reviewState='review'"),
+    "insertEvidence must have reviewState='review' as default parameter"
+  );
+});
+
+test("evidence-vault.js filters COALESCE(e.review_state,'public')='public' (D-42B)", () => {
+  assert.ok(
+    vaultSrc.includes("COALESCE(e.review_state,'public')='public'"),
+    "evidence-vault.js must filter evidence by its own review_state"
+  );
+});
+
+test("claimDetail evidence queries filter COALESCE(review_state,'public')='public' (D-42B)", () => {
+  assert.ok(
+    workerSrc.includes("FROM evidence WHERE claim_id=? AND COALESCE(review_state,'public')='public'"),
+    "claimDetail direct evidence query must include review_state filter"
+  );
+  assert.ok(
+    workerSrc.includes("WHERE l.claim_id=? AND COALESCE(e.review_state,'public')='public'"),
+    "claimDetail reused evidence query must include evidence review_state filter"
+  );
+});
+
+test("reportTarget handles targetType 'evidence' with auto-escalation (D-42B)", () => {
+  assert.ok(
+    workerSrc.includes("targetType === 'evidence'") &&
+    workerSrc.includes("UPDATE evidence SET report_count=report_count+1"),
+    "reportTarget must have an evidence branch that increments report_count and auto-escalates"
+  );
+});
+
+test("reviewDecision handles targetType 'evidence' and returns ok response (D-42B)", () => {
+  assert.ok(
+    workerSrc.includes("UPDATE evidence SET review_state=?, report_count=0 WHERE id=?"),
+    "reviewDecision evidence branch must update review_state and reset report_count"
+  );
+  assert.ok(
+    workerSrc.includes("allowed:['claim','truth','evidence']"),
+    "reviewDecision BAD_REVIEW_TARGET allowed list must include 'evidence'"
   );
 });
 

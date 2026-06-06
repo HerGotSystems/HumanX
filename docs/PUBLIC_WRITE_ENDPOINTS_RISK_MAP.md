@@ -50,13 +50,13 @@ The following files were read to produce this document:
 | POST | `/api/session` | Public — no auth | `users` (INSERT OR IGNORE) | None | Unlimited user creation; caller-supplied ID accepted without validation | Yes — confirm INSERT OR IGNORE is idempotent; confirm no ID injection possible |
 | POST | `/api/claims` | Public — requires `x-humanx-user` | `claims`, optionally `evidence`, `users`, `rate_limits` | Fail-closed rate limit: 8/hr per IP. Duplicate check via `normalized_claim` unique index | Duplicate-race on unique index (handled explicitly); `review_state` defaults to `'review'` not `'public'` — must not regress | Yes — duplicate claim, race condition, rate limit exhaustion, missing header |
 | POST | `/api/claim-vote` | Public — requires `x-humanx-user` | `claim_votes`, `claims` (score recalc) | Fail-closed rate limit: 120/hr per user+IP (confirmed in `OPERATIONAL_STATUS.md`) | Vote stuffing if rate limit weakened; score recalc must stay consistent | Yes — double-vote, rate limit, missing claim ID |
-| POST | `/api/evidence` | Public — requires `x-humanx-user` | `evidence`, `users`, `rate_limits`, `claims` (score recalc) | Fail-closed rate limit: 20/hr per IP | Spam evidence; score recalc side effect on parent claim | Yes — missing claim ID, empty body, rate limit |
+| POST | `/api/evidence` | Public — requires `x-humanx-user` | `evidence`, `users`, `rate_limits`, `claims` (score recalc) | Fail-closed rate limit: 20/hr per IP | D-42B: evidence inserted with `review_state='review'` — not publicly visible until admin approves. Spam evidence still enters DB but is invisible to users. Score recalc side effect on parent claim unchanged | Yes — missing claim ID, empty body, rate limit; confirm `review_state='review'` in inserted row |
 | POST | `/api/evidence-attach` | Public — requires `x-humanx-user` | `evidence_claim_links`, `users`, `rate_limits` | Delegates to `evidence-reuse.js` — rate limiting status uncertain from `worker.js` alone | Link spam; `INSERT OR IGNORE` returns actual DB link id (fixed in PR #13 — must not regress) | Yes — confirm rate limit active in module; confirm returned id is real DB id, not generated |
 | POST | `/api/truths` | Public — requires `x-humanx-user` | `truths`, `users`, `rate_limits` | Delegates to `truths.js` — rate limiting status uncertain from `worker.js` alone; duplicate check via `normalized_statement` unique index | Duplicate-race on unique index (handled in `truths.js`); spam truth creation | Yes — duplicate truth, race condition, confirm rate limit active in module |
 | POST | `/api/truth-to-claim` | Public — requires `x-humanx-user` | `claims`, `truth_claim_links`, `truths`, `users` | Delegates to `truth-claim-bridge.js` — rate limiting and duplicate handling uncertain from `worker.js` alone | Two-table write; partial failure risk if claim insert succeeds but link insert fails | Yes — partial failure path, duplicate bridge, confirm rate limit active in module |
 | POST | `/api/pressure` | Public — requires `x-humanx-user` | `pressure_points`, `users`, `rate_limits`, `claims` (score recalc) | Fail-closed rate limit: 20/hr per IP | Pressure spam; score recalc side effect on parent claim | Yes — missing claim ID, rate limit |
 | POST | `/api/tests` | Public — requires `x-humanx-user` | `home_tests`, `users`, `rate_limits`, `claims` | Fail-closed rate limit: 20/hr per IP. Validates claim existence before insert | Spam home tests; relies on claim existence check — must not be removed | Yes — nonexistent claim ID, short title/instructions, rate limit |
-| POST | `/api/report` | Public — requires `x-humanx-user` | `reports`, `claims` (auto-escalation), `users`, `rate_limits` | Fail-closed rate limit: 20/hr per IP | Report bombing: auto-escalates claim to `review_state='review'` at 2+ reports — can suppress legitimate claims | Yes — double report by same user, report count threshold, rate limit |
+| POST | `/api/report` | Public — requires `x-humanx-user` | `reports`, `claims` or `evidence` (auto-escalation), `users`, `rate_limits` | Fail-closed rate limit: 20/hr per IP | D-42B: supports `targetType='evidence'` — same report-bombing risk as claims. Evidence auto-escalates to `review_state='review'` at 2+ reports, hiding it from Study and Vault. Rate limit (20/hr per IP) is the only defence | Yes — double report by same user, report count threshold, rate limit; confirm evidence auto-escalation fires at threshold 2 |
 | POST | `/api/analysis` | Public — requires `x-humanx-user` | `analysis_results`, `users` | Delegates to `analysis-results.js` — rate limiting status uncertain from `worker.js` alone. No server-side AI call — caller supplies payload | Arbitrary analysis payload injection; no server validation visible in this file | Yes — empty payload, malformed payload, confirm rate limit active in module |
 | POST | `/api/belief-snapshots` | Public — requires `x-humanx-user` | `belief_snapshots`, `users` | Delegates to `belief-snapshots.js` — rate limiting and payload size validation uncertain from `worker.js` alone | Large snapshot payloads; snapshot spam | Yes — large payload, missing user, confirm rate limit active in module |
 | POST | `/api/belief-promote` | Public — requires `x-humanx-user` | `belief_snapshots`, downstream (`claims` or `truths`) | Delegates to `belief-bridge.js` — rate limiting uncertain; duplicate handling confirmed in `OPERATIONAL_STATUS.md` | Cross-system write; promoting a snapshot into claims/truths has downstream effects on scores and lineage | Yes — double-promote, promote nonexistent snapshot, confirm rate limit active in module |
@@ -91,6 +91,13 @@ recalculate parent claim score on success (`recalcClaimScore`). The score recalc
 side effect that touches `claims` — any change to the scoring logic has a write-side effect
 on claims data.
 
+**D-42B change to `/api/evidence`:** evidence is now inserted with `review_state='review'`
+explicitly. New evidence is not publicly visible in the Study view or Evidence Vault until an
+admin approves it via `/api/review/decision`. The response shape includes `review_state:'review'`
+in the returned evidence object — the frontend can use this to show a "pending review" note.
+Score recalculation still runs immediately (the score reflects all evidence regardless of
+review state in Phase 2 — this is a known limitation, to be tightened in D-44+).
+
 ### `POST /api/evidence-attach`
 Fixed in PR #13: now returns the actual D1 link id from the `INSERT OR IGNORE` row, not a
 freshly generated id. This must not regress. The fix is inside `src/evidence-reuse.js` —
@@ -107,6 +114,11 @@ be verified in those files before changes. `truth-to-claim` is a two-table write
 Auto-escalation is load-bearing: at 2+ reports a claim's `review_state` flips to `'review'`,
 hiding it from the public list. This means report-bombing a claim is a denial-of-visibility
 attack. The rate limit (20/hr per IP) is the only current defence.
+
+**D-42B addition:** `targetType='evidence'` is now supported. Evidence auto-escalation mirrors
+claim behaviour: 2+ reports flips `evidence.review_state` to `'review'`, hiding the evidence
+from Study and Vault. Report-bombing a piece of evidence is a denial-of-visibility attack on
+that specific evidence item. The same rate limit applies.
 
 ### `POST /api/analysis`
 No server-side AI is invoked. The caller submits their own analysis payload (from a RunPack
