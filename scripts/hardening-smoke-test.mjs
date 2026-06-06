@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 99 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('99 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 99');
+test('docs/README.md documents hardening smoke count: 100 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('100 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 100');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -905,6 +905,18 @@ test('createAipPacket stamps humanx_worker_version v1', () => {
   assert.ok(
     workerSrc.includes("humanx_worker_version:'v1'"),
     'createAipPacket provenance must include humanx_worker_version:v1'
+  );
+});
+
+// ── 21. D-29: Frontend RunPack provenance de-duplication ─────────────────────
+
+console.log('\n21. D-29: Frontend RunPack provenance de-duplication');
+
+test('generateRunPack preserves Worker packet_id when present (D-29)', () => {
+  assert.ok(
+    appSrc.includes('data.packet&&data.packet.packet_id') &&
+    appSrc.includes("humanx_app_version:'v10'"),
+    'generateRunPack must check data.packet.packet_id and only merge humanx_app_version when Worker already stamped provenance'
   );
 });
 
