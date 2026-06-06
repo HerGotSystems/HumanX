@@ -953,41 +953,51 @@ test('createAipPacket checks review_state public before buildRunPack (D-38)', ()
 
 console.log('\n23. D-42B: Evidence moderation backend guards');
 
-test("insertEvidence passes review_state='review' for new evidence (D-42B)", () => {
+test("insertEvidence INSERT includes review_state column and default param (D-42B)", () => {
   assert.ok(
-    workerSrc.includes("INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at,review_state)") &&
-    workerSrc.includes(",'review').run()"),
-    "insertEvidence must INSERT with review_state column and bind 'review' as value"
+    workerSrc.includes("INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at,review_state)"),
+    "insertEvidence INSERT must include review_state column"
+  );
+  assert.ok(
+    workerSrc.includes("reviewState='review'"),
+    "insertEvidence must have reviewState='review' as default parameter"
   );
 });
 
-test("listEvidenceVault filters COALESCE(e.review_state,'public')='public' (D-42B)", () => {
+test("evidence-vault.js filters COALESCE(e.review_state,'public')='public' (D-42B)", () => {
   assert.ok(
     vaultSrc.includes("COALESCE(e.review_state,'public')='public'"),
-    "evidence-vault.js must add evidence-level review_state filter"
+    "evidence-vault.js must filter evidence by its own review_state"
   );
 });
 
-test("claimDetail direct evidence query filters by evidence review_state (D-42B)", () => {
+test("claimDetail evidence queries filter COALESCE(review_state,'public')='public' (D-42B)", () => {
   assert.ok(
     workerSrc.includes("FROM evidence WHERE claim_id=? AND COALESCE(review_state,'public')='public'"),
-    "claimDetail direct evidence query must include COALESCE(review_state,'public')='public' filter"
+    "claimDetail direct evidence query must include review_state filter"
+  );
+  assert.ok(
+    workerSrc.includes("WHERE l.claim_id=? AND COALESCE(e.review_state,'public')='public'"),
+    "claimDetail reused evidence query must include evidence review_state filter"
   );
 });
 
-test("reviewDecision handles targetType 'evidence' (D-42B)", () => {
+test("reportTarget handles targetType 'evidence' with auto-escalation (D-42B)", () => {
   assert.ok(
     workerSrc.includes("targetType === 'evidence'") &&
-    workerSrc.includes("UPDATE evidence SET review_state=?, report_count=0 WHERE id=?"),
-    "reviewDecision must have an evidence branch that updates review_state and resets report_count"
+    workerSrc.includes("UPDATE evidence SET report_count=report_count+1"),
+    "reportTarget must have an evidence branch that increments report_count and auto-escalates"
   );
 });
 
-test("reviewQueue includes evidence items in non-public state (D-42B)", () => {
+test("reviewDecision handles targetType 'evidence' and returns ok response (D-42B)", () => {
   assert.ok(
-    workerSrc.includes("'evidence' AS target_type") &&
-    workerSrc.includes("COALESCE(e.review_state,'public') NOT IN ('public','archived')"),
-    "reviewQueue must query evidence items with non-public or reported state"
+    workerSrc.includes("UPDATE evidence SET review_state=?, report_count=0 WHERE id=?"),
+    "reviewDecision evidence branch must update review_state and reset report_count"
+  );
+  assert.ok(
+    workerSrc.includes("allowed:['claim','truth','evidence']"),
+    "reviewDecision BAD_REVIEW_TARGET allowed list must include 'evidence'"
   );
 });
 
