@@ -50,7 +50,7 @@ It does not propose changes. It does not define new endpoints.
 |---|---|---|---|---|---|
 | GET | `/api/claims` | Lists public claims, optionally filtered by `q` and `status` | Public | `claims`, `users` | Only returns `review_state='public'` rows. Limit capped at 50 |
 | POST | `/api/claims` | Submits a new claim | Public (requires `x-humanx-user`) | `claims`, `users`, `evidence`, `rate_limits` | Rate-limited (8/hr per IP). Duplicate detection via `normalized_claim`. New claims land in `review_state='review'`. Race condition on unique index handled explicitly |
-| GET | `/api/claims/:id` | Returns full claim detail including evidence, pressure, tests, analyses, and truth lineage | Public | `claims`, `users`, `evidence`, `evidence_claim_links`, `pressure_points`, `home_tests`, `analysis_results`, `truth_claim_links`, `truths` | Aggregates many tables. No `review_state` gate on direct fetch — returns any claim by ID |
+| GET | `/api/claims/:id` | Returns full claim detail including evidence, pressure, tests, analyses, and truth lineage | Public | `claims`, `users`, `evidence`, `evidence_claim_links`, `pressure_points`, `home_tests`, `analysis_results`, `truth_claim_links`, `truths` | Aggregates many tables. `review_state` guard added in D-38: returns `CLAIM_NOT_FOUND` for any claim where `review_state` is not `'public'` |
 | POST | `/api/claim-vote` | Records or updates a user's vote/stance on a claim (`believe`, `reject`, or `unsure`). Upserts into `claim_votes` (INSERT OR IGNORE / UPDATE pattern) then refreshes the claim's `belief_yes`, `belief_no`, and `uncertainty` vote counts. Returns updated claim shape. | Public (requires `x-humanx-user`) | `claim_votes`, `claims`, `users`, `rate_limits` | Rate-limited at 120/hr per user+IP (confirmed in `src/votes.js`). Delegates to `voteClaim` in `src/votes.js`. Response shape (`beliefYes`, `beliefNo`, `uncertainty` on the claim object) is used by the frontend — do not change casually. Invalid vote values are rejected with `BAD_VOTE`. |
 
 ### Evidence
@@ -59,7 +59,7 @@ It does not propose changes. It does not define new endpoints.
 |---|---|---|---|---|---|
 | POST | `/api/evidence` | Adds direct evidence to a claim | Public (requires `x-humanx-user`) | `evidence`, `users`, `rate_limits`, `claims` | Rate-limited (20/hr per IP). Recalculates claim score after insert |
 | POST | `/api/evidence-attach` | Reuses existing evidence and links it to a different claim | Public (requires `x-humanx-user`) | `evidence_claim_links`, `evidence`, `users`, `rate_limits` | Delegates to `evidence-reuse.js`. Rate limiting applied inside helper (uncertain — verify in module) |
-| GET | `/api/evidence-vault` | Lists evidence items from the vault | Public | `evidence` (uncertain — verify in module) | Delegates to `evidence-vault.js`. Exact query and filters uncertain from this file alone |
+| GET | `/api/evidence-vault` | Lists evidence items from the vault | Public | `evidence`, `claims` (JOIN) | Delegates to `evidence-vault.js`. D-38: evidence is filtered to only claims where `COALESCE(c.review_state,'public')='public'` — non-public claim evidence is excluded |
 
 ### Truths
 
@@ -106,8 +106,8 @@ It does not propose changes. It does not define new endpoints.
 
 | Method | Path | Purpose | Visibility | D1 tables touched | Risk notes |
 |---|---|---|---|---|---|
-| POST | `/api/runpack` | Builds and stores a RunPack task packet for a claim | Public (no user header required) | `aip_packets`, `claims`, `evidence`, `pressure_points`, `home_tests`, `analysis_results` | No rate limit. No auth required. Packet stored in `aip_packets`. Response includes full claim detail |
-| POST | `/api/aip` | Alias for `/api/runpack` — same handler, same behaviour | Public (no user header required) | Same as `/api/runpack` | Legacy route name. Both routes call `createAipPacket` |
+| POST | `/api/runpack` | Builds and stores a RunPack task packet for a claim | Public (no user header required) | `aip_packets`, `claims`, `evidence`, `pressure_points`, `home_tests`, `analysis_results` | No rate limit. No auth required. D-38: returns `CLAIM_NOT_FOUND` if claim `reviewState` is not `'public'` — prevents RunPack export of non-public claims |
+| POST | `/api/aip` | Alias for `/api/runpack` — same handler, same behaviour | Public (no user header required) | Same as `/api/runpack` | Legacy route name. Both routes call `createAipPacket`. Same D-38 `review_state` guard applies |
 
 ### Admin / Seed (Import)
 

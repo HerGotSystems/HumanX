@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 100 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('100 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 100');
+test('docs/README.md documents hardening smoke count: 103 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('103 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 103');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -917,6 +917,35 @@ test('generateRunPack preserves Worker packet_id when present (D-29)', () => {
     appSrc.includes('data.packet&&data.packet.packet_id') &&
     appSrc.includes("humanx_app_version:'v10'"),
     'generateRunPack must check data.packet.packet_id and only merge humanx_app_version when Worker already stamped provenance'
+  );
+});
+
+// ── 22. D-38: Public visibility guards ───────────────────────────────────────
+
+console.log('\n22. D-38: Public visibility guards');
+
+const vaultSrc = readFileSync(path.join(__dirname, '../src/evidence-vault.js'), 'utf8');
+
+test("evidence-vault.js contains COALESCE(c.review_state,'public')='public' public filter", () => {
+  assert.ok(
+    vaultSrc.includes("COALESCE(c.review_state,'public')='public'"),
+    "evidence-vault.js must filter evidence to only claims where COALESCE(c.review_state,'public')='public'"
+  );
+});
+
+test('getClaim has public visibility guard for non-public claims (D-38)', () => {
+  assert.ok(
+    workerSrc.includes("(claim.review_state||'public')!=='public'") &&
+    workerSrc.includes("getClaim(request, env, claimId)"),
+    'getClaim must check review_state and return CLAIM_NOT_FOUND for non-public claims'
+  );
+});
+
+test('createAipPacket checks review_state public before buildRunPack (D-38)', () => {
+  assert.ok(
+    workerSrc.includes("(detail.claim.reviewState||'public')!=='public'") &&
+    workerSrc.includes('createAipPacket'),
+    'createAipPacket must guard against non-public claims before building RunPack'
   );
 });
 
