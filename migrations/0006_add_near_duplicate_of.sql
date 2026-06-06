@@ -1,0 +1,44 @@
+-- Migration 0006: add near_duplicate_of column and index to claims.
+--
+-- PURPOSE
+-- -------
+-- Closes the schema gap documented in docs/D24C_BACKEND_MODERATION_D1_AUDIT.md (Q1).
+-- The column and index were manually applied to the production D1 database during
+-- D-10A (2026-06-06) via the Cloudflare D1 console.  They are absent from all prior
+-- migration files, meaning a fresh D1 rebuild from migrations would be missing them.
+--
+-- This file makes a fresh-rebuild path safe without touching production.
+--
+-- PRODUCTION SAFETY
+-- -----------------
+-- DO NOT run this migration against the production database.
+-- The column and index already exist there.  Applying ALTER TABLE on an existing column
+-- in SQLite raises "duplicate column name" and the index creation will also fail with
+-- "already exists".  Both failures are fatal and cannot be rolled back in SQLite.
+--
+-- Before running on ANY database, confirm the column is absent:
+--   PRAGMA table_info(claims);
+-- If near_duplicate_of appears in the output, skip this migration entirely.
+--
+-- APPLIES TO
+-- ----------
+-- Fresh D1 databases only — e.g. a new staging environment, a local Miniflare
+-- instance, or a disaster-recovery rebuild.
+--
+-- WHAT IT DOES
+-- ------------
+-- 1. Adds the near_duplicate_of TEXT column to claims.
+--    This column stores the ID of an existing claim that a newly submitted claim
+--    was flagged as similar to by meaningMatch() at intake time.  It is advisory —
+--    no automatic merge or suppression occurs.
+-- 2. Creates an index on near_duplicate_of to support efficient lookups when the
+--    review queue queries for claims with an active similarity advisory.
+--
+-- APPLIED IN PRODUCTION
+-- ---------------------
+-- Batch:  D-10A (2026-06-06)
+-- Method: Cloudflare D1 console (manual SQL execution)
+-- Index:  idx_claims_near_duplicate_of (confirmed present in production)
+
+ALTER TABLE claims ADD COLUMN near_duplicate_of TEXT;
+CREATE INDEX IF NOT EXISTS idx_claims_near_duplicate_of ON claims (near_duplicate_of);

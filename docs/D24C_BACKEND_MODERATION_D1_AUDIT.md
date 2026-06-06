@@ -144,11 +144,11 @@ Based on this audit, the recommended sequence on a new branch from main:
 
 ## Schema gaps identified
 
-| Gap | Risk | Action required before implementation |
-|-----|------|----------------------------------------|
-| `near_duplicate_of` not in any migration | A fresh D1 rebuild would be missing this column | Add `ALTER TABLE claims ADD COLUMN near_duplicate_of TEXT;` and `CREATE INDEX IF NOT EXISTS idx_claims_near_duplicate_of ON claims (near_duplicate_of);` to a new migration (candidate: 0006) — document only; do not apply yet |
-| `duplicate_of` not in `mapClaim` | Inspect panel shows null even when set | Update `mapClaim` in the implementation branch |
-| `review_state='duplicate'` not excluded from `reviewQueue` | Duplicate claims would linger in the review queue | Update `reviewQueue` query in implementation branch |
+| Gap | Risk | Status |
+|-----|------|--------|
+| `near_duplicate_of` not in any migration | A fresh D1 rebuild would be missing this column | **Closed (D-24F)** — `migrations/0006_add_near_duplicate_of.sql` created; safe for fresh rebuilds only; production must not reapply |
+| `duplicate_of` not in `mapClaim` | Inspect panel shows null even when set | **Closed (D-24D)** — `mapClaim` now returns `duplicateOf` field |
+| `review_state='duplicate'` not excluded from `reviewQueue` | Duplicate claims would linger in the review queue | **Closed (D-24D)** — `reviewQueue` SQL excludes `'duplicate'` alongside `'archived'` |
 
 ---
 
