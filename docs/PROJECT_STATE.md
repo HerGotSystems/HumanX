@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-60 seed import safety post-merge checkpoint.
+Last updated: 2026-06-06 after D-61 source URL candidate worksheet.
 
 ---
 
@@ -187,7 +187,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Evidence moderation stack complete and green (D-50–D-52). Seed launch prep and import route hardening complete (D-53–D-60): inventory, quality audit, source checklist, JSON draft, safety plan, safety implementation (merged PR #101), post-merge checkpoint. Next: D-61 source URL candidate worksheet (human research). D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
+Evidence moderation stack complete and green (D-50–D-52). Seed launch prep and import route hardening complete (D-53–D-61): inventory, quality audit, source checklist, JSON draft, safety plan, safety implementation (merged PR #101), post-merge checkpoint, source URL worksheet. Next: D-62 final launch seed pack after human source research fills the D-61 worksheet. D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
 
 1. **D-42B — ✅ COMPLETE** — merged PR #98 (`faa91af`). Backend evidence moderation. Static checks 108/24/39.
 2. **D-43 — ✅ COMPLETE** — `975129a` direct main. Evidence review UI. Static checks 110/24/39. Live green.
@@ -208,8 +208,8 @@ Evidence moderation stack complete and green (D-50–D-52). Seed launch prep and
 17. **D-58 — ✅ COMPLETE** — docs-only, direct main. Seed import route safety plan: 3 routes audited (GET /api/seed unauthenticated write, GET /api/import-seed no dry-run/public insert, GET /api/import-truths no dry-run/public insert); 10 risks documented; recommended changes (require admin on /api/seed, default ?mode=dry-run, review_state='review', SOURCE_NEEDED guard, structured report); D-59 implementation plan with files, 4 new hardening checks (113→117), branch name, PR checklist; 9-gate safety checklist. Full plan in `docs/D58_SEED_IMPORT_ROUTE_SAFETY_PLAN.md`.
 18. **D-59 — ✅ COMPLETE (PR #101 merged — commit `1c32745`)** — Worker branch + PR (`feature/d59-seed-import-route-safety`). `/api/seed` now requires admin token. `/api/import-seed` and `/api/import-truths` default to `?mode=dry-run`, validate mode param, and pass `{ dryRun: mode !== 'apply' }` to helpers. `importSeedData`: dryRun default, reviewState default 'review', SOURCE_NEEDED guard blocks apply if any source_url is empty/placeholder, claims+evidence inserted as `review_state='review'`, pressure/test dedup guards, structured report. `importTruthSeeds`: same dryRun/reviewState pattern, truths inserted as `review_state='review'`, structured report. Section 26 hardening checks added (6 checks, 113→119). Full record in `docs/D59_SEED_IMPORT_ROUTE_SAFETY_IMPLEMENTATION.md`. Static checks 119/24/39. No D1/Wrangler/import/live writes.
 19. **D-60 — ✅ COMPLETE** — docs-only, direct main. D-59 post-merge checkpoint: PR #101 merge commit `1c32745` recorded; all 8 route safety changes confirmed landed; static checks 119/24/39 confirmed on `main`; Read Smoke confirmed green; no import routes called; remaining gaps documented (all `source_url` fields empty/SOURCE_NEEDED → apply blocked by guard; launch JSON not finalized; no production import); next work sequence D-61 → D-62 → D-63 → D-64 documented. Full record in `docs/D60_D59_POSTMERGE_SEED_IMPORT_SAFETY_CHECKPOINT.md`.
-20. **D-61 — Source URL candidate worksheet** — human research + docs. For each of the 25 launch claims in D-55, locate and record 1–3 candidate source URLs per D-56 quality rules. No Worker changes. No D1. No imports. No seed file edits. Docs-only. Gated on human research.
-21. **D-62 — Final launch seed pack** — after D-61 sources verified. Update seed data files with confirmed URLs and finalized text. No import yet.
+20. **D-61 — ✅ COMPLETE** — docs-only, direct main. Source URL candidate worksheet created: 12 D-57 representative claims mapped to evidence slots (18 total slots) with preferred source class, reliability_score_proposed, evidence_body_draft placeholder, and verification_status; pressure source needs for 5 items; 12 truth framing decisions; 8-gate readiness checklist; all candidate_url fields are TODO_FIND_SOURCE (no URLs fabricated). Full worksheet in `docs/D61_SOURCE_URL_CANDIDATE_WORKSHEET.md`. Human research required to fill slots before any import.
+21. **D-62 — Final launch seed pack source-insertion draft** — after human fills D-61 worksheet with real verified URLs. All TODO_FIND_SOURCE → VERIFIED; evidence_body text finalized; readiness gates checked. No import yet. Docs-only.
 22. **D-63 — Gated dry-run import plan** — after D-62. Run `GET /api/import-seed?mode=dry-run` and `GET /api/import-truths?mode=dry-run` to confirm report shape. Requires explicit per-session approval to call any import route.
 23. **D-64 — Gated production import** — after D-63 dry-run reviewed. Run apply mode, then admin Review queue moderation of all new `review_state='review'` content. Requires explicit per-session D1/write approval.
 24. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
