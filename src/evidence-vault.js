@@ -25,7 +25,7 @@ export async function listEvidenceVault(request, env, helpers) {
     FROM evidence e
     LEFT JOIN claims c ON c.id=e.claim_id
     LEFT JOIN users u ON u.id=e.user_id
-    WHERE COALESCE(c.review_state,'public')='public' AND (e.title LIKE ? OR e.body LIKE ? OR COALESCE(e.source_url,'') LIKE ?)
+    WHERE COALESCE(c.review_state,'public')='public' AND COALESCE(e.review_state,'public')='public' AND (e.title LIKE ? OR e.body LIKE ? OR COALESCE(e.source_url,'') LIKE ?)
     ORDER BY e.reliability_score DESC, e.created_at DESC
     LIMIT ?
   `).bind(q, q, q, limit).all();
