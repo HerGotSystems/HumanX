@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-58 seed import route safety plan.
+Last updated: 2026-06-06 after D-59 seed import route safety implementation (branch + PR).
 
 ---
 
@@ -30,7 +30,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `113 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `119 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `39 passed, 0 failed (39 hard checks)` |
 
@@ -187,7 +187,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Evidence moderation stack complete and green (D-50–D-52). Seed launch prep complete (D-53–D-58): inventory, quality audit, source checklist, JSON draft, import route safety plan. Next: D-59 Worker branch+PR (import route safety implementation); D-60 source URL research. D-47 manual evidence test gated. Static baseline **113 / 24 / 39**.
+Evidence moderation stack complete and green (D-50–D-52). Seed launch prep complete (D-53–D-58). D-59 import route safety implementation complete (branch + PR open, awaiting merge). Next: merge D-59 PR, then D-60 source URL research. D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
 
 1. **D-42B — ✅ COMPLETE** — merged PR #98 (`faa91af`). Backend evidence moderation. Static checks 108/24/39.
 2. **D-43 — ✅ COMPLETE** — `975129a` direct main. Evidence review UI. Static checks 110/24/39. Live green.
@@ -206,7 +206,7 @@ Evidence moderation stack complete and green (D-50–D-52). Seed launch prep com
 15. **D-56 — ✅ COMPLETE** — docs-only, direct main. Source-gathering checklist: acceptable/disallowed source classes, evidence item template, per-category guidance, claim-by-claim table for all 25 D-55 claims, truth seed framing checklist, 7-step source review workflow. No URLs invented. Full checklist in `docs/D56_LAUNCH_SEED_SOURCE_GATHERING_CHECKLIST.md`.
 16. **D-57 — ✅ COMPLETE** — docs-only, direct main. Launch seed JSON draft: file shape for `data/seed_claims_v2.json`; claim + evidence + truth object schemas matched to current importer field sets; 12 draft claim objects + 12 draft truth objects with full body text and SOURCE_NEEDED placeholders; import safety notes (Option A: D-58 Worker change, Option B: admin-signed pack); future path D-58 → D-59 → D-60. No data files edited. No fake URLs. Full draft in `docs/D57_LAUNCH_SEED_JSON_DRAFT.md`.
 17. **D-58 — ✅ COMPLETE** — docs-only, direct main. Seed import route safety plan: 3 routes audited (GET /api/seed unauthenticated write, GET /api/import-seed no dry-run/public insert, GET /api/import-truths no dry-run/public insert); 10 risks documented; recommended changes (require admin on /api/seed, default ?mode=dry-run, review_state='review', SOURCE_NEEDED guard, structured report); D-59 implementation plan with files, 4 new hardening checks (113→117), branch name, PR checklist; 9-gate safety checklist. Full plan in `docs/D58_SEED_IMPORT_ROUTE_SAFETY_PLAN.md`.
-18. **D-59 — Seed import route safety implementation** — Worker branch + PR (`feature/d59-seed-import-safety`). Changes: `src/worker.js` route handler updates; `src/importer.js` review_state + dry-run + SOURCE_NEEDED guard + dedup guards + structured report; `src/truth-seed.js` review_state + dry-run + structured report; 4 new hardening checks (113→117).
+18. **D-59 — ✅ COMPLETE (PR open, not merged)** — Worker branch + PR (`feature/d59-seed-import-route-safety`). `/api/seed` now requires admin token. `/api/import-seed` and `/api/import-truths` default to `?mode=dry-run`, validate mode param, and pass `{ dryRun: mode !== 'apply' }` to helpers. `importSeedData`: dryRun default, reviewState default 'review', SOURCE_NEEDED guard blocks apply if any source_url is empty/placeholder, claims+evidence inserted as `review_state='review'`, pressure/test dedup guards, structured report. `importTruthSeeds`: same dryRun/reviewState pattern, truths inserted as `review_state='review'`, structured report. Section 26 hardening checks added (6 checks, 113→119). Full record in `docs/D59_SEED_IMPORT_ROUTE_SAFETY_IMPLEMENTATION.md`. Static checks 119/24/39. No D1/Wrangler/import/live writes.
 19. **D-60 — Source URL research + final seed pack** — human research + docs. Locate, verify, and record real URLs for each SOURCE_NEEDED placeholder in D-57; results recorded in a working doc following D-56 7-step workflow; update D-57 JSON draft with confirmed URLs; no import yet.
 20. **D-61 — Gated production import / cleanup plan** — after D-60 sources confirmed, D-59 safety change merged; step-by-step production import plan with dry-run review step; execution requires explicit per-session D1 approval.
 21. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.

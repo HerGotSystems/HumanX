@@ -36,7 +36,7 @@ It does not propose changes. It does not define new endpoints.
 |---|---|---|---|---|---|
 | GET | `/api/health` | Returns service status, mode flags, and AI mode label | Public | None | None — no DB read |
 | GET | `/api/debug` | Returns row counts for all tables and the 5 most recent claims | Internal-ish | All tables (COUNT only), `claims` | Exposes full table inventory and live data. No admin token required — relies on obscurity only |
-| GET | `/api/seed` | Seeds demo claims if `claims` table is empty | Internal-ish | `claims`, `users` | Runs INSERT OR IGNORE; safe to call on empty DB only. Returns early if data already exists |
+| GET | `/api/seed` | Seeds demo claims if `claims` table is empty | **Admin only** (D-59) | `claims`, `users` | D-59: now requires admin token (`x-humanx-admin`). Unauthenticated calls return 403. DB-empty guard preserved. Inserts as `review_state='public'` (demo fallback only — not used for launch pack) |
 
 ### Session / User
 
@@ -113,8 +113,8 @@ It does not propose changes. It does not define new endpoints.
 
 | Method | Path | Purpose | Visibility | D1 tables touched | Risk notes |
 |---|---|---|---|---|---|
-| GET | `/api/import-seed` | Imports seed claim data via `importer.js` | Admin only (`x-humanx-admin`) | Uncertain — delegates to `importer.js` | Mutates DB. Behaviour and idempotency depend on `importer.js` |
-| GET | `/api/import-truths` | Imports seed truth data via `truth-seed.js` | Admin only (`x-humanx-admin`) | Uncertain — delegates to `truth-seed.js` | Mutates DB. Behaviour and idempotency depend on `truth-seed.js` |
+| GET | `/api/import-seed` | Imports seed claim data via `importer.js` | Admin only (`x-humanx-admin`) | `claims`, `evidence`, `pressure_points`, `home_tests`, `users` | D-59: defaults to `?mode=dry-run` (no writes). Pass `?mode=apply` to commit. Claims and evidence inserted as `review_state='review'`. SOURCE_NEEDED guard blocks apply if any `source_url` is empty or contains placeholder. Returns structured import report |
+| GET | `/api/import-truths` | Imports seed truth data via `truth-seed.js` | Admin only (`x-humanx-admin`) | `truths`, `users` | D-59: defaults to `?mode=dry-run` (no writes). Pass `?mode=apply` to commit. Truths inserted as `review_state='review'`. Returns structured import report |
 
 ### Graph
 

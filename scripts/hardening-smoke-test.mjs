@@ -669,8 +669,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 113 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('113 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 113');
+test('docs/README.md documents hardening smoke count: 119 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('119 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 119');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1051,6 +1051,62 @@ test("reviewDecision evidence branch calls recalcClaimScore after decision (D-50
   assert.ok(
     workerSrc.includes("if (row.claim_id) await recalcClaimScore(env, row.claim_id).catch(()=>null);"),
     "reviewDecision evidence branch must call recalcClaimScore after updating review_state"
+  );
+});
+
+// ── 26. D-59: Seed import route safety ────────────────────────────────────────
+
+console.log('\n26. D-59: Seed import route safety');
+
+const importerSrc = readFileSync(path.join(__dirname, '../src/importer.js'), 'utf8');
+const truthSeedSrc = readFileSync(path.join(__dirname, '../src/truth-seed.js'), 'utf8');
+
+test('/api/seed route requires admin before writing (D-59)', () => {
+  assert.ok(
+    workerSrc.includes("if (url.pathname === '/api/seed' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError;"),
+    "/api/seed must call requireAdmin before any DB write"
+  );
+});
+
+test('/api/import-seed route defaults to dry-run mode (D-59)', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/import-seed'") &&
+    workerSrc.includes("url.searchParams.get('mode') || 'dry-run'") &&
+    workerSrc.includes("dryRun: mode !== 'apply'"),
+    "/api/import-seed must extract mode param, default to dry-run, and pass dryRun option"
+  );
+});
+
+test('/api/import-truths route defaults to dry-run mode (D-59)', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/import-truths'") &&
+    workerSrc.includes("dryRun: mode !== 'apply'"),
+    "/api/import-truths must extract mode param, default to dry-run, and pass dryRun option"
+  );
+});
+
+test("importSeedData uses reviewState parameter instead of hardcoded 'public' for claims (D-59)", () => {
+  assert.ok(
+    importerSrc.includes('reviewState') &&
+    importerSrc.includes("reviewState = 'review'") &&
+    !importerSrc.includes("now,\n          'public'\n        )\n        .run()"),
+    "importSeedData must use reviewState option for claims, not hardcoded 'public'"
+  );
+});
+
+test("importTruthSeeds uses reviewState parameter instead of hardcoded 'public' for truths (D-59)", () => {
+  assert.ok(
+    truthSeedSrc.includes('reviewState') &&
+    truthSeedSrc.includes("reviewState = 'review'"),
+    "importTruthSeeds must use reviewState option for truths, not hardcoded 'public'"
+  );
+});
+
+test('importSeedData SOURCE_NEEDED guard blocks apply mode when source_url is empty or placeholder (D-59)', () => {
+  assert.ok(
+    importerSrc.includes('SOURCE_NEEDED_BLOCKED') &&
+    importerSrc.includes("src.includes('SOURCE_NEEDED')"),
+    "importSeedData must check each evidence source_url for SOURCE_NEEDED placeholder and block apply if found"
   );
 });
 
