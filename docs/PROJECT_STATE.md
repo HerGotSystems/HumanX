@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-06 after D-22 D-series stabilization release checkpoint.
+Last updated: 2026-06-06 after D-23 RunPack provenance and investigation graph navigation planning.
 
 ---
 
@@ -127,6 +127,7 @@ All flows confirmed working (code audit + static checks):
 | D-20 | `b2f53ee` | Study dock refinement — renamed "Evidence & Pressure" section to "Attach Evidence / Pressure" (D-20A); added static microcopy to Report section (D-20A); added `min-height:32px` to `.runpack-side-status` to prevent layout jump between states (D-20C); added `#side-tools .actions{flex-direction:column}` + `button{width:100%}` at `max-width:900px` for clean narrow-width stacking (D-20D); no IDs, function names, or JS logic changed |
 | D-21 | docs-only | Visual QA audit of D-15 → D-20 — all five focus areas pass; no regressions found; no code changes; full checklist in `docs/D21_VISUAL_QA.md` |
 | D-22 | docs-only | D-series stabilization release checkpoint — full D-1 → D-21 summary, safety boundaries recorded, known-good checks confirmed at 91/24/35; full release note in `docs/D22_D_SERIES_STABILIZATION_RELEASE.md` |
+| D-23 | docs-only | Planning — D-23A: RunPack provenance (packet_id, generated_at, evidence count snapshot, stale detection, AI return linkage, v1.2 schema); D-23B: investigation graph nav audit (5 context-loss points, priority-ranked fixes, `lastModeBeforeStudy` approach); D-23C: backend moderation tooling plan (mark-duplicate, resolve-similar, hard constraints, D1 audit prerequisite) |
 
 ---
 
@@ -139,12 +140,18 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-D-22 D-series stabilization release checkpoint is complete. Full D-1 → D-21 batch summary, safety boundaries, and known-good check results (91/24/35) are recorded in `docs/D22_D_SERIES_STABILIZATION_RELEASE.md`. No code changes in D-22.
+D-23 planning is complete. Three planning documents added:
+- `docs/D23_RUNPACK_PROVENANCE_PLAN.md` — packet_id, generated_at, evidence count snapshot, stale detection, AI return linkage, v1.2 schema; Phase 1 frontend-only, Phase 2 worker branch+PR
+- `docs/D23_INVESTIGATION_GRAPH_NAV_AUDIT.md` — 5 context-loss points identified and priority-ranked; `lastModeBeforeStudy` approach for back-navigation; scroll restoration plan
+- `docs/D23_BACKEND_MODERATION_PLAN.md` — mark-duplicate and resolve-similar endpoints; hard constraints (no auto-dedup, no silent merge, ancestry preserved, admin-only, branch+PR required); D1 audit prerequisite documented
+
+No code changes in D-23. Static checks held at 91/24/35.
 
 Next work:
 
-1. **Moderator merge UI** (only after extended usage audit) — a "Mark as duplicate of" action in the review inspect panel that writes `duplicate_of` and sets `review_state='duplicate'`. Backend + frontend; **branch + PR required**. Do not implement speculatively.
-2. **RunPack provenance / versioning** (optional) — stamp generated packets with a claim snapshot hash and timestamp so AI analysis can be traced back to the state of the claim at generation time.
+1. **D-24A — Graph nav fixes** — implement `lastModeBeforeStudy` back-navigation and scroll restoration as designed in D-23B. Frontend-only, direct main.
+2. **D-24B — RunPack provenance Phase 1** — add provenance fields and stale-detection to `generateRunPack()` as designed in D-23A. Frontend-only, direct main.
+3. **D-24C — Backend moderation** — D1 audit first, then branch + PR for `POST /api/review/mark-duplicate` and `POST /api/review/resolve-similar` as designed in D-23C.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
