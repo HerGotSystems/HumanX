@@ -30,7 +30,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `119 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `127 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `39 passed, 0 failed (39 hard checks)` |
 
@@ -187,7 +187,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Evidence moderation stack complete and green (D-50–D-52). Seed launch prep in progress (D-53–D-76D). Review cycle complete: all 5 READY claims carry APPROVE_FOR_D76 — gate UNBLOCKED_FOR_D77. Next: D-77 create data/seed_claims_v2.json on feature branch + PR (no direct main commit; no import route; no D1). D-78 dry-run and D-79 apply remain gated on explicit per-session approvals. Truth seed framing deferred (HB-8 still open). D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
+Evidence moderation stack complete and green (D-50–D-52). Seed launch pack live (D-77–D-80G, all 5 claims public). Scoring audit complete (D-83A–D-83D). Status lock code support merged (D-83C PR #104). Production DB migration 0008 and A1 lock correction remain gated on explicit D-83E write approval. D-47 manual evidence test gated. Static baseline **127 / 24 / 39**.
 
 1. **D-42B — ✅ COMPLETE** — merged PR #98 (`faa91af`). Backend evidence moderation. Static checks 108/24/39.
 2. **D-43 — ✅ COMPLETE** — `975129a` direct main. Evidence review UI. Static checks 110/24/39. Live green.
@@ -245,8 +245,9 @@ Evidence moderation stack complete and green (D-50–D-52). Seed launch prep in 
 42k. **D-82 — ⛔ BLOCKED / optional** — public UX spot check. Open live site in browser, verify seed claim pages render, evidence attached, pressure points visible. No moderation.
 42l. **D-83A — ✅ COMPLETE** — scoring/status consistency audit. Root cause: `recalcClaimScore` unconditionally overwrites `claims.status` with algorithm-derived value; no editorial override mechanism exists. B5/A4/D2 drift (Proven→Strongly Supported) is low-risk and acceptable. A1 drift (Strongly Supported→Proven) is medium-risk — algorithm correct but stronger than D-76C editorial intent. Full analysis in `docs/D83A_SCORING_STATUS_CONSISTENCY_AUDIT.md`.
 42m. **D-83B — ✅ COMPLETE** — status lock policy decision recorded. Adopted Option 4: `status_locked` boolean column. B5/A4/D2 drift accepted (Strongly Supported is defensible). A1 to be locked at Strongly Supported after code support. One-off D1 correction explicitly rejected as non-durable. Full policy in `docs/D83B_STATUS_LOCK_POLICY_DECISION.md`.
-42n. **D-83C — ⛔ BLOCKED** — branch + PR implementing `status_locked` INTEGER DEFAULT 0 column on claims, `recalcClaimScore` guard in `src/claim-scoring.js`, static test coverage. Requires explicit instruction to begin.
-42o. **D-83D — ⛔ BLOCKED** — production correction: set `status_locked=1` and `status='Strongly Supported'` on `clm_seed_55e17c22e13e` (launch-A1) only. Requires D-83C merged AND explicit write approval in same session.
+42n. **D-83C — ✅ COMPLETE** — branch + PR #104 (feature/d83c-status-lock, merge commit `7f69f26`). `migrations/0008_add_status_locked.sql` (`ALTER TABLE claims ADD COLUMN status_locked INTEGER NOT NULL DEFAULT 0`); `src/claim-scoring.js` reads `status_locked`, splits UPDATE on lock state, returns `statusLocked` flag; `src/worker.js` `mapClaim` exposes `statusLocked`; section 27 added to hardening smoke (8 tests, 119→127). Static checks 127/24/39. Production DB migration 0008 NOT yet applied. A1 NOT yet locked. Full record in `docs/D83C_STATUS_LOCK_IMPLEMENTATION_PROPOSAL.md`.
+42o. **D-83D — ✅ COMPLETE** — docs-only production apply plan. Exact D-83E SQL documented: PRAGMA preflight, migration 0008, A1 UPDATE with text guard, post-write verification. Failure handling (6 scenarios), rollback plan (4 scenarios), D-83E gate defined. No D1 writes. No Wrangler. No status correction. Full plan in `docs/D83D_PRODUCTION_STATUS_LOCK_APPLY_PLAN.md`.
+42p. **D-83E — ⛔ BLOCKED** — production apply execution: apply migration 0008 to D1, set `status_locked=1` and `status='Strongly Supported'` on `clm_seed_55e17c22e13e` (launch-A1) only. Requires explicit D1 write approval in same session as execution.
 42m. **D-84 — ⛔ BLOCKED / optional** — pre-existing reported claims cleanup. 21 non-seed claims in review queue, 5 are reported public user-submitted claims. Consider moderation or archival.
 43. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
 44. **Optional score backfill** — batch `recalcClaimScore` across all affected claims. Requires explicit per-session D1 approval + controlled script. Scores self-correct on next trigger.
