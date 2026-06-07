@@ -105,15 +105,15 @@ They serve as the draft record from which D-76 will construct the actual JSON fi
 
 ---
 
-### 3.2 — A-1: MMR Vaccine Does Not Cause Autism
+### 3.2 — A-1: MMR Vaccine / Autism (EDITED — D-76B)
 
 ```
 {
   "seed_id": "launch-A1",
-  "claim": "The MMR vaccine does not cause autism",
+  "claim": "Large population studies and systematic reviews have not found evidence that the MMR vaccine causes autism",
   "category": "Science / Medicine",
   "type": "Physical/Testable",
-  "status": "Proven",
+  "status": "Strongly Supported",
   "review_state_intended": "review",
   "launch_priority": "high",
   "risk_level": "high",
@@ -152,7 +152,7 @@ They serve as the draft record from which D-76 will construct the actual JSON fi
     }
   ],
   "tests": [],
-  "notes": "A-1 fully resolved D-68. CDC autism page REJECTED (Nov 2025 policy reversal — content now contradicts claim; peer-reviewed evidence unaffected). Pressure: Wakefield fraud and retraction."
+  "notes": "A-1 fully resolved D-68. CDC autism page REJECTED (Nov 2025 policy reversal — content now contradicts claim; peer-reviewed evidence unaffected). Pressure: Wakefield fraud and retraction. EDIT D-76B: claim text rephrased from absolute negation ('does not cause') to evidence-based framing ('have not found evidence'); status changed Proven → Strongly Supported for calibration and launch risk reduction. All source URLs, evidence bodies, pressure bodies, and reliability scores unchanged."
 }
 ```
 
@@ -211,12 +211,12 @@ They serve as the draft record from which D-76 will construct the actual JSON fi
 
 ---
 
-### 3.4 — C-1: Social Media Algorithms Amplify Content Based on Engagement
+### 3.4 — C-1: Online Platform Recommendation Systems / Engagement (EDITED — D-76B)
 
 ```
 {
   "seed_id": "launch-C1",
-  "claim": "Social media algorithms amplify certain content based on engagement signals, affecting which information spreads widely",
+  "claim": "Online platform recommendation systems can use engagement signals that influence which information spreads widely",
   "category": "Civic / Media Literacy",
   "type": "Sociological/Observable",
   "status": "Plausible",
@@ -258,7 +258,7 @@ They serve as the draft record from which D-76 will construct the actual JSON fi
     }
   ],
   "tests": [],
-  "notes": "C-1 fully resolved D-69. Pressure source shares URL with evidence slot 2 (YouTube blog) — dual-use approved per D-63 note. Pressure angle: platform responsibility argument. Status Plausible (not Proven) — claim is observable/sociological; causal magnitude contested."
+  "notes": "C-1 fully resolved D-69. Pressure source shares URL with evidence slot 2 (YouTube blog) — dual-use approved per D-63 note. Pressure angle: platform responsibility argument. Status Plausible (not Proven) — claim is observable/sociological; causal magnitude contested. EDIT D-76B: claim text narrowed from 'social media algorithms amplify' (too broad — implies all platforms and all algorithm types) to 'online platform recommendation systems can use engagement signals that influence' (scoped to recommendation systems; hedged with 'can use'). Status remains Plausible. All source URLs, evidence bodies, pressure bodies, and reliability scores unchanged."
 }
 ```
 

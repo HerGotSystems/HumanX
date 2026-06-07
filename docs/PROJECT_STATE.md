@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-07 after D-76B ChatGPT seed review decisions.
+Last updated: 2026-06-07 after D-76C launch seed review edits applied.
 
 ---
 
@@ -187,7 +187,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Evidence moderation stack complete and green (D-50–D-52). Seed launch prep in progress (D-53–D-76B). ChatGPT review complete: 3/5 APPROVE_FOR_D76 (B-5, A-4, D-2); 2/5 NEEDS_EDIT (A-1 claim text + status label; C-1 claim text). Gate BLOCKED. Next: D-76C docs-only edit of A-1 and C-1 in source insertion draft → re-review edited claims → D-77 executable JSON branch+PR only after all 5 carry APPROVE_FOR_D76. No import route calls, no D1, no live write smoke without approval. Truth seed framing deferred (HB-8 still open). D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
+Evidence moderation stack complete and green (D-50–D-52). Seed launch prep in progress (D-53–D-76C). D-76C edits applied to D-74: A-1 claim text rephrased + status Proven→Strongly Supported; C-1 claim text narrowed to recommendation systems. No source URLs, evidence bodies, or scores changed. Gate BLOCKED — A-1 and C-1 are EDIT_APPLIED_REVIEW_PENDING. Next: D-76D re-review of edited A-1 and C-1 wording → if both approved, D-77 creates data/seed_claims_v2.json on branch+PR. No import route calls, no D1, no live write smoke without approval. Truth seed framing deferred (HB-8 still open). D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
 
 1. **D-42B — ✅ COMPLETE** — merged PR #98 (`faa91af`). Backend evidence moderation. Static checks 108/24/39.
 2. **D-43 — ✅ COMPLETE** — `975129a` direct main. Evidence review UI. Static checks 110/24/39. Live green.
@@ -226,16 +226,17 @@ Evidence moderation stack complete and green (D-50–D-52). Seed launch prep in 
 35. **D-76 — ✅ COMPLETE** — docs-only, direct main. Launch seed human review gate status recorded: executable JSON creation BLOCKED — 0 of 5 READY claims have a recorded decision; criteria 1 and 2 of the 9-criterion D-75 entry gate are unsatisfied; source URL table, step-by-step unblocking instructions, and safety boundaries for D-76B through D-78 documented. Full record in `docs/D76_LAUNCH_SEED_HUMAN_REVIEW_GATE_STATUS.md`.
 36. **D-76A — ✅ COMPLETE** — docs-only, direct main. ChatGPT review packet extracted: full claim metadata, evidence items (body + field table + source research notes), pressure items, review checklist rows, and blank decision fields for all 5 READY claims; summary decision table; reviewer instructions. Full packet in `docs/D76A_CHATGPT_REVIEW_PACKET.md`.
 37. **D-76B — ✅ COMPLETE** — docs-only, direct main. ChatGPT review decisions recorded: 3/5 APPROVE_FOR_D76 (B-5, A-4, D-2); 2/5 NEEDS_EDIT (A-1: claim text + status label; C-1: claim text). Approved claim values locked. Required edits for A-1 and C-1 documented exactly. Gate BLOCKED — criteria 1 and 2 unsatisfied until edits applied and re-reviewed. Full record in `docs/D76B_CHATGPT_REVIEW_DECISIONS.md`.
-38. **D-76C — Apply A-1 and C-1 edits** — docs-only. Edit claim text for A-1 (rephrase + status Proven→Strongly Supported) and C-1 (narrow claim text). Create `docs/D76C_EDITED_CLAIMS_DRAFT.md`. Re-review against D-76B required changes. BLOCKED until D-76B (this item).
-39. **D-77 — Executable JSON file proposal** — branch + PR only. Create `data/seed_claims_v2.json` for all 5 READY claims with APPROVE_FOR_D76; no direct main commit; PR reviewed before merge. BLOCKED until D-76C re-review clears all 5 claims.
-40. **D-78 — Gated dry-run import** — after D-77 merged. Call `GET /api/import-seed?mode=dry-run`; review structured report; confirm `source_needed_blocked: 0`. Requires explicit per-session approval.
-41. **D-79 — Gated production apply** — after D-78 dry-run reviewed. Call `?mode=apply`; moderate all new `review_state='review'` content in admin Review queue. Requires separate explicit per-session D1/write approval.
-42. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
-43. **Optional score backfill** — batch `recalcClaimScore` across all affected claims. Requires explicit per-session D1 approval + controlled script. Scores self-correct on next trigger.
-44. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
-45. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
-46. **No live write smoke** without explicit per-session approval.
-47. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
+38. **D-76C — ✅ COMPLETE** — docs-only, direct main. Applied ChatGPT review edits to `docs/D74_SOURCE_INSERTION_DRAFT.md`: A-1 claim text rephrased from absolute negation to evidence-based framing; A-1 status Proven→Strongly Supported; C-1 claim text narrowed from "social media algorithms amplify" to "online platform recommendation systems can use engagement signals that influence." No source URLs, evidence bodies, pressure bodies, or reliability scores changed. D-75 decision table updated with APPROVE_FOR_D76 for B-5/A-4/D-2 and EDIT_APPLIED_REVIEW_PENDING for A-1/C-1. Edit record in `docs/D76C_REVIEW_EDIT_APPLY_RECORD.md`. Gate remains BLOCKED.
+39. **D-76D — Re-review edited A-1 and C-1** — docs-only. Confirm edited wording matches D-76B requirements and sources still support the revised claims. Record APPROVE_FOR_D76 for both if accepted. BLOCKED until D-76C (this item).
+40. **D-77 — Executable JSON file proposal** — branch + PR only. Create `data/seed_claims_v2.json` for all 5 READY claims with APPROVE_FOR_D76; no direct main commit; PR reviewed before merge. BLOCKED until D-76D re-review clears all 5 claims.
+41. **D-78 — Gated dry-run import** — after D-77 merged. Call `GET /api/import-seed?mode=dry-run`; review structured report; confirm `source_needed_blocked: 0`. Requires explicit per-session approval.
+42. **D-79 — Gated production apply** — after D-78 dry-run reviewed. Call `?mode=apply`; moderate all new `review_state='review'` content in admin Review queue. Requires separate explicit per-session D1/write approval.
+43. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
+44. **Optional score backfill** — batch `recalcClaimScore` across all affected claims. Requires explicit per-session D1 approval + controlled script. Scores self-correct on next trigger.
+45. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
+46. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
+47. **No live write smoke** without explicit per-session approval.
+48. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.

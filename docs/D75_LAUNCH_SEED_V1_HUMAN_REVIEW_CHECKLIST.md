@@ -248,11 +248,11 @@ decision. EXCLUDED claims are listed for completeness.
 
 | Claim | seed_id | Decision | Notes / corrections required |
 |-------|---------|----------|------------------------------|
-| Holocaust: six million | `launch-B5` | _[reviewer records]_ | |
-| MMR vaccine / autism | `launch-A1` | _[reviewer records]_ | |
-| CO₂ / climate driver | `launch-A4` | _[reviewer records]_ | |
-| Social media algorithms | `launch-C1` | _[reviewer records]_ | |
-| Sleep deprivation | `launch-D2` | _[reviewer records]_ | |
+| Holocaust: six million | `launch-B5` | **APPROVE_FOR_D76** (D-76B) | Strong launch candidate. Keep neutral wording; avoid performative denial framing. |
+| MMR vaccine / autism | `launch-A1` | **EDIT_APPLIED_REVIEW_PENDING** (D-76C) | Claim text rephrased; status Proven→Strongly Supported. Re-review required before approval. |
+| CO₂ / climate driver | `launch-A4` | **APPROVE_FOR_D76** (D-76B) | Strong launch candidate. Dual-use IPCC source acceptable. |
+| Social media algorithms | `launch-C1` | **EDIT_APPLIED_REVIEW_PENDING** (D-76C) | Claim text narrowed to recommendation systems. Re-review required before approval. |
+| Sleep deprivation | `launch-D2` | **APPROVE_FOR_D76** (D-76B) | Strong, low-risk launch candidate. No pressure source required. |
 | Smoking / lung cancer | `launch-B4` | _[reviewer records — PARTIAL; only promote if slot 3 gap is explicitly accepted]_ | |
 | Eyewitness testimony | `launch-C2` | _[reviewer records — PARTIAL; only promote if pressure gap is explicitly accepted]_ | |
 | Dunning-Kruger | `launch-D3` | _[reviewer records — PARTIAL; only promote if Nuhfer 2016 CANDIDATE is accepted for critique slot]_ | |
@@ -302,6 +302,23 @@ D-76 (final JSON file proposal) may begin only when ALL of the following are tru
 | No Wrangler | ✅ Confirmed |
 | No frontend or Worker changes | ✅ Confirmed |
 | No executable JSON files created | ✅ Confirmed — D-75 is a checklist document only |
+
+---
+
+## 9. Review Status Summary (Updated D-76B / D-76C)
+
+Added after ChatGPT review (D-76A/D-76B) and edit application (D-76C).
+
+| seed_id | Claim | Review status | Gate contribution |
+|---------|-------|--------------|-------------------|
+| `launch-B5` | The Holocaust resulted in the murder of approximately six million Jews | **APPROVE_FOR_D76** | ✅ |
+| `launch-A4` | Rising CO2 levels from human activity are the primary driver of observed global warming | **APPROVE_FOR_D76** | ✅ |
+| `launch-D2` | Sleep deprivation significantly impairs cognitive performance, even when individuals feel only mildly sleepy | **APPROVE_FOR_D76** | ✅ |
+| `launch-A1` | Large population studies and systematic reviews have not found evidence that the MMR vaccine causes autism *(edited D-76C)* | **EDIT_APPLIED_REVIEW_PENDING** | ❌ pending re-review |
+| `launch-C1` | Online platform recommendation systems can use engagement signals that influence which information spreads widely *(edited D-76C)* | **EDIT_APPLIED_REVIEW_PENDING** | ❌ pending re-review |
+
+**Overall gate status: BLOCKED** — 3/5 approved; 2/5 pending re-review after edits.
+D-77 executable JSON creation may not proceed until A-1 and C-1 carry APPROVE_FOR_D76.
 
 ---
 
