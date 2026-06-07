@@ -7,7 +7,7 @@ export async function recalcClaimScore(env, claimId) {
     WHERE l.claim_id=? AND COALESCE(e.review_state,'public')='public'
   `).bind(claimId).all();
   const pressure = await env.DB.prepare(`SELECT severity FROM pressure_points WHERE claim_id=?`).bind(claimId).all();
-  const claim = await env.DB.prepare(`SELECT type,testability FROM claims WHERE id=?`).bind(claimId).first();
+  const claim = await env.DB.prepare(`SELECT type,testability,status_locked FROM claims WHERE id=?`).bind(claimId).first();
 
   const evidenceRows = [...(directEvidence.results || []), ...(reusedEvidence.results || [])];
   const supportRows = evidenceRows.filter(e => String(e.stance || 'support').toLowerCase() !== 'pressure');
@@ -18,13 +18,22 @@ export async function recalcClaimScore(env, claimId) {
   const contradictions = (pressure.results || []).length + pressureEvidenceRows.length;
   const testability = Number(claim?.testability || 50);
   const survivability = clamp(Math.round(avg - pressureSeverity * 1.8 + testability * 0.22), 0, 100);
-  const status = verdict(claim?.type || '', avg, testability, survivability, contradictions);
+  const computedStatus = verdict(claim?.type || '', avg, testability, survivability, contradictions);
 
-  await env.DB.prepare(`UPDATE claims SET evidence_score=?, survivability=?, contradictions=?, status=?, updated_at=? WHERE id=?`)
-    .bind(avg, survivability, contradictions, status, Date.now(), claimId)
-    .run();
+  if (claim?.status_locked) {
+    // Status is editorially locked — update computed fields only, preserve existing status
+    await env.DB.prepare(`UPDATE claims SET evidence_score=?, survivability=?, contradictions=?, updated_at=? WHERE id=?`)
+      .bind(avg, survivability, contradictions, Date.now(), claimId)
+      .run();
+  } else {
+    // Default behavior — update all fields including status
+    await env.DB.prepare(`UPDATE claims SET evidence_score=?, survivability=?, contradictions=?, status=?, updated_at=? WHERE id=?`)
+      .bind(avg, survivability, contradictions, computedStatus, Date.now(), claimId)
+      .run();
+  }
 
-  return { evidenceScore: avg, survivability, contradictions, status, testability };
+  const status = claim?.status_locked ? undefined : computedStatus;
+  return { evidenceScore: avg, survivability, contradictions, status: computedStatus, statusLocked: !!(claim?.status_locked), testability };
 }
 
 export function verdict(type, avg, testability, survivability, contradictions) {
