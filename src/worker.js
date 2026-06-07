@@ -96,7 +96,7 @@ async function reviewCleanup(request, env) {
   // ── fetch row ─────────────────────────────────────────────────────────────
   let row;
   if (targetType==='claim') {
-    row=await env.DB.prepare(`SELECT id,claim,review_state,status_locked,handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(targetId).first();
+    row=await env.DB.prepare(`SELECT c.id,c.claim,c.review_state,c.status_locked,u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(targetId).first();
     if (!row) return json({ error:'CLAIM_NOT_FOUND' },404);
   } else {
     row=await env.DB.prepare(`SELECT id,statement,review_state,status_locked FROM truths WHERE id=?`).bind(targetId).first();
