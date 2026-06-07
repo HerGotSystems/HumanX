@@ -1,6 +1,6 @@
 export async function addAnalysisResult(request, env, helpers) {
   const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
-  const userId = requireUser(request);
+  const userId = await requireUser(request);
   await safeRateLimit(request, env, `analysis:${ip(request)}`, 20, 3600000);
   const body = await readJson(request);
   const claimId = cleanId(body.claimId || body.claim_id || '');

@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 119 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('119 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 119');
+test('docs/README.md documents hardening smoke count: 155 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('155 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 155');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1280,6 +1280,67 @@ test('D-83C: recalcClaimScore does not hardcode any claim ID (D-83C)', () => {
   assert.ok(
     !hardcodedIds || hardcodedIds.length === 0,
     "recalcClaimScore must not contain any hardcoded claim IDs"
+  );
+});
+
+// ── Section 28 — D-89C: Shadow ban enforcement ───────────────────────────────
+
+console.log('\n28. D-89C: Shadow ban enforcement');
+
+test('D-89C: requireUser is declared as async function (D-89C)', () => {
+  assert.ok(
+    workerSrc.includes('async function requireUser(request, env)'),
+    "requireUser must be declared as async function with (request, env) signature"
+  );
+});
+
+test('D-89C: requireUser queries is_shadow_banned from users table (D-89C)', () => {
+  assert.ok(
+    workerSrc.includes('SELECT is_shadow_banned FROM users WHERE id=?'),
+    "requireUser must query is_shadow_banned from users table"
+  );
+});
+
+test('D-89C: requireUser throws USER_SHADOW_BANNED when banned (D-89C)', () => {
+  assert.ok(
+    workerSrc.includes("throw new Error('USER_SHADOW_BANNED')"),
+    "requireUser must throw USER_SHADOW_BANNED when is_shadow_banned is truthy"
+  );
+});
+
+test('D-89C: catch block handles USER_SHADOW_BANNED with 403 (D-89C)', () => {
+  assert.ok(
+    workerSrc.includes("message.includes('USER_SHADOW_BANNED')") &&
+    workerSrc.includes("json({ error:'UNAUTHORIZED', message:'Action not permitted.' },403)"),
+    "catch block must handle USER_SHADOW_BANNED and return 403 UNAUTHORIZED"
+  );
+});
+
+test('D-89C: requireUser guards DB lookup with env?.DB presence check (D-89C)', () => {
+  assert.ok(
+    workerSrc.includes('if (env?.DB)'),
+    "requireUser must guard DB lookup with env?.DB to stay safe when env is undefined"
+  );
+});
+
+test('D-89C: createClaim uses await requireUser(request, env) (D-89C)', () => {
+  assert.ok(
+    workerSrc.includes('async function createClaim(request, env) { const userId = await requireUser(request, env);'),
+    "createClaim must await requireUser with env for shadow-ban check"
+  );
+});
+
+test('D-89C: addPressure uses await requireUser(request, env) (D-89C)', () => {
+  assert.ok(
+    workerSrc.includes('async function addPressure(request, env) { const userId=await requireUser(request, env);'),
+    "addPressure must await requireUser with env for shadow-ban check"
+  );
+});
+
+test('D-89C: module dispatch passes env-bound requireUser to helpers (D-89C)', () => {
+  assert.ok(
+    workerSrc.includes('requireUser: async (req) => requireUser(req, env)'),
+    "module dispatch helpers must pass env-bound async requireUser so modules receive the ban check"
   );
 });
 

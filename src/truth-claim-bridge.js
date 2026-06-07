@@ -2,7 +2,7 @@ import { meaningKey } from './meaning-key.js';
 
 export async function convertTruthToClaim(request, env, helpers) {
   const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
-  const userId = requireUser(request);
+  const userId = await requireUser(request);
   await safeRateLimit(request, env, `truth-claim:${ip(request)}`, 8, 3600000);
   const body = await readJson(request);
 
