@@ -166,5 +166,6 @@ All static check suites pass on the branch:
 | No status_locked = 1 set on any claim | ✅ |
 | docs/D83C_STATUS_LOCK_IMPLEMENTATION_PROPOSAL.md created | ✅ |
 | Committed to branch: feat: add status lock support for claim scoring | ✅ |
-| PR opened against main | ✅ |
+| Branch pushed to origin/feature/d83c-status-lock | ✅ |
+| PR opened against main | ⏳ — open manually: https://github.com/HerGotSystems/HumanX/pull/new/feature/d83c-status-lock |
 | D-83D remains blocked | ✅ |
