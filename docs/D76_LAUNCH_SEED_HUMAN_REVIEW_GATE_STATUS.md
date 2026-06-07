@@ -237,3 +237,20 @@ Requires separate explicit per-session D1/write approval.
 | No seed files edited | ✅ |
 | No import routes called | ✅ |
 | No D1/Wrangler/live writes | ✅ |
+
+---
+
+## D-76D Outcome Note (added 2026-06-07)
+
+All 5 READY claims now carry `APPROVE_FOR_D76` following the D-76A → D-76D review cycle:
+
+- **D-76A** — ChatGPT review packet extracted
+- **D-76B** — ChatGPT review: B-5, A-4, D-2 approved; A-1 and C-1 flagged NEEDS_EDIT
+- **D-76C** — Edits applied: A-1 claim text rephrased + status Proven→Strongly Supported; C-1 claim text narrowed to recommendation systems
+- **D-76D** — Final re-review: A-1 and C-1 approved with revised wording
+
+**Gate status: UNBLOCKED_FOR_D77**
+
+D-77 is authorised to create `data/seed_claims_v2.json` on a feature branch + PR.
+No import route has been called. No production data has been mutated.
+D-78 (dry-run) and D-79 (apply) remain gated on explicit per-session approvals.
