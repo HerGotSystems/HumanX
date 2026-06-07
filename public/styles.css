@@ -137,6 +137,8 @@
 .review-card-duplicate{opacity:.5}
 /* Truth-type review cards — subtle amber tint so truth vs claim is scannable */
 .review-card-truth{background:linear-gradient(180deg,rgba(255,209,102,.04),rgba(16,19,29,.86));border-left-color:#ffd16688!important}
+/* Pressure-type review cards — subtle orange tint */
+.review-card-pressure{border-left:3px solid #ff9a3caa;background:linear-gradient(180deg,rgba(255,154,60,.04),rgba(16,19,29,.86))}
 /* Truth cards in Truths workspace */
 .truth-card{border-left:3px solid #ffd16644}
 .truth-card:hover{border-left-color:var(--yellow)}
@@ -305,6 +307,7 @@
 .review-audit-stat-similar .review-audit-n{color:#f0a83a}
 .b-similar{color:#f0a83a;border-color:#f0a83a55}
 .b-quality{color:#c4a460;border-color:#c4a46055}
+.b-orange{color:#ff9a3c;border-color:#ff9a3c66}
 .b-purple{color:var(--purple);border-color:#a066ff66}
 /* Claim quality hints — submit form live feedback */
 .claim-quality-hints{margin:4px 0 0}

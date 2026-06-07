@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-07 after D-76D final launch seed review approval.
+Last updated: 2026-06-08 after D-90C pressure moderation frontend PR opened.
 
 ---
 
@@ -30,7 +30,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `175 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `190 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `39 passed, 0 failed (39 hard checks)` |
 
@@ -187,7 +187,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Evidence moderation stack complete and green (D-50–D-52). Seed launch pack live (D-77–D-80G, all 5 claims public). Scoring audit complete (D-83A–D-83D). Status lock applied (D-83E). D-88 archive sequence complete. Shadow ban now enforced on all write routes (D-89C PR #106). Belief snapshot read fix applied (D-89D). Pressure moderation plan complete (D-90A). Pressure backend PR open — awaiting D-90C frontend, D-90E production migration, then deploy (D-90B). D-47 manual evidence test gated. Static baseline **175 / 24 / 39** (on D-90B branch; main is 161/24/39 until D-90B merges).
+Evidence moderation stack complete and green (D-50–D-52). Seed launch pack live (D-77–D-80G, all 5 claims public). Scoring audit complete (D-83A–D-83D). Status lock applied (D-83E). D-88 archive sequence complete. Shadow ban now enforced on all write routes (D-89C PR #106). Belief snapshot read fix applied (D-89D). Pressure moderation plan complete (D-90A). Pressure backend PR open (D-90B). Pressure frontend PR open (D-90C). Both blocked on D-90E production migration before merge + deploy. D-47 manual evidence test gated. Static baseline **190 / 24 / 39** (on D-90C branch; main is 161/24/39 until D-90B+D-90C merge).
 
 1. **D-42B — ✅ COMPLETE** — merged PR #98 (`faa91af`). Backend evidence moderation. Static checks 108/24/39.
 2. **D-43 — ✅ COMPLETE** — `975129a` direct main. Evidence review UI. Static checks 110/24/39. Live green.
@@ -270,6 +270,7 @@ Evidence moderation stack complete and green (D-50–D-52). Seed launch pack liv
 48. **D-89C — ✅ COMPLETE** — branch + PR #106 (fix/d89c-shadow-ban-enforcement, merge commit `5fedf8d`, feature commit `6f451d7`). Shadow ban enforcement on all user write routes. `requireUser` made async with D1 ban check; `USER_SHADOW_BANNED` error maps to 403; five inline write routes + seven external modules updated to `await requireUser`; module dispatch uses env-bound closure. Section 28 added to hardening smoke (8 tests, 147→155). Full record in `docs/D89C_SHADOW_BAN_ENFORCEMENT.md`. Static checks 155/24/39.
 49. **D-89D — ✅ COMPLETE** — branch + PR (fix/d89d-belief-snapshot-read-shadowban). Behaviour fix: GET /api/belief-snapshots was incorrectly shadow-ban blocked. Added `requireUserId` sync helper (header-only, no ban check); refactored `requireUser` to delegate header extraction to it; GET belief-snapshots now uses `requireUserId`; POST routes stay ban-enforced. Strengthened ban check to explicit numeric `Number(row?.is_shadow_banned||0)===1`. Section 29 added to hardening smoke (6 tests, 155→161). Created `docs/D89C_SHADOW_BAN_ENFORCEMENT.md`. Updated `docs/PROJECT_STATE.md`. Static checks 161/24/39.
 51. **D-90B — ⏳ PR OPEN, NOT MERGED** — branch `feature/d90b-pressure-moderation-backend`. Backend pressure point moderation. Migration 0009 created (NOT RUN — gated on D-90E). `addPressure` now inserts `review_state='review'`, no immediate `recalcClaimScore`; `getClaim`/`claimDetail` pressure queries add `COALESCE(review_state,'public')='public'` filter; `recalcClaimScore` pressure query adds same filter; `reviewQueue` adds pressure items query; `reviewDecision` adds pressure branch with recalc trigger; `reportTarget` adds pressure branch with auto-escalation. Section 30 added to hardening smoke (+14 tests, 161→175). **DO NOT MERGE until production D1 migration 0009 is applied (D-90E).** Full record in `docs/D90B_PRESSURE_MODERATION_BACKEND.md`. Static checks 175/24/39.
+52. **D-90C — ⏳ PR OPEN, NOT MERGED** — branch `feature/d90c-pressure-moderation-frontend`, stacked on D-90B. Frontend pressure review item support. `reviewCard`: `isPressure` branch, `b-orange` badge, `review-card-pressure` card class, severity/handle/parent-claim meta, quality hints skipped. `renderReviewInspectPanel`: `isPressure` branch with Severity/Body/Parent Claim/Claim ID/Submitted By/Review State/Report Count fields; Study button links to `item.claim_id`; `canMarkDup` and `dupSection` and `qhintsHtml` all guard on `!isPressure`. `applyReviewFilter`: pressure filter added; quality filter excludes pressure. `renderReviewFilterBar`: Pressure chip + count added. `renderReviewAuditSummary`: Pressure stat added (`cls:'orange'`). `addCaseItem`: toast changed to `'Pressure point submitted for review.'`. CSS: `.b-orange` badge + `.review-card-pressure` left-border card modifier added. Section 31 hardening smoke (+15 tests, 175→190); D-43 dupSection guard test updated. **DO NOT MERGE — stacked on D-90B; requires production D1 migration 0009 before Worker deploy.** Full record in `docs/D90C_PRESSURE_MODERATION_FRONTEND.md`. Static checks 190/24/39.
 
 50. **D-90A — ✅ COMPLETE** — docs-only, direct main. Pressure point moderation implementation plan. Full audit of `addPressure`, `getClaim`, `claimDetail`, `recalcClaimScore`, `reviewQueue`, `reviewDecision`, `reportTarget`, `createAipPacket`, and frontend pressure rendering. Top findings: no `review_state`/`report_count` on `pressure_points` table; all pressure immediately public and scored; no admin review path. Proposed migration 0009 (NOT RUN). Backend plan: `addPressure` inserts `review_state='review'`, no immediate recalc; all 3 pressure fetch sites add `COALESCE(review_state,'public')='public'` filter; `reviewQueue`/`reviewDecision`/`reportTarget` all extended for pressure. Frontend plan: `reviewCard` pressure branch, orange badge, inspect panel fields, filter chip, toast change. Estimated +12 hardening smoke checks (161→173). Implementation split: D-90B backend branch+PR, D-90C frontend branch+PR, D-90D validation docs, D-90E production migration (gated), D-90F manual test (gated). Full plan in `docs/D90A_PRESSURE_MODERATION_IMPLEMENTATION_PLAN.md`. Static checks 161/24/39.
 

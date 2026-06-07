@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 175 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('175 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 175');
+test('docs/README.md documents hardening smoke count: 190 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('190 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 190');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1128,8 +1128,8 @@ test("reviewCard handles target_type 'evidence' — isEvidence branch present (D
 
 test("renderReviewInspectPanel hides duplicate controls for evidence (D-43)", () => {
   assert.ok(
-    appSrc.includes("(!isTruth&&!isEvidence)?((canMarkDup?"),
-    "renderReviewInspectPanel dupSection must be hidden for evidence"
+    appSrc.includes("(!isTruth&&!isEvidence&&!isPressure)?((canMarkDup?"),
+    "renderReviewInspectPanel dupSection must be hidden for evidence and pressure"
   );
   assert.ok(
     appSrc.includes("isEvidence?(item.claim_id?"),
@@ -1498,6 +1498,121 @@ test('D-90B: reportTarget handles targetType pressure (D-90B)', () => {
     workerSrc.includes("targetType === 'pressure'") &&
     workerSrc.includes("UPDATE pressure_points SET report_count=report_count+1"),
     "reportTarget must handle targetType 'pressure' with report_count increment and auto-escalation"
+  );
+});
+
+// ── Section 31 — D-90C: Pressure point moderation frontend ───────────────────
+
+test('D-90C: reviewCard defines isPressure variable (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("const isPressure=type==='pressure';"),
+    "reviewCard must define isPressure from target_type"
+  );
+});
+
+test('D-90C: reviewCard skips quality hints for pressure (D-90C)', () => {
+  assert.ok(
+    appSrc.includes('&&!isPressure)?claimQualityHints('),
+    "reviewCard qhints guard must exclude pressure (!isPressure)"
+  );
+});
+
+test('D-90C: reviewCard uses b-orange badge for pressure (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("isPressure?'b-orange':"),
+    "reviewCard badge must use b-orange for pressure items"
+  );
+});
+
+test('D-90C: reviewCard applies review-card-pressure class (D-90C)', () => {
+  assert.ok(
+    appSrc.includes('review-card-pressure') && appSrc.includes("pressureMod=isPressure?' review-card-pressure':''"),
+    "reviewCard must add pressureMod class for pressure items"
+  );
+});
+
+test('D-90C: reviewCard pressure metaParts include severity (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("isPressure?['severity '+(item.severity||1)+'/5'"),
+    "reviewCard pressure metaParts must include severity x/5"
+  );
+});
+
+test('D-90C: renderReviewInspectPanel has isPressure branch with fields (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("}else if(isPressure){") &&
+    appSrc.includes("fields.push(['Severity',esc(item.severity)") &&
+    appSrc.includes("fields.push(['Parent Claim',esc(item.parent_claim)") &&
+    appSrc.includes("fields.push(['Claim ID',esc(item.claim_id)"),
+    "renderReviewInspectPanel must have isPressure branch with Severity, Parent Claim, Claim ID fields"
+  );
+});
+
+test('D-90C: renderReviewInspectPanel pressure Study button uses claim_id (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("isPressure?(item.claim_id?`<button class=\"btn-study-review\" onclick=\"openReviewClaimStudy('${esc(item.claim_id)}')\""),
+    "renderReviewInspectPanel Study button must use item.claim_id for pressure"
+  );
+});
+
+test('D-90C: renderReviewInspectPanel canMarkDup excludes pressure (D-90C)', () => {
+  assert.ok(
+    appSrc.includes('!isTruth&&!isEvidence&&!isPressure&&state'),
+    "canMarkDup must exclude pressure items"
+  );
+});
+
+test('D-90C: addCaseItem pressure toast updated (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("'Pressure point submitted for review.'"),
+    "addCaseItem must toast 'Pressure point submitted for review.' for pressure"
+  );
+  assert.ok(
+    !appSrc.includes("'Attack / pressure attached to selected claim.'"),
+    "addCaseItem must NOT use old 'Attack / pressure attached to selected claim.' toast"
+  );
+});
+
+test('D-90C: applyReviewFilter has pressure filter (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("f==='pressure')return list.filter(i=>(i.target_type||i.targetType||i.type||'claim')==='pressure')"),
+    "applyReviewFilter must have dedicated pressure filter branch"
+  );
+});
+
+test('D-90C: applyReviewFilter quality filter excludes pressure (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("tp==='pressure')return false;return claimQualityHints"),
+    "applyReviewFilter quality filter must exclude pressure items"
+  );
+});
+
+test('D-90C: renderReviewFilterBar has pressure chip and count (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("pressure:list.filter(i=>(i.target_type||i.targetType||i.type||'claim')==='pressure').length") &&
+    appSrc.includes("['pressure','Pressure']"),
+    "renderReviewFilterBar must include pressure count and Pressure chip in defs"
+  );
+});
+
+test('D-90C: renderReviewAuditSummary includes Pressure stat (D-90C)', () => {
+  assert.ok(
+    appSrc.includes("{label:'Pressure',n:pressureCount,cls:'orange'}"),
+    "renderReviewAuditSummary must include a Pressure stat entry"
+  );
+});
+
+test('D-90C: CSS b-orange badge class exists (D-90C)', () => {
+  assert.ok(
+    cssSrc.includes('.b-orange{'),
+    "styles.css must define .b-orange badge class"
+  );
+});
+
+test('D-90C: CSS review-card-pressure class exists (D-90C)', () => {
+  assert.ok(
+    cssSrc.includes('.review-card-pressure{'),
+    "styles.css must define .review-card-pressure card modifier class"
   );
 });
 
