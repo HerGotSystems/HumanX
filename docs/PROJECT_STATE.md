@@ -1,6 +1,6 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-07 after D-73 launch seed research readiness delta.
+Last updated: 2026-06-07 after D-74 source insertion draft.
 
 ---
 
@@ -187,7 +187,7 @@ All flows confirmed working (code audit + static checks):
 
 ## What is safe to do next
 
-Evidence moderation stack complete and green (D-50–D-52). Seed launch prep in progress (D-53–D-73). Readiness delta (D-73): 5 claims READY (B-5, A-1, A-4, C-1, D-2); 4 PARTIAL (B-4, C-2, D-3, D-5); 2 EXCLUDED from v1 (C-4, E-5 — paywall/access gap only). Next: D-74 source insertion draft — update D-61 worksheet and D-57 JSON draft with all 20 VERIFIED source URLs; finalize evidence bodies; truth framing decisions; no import yet. D-75 gated dry-run after D-74 complete. D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
+Evidence moderation stack complete and green (D-50–D-52). Seed launch prep in progress (D-53–D-74). D-74 source insertion draft complete: 5 READY claims (B-5, A-1, A-4, C-1, D-2) fully drafted as non-executable JSON-like objects using only VERIFIED sources; D-62 gate CLEARED for READY claims; 4 PARTIAL appendix entries; C-4/E-5 excluded with access-gap reasoning. Next: D-75 human review of D-74 draft → D-76 final JSON file branch+PR → D-77 dry-run (explicit approval) → D-78 apply (explicit approval). Truth seed framing deferred (HB-8 still open). D-47 manual evidence test gated. Static baseline **119 / 24 / 39**.
 
 1. **D-42B — ✅ COMPLETE** — merged PR #98 (`faa91af`). Backend evidence moderation. Static checks 108/24/39.
 2. **D-43 — ✅ COMPLETE** — `975129a` direct main. Evidence review UI. Static checks 110/24/39. Live green.
@@ -221,15 +221,17 @@ Evidence moderation stack complete and green (D-50–D-52). Seed launch prep in 
 30. **D-71 — ✅ COMPLETE** — docs-only, direct main. E-5 astrology source research: Carlson 1985 Nature "A double-blind test of astrology" (DOI 10.1038/318419a0, `repeatable`, score 88 proposed — CANDIDATE_FOUND; Nature publisher page not yet confirmed accessible without paywall); Hartmann/Reuter/Nyborg 2006 PAID (DOI 10.1016/j.paid.2005.11.017, `repeatable`, score 78 proposed — CANDIDATE_FOUND; Elsevier 403 expected; PubMed PMID not yet found); E-5 pressure source: Musch & Grondin 2001 (10.1006/drev.2000.0516) identified but not yet attempted. E-5 VERIFIED count: 0/2 evidence + 0/1 pressure. Rejected source classes documented (Wikipedia, ML papers, blog commentary). D-62 gate delta: E-5 remains BLOCKED. Full record in `docs/D71_E5_ASTROLOGY_SOURCE_RESEARCH_BLOCKED.md`.
 31. **D-72 — ✅ COMPLETE** — docs-only, direct main. E-5 astrology direct DOI/publisher capture: Carlson 1985 Nature (nature.com/articles/318419a0) — PAYWALLED_OR_INACCESSIBLE; stable URL redirects to auth; cookie-error URL shows title/author/DOI/year/opening abstract sentence but full conclusion blocked; PubMed not indexed. Hartmann/Reuter/Nyborg 2006 PAID — ScienceDirect HTTP 403; PubMed not indexed. Musch & Grondin 2001 Developmental Review — Elsevier LinkingHub redirect-only. E-5 VERIFIED after D-72: 0/2 evidence + 0/1 pressure. Alternative paths documented (OSTI/eScholarship for LBNL Carlson; PMC meta-analysis search; RAE paper alternatives for pressure). Full record in `docs/D72_E5_ASTROLOGY_DIRECT_CAPTURE_ATTEMPT.md`.
 32. **D-73 — ✅ COMPLETE** — docs-only, direct main. Launch seed research readiness delta: 5 claims READY_FOR_SOURCE_INSERTION (B-5, A-1, A-4, C-1, D-2); 4 PARTIAL_NEEDS_ONE_MORE_SOURCE (B-4 slot 3, C-2 pressure, D-3 slot 2/critique, D-5 slot 2); 2 EXCLUDE_FROM_LAUNCH_V1 (C-4 — 0 VERIFIED/paywalled, E-5 — 0 VERIFIED/Nature+Elsevier paywall). E-5 exclusion: conservative access-gap decision only, not editorial; can be added in v1.1 once free-access path found. D-74 scope: 5 READY claims for full insertion; 4 PARTIAL with SLOT_OPEN marker; D-3 Option A (include Nuhfer 2016 CANDIDATE flagged for moderation review). Full record in `docs/D73_LAUNCH_SEED_RESEARCH_READINESS_DELTA.md`.
-33. **D-74 — Source insertion draft** — docs-only. Update D-61 worksheet and D-57 JSON draft with all VERIFIED URLs for 5 READY claims + PARTIAL drafts; evidence_body text finalized; truth seed framing decisions; readiness gates checked per D-73 scope. No import yet.
-34. **D-75 — Gated dry-run import** — after D-74 complete. Call `GET /api/import-seed?mode=dry-run` and `GET /api/import-truths?mode=dry-run`; review structured report; confirm `source_needed_blocked: 0`. Requires explicit per-session approval.
-35. **D-76 — Gated production apply** — after D-75 dry-run reviewed. Call `?mode=apply`; moderate all new `review_state='review'` content in admin Review queue. Requires separate explicit per-session D1/write approval.
-36. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
-37. **Optional score backfill** — batch `recalcClaimScore` across all affected claims. Requires explicit per-session D1 approval + controlled script. Scores self-correct on next trigger.
-38. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
-39. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
-40. **No live write smoke** without explicit per-session approval.
-41. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
+33. **D-74 — ✅ COMPLETE** — docs-only, direct main. Source insertion draft: 5 READY claims (B-5, A-1, A-4, C-1, D-2) drafted as non-executable JSON-like claim objects using only VERIFIED source records from D-66–D-70; all source_url, title, body, reliability_score fields populated from VERIFIED records; no values invented. 4 PARTIAL claims (B-4, C-2, D-3, D-5) documented in appendix with SLOT_OPEN markers and recommendations. C-4 and E-5 excluded with access-gap reasoning. D-62 gate for READY claims: CLEARED for D-76 (HB-1 through HB-7, HB-9, HB-10 all satisfied for 5 READY claims; HB-8 truth framing deferred). Future path: D-75 human review → D-76 final JSON branch+PR → D-77 dry-run → D-78 apply. Full record in `docs/D74_SOURCE_INSERTION_DRAFT.md`.
+34. **D-75 — Launch seed v1 candidate review** — docs-only. Human reads D-74 draft; confirms evidence bodies, source choices, and framing are accurate; approves scope for D-76 JSON file creation.
+35. **D-76 — Final JSON file proposal** — branch + PR only. Create `data/seed_claims_v2.json` for 5 READY claims using D-74 objects; no direct main commit; PR reviewed before merge.
+36. **D-77 — Gated dry-run import** — after D-76 merged. Call `GET /api/import-seed?mode=dry-run`; review structured report; confirm `source_needed_blocked: 0`. Requires explicit per-session approval.
+37. **D-78 — Gated production apply** — after D-77 dry-run reviewed. Call `?mode=apply`; moderate all new `review_state='review'` content in admin Review queue. Requires separate explicit per-session D1/write approval.
+38. **Execute D-47 manual test plan** — only when user explicitly approves a live-write browser session. `HX_TEST_D47_` prefix. Full plan in `docs/D47_EVIDENCE_MODERATION_MANUAL_TEST_PLAN.md`.
+39. **Optional score backfill** — batch `recalcClaimScore` across all affected claims. Requires explicit per-session D1 approval + controlled script. Scores self-correct on next trigger.
+40. **Actions v5 upgrade (optional)** — upgrade to `actions/checkout@v5` / `actions/setup-node@v5` when available with native Node 24. CI-only, direct main.
+41. **D-26 general manual test plan** — `docs/D26_MANUAL_LIVE_UI_TEST_PLAN.md`. Still available.
+42. **No live write smoke** without explicit per-session approval.
+43. **No further migrations** without explicit per-session approval and PRAGMA confirmation.
 
 **Do not:**
 - Speculatively refactor `src/worker.js` routing without a written plan reviewed first.
