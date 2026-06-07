@@ -194,6 +194,10 @@ Earlier plan for splitting the large single-file frontend. Superseded in practic
 Notes from an earlier patch cycle about the seed import route. Describes the state before `src/importer.js` and `GET /api/import-seed` were added. Largely superseded by the current Worker; retained as a historical reference.
 **Read when:** investigating the seed/import route history or understanding what was added in early patching.
 
+### `D78_DRY_RUN_IMPORT_PLAN.md`
+D-78A planning document for the future gated dry-run import of `data/seed_claims_v2.json` via `GET /api/import-seed?mode=dry-run`. Documents the critical blocker: `src/importer.js` currently imports `HUMANX_SEED` from `src/seed-data.js` (4 demo claims), NOT from `data/seed_claims_v2.json` — a D-78-Blocker PR is required before any dry-run has value. Includes full importer audit (route shape, dry-run default, apply behavior, response schema, failure modes), preflight checklist, the proposed future dry-run command (marked BLOCKED — DO NOT RUN), expected output fields, go/no-go criteria, and rollback notes.
+**Read when:** before planning or executing the D-78 dry-run import, before any Worker change to `src/seed-data.js` or `src/importer.js`, or when picking up the D-78 → D-79 launch seed import sequence.
+
 ---
 
 ## 7. Smoke Testing
