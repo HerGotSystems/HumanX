@@ -405,14 +405,20 @@ await testAsync('ensureUser skips insert when user already exists', async () => 
 
 console.log('\n9. reviewCleanup validation logic');
 
-// Inline copy of the backend artefact heuristic for pure-function testing.
+// Inline copy of legacy backend keyword-only artefact heuristic (v1, pre D-88B).
+// Kept for backward-compatibility of existing keyword tests below.
+// D-88B backend now uses isTestArtefactV2 (defined later in this section).
 function isTestArtefact(text) {
   const t = String(text || '').toLowerCase();
   return t.includes('smoke') || /\btest\b/.test(t) || t.includes('automated write') || t.includes('automated smoke');
 }
 
-// Inline copy of frontend heuristic (mirrors backend).
+// Inline copy of frontend heuristic (D-87B extended: handle + id-pattern + keyword).
 function isSuspectedTestArtefactPure(item) {
+  const handle = (item.handle || '').toLowerCase();
+  const id = item.id || '';
+  if (['humanx-seed','anon-o_seed','anon-xksavy','anon-73d9y2','anon-ek3562'].includes(handle)) return true;
+  if (/^clm_seed_/.test(id) || /^HX-/i.test(id)) return true;
   const text = [item.claim || '', item.statement || '', item.origin || '', item.category || '', item.handle || ''].join(' ').toLowerCase();
   return text.includes('smoke') || /\btest\b/.test(text) || text.includes('automated write') || text.includes('automated smoke');
 }
@@ -501,6 +507,110 @@ test('reviewCleanup checks CLEANUP_REQUIRES_REJECTED', () => {
 
 test('reviewCleanup checks CLEANUP_REQUIRES_TEST_ARTEFACT', () => {
   assert.ok(cleanupBody.includes('CLEANUP_REQUIRES_TEST_ARTEFACT'), 'reviewCleanup must reject non-artefact items');
+});
+
+// D-88B: expanded policy checks
+test('reviewCleanup blocks protected launch seeds with CLEANUP_PROTECTED_SEED', () => {
+  assert.ok(cleanupBody.includes('CLEANUP_PROTECTED_SEED'), 'reviewCleanup must block protected seed IDs');
+});
+
+test('reviewCleanup blocks status_locked rows with CLEANUP_REQUIRES_NOT_LOCKED', () => {
+  assert.ok(cleanupBody.includes('CLEANUP_REQUIRES_NOT_LOCKED'), 'reviewCleanup must refuse to archive status_locked items');
+});
+
+test('reviewCleanup recognises clm_seed_ id pattern as artefact', () => {
+  assert.ok(cleanupBody.includes('clm_seed_'), 'reviewCleanup must detect clm_seed_ id prefix');
+});
+
+test('reviewCleanup recognises HX- id pattern as artefact', () => {
+  assert.ok(cleanupBody.match(/HX-/), 'reviewCleanup must detect HX- id prefix for dev seed rows');
+});
+
+test('reviewCleanup recognises known dev/test handles as artefacts', () => {
+  assert.ok(cleanupBody.includes('humanx-seed') && cleanupBody.includes('anon-o_seed') && cleanupBody.includes('anon-xksavy'), 'reviewCleanup must detect known dev handles');
+});
+
+test('reviewCleanup supports junk_override path', () => {
+  assert.ok(cleanupBody.includes('junk_override'), 'reviewCleanup must support junk_override body field');
+});
+
+test('reviewCleanup requires reason for junk_override', () => {
+  assert.ok(cleanupBody.includes('CLEANUP_REASON_REQUIRED'), 'reviewCleanup must reject junk_override with missing reason');
+});
+
+test('reviewCleanup applies secondary heuristic for junk_override', () => {
+  assert.ok(cleanupBody.includes('CLEANUP_JUNK_OVERRIDE_REJECTED'), 'reviewCleanup must reject junk_override when heuristic fails');
+});
+
+test('reviewCleanup policy v2: archive_policy field present in success path', () => {
+  assert.ok(cleanupBody.includes('archive_policy'), 'reviewCleanup success response must include archive_policy field');
+});
+
+// Inline v2 artefact heuristic for pure-function testing (mirrors D-88B backend logic)
+function isTestArtefactV2({ id = '', handle = '', text = '' }) {
+  const t = String(text || '').toLowerCase();
+  const h = String(handle || '').toLowerCase();
+  const keywordMatch = t.includes('smoke') || /\btest\b/.test(t) || t.includes('automated write') || t.includes('automated smoke');
+  const idPatternMatch = /^clm_seed_/.test(id) || /^HX-\d/i.test(id);
+  const DEV_HANDLES = new Set(['humanx-seed', 'anon-o_seed', 'anon-xksavy', 'anon-73d9y2', 'anon-ek3562']);
+  const handleMatch = DEV_HANDLES.has(h);
+  return keywordMatch || idPatternMatch || handleMatch;
+}
+
+test('v2 heuristic: clm_seed_ id prefix triggers artefact', () => {
+  assert.equal(isTestArtefactV2({ id: 'clm_seed_abc123', handle: '', text: 'The Earth is flat' }), true);
+});
+
+test('v2 heuristic: HX-000001 id triggers artefact', () => {
+  assert.equal(isTestArtefactV2({ id: 'HX-000001', handle: '', text: 'The Earth is flat' }), true);
+});
+
+test('v2 heuristic: humanx-seed handle triggers artefact', () => {
+  assert.equal(isTestArtefactV2({ id: 'clm_abc', handle: 'humanx-seed', text: 'Normal claim text' }), true);
+});
+
+test('v2 heuristic: anon-xksavy handle triggers artefact', () => {
+  assert.equal(isTestArtefactV2({ id: 'clm_abc', handle: 'anon-xksavy', text: 'Normal claim text' }), true);
+});
+
+test('v2 heuristic: normal user claim is NOT artefact', () => {
+  assert.equal(isTestArtefactV2({ id: 'clm_abc123', handle: 'anon-user99', text: 'Vaccines cause autism' }), false);
+});
+
+test('v2 heuristic: text keyword still works alongside id/handle signals', () => {
+  assert.equal(isTestArtefactV2({ id: 'clm_abc123', handle: 'anon-user99', text: 'automated smoke check' }), true);
+});
+
+// Junk heuristic pure-function test (mirrors D-88B backend logic)
+function junkHeuristicPass(rawText) {
+  const trimmed = String(rawText || '').trim();
+  const isShort = trimmed.length <= 40;
+  const isAllCapsFragment = /^[A-Z0-9\s!?.,'"-]{1,40}$/.test(trimmed) && /^[A-Z]/.test(trimmed) && trimmed === trimmed.toUpperCase() && trimmed.split(/\s+/).length <= 3;
+  const alphaChars = (trimmed.match(/[a-zA-Z]/g) || []).length;
+  const totalChars = trimmed.replace(/\s/g, '').length || 1;
+  const alphaRatio = alphaChars / totalChars;
+  const isLowAlpha = alphaRatio < 0.6 && trimmed.length > 3;
+  return isShort || isAllCapsFragment || isLowAlpha;
+}
+
+test('junk heuristic: short text (<= 40 chars) passes', () => {
+  assert.equal(junkHeuristicPass('Blablablabla'), true);
+});
+
+test('junk heuristic: gibberish keyboard mash (low alpha ratio) passes', () => {
+  assert.equal(junkHeuristicPass('gfsdhdfhfdhdfhdfhgdfa'), true);
+});
+
+test('junk heuristic: all-caps 1-word fragment passes', () => {
+  assert.equal(junkHeuristicPass('DOCTRINE'), true);
+});
+
+test('junk heuristic: long factual claim does NOT pass', () => {
+  assert.equal(junkHeuristicPass('The government is secretly controlling all major media outlets and suppressing evidence of extraterrestrial contact'), false);
+});
+
+test('junk heuristic: full sentence (> 40 chars, normal alpha) does NOT pass', () => {
+  assert.equal(junkHeuristicPass('Never trust the experts on this important matter at all'), false);
 });
 
 // ── 10. reviewQueue archived metadata ────────────────────────────────────────
