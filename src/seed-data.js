@@ -1,92 +1,216 @@
+// D-78-Blocker: updated to export version 2 launch seed claims.
+// Source of truth: data/seed_claims_v2.json (D-77, approved via D-76A–D-76D).
+// All 5 claims carry APPROVE_FOR_D76 from human review.
+// Old demo claims (seed-flat-earth, seed-moon-landing, seed-dream-prediction,
+// seed-perpetual-motion) removed — they had empty source_url fields and were
+// not approved for launch.
+//
+// Importer reads: HUMANX_SEED.version and HUMANX_SEED.claims only.
+// No importer behavior change in this PR.
+// No import route has been called. No D1 touched.
+
 export const HUMANX_SEED = {
-  version: 1,
+  version: 2,
   claims: [
     {
-      seed_id: 'seed-flat-earth',
-      claim: 'The Earth is flat',
-      category: 'Cosmology',
-      type: 'Physical/Testable',
-      status: 'Disproven',
-      evidence_score: 18,
-      testability: 98,
-      survivability: 2,
+      seed_id: 'launch-B5',
+      claim: 'The Holocaust resulted in the murder of approximately six million Jews',
+      category: 'History / Public Record',
+      type: 'Historical/Physical',
+      status: 'Proven',
+      evidence_score: null,
+      testability: null,
+      survivability: null,
       evidence: [
-        { stance: 'support', quality: 'media', title: 'Local horizon often appears flat', body: 'At normal human scale, the horizon can appear flat. This explains why the claim feels intuitive, but local perception is not enough to establish planetary geometry.', source_url: '', media_type: 'observation', reliability_score: 20 },
-        { stance: 'support', quality: 'vibes', title: 'Water-level phrase argument', body: "The phrase 'water finds its level' is often used as support. HumanX should classify this as language pressure, not a global measurement.", source_url: '', media_type: 'argument', reliability_score: 8 }
+        {
+          stance: 'support',
+          quality: 'documented',
+          title: 'Wannsee Protocol',
+          body: 'The Wannsee Protocol is a classified Nazi German government document dated January 20, 1942, recording a meeting of senior Nazi officials in Berlin at which the systematic organization of the "final solution of the Jewish question" was discussed and coordinated across Europe. The document lists an estimated 11 million Jews across European countries as the target population for this coordinated plan and was entered as prosecution evidence at the International Military Tribunal at Nuremberg. Yale Law School\'s Avalon Project hosts this document as a primary historical record, demonstrating the state-sponsored and systematically planned character of the genocide that resulted in the Holocaust.',
+          source_url: 'https://avalon.law.yale.edu/imt/wannsee.asp',
+          media_type: 'article',
+          reliability_score: 85
+        },
+        {
+          stance: 'support',
+          quality: 'documented',
+          title: 'How Many People did the Nazis Murder?',
+          body: 'The United States Holocaust Memorial Museum states that the Nazis and their allies and collaborators killed six million Jewish people in the systematic, state-sponsored genocide now known as the Holocaust. The USHMM article explains that these figures derive from Nazi German documents and prewar and postwar demographic studies, and provides a breakdown showing approximately 2.7 million killed at dedicated killing centers, approximately 2 million in mass shooting operations, and between 800,000 and 1 million in ghettos and other camps. This is the established finding of the leading US federal Holocaust research and memorial institution, last updated September 26, 2023.',
+          source_url: 'https://encyclopedia.ushmm.org/content/en/article/documenting-numbers-of-victims-of-the-holocaust-and-nazi-persecution',
+          media_type: 'article',
+          reliability_score: 82
+        }
       ],
       pressure: [
-        { title: 'Time zones require different sun angles across the globe', body: 'A flat local appearance does not explain predictable global day/night timing without extra unsupported mechanisms.', severity: 5 },
-        { title: 'Lunar eclipse shadow geometry', body: "Earth's shadow during lunar eclipses repeatedly appears curved from different orientations.", severity: 5 },
-        { title: 'Circumnavigation and flight routing', body: 'Navigation, aviation routing and circumnavigation are operational tests used daily.', severity: 4 },
-        { title: 'Satellite telemetry and independent tracking', body: 'Satellite signals, orbital prediction, amateur radio tracking and GPS operation form repeatable technical evidence.', severity: 5 }
+        {
+          title: 'Antisemitism: An Introduction',
+          body: 'The USHMM Holocaust Encyclopedia article on antisemitism includes a dedicated section titled "Holocaust Distortion and Denial as Forms of Antisemitism," defining Holocaust denial as any attempt to negate the established facts of the Nazi German genocide and Holocaust distortion as statements that misrepresent those established facts. The article notes that deniers falsely claim the Holocaust was invented or exaggerated and characterizes both denial and distortion as recognized contemporary forms of antisemitism. This source, last edited January 10, 2025, establishes that challenges to the established six million figure lack evidentiary basis and reflect ideological rather than historical methodology.',
+          source_url: 'https://encyclopedia.ushmm.org/content/en/article/antisemitism',
+          stance: 'support',
+          quality: 'documented',
+          reliability_score: 78,
+          severity: 5
+        }
       ],
-      tests: [
-        { title: 'Measure shadow angles at two distant locations', instructions: 'At the same time on the same day, compare shadow length from identical vertical sticks in two distant locations.', difficulty: 'medium', safety_level: 'normal' },
-        { title: 'Track ships or buildings disappearing bottom-first', instructions: 'Use a zoom camera near a large body of water and record distant objects. Control for haze and distortion.', difficulty: 'easy', safety_level: 'normal' }
-      ]
+      tests: []
     },
     {
-      seed_id: 'seed-moon-landing',
-      claim: 'Humans landed on the Moon',
-      category: 'History/Space',
-      type: 'Historical',
+      seed_id: 'launch-A1',
+      claim: 'Large population studies and systematic reviews have not found evidence that the MMR vaccine causes autism',
+      category: 'Science / Medicine',
+      type: 'Physical/Testable',
       status: 'Strongly Supported',
-      evidence_score: 76,
-      testability: 82,
-      survivability: 88,
+      evidence_score: null,
+      testability: null,
+      survivability: null,
       evidence: [
-        { stance: 'support', quality: 'documented', title: 'Apollo mission documentation chain', body: 'Mission planning records, telemetry, photography, transcripts and hardware documentation form a large cross-linked documentary chain.', source_url: '', media_type: 'document', reliability_score: 68 },
-        { stance: 'support', quality: 'repeatable', title: 'Lunar retroreflector experiments', body: 'Retroreflectors placed on the Moon allow laser ranging experiments, a repeatable measurement stream independent of testimony.', source_url: '', media_type: 'experiment', reliability_score: 85 },
-        { stance: 'support', quality: 'documented', title: 'Moon rocks and sample analysis', body: 'Returned lunar samples have been studied by researchers over decades; custody, composition and independent analysis matter together.', source_url: '', media_type: 'physical_sample', reliability_score: 72 }
+        {
+          stance: 'support',
+          quality: 'repeatable',
+          title: 'Vaccines for measles, mumps and rubella in children',
+          body: 'A 2012 Cochrane systematic review by Demicheli et al., published in the Cochrane Database of Systematic Reviews, analyzed data from approximately 14.7 million children across randomized controlled trials, cohort studies, case-control studies, and other study designs to assess the safety and effectiveness of measles-mumps-rubella (MMR) vaccines. The review explicitly concluded that exposure to the MMR vaccine was unlikely to be associated with autism. This is the largest systematic review of MMR vaccine safety and represents the Cochrane gold standard of evidence synthesis.',
+          source_url: 'https://pubmed.ncbi.nlm.nih.gov/22336803/',
+          media_type: 'study',
+          reliability_score: 85
+        },
+        {
+          stance: 'support',
+          quality: 'repeatable',
+          title: 'A population-based study of measles, mumps, and rubella vaccination and autism',
+          body: 'A 2002 population-based cohort study by Madsen et al., published in The New England Journal of Medicine, followed 537,303 children born in Denmark between 1991 and 1998 (representing over 2.1 million person-years of follow-up) and compared autism diagnosis rates between MMR-vaccinated and unvaccinated children. After adjusting for confounders, vaccinated children showed no increased risk of autistic disorder (relative risk 0.92) or other autistic-spectrum disorders (relative risk 0.83) compared to unvaccinated children. The study concluded that this provided strong evidence against the hypothesis that MMR vaccination causes autism.',
+          source_url: 'https://pubmed.ncbi.nlm.nih.gov/12421889/',
+          media_type: 'study',
+          reliability_score: 84
+        }
       ],
       pressure: [
-        { title: 'Hoax claim must explain independent tracking', body: 'A hoax explanation must account for independent radio tracking, international observation and telemetry.', severity: 4 },
-        { title: 'Photo anomalies are not enough alone', body: 'Claims about shadows, flags or cameras must become testable technical arguments.', severity: 3 }
+        {
+          title: "Wakefield's article linking MMR vaccine and autism was fraudulent",
+          body: 'A 2011 editorial in the BMJ by Godlee, Smith, and Marcovitch concluded that the 1998 Lancet paper by Andrew Wakefield, which claimed to find a link between MMR vaccination and autism in 12 children, constituted fraudulent research. The editorial, published alongside a BMJ investigative series by Brian Deer titled "How the case against the MMR vaccine was fixed," found that the data in the original paper were manipulated and that the Wakefield study\'s findings could not be substantiated. The Lancet formally retracted the 1998 paper, removing the primary published basis for the vaccines-autism hypothesis.',
+          source_url: 'https://pubmed.ncbi.nlm.nih.gov/21209060/',
+          stance: 'support',
+          quality: 'documented',
+          reliability_score: 72,
+          severity: 5
+        }
       ],
-      tests: [
-        { title: 'Recreate single-light shadow scenes', instructions: 'Use one strong light, rough ground texture and small models to test whether terrain and perspective can make shadows look non-parallel.', difficulty: 'easy', safety_level: 'normal' }
-      ]
+      tests: []
     },
     {
-      seed_id: 'seed-dream-prediction',
-      claim: 'A dream predicted my future',
-      category: 'Belief',
-      type: 'Religious/Belief',
-      status: 'Untestable',
-      evidence_score: 24,
-      testability: 8,
-      survivability: 42,
-      evidence: [
-        { stance: 'support', quality: 'testimony', title: 'Personal testimony', body: 'The claimant reports a dream and later event match. This may be meaningful but is weak as public proof without timestamped records.', source_url: '', media_type: 'personal_report', reliability_score: 24 }
-      ],
-      pressure: [
-        { title: 'Memory distortion and retrofitting', body: 'After an event happens, people can reinterpret vague memories as more specific than they were.', severity: 4 },
-        { title: 'Prediction criteria missing', body: 'A claim needs exact prediction, timestamp, event window and failure condition.', severity: 3 }
-      ],
-      tests: [
-        { title: 'Timestamped dream log test', instructions: 'Write dreams into a timestamped document before events happen. Define what counts as hit or miss, then review after a fixed period.', difficulty: 'easy', safety_level: 'normal' }
-      ]
-    },
-    {
-      seed_id: 'seed-perpetual-motion',
-      claim: 'Perpetual motion machines can produce free energy forever',
-      category: 'Physics',
+      seed_id: 'launch-A4',
+      claim: 'Rising CO2 levels from human activity are the primary driver of observed global warming',
+      category: 'Science / Physical World',
       type: 'Physical/Testable',
-      status: 'Reality Collapse',
-      evidence_score: 12,
-      testability: 96,
-      survivability: 1,
+      status: 'Proven',
+      evidence_score: null,
+      testability: null,
+      survivability: null,
       evidence: [
-        { stance: 'support', quality: 'media', title: 'Video demonstrations of magnet wheels', body: 'Videos can show motion, but without controlled measurement they do not prove net energy production.', source_url: '', media_type: 'video', reliability_score: 25 }
+        {
+          stance: 'support',
+          quality: 'documented',
+          title: 'Climate Change 2021: The Physical Science Basis — Summary for Policymakers',
+          body: 'The IPCC Sixth Assessment Report Working Group 1 Summary for Policymakers (2021) states that it is unequivocal that human influence has warmed the atmosphere, ocean, and land since 1750 as a result of rising greenhouse gas concentrations that have increased continuously since the pre-industrial era. The report establishes a near-linear relationship between cumulative anthropogenic CO2 emissions and global warming, finding that observed global surface temperature is approximately 1.09°C higher in 2011–20 than in 1850–1900, and that each 1,000 GtCO2 of cumulative emissions is likely to cause an additional 0.27–0.63°C of warming. This is the consensus finding of the world\'s leading intergovernmental body on climate science, synthesizing evidence from thousands of peer-reviewed studies.',
+          source_url: 'https://www.ipcc.ch/report/ar6/wg1/chapter/summary-for-policymakers/',
+          media_type: 'article',
+          reliability_score: 90
+        },
+        {
+          stance: 'support',
+          quality: 'documented',
+          title: 'The Causes of Climate Change',
+          body: 'NASA\'s "The Causes of Climate Change" page states that industrial activities have raised atmospheric CO2 levels by nearly 50% since 1750, and that scientists can identify a distinctive isotopic fingerprint in the atmosphere confirming the source as human activity rather than natural processes. The agency states that burning fossil fuels has increased the concentration of atmospheric CO2 over the past century, and that the IPCC has concluded that the increase of CO2, methane, and nitrous oxide in the atmosphere over the industrial era is the result of human activities. NASA further states that human influence is the principal driver of many changes observed across the atmosphere, ocean, cryosphere, and biosphere. This page was last updated October 23, 2024.',
+          source_url: 'https://science.nasa.gov/climate-change/causes',
+          media_type: 'article',
+          reliability_score: 82
+        }
       ],
       pressure: [
-        { title: 'Energy conservation burden', body: 'A free-energy device must show measured output exceeding all input under controlled conditions.', severity: 5 },
-        { title: 'Independent replication required', body: 'A single inventor video is not enough. The device must be reproduced and measured independently.', severity: 5 },
-        { title: 'Continuous load test', body: 'A useful machine must power an external load continuously without hidden batteries, mains supply or energy depletion.', severity: 5 }
+        {
+          title: 'Climate Change 2021: The Physical Science Basis — Summary for Policymakers (Attribution section)',
+          body: 'The IPCC AR6 WG1 Summary for Policymakers (2021) directly addresses the attribution question, stating that it is unequivocal that human influence has warmed the climate and that the scale of recent changes across the climate system is unprecedented. The report establishes that greenhouse gas-driven warming is robustly attributed to human activity by multiple independent lines of evidence and that observed warming cannot be explained by natural drivers alone. The IPCC attribution finding rules out natural variability (solar cycles, volcanic activity) as the primary explanation for the observed temperature increase since the pre-industrial era.',
+          source_url: 'https://www.ipcc.ch/report/ar6/wg1/chapter/summary-for-policymakers/',
+          stance: 'support',
+          quality: 'documented',
+          reliability_score: 90,
+          severity: 5
+        }
       ],
-      tests: [
-        { title: 'Input/output load measurement', instructions: 'Measure all energy entering and leaving the device over time. Include batteries, capacitors, falling weights, temperature changes and external fields. Do not use dangerous voltages.', difficulty: 'hard', safety_level: 'caution' }
-      ]
+      tests: []
+    },
+    {
+      seed_id: 'launch-C1',
+      claim: 'Online platform recommendation systems can use engagement signals that influence which information spreads widely',
+      category: 'Civic / Media Literacy',
+      type: 'Sociological/Observable',
+      status: 'Plausible',
+      evidence_score: null,
+      testability: null,
+      survivability: null,
+      evidence: [
+        {
+          stance: 'support',
+          quality: 'repeatable',
+          title: 'The spread of true and false news online',
+          body: 'A 2018 study by Vosoughi, Roy, and Aral published in Science analyzed approximately 126,000 news stories shared on Twitter between 2006 and 2017 by roughly 3 million users and found that false information diffused significantly farther, faster, deeper, and more broadly than true information across all categories of content, with the effect most pronounced for false political news. Importantly, the study found that automated accounts (bots) spread both true and false content at comparable rates, establishing that humans — not bots — are primarily responsible for the greater amplification of misinformation. The research demonstrates that social media platforms exhibit systematic patterns of differential information spread driven by user engagement with novel or emotionally arousing content.',
+          source_url: 'https://pubmed.ncbi.nlm.nih.gov/29590045/',
+          media_type: 'study',
+          reliability_score: 86
+        },
+        {
+          stance: 'support',
+          quality: 'testimony',
+          title: "On YouTube's recommendation system",
+          body: "YouTube's VP of Engineering Cristos Goodrow, writing on YouTube's official blog in September 2021, describes the company's recommendation system as using multiple engagement signals — including clicks, watch time, survey responses, shares, likes, and dislikes — to personalize video suggestions. The post states that these signals can be \"overruled\" by YouTube's responsibility commitments and that the platform actively demotes borderline content including misinformation even when such material might generate higher engagement. This first-person description of YouTube's recommendation architecture confirms that engagement signals (watch time, clicks, reactions) are the primary ranking inputs, with responsibility-based overrides as a secondary layer.",
+          source_url: 'https://blog.youtube/inside-youtube/on-youtubes-recommendation-system/',
+          media_type: 'article',
+          reliability_score: 55
+        }
+      ],
+      pressure: [
+        {
+          title: "On YouTube's recommendation system (responsibility framing)",
+          body: "In the same September 2021 blog post, YouTube's VP of Engineering describes the platform's responsibility-based override system, which demotes borderline content even when it would otherwise score highly on engagement metrics. The platform's position is that recommendation algorithms are not purely engagement-maximising and include deliberate interventions to reduce harmful content amplification. This platform-side argument — that algorithmic responsibility commitments moderate pure engagement amplification — is the primary counterargument to the claim that social media algorithms amplify harmful content unchecked.",
+          source_url: 'https://blog.youtube/inside-youtube/on-youtubes-recommendation-system/',
+          stance: 'support',
+          quality: 'testimony',
+          reliability_score: 55,
+          severity: 5
+        }
+      ],
+      tests: []
+    },
+    {
+      seed_id: 'launch-D2',
+      claim: 'Sleep deprivation significantly impairs cognitive performance, even when individuals feel only mildly sleepy',
+      category: 'Human Behaviour / Biology',
+      type: 'Physical/Testable',
+      status: 'Proven',
+      evidence_score: null,
+      testability: null,
+      survivability: null,
+      evidence: [
+        {
+          stance: 'support',
+          quality: 'repeatable',
+          title: 'The Cumulative Cost of Additional Wakefulness: Dose-Response Effects on Neurobehavioral Functions and Sleep Physiology From Chronic Sleep Restriction and Total Sleep Deprivation',
+          body: 'A landmark 2003 study by Van Dongen, Maislin, Mullington, and Dinges published in SLEEP found that restricting sleep to 6 hours or fewer per night for two weeks produced cognitive performance deficits equivalent to up to two nights of total sleep deprivation. Critically, participants in the study underestimated their level of impairment: their subjective sleepiness ratings did not keep pace with the actual measured decline in cognitive performance as sleep debt accumulated. The research established a dose-response relationship between cumulative wakefulness and neurobehavioral deficits, demonstrating that sleep-deprived individuals are systematically unaware of the extent of their own impairment.',
+          source_url: 'https://academic.oup.com/sleep/article-lookup/doi/10.1093/sleep/26.2.117',
+          media_type: 'study',
+          reliability_score: 87
+        },
+        {
+          stance: 'support',
+          quality: 'documented',
+          title: 'About Sleep',
+          body: 'The CDC states that adults aged 18–60 years need 7 or more hours of sleep per night and that insufficient sleep is associated with a range of adverse health and cognitive outcomes. The agency identifies that inadequate sleep is linked to increased risk of chronic conditions including Type 2 diabetes, heart disease, high blood pressure, and stroke, and notes that sufficient sleep improves cognitive performance, mood, and reduces motor vehicle crash risk. This is the position of the lead US federal public health authority on sleep as a public health issue, last reviewed May 15, 2024.',
+          source_url: 'https://www.cdc.gov/sleep/about/index.html',
+          media_type: 'article',
+          reliability_score: 80
+        }
+      ],
+      pressure: [],
+      tests: []
     }
   ]
 };
