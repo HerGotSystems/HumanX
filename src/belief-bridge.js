@@ -2,7 +2,7 @@ import { meaningKey } from './meaning-key.js';
 
 export async function promoteBeliefSnapshot(request, env, helpers) {
   const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
-  const userId = requireUser(request);
+  const userId = await requireUser(request);
   await safeRateLimit(request, env, `belief-promote:${ip(request)}`, 10, 3600000);
   const body = await readJson(request);
   const snapshotId = cleanId(body.snapshotId || body.snapshot_id || '');

@@ -2,7 +2,7 @@ import { recalcClaimScore } from './claim-scoring.js';
 
 export async function attachEvidenceToClaim(request, env, helpers) {
   const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
-  const userId = requireUser(request);
+  const userId = await requireUser(request);
   await safeRateLimit(request, env, `evidence-attach:${ip(request)}`, 20, 3600000);
   const body = await readJson(request);
 

@@ -1,6 +1,6 @@
 export async function voteClaim(request, env, helpers) {
   const { readJson, cleanId, json, requireUser, makeId } = helpers;
-  const userId = requireUser(request);
+  const userId = await requireUser(request);
   await safeRateLimit(request, env, `vote:${userId}:${ip(request)}`, 120, 3600000);
   const body = await readJson(request);
   const claimId = cleanId(body.claimId);

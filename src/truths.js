@@ -21,7 +21,7 @@ export async function listTruths(request, env, helpers) {
 
 export async function createTruth(request, env, helpers) {
   const { readJson, cleanText, cleanId, json, requireUser, makeId } = helpers;
-  const userId = requireUser(request);
+  const userId = await requireUser(request);
   await safeRateLimit(request, env, `truth:${ip(request)}`, 12, 3600000);
   const body = await readJson(request);
   const statement = cleanText(body.statement || '', 500);
