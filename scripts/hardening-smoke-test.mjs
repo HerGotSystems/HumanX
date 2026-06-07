@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 155 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('155 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 155');
+test('docs/README.md documents hardening smoke count: 161 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('161 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 161');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1341,6 +1341,53 @@ test('D-89C: module dispatch passes env-bound requireUser to helpers (D-89C)', (
   assert.ok(
     workerSrc.includes('requireUser: async (req) => requireUser(req, env)'),
     "module dispatch helpers must pass env-bound async requireUser so modules receive the ban check"
+  );
+});
+
+// ── Section 29 — D-89D: belief snapshot read correction ──────────────────────
+
+console.log('\n29. D-89D: belief snapshot read correction');
+
+test('D-89D: requireUserId is declared as sync function in worker.js (D-89D)', () => {
+  assert.ok(
+    workerSrc.includes('function requireUserId(request)'),
+    "requireUserId must be declared as a sync function in worker.js"
+  );
+});
+
+test('D-89D: requireUser delegates header check to requireUserId (D-89D)', () => {
+  assert.ok(
+    workerSrc.includes('const userId=requireUserId(request)'),
+    "requireUser must call requireUserId(request) for the header check"
+  );
+});
+
+test('D-89D: GET /api/belief-snapshots passes requireUserId (identity-only, read) (D-89D)', () => {
+  assert.ok(
+    workerSrc.includes("'/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId })"),
+    "GET /api/belief-snapshots must pass requireUserId so shadow-banned users can still read their snapshots"
+  );
+});
+
+test('D-89D: POST /api/belief-snapshots still passes env-bound async requireUser (D-89D)', () => {
+  assert.ok(
+    workerSrc.includes("'/api/belief-snapshots' && request.method === 'POST') return await saveBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env)"),
+    "POST /api/belief-snapshots must still pass the env-bound async requireUser for shadow-ban enforcement"
+  );
+});
+
+test('D-89D: POST /api/belief-promote still passes env-bound async requireUser (D-89D)', () => {
+  assert.ok(
+    workerSrc.includes("'/api/belief-promote' && request.method === 'POST') return await promoteBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env)"),
+    "POST /api/belief-promote must still pass the env-bound async requireUser for shadow-ban enforcement"
+  );
+});
+
+test('D-89D: USER_SHADOW_BANNED still maps to 403 after refactor (D-89D)', () => {
+  assert.ok(
+    workerSrc.includes("message.includes('USER_SHADOW_BANNED')") &&
+    workerSrc.includes("json({ error:'UNAUTHORIZED', message:'Action not permitted.' },403)"),
+    "catch block must still handle USER_SHADOW_BANNED as 403 after D-89D refactor"
   );
 });
 
