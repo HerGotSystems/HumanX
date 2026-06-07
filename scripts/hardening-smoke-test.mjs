@@ -1110,6 +1110,69 @@ test('importSeedData SOURCE_NEEDED guard blocks apply mode when source_url is em
   );
 });
 
+// ── Section 27 — D-83C: status_locked column and recalcClaimScore guard ───────
+
+const migrationSrc0008 = readFileSync(path.join(__dirname, '../migrations/0008_add_status_locked.sql'), 'utf8');
+
+test('D-83C: migration 0008 adds status_locked INTEGER NOT NULL DEFAULT 0 (D-83C)', () => {
+  assert.ok(
+    migrationSrc0008.includes('status_locked INTEGER NOT NULL DEFAULT 0'),
+    "migration 0008 must contain 'status_locked INTEGER NOT NULL DEFAULT 0'"
+  );
+});
+
+test('D-83C: migration 0008 uses ALTER TABLE claims ADD COLUMN (D-83C)', () => {
+  assert.ok(
+    migrationSrc0008.includes('ALTER TABLE claims ADD COLUMN'),
+    "migration 0008 must use ALTER TABLE claims ADD COLUMN"
+  );
+});
+
+test('D-83C: migration 0008 does not SET status_locked on any row (D-83C)', () => {
+  const lines = migrationSrc0008.split('\n').filter(l => !l.trim().startsWith('--'));
+  const hasUpdate = lines.some(l => /UPDATE\s+claims/i.test(l) && /status_locked/i.test(l));
+  assert.ok(!hasUpdate, "migration 0008 must not UPDATE any row's status_locked value");
+});
+
+test('D-83C: recalcClaimScore reads status_locked from claims row (D-83C)', () => {
+  assert.ok(
+    scoringSrc.includes('status_locked'),
+    "recalcClaimScore must read status_locked from claims row"
+  );
+});
+
+test('D-83C: recalcClaimScore claim query selects status_locked (D-83C)', () => {
+  assert.ok(
+    scoringSrc.includes('SELECT type,testability,status_locked FROM claims WHERE id=?'),
+    "recalcClaimScore must include status_locked in claim SELECT query"
+  );
+});
+
+test('D-83C: recalcClaimScore has locked branch that skips status in UPDATE (D-83C)', () => {
+  // Locked branch must update evidence_score, survivability, contradictions, updated_at
+  // but must NOT include status=? in the UPDATE
+  assert.ok(
+    scoringSrc.includes('status_locked') &&
+    scoringSrc.includes('evidence_score=?, survivability=?, contradictions=?, updated_at=?'),
+    "recalcClaimScore must have a locked UPDATE branch without status=?"
+  );
+});
+
+test('D-83C: recalcClaimScore has unlocked branch that includes status in UPDATE (D-83C)', () => {
+  assert.ok(
+    scoringSrc.includes('evidence_score=?, survivability=?, contradictions=?, status=?, updated_at=?'),
+    "recalcClaimScore must preserve original UPDATE with status=? for unlocked claims"
+  );
+});
+
+test('D-83C: recalcClaimScore does not hardcode any claim ID (D-83C)', () => {
+  const hardcodedIds = scoringSrc.match(/clm_seed_[a-f0-9]+/g);
+  assert.ok(
+    !hardcodedIds || hardcodedIds.length === 0,
+    "recalcClaimScore must not contain any hardcoded claim IDs"
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

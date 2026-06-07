@@ -1,0 +1,22 @@
+-- Migration: 0008_add_status_locked.sql
+-- Purpose:   Add status_locked column to claims table to allow editorial
+--            override of recalcClaimScore's computed status field.
+--            When status_locked = 1, recalcClaimScore preserves the existing
+--            claims.status value and updates only computed fields (evidence_score,
+--            survivability, contradictions, updated_at).
+--            When status_locked = 0 (default), behavior is unchanged from prior.
+--
+-- Applies to: claims table
+-- Does NOT:  Set status_locked = 1 on any existing row (all rows default to 0).
+--            Does not modify any claim's status or any other field.
+--            Does not affect evidence, pressure_points, or any other table.
+--            Does not require a data migration — DEFAULT 0 back-fills all rows.
+--
+-- Safety:    ALTER TABLE ... ADD COLUMN with a literal DEFAULT is safe in
+--            SQLite/D1 and does not require a full table rewrite. No lock escalation.
+--            Safe to run on a live database with concurrent reads.
+--
+-- Applied in production:
+--   [ ] humanx (f68709d8-b93a-4e5b-8a0e-5b58cc357125) — pending D-83C merge + D-83D approval
+
+ALTER TABLE claims ADD COLUMN status_locked INTEGER NOT NULL DEFAULT 0;
