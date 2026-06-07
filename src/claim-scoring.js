@@ -6,7 +6,7 @@ export async function recalcClaimScore(env, claimId) {
     JOIN evidence e ON e.id=l.evidence_id
     WHERE l.claim_id=? AND COALESCE(e.review_state,'public')='public'
   `).bind(claimId).all();
-  const pressure = await env.DB.prepare(`SELECT severity FROM pressure_points WHERE claim_id=?`).bind(claimId).all();
+  const pressure = await env.DB.prepare(`SELECT severity FROM pressure_points WHERE claim_id=? AND COALESCE(review_state,'public')='public'`).bind(claimId).all();
   const claim = await env.DB.prepare(`SELECT type,testability,status_locked FROM claims WHERE id=?`).bind(claimId).first();
 
   const evidenceRows = [...(directEvidence.results || []), ...(reusedEvidence.results || [])];
