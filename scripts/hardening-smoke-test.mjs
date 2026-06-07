@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 161 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('161 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 161');
+test('docs/README.md documents hardening smoke count: 175 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('175 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 175');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1106,8 +1106,8 @@ test("reviewDecision handles targetType 'evidence' and returns ok response (D-42
     "reviewDecision evidence branch must update review_state and reset report_count"
   );
   assert.ok(
-    workerSrc.includes("allowed:['claim','truth','evidence']"),
-    "reviewDecision BAD_REVIEW_TARGET allowed list must include 'evidence'"
+    workerSrc.includes("allowed:['claim','truth','evidence','pressure']"),
+    "reviewDecision BAD_REVIEW_TARGET allowed list must include 'evidence' and 'pressure' (D-90B extended)"
   );
 });
 
@@ -1388,6 +1388,116 @@ test('D-89D: USER_SHADOW_BANNED still maps to 403 after refactor (D-89D)', () =>
     workerSrc.includes("message.includes('USER_SHADOW_BANNED')") &&
     workerSrc.includes("json({ error:'UNAUTHORIZED', message:'Action not permitted.' },403)"),
     "catch block must still handle USER_SHADOW_BANNED as 403 after D-89D refactor"
+  );
+});
+
+// ── Section 30 — D-90B: Pressure point moderation backend ────────────────────
+
+console.log('\n30. D-90B: Pressure point moderation backend');
+
+const migSrc0009 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0009_add_pressure_review_state.sql'), 'utf8'); } catch { return ''; } })();
+
+test('D-90B: migration 0009 file exists', () => {
+  assert.ok(migSrc0009.length > 0, 'migrations/0009_add_pressure_review_state.sql must exist');
+});
+
+test('D-90B: migration 0009 adds review_state TEXT DEFAULT public to pressure_points', () => {
+  assert.ok(
+    migSrc0009.includes('review_state TEXT DEFAULT') && migSrc0009.includes("'public'"),
+    "migration 0009 must add review_state TEXT DEFAULT 'public'"
+  );
+});
+
+test('D-90B: migration 0009 adds report_count INTEGER DEFAULT 0 to pressure_points', () => {
+  assert.ok(
+    migSrc0009.includes('report_count INTEGER DEFAULT 0'),
+    "migration 0009 must add report_count INTEGER DEFAULT 0"
+  );
+});
+
+test('D-90B: migration 0009 adds index on review_state for pressure_points', () => {
+  assert.ok(
+    migSrc0009.includes('idx_pressure_points_review_state'),
+    "migration 0009 must create idx_pressure_points_review_state index"
+  );
+});
+
+test('D-90B: migration 0009 adds index on report_count for pressure_points', () => {
+  assert.ok(
+    migSrc0009.includes('idx_pressure_points_report_count'),
+    "migration 0009 must create idx_pressure_points_report_count index"
+  );
+});
+
+test('D-90B: addPressure inserts review_state review (D-90B)', () => {
+  assert.ok(
+    workerSrc.includes("INSERT INTO pressure_points") && workerSrc.includes("review_state") && workerSrc.includes("'review',0,"),
+    "addPressure must insert review_state='review' into pressure_points"
+  );
+});
+
+test('D-90B: addPressure does NOT call recalcClaimScore after insert (pending pressure must not affect score) (D-90B)', () => {
+  // Extract just the addPressure function body to check it doesn't call recalcClaimScore
+  const addPressureMatch = workerSrc.match(/async function addPressure\(.*?\}\s*(?=async function)/s);
+  const addPressureSrc = addPressureMatch ? addPressureMatch[0] : '';
+  assert.ok(
+    addPressureSrc.length > 0 && !addPressureSrc.includes('recalcClaimScore'),
+    "addPressure must NOT call recalcClaimScore immediately — pending pressure must not affect claim score until approved"
+  );
+});
+
+test('D-90B: getClaim pressure query filters COALESCE(p.review_state) public (D-90B)', () => {
+  assert.ok(
+    workerSrc.includes("COALESCE(p.review_state,'public')='public'"),
+    "getClaim pressure query must filter COALESCE(p.review_state,'public')='public'"
+  );
+});
+
+test('D-90B: claimDetail pressure query filters COALESCE(review_state) public (D-90B)', () => {
+  assert.ok(
+    workerSrc.includes("pressure_points WHERE claim_id=? AND COALESCE(review_state,'public')='public'"),
+    "claimDetail pressure query must filter COALESCE(review_state,'public')='public'"
+  );
+});
+
+test('D-90B: claim-scoring pressure query filters COALESCE(review_state) public (D-90B)', () => {
+  const claimScoringSrc = readFileSync(path.join(__dirname, '../src/claim-scoring.js'), 'utf8');
+  assert.ok(
+    claimScoringSrc.includes("pressure_points WHERE claim_id=? AND COALESCE(review_state,'public')='public'"),
+    "recalcClaimScore pressure query must filter COALESCE(review_state,'public')='public'"
+  );
+});
+
+test('D-90B: reviewQueue queries pressure_points for non-public items (D-90B)', () => {
+  assert.ok(
+    workerSrc.includes("'pressure' AS target_type") && workerSrc.includes('FROM pressure_points p'),
+    "reviewQueue must include a pressure_points query with target_type='pressure'"
+  );
+});
+
+test('D-90B: reviewDecision handles targetType pressure (D-90B)', () => {
+  assert.ok(
+    workerSrc.includes("targetType === 'pressure'") &&
+    workerSrc.includes("UPDATE pressure_points SET review_state=?"),
+    "reviewDecision must handle targetType 'pressure' and update pressure_points.review_state"
+  );
+});
+
+test('D-90B: reviewDecision pressure branch calls recalcClaimScore (D-90B)', () => {
+  // Check that within the pressure branch, recalcClaimScore is called
+  assert.ok(
+    workerSrc.includes("targetType === 'pressure'") &&
+    workerSrc.includes("PRESSURE_NOT_FOUND") &&
+    workerSrc.includes("if (row.claim_id) await recalcClaimScore(env, row.claim_id)"),
+    "reviewDecision pressure branch must call recalcClaimScore to update claim score after approval/rejection"
+  );
+});
+
+test('D-90B: reportTarget handles targetType pressure (D-90B)', () => {
+  assert.ok(
+    workerSrc.includes("targetType === 'pressure'") &&
+    workerSrc.includes("UPDATE pressure_points SET report_count=report_count+1"),
+    "reportTarget must handle targetType 'pressure' with report_count increment and auto-escalation"
   );
 });
 
