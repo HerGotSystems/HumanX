@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 212 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('212 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 212');
+test('docs/README.md documents hardening smoke count: 220 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('220 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 220');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1803,6 +1803,72 @@ test('D-92C: no auto-hide of artifact truths (artifact flag is advisory only)', 
   assert.ok(
     !hasAutoHide,
     'app-v10.js must NOT auto-hide artifact truths — flag is advisory only'
+  );
+});
+
+// ── Section 35 — D-92E: Admin truth ID copy UI ────────────────────────────────
+
+test('D-92E: truthCard calls adminToken() for admin-aware ID display', () => {
+  const src = appSrc;
+  // Must reference adminToken() inside or near truthCard
+  assert.ok(
+    src.includes('adminToken()') && src.includes('isAdmin'),
+    'app-v10.js truthCard must use adminToken() and isAdmin for admin-aware ID display'
+  );
+});
+
+test('D-92E: truth-id-full class exists in app-v10.js', () => {
+  assert.ok(
+    appSrc.includes('truth-id-full'),
+    'app-v10.js must include truth-id-full class for full-ID display element'
+  );
+});
+
+test('D-92E: btn-copy-id class exists in app-v10.js', () => {
+  assert.ok(
+    appSrc.includes('btn-copy-id'),
+    'app-v10.js must include btn-copy-id class for copy button'
+  );
+});
+
+test('D-92E: navigator.clipboard.writeText used in copyTruthId', () => {
+  assert.ok(
+    appSrc.includes('navigator.clipboard.writeText'),
+    'app-v10.js must use navigator.clipboard.writeText in copyTruthId'
+  );
+});
+
+test('D-92E: copyTruthId function defined and exposed on window', () => {
+  assert.ok(
+    appSrc.includes('function copyTruthId') && appSrc.includes('window.copyTruthId=copyTruthId'),
+    'app-v10.js must define copyTruthId and expose it on window'
+  );
+});
+
+test('D-92E: normal short ID path (slice(-8)) still present for non-admin', () => {
+  assert.ok(
+    appSrc.includes('slice(-8)'),
+    'app-v10.js must keep the short ID suffix path for non-admin users'
+  );
+});
+
+test('D-92E: truth-id-full and btn-copy-id CSS rules exist in styles.css', () => {
+  assert.ok(
+    cssSrc2.includes('truth-id-full') && cssSrc2.includes('btn-copy-id'),
+    'styles.css must include .truth-id-full and .btn-copy-id rules'
+  );
+});
+
+test('D-92E: no cleanup/archive/reject call added to truthCard', () => {
+  const src = appSrc;
+  // Extract the truthCard function body (starts after 'function truthCard(t){', ends at the closing }
+  const start = src.indexOf('function truthCard(t){');
+  const end = src.indexOf('\nfunction ', start + 1);
+  const cardSrc = end > -1 ? src.slice(start, end) : src.slice(start, start + 3000);
+  const forbidden = ['reviewDecision', 'reviewCleanup', 'reject', 'archive'].some(k => cardSrc.includes(k));
+  assert.ok(
+    !forbidden,
+    'truthCard must NOT contain any cleanup/archive/reject call'
   );
 });
 
