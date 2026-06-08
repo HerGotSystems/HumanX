@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 220 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('220 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 220');
+test('docs/README.md documents hardening smoke count: 235 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('235 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 235');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1859,16 +1859,145 @@ test('D-92E: truth-id-full and btn-copy-id CSS rules exist in styles.css', () =>
   );
 });
 
-test('D-92E: no cleanup/archive/reject call added to truthCard', () => {
+test('D-92E/G: truthCard does not call review APIs directly (delegates to helper functions)', () => {
   const src = appSrc;
   // Extract the truthCard function body (starts after 'function truthCard(t){', ends at the closing }
   const start = src.indexOf('function truthCard(t){');
   const end = src.indexOf('\nfunction ', start + 1);
   const cardSrc = end > -1 ? src.slice(start, end) : src.slice(start, start + 3000);
-  const forbidden = ['reviewDecision', 'reviewCleanup', 'reject', 'archive'].some(k => cardSrc.includes(k));
+  // Direct API calls are forbidden in truthCard; archiveTruthArtefact and copyTruthId helper calls are allowed
+  const forbidden = ['reviewDecision', 'reviewCleanup', 'api('].some(k => cardSrc.includes(k));
   assert.ok(
     !forbidden,
-    'truthCard must NOT contain any cleanup/archive/reject call'
+    'truthCard must NOT contain direct review API calls (use helper functions instead)'
+  );
+});
+
+// ── Section 36 — D-92G: Admin Truth artefact cleanup UI ──────────────────────
+
+test('D-92G: archiveTruthArtefact helper exists in app-v10.js', () => {
+  assert.ok(
+    appSrc.includes('async function archiveTruthArtefact'),
+    'app-v10.js must define archiveTruthArtefact helper'
+  );
+});
+
+test('D-92G: archiveTruthArtefact uses adminToken()', () => {
+  assert.ok(
+    appSrc.includes('archiveTruthArtefact') && appSrc.includes('adminToken()'),
+    'archiveTruthArtefact must call adminToken()'
+  );
+});
+
+test('D-92G: archiveTruthArtefact uses confirm(', () => {
+  assert.ok(
+    appSrc.includes("confirm('Archive this Truth artefact?"),
+    'archiveTruthArtefact must use confirm() with expected message'
+  );
+});
+
+test('D-92G: archiveTruthArtefact posts to /api/review/decision', () => {
+  assert.ok(
+    appSrc.includes("'/api/review/decision'") && appSrc.includes('archiveTruthArtefact'),
+    'archiveTruthArtefact must POST to /api/review/decision'
+  );
+});
+
+test('D-92G: archiveTruthArtefact posts to /api/review/cleanup', () => {
+  assert.ok(
+    appSrc.includes("'/api/review/cleanup'") && appSrc.includes('archiveTruthArtefact'),
+    'archiveTruthArtefact must POST to /api/review/cleanup'
+  );
+});
+
+test('D-92G: archiveTruthArtefact payload includes targetType:"truth"', () => {
+  assert.ok(
+    appSrc.includes("targetType:'truth'"),
+    'archiveTruthArtefact payload must include targetType:"truth"'
+  );
+});
+
+test('D-92G: archiveTruthArtefact payload includes target_type:"truth"', () => {
+  assert.ok(
+    appSrc.includes("target_type:'truth'"),
+    'archiveTruthArtefact payload must include target_type:"truth"'
+  );
+});
+
+test('D-92G: archiveTruthArtefact payload includes junk_override:true', () => {
+  assert.ok(
+    appSrc.includes('junk_override:true'),
+    'archiveTruthArtefact must pass junk_override:true'
+  );
+});
+
+test('D-92G: archiveTruthArtefact payload includes Admin UI artefact cleanup reason', () => {
+  assert.ok(
+    appSrc.includes('Admin UI artefact cleanup'),
+    'archiveTruthArtefact must include the reason string'
+  );
+});
+
+test('D-92G: window.archiveTruthArtefact is exposed', () => {
+  assert.ok(
+    appSrc.includes('window.archiveTruthArtefact=archiveTruthArtefact'),
+    'archiveTruthArtefact must be exposed on window'
+  );
+});
+
+test('D-92G: btn-archive-artifact class exists in app-v10.js', () => {
+  assert.ok(
+    appSrc.includes('btn-archive-artifact'),
+    'app-v10.js must include btn-archive-artifact class'
+  );
+});
+
+test('D-92G: truthCard archive button conditioned on isAdmin&&artifact', () => {
+  const start = appSrc.indexOf('function truthCard(t){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const cardSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 4000);
+  assert.ok(
+    cardSrc.includes('isAdmin&&artifact'),
+    'truthCard must gate archive button on isAdmin&&artifact'
+  );
+});
+
+test('D-92G: no bulk cleanup loop over truths array', () => {
+  // truths.forEach should not exist at all
+  assert.ok(
+    !appSrc.includes('truths.forEach'),
+    'Must not use truths.forEach (potential bulk action risk)'
+  );
+  // truths.map is used only for card rendering — must not call archiveTruthArtefact within its callback
+  const mapIdx = appSrc.indexOf('truths.map(');
+  const mapContext = mapIdx >= 0 ? appSrc.slice(mapIdx, mapIdx + 120) : '';
+  assert.ok(
+    !mapContext.includes('archiveTruthArtefact'),
+    'truths.map callback must not call archiveTruthArtefact (no bulk archive)'
+  );
+});
+
+test('D-92G: no hardcoded exact artefact IDs in archiveTruthArtefact function', () => {
+  const start = appSrc.indexOf('async function archiveTruthArtefact');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const fnSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 2000);
+  const hardcoded = [
+    'tru_8dda0954d7b14910bb',
+    'tru_2544a80a73034a6a95',
+    'tru_67ae90e56f7449ee85',
+    'tru_5fe9ce641c634fcba5',
+    'tru_a3ecc8ef96104c6ebe',
+  ].some(id => fnSrc.includes(id));
+  assert.ok(
+    !hardcoded,
+    'archiveTruthArtefact must not hardcode specific artefact IDs'
+  );
+});
+
+test('D-92G: btn-archive-artifact CSS rule exists in styles.css', () => {
+  assert.ok(
+    cssSrc2.includes('btn-archive-artifact'),
+    'styles.css must include .btn-archive-artifact rule'
   );
 });
 
