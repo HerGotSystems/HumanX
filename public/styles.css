@@ -161,8 +161,18 @@
 .btn-copy-id{font-size:9px;padding:1px 5px;border-radius:3px;cursor:pointer;opacity:.55;background:transparent;border:1px solid var(--muted);color:var(--muted);line-height:1.5}
 .btn-copy-id:hover{opacity:1}
 .truth-admin-actions{margin:3px 0 0;display:flex;gap:5px;flex-wrap:wrap}
-.btn-archive-artifact{font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;opacity:.6;background:transparent;border:1px solid #ff6b3533;color:#ff6b35cc;line-height:1.5}
-.btn-archive-artifact:hover{opacity:1;border-color:#ff6b35;background:#ff6b3511}
+.btn-archive-artifact{font-size:10px;padding:2px 8px;border-radius:3px;cursor:pointer;opacity:.75;background:transparent;border:1px solid #ff6b3566;color:#ff6b35ee;line-height:1.6;font-weight:500}
+.btn-archive-artifact:hover{opacity:1;border-color:#ff6b35;background:#ff6b3518}
+.truth-borderline-badge{color:#c8a00099;border-color:#c8a00033}
+.truth-admin-bar{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:6px 10px;background:#1a2030;border-radius:4px;font-size:10px;color:var(--muted);margin-bottom:4px}
+.truth-admin-bar b{color:#8899bb}
+.truth-admin-stat{color:#aabbcc;font-weight:500}
+.truth-admin-bar-hint{font-size:9px;opacity:.55;margin-left:4px;font-style:italic}
+.truth-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.truth-filter-chip{font-size:10px;padding:2px 8px;border-radius:12px;cursor:pointer;background:transparent;border:1px solid #2a3550;color:var(--muted);line-height:1.5}
+.truth-filter-chip:hover{border-color:#445577;color:#8899cc}
+.truth-filter-chip-active{border-color:#4a6a9a;color:#aaccff;background:#1e2d45}
+.truth-filter-count{font-size:9px;opacity:.75;margin-left:2px}
 /* Filter bar help text */
 .review-filter-chips{display:flex;gap:6px;flex-wrap:wrap}
 .review-filter-help{margin:5px 0 0;font-size:10px;color:var(--muted);line-height:1.4}

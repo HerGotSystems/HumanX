@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 235 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('235 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 235');
+test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
+  assert.ok(readmeSrc.includes('254 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 251');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1796,13 +1796,15 @@ test('D-92C: truthCard includes truth-id-line for ID display', () => {
 });
 
 test('D-92C: no auto-hide of artifact truths (artifact flag is advisory only)', () => {
-  const src = appSrc;
-  // Must NOT contain code that sets display:none or filters out artifact truths
-  const hasAutoHide = /isTruthArtifact[^}]+display\s*[:=]\s*['"]none/.test(src) ||
-    /filter[^}]+isTruthArtifact/.test(src);
+  // Scope check to truthCard only — admin filter functions may legitimately use filter(isTruthArtifact)
+  const cardStart = appSrc.indexOf('function truthCard(t){');
+  const cardEnd = appSrc.indexOf('\nfunction ', cardStart + 1);
+  const cardSrc = cardEnd > -1 ? appSrc.slice(cardStart, cardEnd) : appSrc.slice(cardStart, cardStart + 4000);
+  const hasAutoHide = /isTruthArtifact[^}]+display\s*[:=]\s*['"]none/.test(cardSrc) ||
+    /filter[^}]+isTruthArtifact/.test(cardSrc);
   assert.ok(
     !hasAutoHide,
-    'app-v10.js must NOT auto-hide artifact truths — flag is advisory only'
+    'truthCard must NOT auto-hide artifact truths — flag is advisory only; admin filter functions may use filter(isTruthArtifact)'
   );
 });
 
@@ -1999,6 +2001,164 @@ test('D-92G: btn-archive-artifact CSS rule exists in styles.css', () => {
     cssSrc2.includes('btn-archive-artifact'),
     'styles.css must include .btn-archive-artifact rule'
   );
+});
+
+// ── Section 37 — D-93B: Truth admin cleanup ergonomics UI ────────────────────
+
+test('D-93B: isTruthBorderlineArtefact helper is defined', () => {
+  assert.ok(
+    appSrc.includes('function isTruthBorderlineArtefact(t)'),
+    'app-v10.js must define isTruthBorderlineArtefact helper'
+  );
+});
+
+test('D-93B: isTruthBorderlineArtefact guards against already-caught artefacts', () => {
+  const start = appSrc.indexOf('function isTruthBorderlineArtefact(t)');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const fnSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 600);
+  assert.ok(
+    fnSrc.includes('isTruthArtifact(t)') && fnSrc.includes('return false'),
+    'isTruthBorderlineArtefact must early-return false when isTruthArtifact is already true'
+  );
+});
+
+test('D-93B: isTruthBorderlineArtefact detects all-caps multi-word phrases', () => {
+  const start = appSrc.indexOf('function isTruthBorderlineArtefact(t)');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const fnSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 600);
+  assert.ok(
+    fnSrc.includes('toUpperCase()'),
+    'isTruthBorderlineArtefact must check toUpperCase() for all-caps detection'
+  );
+});
+
+test('D-93B: truth-borderline-badge class referenced in truthCard', () => {
+  const start = appSrc.indexOf('function truthCard(t){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const cardSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 4000);
+  assert.ok(
+    cardSrc.includes('truth-borderline-badge'),
+    'truthCard must include truth-borderline-badge for borderline advisory badge'
+  );
+});
+
+test('D-93B: borderline badge is admin-only in truthCard', () => {
+  const start = appSrc.indexOf('function truthCard(t){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const cardSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 4000);
+  assert.ok(
+    cardSrc.includes('borderline') && cardSrc.includes('isAdmin'),
+    'truthCard must gate borderline badge on admin status'
+  );
+});
+
+test('D-93B: no archive button for borderline-only cards in truthCard', () => {
+  const start = appSrc.indexOf('function truthCard(t){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const cardSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 4000);
+  // Archive button must be gated on artifact, not borderline
+  assert.ok(
+    cardSrc.includes('isAdmin&&artifact') && !cardSrc.includes('isAdmin&&borderline'),
+    'Archive button must only appear for confirmed artefacts (isAdmin&&artifact), not borderline items'
+  );
+});
+
+test('D-93B: renderTruthAdminBar helper is defined', () => {
+  assert.ok(
+    appSrc.includes('function renderTruthAdminBar('),
+    'app-v10.js must define renderTruthAdminBar helper'
+  );
+});
+
+test('D-93B: renderTruthAdminBar references artefact and borderline counts', () => {
+  const start = appSrc.indexOf('function renderTruthAdminBar(');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const fnSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 600);
+  assert.ok(
+    fnSrc.includes('artefact') && fnSrc.includes('borderline'),
+    'renderTruthAdminBar must reference artefact and borderline counts'
+  );
+});
+
+test('D-93B: renderTruthFilterBar helper is defined', () => {
+  assert.ok(
+    appSrc.includes('function renderTruthFilterBar('),
+    'app-v10.js must define renderTruthFilterBar helper'
+  );
+});
+
+test('D-93B: renderTruthFilterBar includes all four filter keys', () => {
+  const start = appSrc.indexOf('function renderTruthFilterBar(');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const fnSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 1000);
+  const allKeys = ['artefacts', 'borderline', 'personal', 'clean'].every(k => fnSrc.includes(`'${k}'`));
+  assert.ok(allKeys, 'renderTruthFilterBar must include artefacts, borderline, personal, and clean filter chips');
+});
+
+test('D-93B: applyTruthAdminFilter helper is defined', () => {
+  assert.ok(
+    appSrc.includes('function applyTruthAdminFilter('),
+    'app-v10.js must define applyTruthAdminFilter helper'
+  );
+});
+
+test('D-93B: truthAdminFilter module-level state variable is defined', () => {
+  assert.ok(
+    appSrc.includes("let truthAdminFilter = 'all'"),
+    "app-v10.js must declare let truthAdminFilter = 'all' at module level"
+  );
+});
+
+test('D-93B: setTruthAdminFilter is exposed on window', () => {
+  assert.ok(
+    appSrc.includes('window.setTruthAdminFilter=setTruthAdminFilter'),
+    'setTruthAdminFilter must be exposed on window'
+  );
+});
+
+test('D-93B: renderTruths uses applyTruthAdminFilter instead of raw truths.map', () => {
+  const start = appSrc.indexOf('async function renderTruths(){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const fnSrc = end > -1 ? appSrc.slice(start, end) : appSrc.slice(start, start + 3000);
+  assert.ok(
+    fnSrc.includes('applyTruthAdminFilter(truths)'),
+    'renderTruths must call applyTruthAdminFilter(truths) to support filter chips'
+  );
+});
+
+test('D-93B: truth-borderline-badge CSS rule exists in styles.css', () => {
+  assert.ok(
+    cssSrc2.includes('truth-borderline-badge'),
+    'styles.css must include .truth-borderline-badge rule'
+  );
+});
+
+test('D-93B: truth-admin-bar CSS rule exists in styles.css', () => {
+  assert.ok(
+    cssSrc2.includes('truth-admin-bar'),
+    'styles.css must include .truth-admin-bar rule'
+  );
+});
+
+test('D-93B: truth-filter-chip CSS rule exists in styles.css', () => {
+  assert.ok(
+    cssSrc2.includes('truth-filter-chip'),
+    'styles.css must include .truth-filter-chip rule'
+  );
+});
+
+test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', () => {
+  const start = cssSrc2.indexOf('.btn-archive-artifact{');
+  const end = cssSrc2.indexOf('}', start);
+  const ruleSrc = end > -1 ? cssSrc2.slice(start, end) : cssSrc2.slice(start, start + 200);
+  assert.ok(
+    ruleSrc.includes('font-size:10px'),
+    '.btn-archive-artifact must use font-size:10px (increased from 9px for visibility)'
+  );
+});
+
+test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('254 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 251');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
