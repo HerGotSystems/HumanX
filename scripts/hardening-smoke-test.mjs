@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 190 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('190 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 190');
+test('docs/README.md documents hardening smoke count: 196 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('196 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 196');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1613,6 +1613,64 @@ test('D-90C: CSS review-card-pressure class exists (D-90C)', () => {
   assert.ok(
     cssSrc.includes('.review-card-pressure{'),
     "styles.css must define .review-card-pressure card modifier class"
+  );
+});
+
+// ── Section 32 — D-90G: Pressure review UI clarity and side panel copy ────────
+
+const indexSrc = readFileSync(path.join(__dirname, '../public/index.html'), 'utf8');
+
+test('D-90G: side panel body placeholder updated to challenge/support (D-90G)', () => {
+  assert.ok(
+    indexSrc.includes('What does this support or challenge?'),
+    "index.html eNote placeholder must say 'What does this support or challenge?'"
+  );
+  assert.ok(
+    !indexSrc.includes('What does this prove or break?'),
+    "index.html must NOT use old 'What does this prove or break?' placeholder"
+  );
+});
+
+test('D-90G: side panel hint says Support adds evidence Attack adds pressure (D-90G)', () => {
+  assert.ok(
+    indexSrc.includes('Support</b> adds evidence. <b>Attack</b> adds pressure.'),
+    "index.html evidence-kind-hint must say 'Support adds evidence. Attack adds pressure.'"
+  );
+});
+
+test('D-90G: side panel hint says New items enter Review first (D-90G)', () => {
+  assert.ok(
+    indexSrc.includes('New items enter Review first.'),
+    "index.html evidence-kind-hint must say 'New items enter Review first.'"
+  );
+});
+
+test('D-90G: evidence-attach-note updated with approval/pending messaging (D-90G)', () => {
+  assert.ok(
+    indexSrc.includes('After approval, it can affect the public claim'),
+    "index.html evidence-attach-note must say 'After approval, it can affect the public claim'"
+  );
+  assert.ok(
+    !indexSrc.includes('Saved to selected claim. Visibility follows Review state.'),
+    "index.html must NOT use old 'Saved to selected claim. Visibility follows Review state.' copy"
+  );
+});
+
+test('D-90G: RunPack side note updated with approved public items messaging (D-90G)', () => {
+  assert.ok(
+    indexSrc.includes('RunPack includes approved public'),
+    "index.html runpack-side-note must say 'RunPack includes approved public'"
+  );
+  assert.ok(
+    !indexSrc.includes('Private working packet. Exporting does not publish anything.'),
+    "index.html must NOT use old 'Private working packet. Exporting does not publish anything.' copy"
+  );
+});
+
+test('D-90G: graphBox labels global counts (D-90G)', () => {
+  assert.ok(
+    appSrc.includes('Global graph totals'),
+    "graphBox must include 'Global graph totals' label"
   );
 });
 
