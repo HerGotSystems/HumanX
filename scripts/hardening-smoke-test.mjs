@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 204 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('204 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 204');
+test('docs/README.md documents hardening smoke count: 212 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('212 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 212');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1734,6 +1734,75 @@ test('D-91B: CSS sets max-height and overflow:auto on inspect-long-pre (D-91B)',
     cssSrc2.includes('max-height') &&
     cssSrc2.includes('overflow:auto'),
     "styles.css must set max-height and overflow:auto on .inspect-long-pre"
+  );
+});
+
+// ── Section 34 — D-92C: Truths public page clarity ───────────────────────────
+
+test('D-92C: renderTruths copy contains "Public means visible, not proven"', () => {
+  const src = appSrc;
+  assert.ok(
+    src.includes('Public means visible, not proven'),
+    'app-v10.js renderTruths must contain "Public means visible, not proven"'
+  );
+});
+
+test('D-92C: renderTruths copy contains "not proven" or "Public means visible"', () => {
+  const src = appSrc;
+  assert.ok(
+    src.includes('not proven') || src.includes('Public means visible'),
+    'app-v10.js renderTruths must reference "not proven" or "Public means visible"'
+  );
+});
+
+test('D-92C: truthCard contains "not-verified" badge text or class', () => {
+  const src = appSrc;
+  assert.ok(
+    src.includes('not verified') || src.includes('truth-not-verified'),
+    'app-v10.js truthCard must include "not verified" badge'
+  );
+});
+
+test('D-92C: truthCard button text changed to "Pressure-test as Claim"', () => {
+  const src = appSrc;
+  assert.ok(
+    src.includes('Pressure-test as Claim'),
+    'app-v10.js truthCard button must say "Pressure-test as Claim"'
+  );
+});
+
+test('D-92C: isTruthPersonalBelief helper exists in app-v10.js', () => {
+  const src = appSrc;
+  assert.ok(
+    src.includes('isTruthPersonalBelief'),
+    'app-v10.js must define isTruthPersonalBelief helper'
+  );
+});
+
+test('D-92C: isTruthArtifact helper exists in app-v10.js', () => {
+  const src = appSrc;
+  assert.ok(
+    src.includes('isTruthArtifact'),
+    'app-v10.js must define isTruthArtifact helper'
+  );
+});
+
+test('D-92C: truthCard includes truth-id-line for ID display', () => {
+  const src = appSrc;
+  assert.ok(
+    src.includes('truth-id-line'),
+    'app-v10.js truthCard must include truth-id-line element'
+  );
+});
+
+test('D-92C: no auto-hide of artifact truths (artifact flag is advisory only)', () => {
+  const src = appSrc;
+  // Must NOT contain code that sets display:none or filters out artifact truths
+  const hasAutoHide = /isTruthArtifact[^}]+display\s*[:=]\s*['"]none/.test(src) ||
+    /filter[^}]+isTruthArtifact/.test(src);
+  assert.ok(
+    !hasAutoHide,
+    'app-v10.js must NOT auto-hide artifact truths — flag is advisory only'
   );
 });
 
