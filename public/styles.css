@@ -267,6 +267,11 @@
 .ev-body-details summary{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);cursor:pointer;opacity:.65;user-select:none}
 .ev-body-details summary:hover{opacity:1}
 .ev-body-full{font-size:9px;white-space:pre-wrap;max-height:180px;overflow:auto;background:#060911;border:1px solid var(--line);border-radius:6px;padding:6px;margin-top:4px;line-height:1.5;color:var(--muted)}
+/* D-91B inspect long body collapse */
+.inspect-long-details{margin:4px 0 0}
+.inspect-long-toggle{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);cursor:pointer;opacity:.65;user-select:none}
+.inspect-long-toggle:hover{opacity:1}
+.inspect-long-pre{font-size:9px;white-space:pre-wrap;max-height:200px;overflow:auto;background:#060911;border:1px solid var(--line);border-radius:6px;padding:6px;margin-top:4px;line-height:1.5;color:var(--muted)}
 .ev-row-reused{background:linear-gradient(90deg,rgba(87,184,255,.04),rgba(8,11,18,.92));border-left:2px solid #57b8ff33}
 /* D-9A reused evidence compression */
 .reused-collapse-outer{margin:6px 0;border:1px solid #57b8ff22;border-radius:8px;overflow:hidden}
