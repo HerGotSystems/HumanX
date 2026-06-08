@@ -232,18 +232,38 @@ This entry is NOT a junk artefact — it is a genuine belief profile output with
 
 ---
 
-## G. Results (fill after execution)
+## G. Results — Completed via D-92G Admin UI (not curl)
+
+**Method used:** D-92G "archive artefact" button in admin Truth card view. Curl was not executed (jq missing, token security concerns). The D-92G UI was merged and used instead.
 
 | # | ID | Statement | Reject result | Archive result | Final state |
 |---|----|-----------|-----------|-----------------------|-------------|
-| 1 | tru_8dda0954d7b14910bb | gfsdhdfhdfhdfhgdfa | _(pending)_ | _(pending)_ | _(pending)_ |
-| 2 | tru_2544a80a73034a6a95 | Blablabla | _(pending)_ | _(pending)_ | _(pending)_ |
-| 3 | tru_67ae90e56f7449ee85 | SMALL INDEFERENT TRUTH | _(pending)_ | _(pending)_ | _(pending)_ |
-| 4 | tru_5fe9ce641c634fcba5 | Statement | _(pending)_ | _(pending)_ | _(pending)_ |
-| 5 | tru_a3ecc8ef96104c6ebe | Slogan | _(pending)_ | _(pending)_ | _(pending)_ |
+| 1 | tru_8dda0954d7b14910bb | gfsdhdfhdfhdfhgdfa | ✅ via UI | ✅ archived | removed from public |
+| 2 | tru_2544a80a73034a6a95 | Blablabla | ✅ via UI | ✅ archived | removed from public |
+| 3 | tru_67ae90e56f7449ee85 | SMALL INDEFERENT TRUTH | ⚠️ not actioned | not actioned | still visible — edge case |
+| 4 | tru_5fe9ce641c634fcba5 | Statement | ✅ via UI | ✅ archived | removed from public |
+| 5 | tru_a3ecc8ef96104c6ebe | Slogan | ✅ via UI | ✅ archived | removed from public |
 
-Archived truth count before: _(pending)_
-Archived truth count after: _(pending)_
+**Archived truth count before:** unknown (not captured)
+**Archived truth count after:** increased by 4 (gfsdhdfhdfhdfhgdfa, Blablabla, Statement, Slogan)
+
+**Edge case — SMALL INDEFERENT TRUTH (`tru_67ae90e56f7449ee85`):**
+This entry was not visibly flagged `? ARTEFACT` in the final live screenshot, meaning `isTruthArtifact` did not fire for it (the phrase is not short enough alone, has real vowel ratio, is not a repeated syllable, and is not a single-word generic placeholder). The admin "archive artefact" button therefore did not appear on that card. No force-cleanup was performed. Status: deferred as edge case — requires a separate policy decision or a new soft classification lane.
+
+**Overall result: PASS with one edge case remaining.**
+
+---
+
+## I. Live UI Cleanup Outcome (D-92H confirmation)
+
+Executed via D-92G admin Truth UI, 2026-06-08.
+
+- Confirmation dialog showed exact statement text and full truth ID for each card.
+- User confirmed each action individually — no bulk action.
+- Truths page reloaded after each archive; cards disappeared from public view.
+- `Belief Engine Profile — Stoic Atheism` (`tru_53ee59f3fa4247f4be`): **untouched** — no artefact badge, no archive button shown.
+- Socially real/sensitive beliefs all **untouched**: People are stupid, Money is evil, Trust the experts, Never trust the experts, Children should always obey adults, Science has proven it, My religion is the only true path.
+- `SMALL INDEFERENT TRUTH` (`tru_67ae90e56f7449ee85`): remains visible. `isTruthArtifact` did not flag it. Deferred — see Section G edge case note.
 
 ---
 
