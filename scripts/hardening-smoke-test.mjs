@@ -779,8 +779,8 @@ test('docs/README.md contains "Known-good checks" section', () => {
 
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
-test('docs/README.md documents hardening smoke count: 196 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('196 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 196');
+test('docs/README.md documents hardening smoke count: 204 passed, 0 failed', () => {
+  assert.ok(readmeSrc.includes('204 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 204');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1671,6 +1671,69 @@ test('D-90G: graphBox labels global counts (D-90G)', () => {
   assert.ok(
     appSrc.includes('Global graph totals'),
     "graphBox must include 'Global graph totals' label"
+  );
+});
+
+// ── Section 33 — D-91B: Review Inspect long-body collapse ────────────────────
+
+const cssSrc2 = readFileSync(path.join(__dirname, '../public/styles.css'), 'utf8');
+
+test('D-91B: inspectLongText helper exists (D-91B)', () => {
+  assert.ok(
+    appSrc.includes('function inspectLongText('),
+    "app-v10.js must define an inspectLongText helper function"
+  );
+});
+
+test('D-91B: inspectLongText uses <details for collapse (D-91B)', () => {
+  assert.ok(
+    appSrc.includes('<details class="inspect-long-details">'),
+    "inspectLongText must use a <details class=\"inspect-long-details\"> element"
+  );
+});
+
+test('D-91B: inspectLongText uses <pre for full text (D-91B)', () => {
+  assert.ok(
+    appSrc.includes('<pre class="inspect-long-pre">'),
+    "inspectLongText must use a <pre class=\"inspect-long-pre\"> element"
+  );
+});
+
+test('D-91B: pressure body field uses inspectLongText (D-91B)', () => {
+  assert.ok(
+    appSrc.includes("fields.push(['Body',inspectLongText(item.body)]);if(item.severity)"),
+    "renderReviewInspectPanel pressure branch must use inspectLongText for Body field"
+  );
+});
+
+test('D-91B: evidence body field uses inspectLongText (D-91B)', () => {
+  assert.ok(
+    appSrc.includes("fields.push(['Body',inspectLongText(item.body)]);if(item.stance)"),
+    "renderReviewInspectPanel evidence branch must use inspectLongText for Body field"
+  );
+});
+
+test('D-91B: at least one non-pressure text field uses inspectLongText (D-91B)', () => {
+  // Evidence body (stance check below) confirms non-pressure usage
+  assert.ok(
+    appSrc.includes("fields.push(['Body',inspectLongText(item.body)]);if(item.stance)"),
+    "At least one non-pressure field (evidence body) must use inspectLongText"
+  );
+});
+
+test('D-91B: CSS defines .inspect-long-details (D-91B)', () => {
+  assert.ok(
+    cssSrc2.includes('.inspect-long-details'),
+    "styles.css must define .inspect-long-details"
+  );
+});
+
+test('D-91B: CSS sets max-height and overflow:auto on inspect-long-pre (D-91B)', () => {
+  assert.ok(
+    cssSrc2.includes('.inspect-long-pre') &&
+    cssSrc2.includes('max-height') &&
+    cssSrc2.includes('overflow:auto'),
+    "styles.css must set max-height and overflow:auto on .inspect-long-pre"
   );
 });
 
