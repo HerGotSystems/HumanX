@@ -77,6 +77,10 @@ Records the completed Add Test repair and live verification. Covers the original
 Deployment record for D-93D/E (PR #116) — Worker version `529514a6`, main HEAD `429cd5f`. Documents what went live (Review Truth-Derived context badges, Truth-Derived filter chip, category-echo exact-equality fix), live visual verification of `clm_30889d651e3b4b2cb6` / `SMALL INDEFERENT TRUTH`, safety confirmations (no D1/schema/admin mutations), static checks 267/24/39, and the standing Wrangler/D1 explicit-approval rule.
 **Read when:** verifying what is currently deployed, checking the Worker version ID, or confirming D-93D/E is live.
 
+### `D95F_LIVE_DEPLOYMENT_VERIFICATION.md`
+Deployment record for D-95B (PR #117) — Worker version `4673f865`, main HEAD `39c07ad`. Documents what went live (Review inspect panel scrolls into view after Inspect click, top inspect Approve styling aligned with bottom Approve), uploaded asset `/app-v10.js`, safety confirmations (no D1/schema/admin mutations), static checks 272/24/39, and the standing Wrangler/D1 explicit-approval rule.
+**Read when:** verifying what is currently deployed, checking the Worker version ID for D-95B, or confirming Review inspect ergonomics are live.
+
 ### `LOCAL_STATIC_CHECKS_USAGE.md`
 Simple usage guide for running the two local static check scripts before or after risky changes. Covers both `scripts/belief-engine-static-check.mjs` (24 hard checks) and `scripts/worker-route-static-check.mjs` (35 hard checks): exact run commands, safety properties, when to run each, what they do not prove, relationship to smoke tests, and stop conditions.
 **Read when:** before running either static check script, or before/after any Belief Engine or Worker route change.
