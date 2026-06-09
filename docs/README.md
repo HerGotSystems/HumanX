@@ -73,6 +73,10 @@ Records the completed Add Test repair and live verification. Covers the original
 **Read when:** before changing `/api/tests`, `home_tests` schema, Study Claim Tests UI, or test display in the Claim Flow.
 **Safety note:** Migration `0005_add_home_tests_updated_at.sql` was applied manually through the Cloudflare D1 console; do not rerun it unless the target database is known to be missing `home_tests.updated_at`. Known artefact: `Sniff / Sniff Butt` exists as a visible smoke-test marker in production — leave it unless intentionally cleaning it through the normal UI or admin process.
 
+### `D94C_LIVE_DEPLOYMENT_VERIFICATION.md`
+Deployment record for D-93D/E (PR #116) — Worker version `529514a6`, main HEAD `429cd5f`. Documents what went live (Review Truth-Derived context badges, Truth-Derived filter chip, category-echo exact-equality fix), live visual verification of `clm_30889d651e3b4b2cb6` / `SMALL INDEFERENT TRUTH`, safety confirmations (no D1/schema/admin mutations), static checks 267/24/39, and the standing Wrangler/D1 explicit-approval rule.
+**Read when:** verifying what is currently deployed, checking the Worker version ID, or confirming D-93D/E is live.
+
 ### `LOCAL_STATIC_CHECKS_USAGE.md`
 Simple usage guide for running the two local static check scripts before or after risky changes. Covers both `scripts/belief-engine-static-check.mjs` (24 hard checks) and `scripts/worker-route-static-check.mjs` (35 hard checks): exact run commands, safety properties, when to run each, what they do not prove, relationship to smoke tests, and stop conditions.
 **Read when:** before running either static check script, or before/after any Belief Engine or Worker route change.
