@@ -780,7 +780,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2158,7 +2158,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -2307,6 +2307,139 @@ test('D-95B: no new backend/D1/wrangler/deploy references added', () => {
   assert.ok(
     !body.includes('/api/') && !body.includes('wrangler') && !body.includes('d1'),
     'inspectReviewItem must not contain API calls or backend references — display-only change'
+  );
+});
+
+// ── Section 40 — D-96B: Card-row Approve two-step confirmation ────────────────
+
+test('D-96B: pendingApproveReviewId state variable declared', () => {
+  assert.ok(
+    appSrc.includes('let pendingApproveReviewId = null;'),
+    'pendingApproveReviewId state variable must be declared near other review state vars'
+  );
+});
+
+test('D-96B: requestApproveReview function defined', () => {
+  assert.ok(
+    appSrc.includes('function requestApproveReview(id)'),
+    'requestApproveReview must be defined'
+  );
+});
+
+test('D-96B: cancelApproveReview function defined', () => {
+  assert.ok(
+    appSrc.includes('function cancelApproveReview()'),
+    'cancelApproveReview must be defined'
+  );
+});
+
+test('D-96B: card-row Approve calls requestApproveReview, not reviewDecisionUI directly', () => {
+  const start = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes("onclick=\"requestApproveReview('${esc(id)}')"),
+    'card-row Approve must call requestApproveReview, not reviewDecisionUI directly'
+  );
+});
+
+test('D-96B: card-row no longer has old direct btn-approve calling reviewDecisionUI', () => {
+  const start = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  // The old direct pattern: btn-approve button with title "Approve and publish" calling reviewDecisionUI directly
+  const oldDirectPattern = 'btn-approve" title="Approve and publish to all users" onclick="reviewDecisionUI';
+  assert.ok(
+    !body.includes(oldDirectPattern),
+    'card-row btn-approve must not directly call reviewDecisionUI — must go through requestApproveReview'
+  );
+});
+
+test('D-96B: Confirm Approve button calls reviewDecisionUI with public', () => {
+  assert.ok(
+    appSrc.includes('btn-approve-confirm') &&
+    appSrc.includes("onclick=\"reviewDecisionUI('${esc(type)}','${esc(id)}','public')\">Confirm Approve"),
+    'Confirm Approve button must call reviewDecisionUI with public decision'
+  );
+});
+
+test('D-96B: approve pending copy says will become public', () => {
+  assert.ok(
+    appSrc.includes('will become public'),
+    'Approve confirmation message must include "will become public"'
+  );
+});
+
+test('D-96B: reviewDecisionUI clears pendingApproveReviewId on success', () => {
+  const start = appSrc.indexOf('async function reviewDecisionUI(');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('pendingApproveReviewId=null'),
+    'reviewDecisionUI must clear pendingApproveReviewId after successful decision'
+  );
+});
+
+test('D-96B: inspect panel top-actions Approve still calls reviewDecisionUI directly', () => {
+  const start = appSrc.indexOf('function renderReviewInspectPanel');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('review-inspect-top-actions') &&
+    body.includes('btn-approve review-inspect-approve') &&
+    body.includes("onclick=\"reviewDecisionUI('${esc(type)}','${esc(id)}','public')\">Approve"),
+    'inspect panel top-actions Approve must still call reviewDecisionUI directly — deliberate review path'
+  );
+});
+
+test('D-96B: inspect panel bottom-actions Approve still calls reviewDecisionUI directly', () => {
+  const start = appSrc.indexOf('function renderReviewInspectPanel');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  // bottom actions: review-inspect-actions div contains Approve
+  const bottomIdx = body.indexOf('review-inspect-actions');
+  assert.ok(
+    bottomIdx !== -1 &&
+    body.slice(bottomIdx).includes("onclick=\"reviewDecisionUI('${esc(type)}','${esc(id)}','public')\">Approve"),
+    'inspect panel bottom-actions Approve must still call reviewDecisionUI directly'
+  );
+});
+
+test('D-96B: reject pending flow still present (requestRejectReview/cancelRejectReview)', () => {
+  assert.ok(
+    appSrc.includes('function requestRejectReview(id)') &&
+    appSrc.includes('function cancelRejectReview()') &&
+    appSrc.includes('let pendingRejectReviewId = null;'),
+    'existing reject 2-step flow must remain intact'
+  );
+});
+
+test('D-96B: window exposes requestApproveReview and cancelApproveReview', () => {
+  assert.ok(
+    appSrc.includes('window.requestApproveReview=requestApproveReview') &&
+    appSrc.includes('window.cancelApproveReview=cancelApproveReview'),
+    'requestApproveReview and cancelApproveReview must be exposed on window for inline onclick use'
+  );
+});
+
+test('D-96B: CSS approve-confirm classes defined in styles.css', () => {
+  assert.ok(
+    cssSrc.includes('.review-approve-confirm-msg') &&
+    cssSrc.includes('.btn-approve-confirm') &&
+    cssSrc.includes('.btn-approve-cancel'),
+    'styles.css must define approve confirmation CSS classes'
+  );
+});
+
+test('D-96B: no new backend/D1/wrangler/deploy references in approve functions', () => {
+  const reqStart = appSrc.indexOf('function requestApproveReview(id)');
+  const reqEnd = appSrc.indexOf('}', reqStart) + 1;
+  const cancelStart = appSrc.indexOf('function cancelApproveReview()');
+  const cancelEnd = appSrc.indexOf('}', cancelStart) + 1;
+  const body = appSrc.slice(reqStart, reqEnd) + appSrc.slice(cancelStart, cancelEnd);
+  assert.ok(
+    !body.includes('/api/') && !body.includes('wrangler') && !body.includes('d1'),
+    'requestApproveReview and cancelApproveReview must not reference backend — display-only state functions'
   );
 });
 
