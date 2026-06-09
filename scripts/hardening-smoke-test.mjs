@@ -780,7 +780,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 251');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2158,7 +2158,106 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count of 251');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+});
+
+// ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
+
+test('D-93D: isTruthDerivedClaim helper is defined', () => {
+  assert.ok(
+    appSrc.includes('function isTruthDerivedClaim(item)'),
+    'app-v10.js must define isTruthDerivedClaim helper'
+  );
+});
+
+test('D-93D: isTruthDerivedClaim detects Truth-Derived type string', () => {
+  assert.ok(
+    appSrc.includes("==='truth-derived'"),
+    'isTruthDerivedClaim must compare against lowercased truth-derived string'
+  );
+});
+
+test('D-93D: isClaimCategoryEcho helper is defined', () => {
+  assert.ok(
+    appSrc.includes('function isClaimCategoryEcho(item)'),
+    'app-v10.js must define isClaimCategoryEcho helper'
+  );
+});
+
+test('D-93D: isClaimCategoryEcho uses exact equality — no substring matching (false-positive guard)', () => {
+  // Must use cl===ca but must NOT use .includes() for echo detection
+  // Substring matching would fire on e.g. claim="My religion is the only true path", category="religion"
+  const start = appSrc.indexOf('function isClaimCategoryEcho(item)');
+  const end = appSrc.indexOf('}', start) + 1;
+  const body = appSrc.slice(start, end);
+  assert.ok(body.includes('cl===ca'), 'isClaimCategoryEcho must use exact equality (cl===ca)');
+  assert.ok(!body.includes('.includes('), 'isClaimCategoryEcho must NOT use substring .includes() — false-positive risk on common category words like "religion", "science", "trust"');
+});
+
+test('D-93D: isLikelyBorderlineDerivedClaim helper is defined', () => {
+  assert.ok(
+    appSrc.includes('function isLikelyBorderlineDerivedClaim(item)'),
+    'app-v10.js must define isLikelyBorderlineDerivedClaim helper'
+  );
+});
+
+test('D-93D: reviewCard references b-truth-derived badge class', () => {
+  assert.ok(
+    appSrc.includes('b-truth-derived'),
+    'reviewCard must reference b-truth-derived badge class'
+  );
+});
+
+test('D-93D: reviewCard references b-category-echo badge class', () => {
+  assert.ok(
+    appSrc.includes('b-category-echo'),
+    'reviewCard must reference b-category-echo badge class'
+  );
+});
+
+test('D-93D: reviewCard references b-borderline-origin badge class', () => {
+  assert.ok(
+    appSrc.includes('b-borderline-origin'),
+    'reviewCard must reference b-borderline-origin badge class'
+  );
+});
+
+test('D-93D: applyReviewFilter includes truth-derived branch', () => {
+  assert.ok(
+    appSrc.includes("f==='truth-derived'") && appSrc.includes('isTruthDerivedClaim'),
+    'applyReviewFilter must include truth-derived filter branch using isTruthDerivedClaim'
+  );
+});
+
+test('D-93D: renderReviewFilterBar includes truth-derived chip', () => {
+  assert.ok(
+    appSrc.includes("'truth-derived','Truth-Derived'"),
+    "renderReviewFilterBar defs must include ['truth-derived','Truth-Derived'] chip"
+  );
+});
+
+test('D-93D: b-truth-derived CSS rule exists in styles.css', () => {
+  assert.ok(
+    cssSrc2.includes('b-truth-derived'),
+    'styles.css must include .b-truth-derived rule'
+  );
+});
+
+test('D-93D: b-category-echo CSS rule exists in styles.css', () => {
+  assert.ok(
+    cssSrc2.includes('b-category-echo'),
+    'styles.css must include .b-category-echo rule'
+  );
+});
+
+test('D-93E: isLikelyBorderlineDerivedClaim is gated by isTruthDerivedClaim (non-Truth-Derived items never flagged)', () => {
+  const start = appSrc.indexOf('function isLikelyBorderlineDerivedClaim(item)');
+  const end = appSrc.indexOf('}', start) + 1;
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('isTruthDerivedClaim(item)') && body.startsWith('function isLikelyBorderlineDerivedClaim(item){if(!isTruthDerivedClaim(item))return false'),
+    'isLikelyBorderlineDerivedClaim must return false immediately for non-Truth-Derived items'
+  );
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────

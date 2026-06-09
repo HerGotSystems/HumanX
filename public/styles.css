@@ -336,6 +336,9 @@
 .review-audit-stat-similar .review-audit-n{color:#f0a83a}
 .b-similar{color:#f0a83a;border-color:#f0a83a55}
 .b-quality{color:#c4a460;border-color:#c4a46055}
+.b-truth-derived{color:#57d4ff;border-color:#57d4ff44}
+.b-category-echo{color:#ffaa33;border-color:#ffaa3344}
+.b-borderline-origin{color:#c8a000;border-color:#c8a00033;opacity:.85}
 .b-orange{color:#ff9a3c;border-color:#ff9a3c66}
 .b-purple{color:var(--purple);border-color:#a066ff66}
 /* Claim quality hints — submit form live feedback */
