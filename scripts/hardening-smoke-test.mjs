@@ -780,7 +780,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2158,7 +2158,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -2257,6 +2257,56 @@ test('D-93E: isLikelyBorderlineDerivedClaim is gated by isTruthDerivedClaim (non
   assert.ok(
     body.includes('isTruthDerivedClaim(item)') && body.startsWith('function isLikelyBorderlineDerivedClaim(item){if(!isTruthDerivedClaim(item))return false'),
     'isLikelyBorderlineDerivedClaim must return false immediately for non-Truth-Derived items'
+  );
+});
+
+// ── Section 39 — D-95B: Review inspect panel scroll + approve visual consistency ──
+
+test('D-95B: inspectReviewItem calls renderReviewList', () => {
+  const start = appSrc.indexOf('function inspectReviewItem(id)');
+  const end = appSrc.indexOf('}', start) + 1;
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('renderReviewList()'),
+    'inspectReviewItem must call renderReviewList()'
+  );
+});
+
+test('D-95B: inspectReviewItem scrolls inspect panel into view after render', () => {
+  const start = appSrc.indexOf('function inspectReviewItem(id)');
+  const end = appSrc.indexOf('}', start) + 1;
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('scrollIntoView') && body.includes('.review-inspect-panel'),
+    'inspectReviewItem must call scrollIntoView on .review-inspect-panel after renderReviewList'
+  );
+});
+
+test('D-95B: inspectReviewItem scrollIntoView is guarded — only fires when panel is open', () => {
+  const start = appSrc.indexOf('function inspectReviewItem(id)');
+  const end = appSrc.indexOf('}', start) + 1;
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('if(inspectedReviewItem)') && body.includes('scrollIntoView'),
+    'scrollIntoView must be guarded by inspectedReviewItem check — must not fire when toggling panel closed'
+  );
+});
+
+test('D-95B: top-actions Approve in inspect panel has review-inspect-approve class', () => {
+  assert.ok(
+    appSrc.includes('review-inspect-top-actions"><button class="btn-approve review-inspect-approve"'),
+    'top-actions Approve button must include review-inspect-approve class for visual consistency with bottom Approve'
+  );
+});
+
+test('D-95B: no new backend/D1/wrangler/deploy references added', () => {
+  // Verify inspectReviewItem does not contain any API calls or backend mutation
+  const start = appSrc.indexOf('function inspectReviewItem(id)');
+  const end = appSrc.indexOf('}', start) + 1;
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    !body.includes('/api/') && !body.includes('wrangler') && !body.includes('d1'),
+    'inspectReviewItem must not contain API calls or backend references — display-only change'
   );
 });
 
