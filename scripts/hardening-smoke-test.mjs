@@ -756,7 +756,8 @@ test('claim card rendering calls reviewStatusBadge(c)', () => {
 });
 
 test('truth card rendering calls reviewStatusBadge(t)', () => {
-  assert.ok(appSrc.includes('reviewStatusBadge(t)'), 'truthCard must call reviewStatusBadge(t)');
+  // D-97B: truthCard now passes truthCtx=true → reviewStatusBadge(t,false,true)
+  assert.ok(appSrc.includes('reviewStatusBadge(t,false,true)') || appSrc.includes('reviewStatusBadge(t)'), 'truthCard must call reviewStatusBadge for the truth');
 });
 
 test('CSS contains .review-badge-block', () => {
@@ -780,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2158,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -2440,6 +2441,131 @@ test('D-96B: no new backend/D1/wrangler/deploy references in approve functions',
   assert.ok(
     !body.includes('/api/') && !body.includes('wrangler') && !body.includes('d1'),
     'requestApproveReview and cancelApproveReview must not reference backend — display-only state functions'
+  );
+});
+
+// ── Section 41 — D-97B: Public Truths trust-signal clarity ────────────────────
+
+test('D-97B: reviewStatusBadge accepts truthCtx parameter', () => {
+  assert.ok(
+    appSrc.includes('function reviewStatusBadge(c,withNote=false,truthCtx=false)'),
+    'reviewStatusBadge must accept a truthCtx parameter to render neutral truth visibility badge'
+  );
+});
+
+test('D-97B: public truth badge says "visible", not "Public", and is not green', () => {
+  assert.ok(
+    appSrc.includes("label=truthCtx?'visible':'Public'") &&
+    appSrc.includes("clr=truthCtx?'b-muted truth-visible-badge':'b-green'"),
+    'public truth visibility badge must read "visible" with neutral b-muted styling, not green "Public"'
+  );
+});
+
+test('D-97B: truthCard passes truthCtx=true to reviewStatusBadge', () => {
+  const start = appSrc.indexOf('function truthCard(t){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('reviewStatusBadge(t,false,true)'),
+    'truthCard must call reviewStatusBadge with truthCtx=true so public state renders as neutral "visible"'
+  );
+});
+
+test('D-97B: claim card still uses default (green) reviewStatusBadge — truths-only change', () => {
+  // The claim card caller must NOT pass truthCtx — claims keep green Public
+  assert.ok(
+    appSrc.includes('${reviewStatusBadge(c)}'),
+    'claim card must keep default reviewStatusBadge(c) — the visible/neutral change is truths-only'
+  );
+});
+
+test('D-97B: .truth-not-verified font-size is no longer 8px', () => {
+  assert.ok(
+    !cssSrc.includes('.truth-not-verified{font-size:8px}'),
+    '.truth-not-verified must be larger than 8px — it is the primary honesty signal'
+  );
+});
+
+test('D-97B: .truth-not-verified font-size is at least 10px', () => {
+  const m = cssSrc.match(/\.truth-not-verified\{font-size:(\d+)px/);
+  assert.ok(m, '.truth-not-verified must define a font-size');
+  assert.ok(
+    Number(m[1]) >= 10,
+    `.truth-not-verified font-size must be >= 10px (found ${m ? m[1] : '?'}px)`
+  );
+});
+
+test('D-97B: NOT VERIFIED badge remains present in truthCard', () => {
+  const start = appSrc.indexOf('function truthCard(t){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('truth-not-verified') && body.includes('not verified'),
+    'truthCard must still render the "not verified" badge'
+  );
+});
+
+test('D-97B: claim-exists chip no longer uses green/approval styling', () => {
+  assert.ok(
+    !appSrc.includes('b-green truth-linked-chip'),
+    'the linked-claim chip must not use success-green styling'
+  );
+});
+
+test('D-97B: claim-exists chip avoids "verified"/"proven" wording', () => {
+  const start = appSrc.indexOf('function truthCard(t){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  const chipIdx = body.indexOf('truth-linked-chip');
+  const chipText = body.slice(chipIdx, chipIdx + 40);
+  assert.ok(
+    !/verified|proven/i.test(chipText),
+    'linked-claim chip text must not imply verification/proof'
+  );
+});
+
+test('D-97B: borderline badge remains admin-only after restyle', () => {
+  const start = appSrc.indexOf('function truthCard(t){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('const borderline=isAdmin&&isTruthBorderlineArtefact(t)&&!artifact'),
+    'borderline badge must remain gated on isAdmin'
+  );
+});
+
+test('D-97B: full truth ID + archive button remain admin-only', () => {
+  const start = appSrc.indexOf('function truthCard(t){');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('isAdmin?') && body.includes('isAdmin&&artifact?'),
+    'truthCard must keep full-ID display and archive button gated on admin'
+  );
+});
+
+test('D-97B: sensitive social beliefs are not structurally flagged as artefact', () => {
+  // Re-derive the artefact heuristic to confirm content-neutrality
+  const isArtefact = (s) => {
+    s = String(s).trim();
+    if (s.length < 4) return true;
+    if (/^(statement|slogan|truth|claim|placeholder|test|demo|example|sample|label|title)$/i.test(s)) return true;
+    const letters = s.replace(/[^a-z]/gi, '').toLowerCase();
+    if (letters.length > 6) { const v = (letters.match(/[aeiou]/g) || []).length; if (v / letters.length < 0.12) return true; }
+    if (/^(.{2,5})\1{2,}$/i.test(s.replace(/[\s-]/g, ''))) return true;
+    return false;
+  };
+  const beliefs = ['People are stupid','Money is evil','Trust the experts','Never trust the experts','Children should always obey adults','Science has proven it','My religion is the only true path'];
+  beliefs.forEach(b => assert.ok(!isArtefact(b), `"${b}" must NOT be flagged as artefact — sensitive beliefs stay neutral`));
+});
+
+test('D-97B: no backend/D1/wrangler/deploy references added in trust-signal changes', () => {
+  const start = appSrc.indexOf('function reviewStatusBadge(');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    !body.includes('wrangler') && !body.includes('deploy') && !/\bd1\b/i.test(body),
+    'reviewStatusBadge must not reference backend/deploy — display-only change'
   );
 });
 
