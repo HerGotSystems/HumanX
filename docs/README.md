@@ -85,6 +85,10 @@ Deployment record for D-95B (PR #117) — Worker version `4673f865`, main HEAD `
 Deployment record for D-96B (PR #118) — main HEAD `fa24c92`, feature commit `8bfe726`. Documents what went live (two-step card-row Review Approve confirmation: first click shows "Approve this item? It will become public." inline, second click publishes, Cancel restores normal buttons; inspect-panel Approve stays one-click; Reject flow unchanged), user-confirmed live verification, safety confirmations (no D1/schema/admin mutations), static checks 286/24/39, and the standing Wrangler/D1 explicit-approval rule.
 **Read when:** verifying what is currently deployed, or confirming the two-step card-row Approve safety guard is live.
 
+### `D97E_LIVE_DEPLOYMENT_VERIFICATION.md`
+Deployment record for D-97B (PR #119) — main HEAD `d506cd9`, feature commit `a97e2fc`. Documents what went live (public Truth trust-signal clarity: visibility badge reframed from green "Public" to neutral "visible", NOT VERIFIED badge strengthened 8px→11px bold caution-yellow, linked-claim chip changed from green "→ claim exists" to muted "claim derived"; claims/study keep green "Public"; admin-only controls stay gated), user-confirmed live verification, safety confirmations (no D1/schema/admin mutations), static checks 299/24/39, and the standing Wrangler/D1 explicit-approval rule.
+**Read when:** verifying what is currently deployed, or confirming the public Truth trust-signal clarity changes are live.
+
 ### `LOCAL_STATIC_CHECKS_USAGE.md`
 Simple usage guide for running the two local static check scripts before or after risky changes. Covers both `scripts/belief-engine-static-check.mjs` (24 hard checks) and `scripts/worker-route-static-check.mjs` (35 hard checks): exact run commands, safety properties, when to run each, what they do not prove, relationship to smoke tests, and stop conditions.
 **Read when:** before running either static check script, or before/after any Belief Engine or Worker route change.
