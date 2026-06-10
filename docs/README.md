@@ -81,6 +81,10 @@ Deployment record for D-93D/E (PR #116) — Worker version `529514a6`, main HEAD
 Deployment record for D-95B (PR #117) — Worker version `4673f865`, main HEAD `39c07ad`. Documents what went live (Review inspect panel scrolls into view after Inspect click, top inspect Approve styling aligned with bottom Approve), uploaded asset `/app-v10.js`, safety confirmations (no D1/schema/admin mutations), static checks 272/24/39, and the standing Wrangler/D1 explicit-approval rule.
 **Read when:** verifying what is currently deployed, checking the Worker version ID for D-95B, or confirming Review inspect ergonomics are live.
 
+### `D96E_LIVE_DEPLOYMENT_VERIFICATION.md`
+Deployment record for D-96B (PR #118) — main HEAD `fa24c92`, feature commit `8bfe726`. Documents what went live (two-step card-row Review Approve confirmation: first click shows "Approve this item? It will become public." inline, second click publishes, Cancel restores normal buttons; inspect-panel Approve stays one-click; Reject flow unchanged), user-confirmed live verification, safety confirmations (no D1/schema/admin mutations), static checks 286/24/39, and the standing Wrangler/D1 explicit-approval rule.
+**Read when:** verifying what is currently deployed, or confirming the two-step card-row Approve safety guard is live.
+
 ### `LOCAL_STATIC_CHECKS_USAGE.md`
 Simple usage guide for running the two local static check scripts before or after risky changes. Covers both `scripts/belief-engine-static-check.mjs` (24 hard checks) and `scripts/worker-route-static-check.mjs` (35 hard checks): exact run commands, safety properties, when to run each, what they do not prove, relationship to smoke tests, and stop conditions.
 **Read when:** before running either static check script, or before/after any Belief Engine or Worker route change.
