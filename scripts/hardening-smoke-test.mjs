@@ -781,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2159,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -2566,6 +2566,115 @@ test('D-97B: no backend/D1/wrangler/deploy references added in trust-signal chan
   assert.ok(
     !body.includes('wrangler') && !body.includes('deploy') && !/\bd1\b/i.test(body),
     'reviewStatusBadge must not reference backend/deploy — display-only change'
+  );
+});
+
+// ── Section 42 — D-98B: Public onboarding terminology clarity ─────────────────
+
+const beliefEngineSrc = readFileSync(path.join(__dirname, '../public/apps/humanx-belief-engine/index.html'), 'utf8');
+
+test('D-98B: hero no-overclaim copy remains present', () => {
+  assert.ok(
+    appSrc.includes('it does not decide what is true'),
+    'renderHome hero must keep "it does not decide what is true" — core anti-overclaim promise'
+  );
+});
+
+test('D-98B: noscript no-overclaim copy remains present', () => {
+  assert.ok(
+    indexSrc.includes('does not automatically decide what is true'),
+    'index.html noscript must keep "does not automatically decide what is true"'
+  );
+});
+
+test('D-98B: Belief Engine not-diagnosis / pressure-tendency disclaimer remains present', () => {
+  assert.ok(
+    beliefEngineSrc.includes('not diagnoses') && beliefEngineSrc.includes('pressure-tendency'),
+    'Belief Engine must keep "not diagnoses" and "pressure-tendency" interpretive-framing disclaimer'
+  );
+});
+
+test('D-98B: Belief Engine neutrality copy remains present', () => {
+  assert.ok(
+    beliefEngineSrc.includes('No correct answers') && beliefEngineSrc.includes('No religion assigned'),
+    'Belief Engine intro must keep "No correct answers" / "No religion assigned" neutrality copy'
+  );
+});
+
+test('D-98B: submit helper "not an automatic verdict" qualifier remains present', () => {
+  assert.ok(
+    appSrc.includes('not an automatic verdict'),
+    'submit helperText must keep "not an automatic verdict" anti-overclaim qualifier'
+  );
+});
+
+test('D-98B: "Send to Claim Review" no longer appears in public copy', () => {
+  assert.ok(
+    !appSrc.includes('Send to Claim Review'),
+    'public copy must not use "Send to Claim Review" — unified to "Pressure-test as Claim"'
+  );
+});
+
+test('D-98B: "Pressure-test as Claim" appears consistently for Truth-to-Claim action', () => {
+  // Button + home card + drift + both helperText branches → multiple occurrences
+  const n = (appSrc.match(/Pressure-test as Claim/g) || []).length;
+  assert.ok(
+    n >= 4,
+    `"Pressure-test as Claim" must be the consistent Truth-to-Claim wording (found ${n} occurrences, expected >= 4)`
+  );
+});
+
+test('D-98B: verdict qualifier present near filter', () => {
+  assert.ok(
+    indexSrc.includes('not automatic truth rulings') && indexSrc.includes('verdict-qualifier'),
+    'index.html searchbar must carry a verdict qualifier: "...not automatic truth rulings"'
+  );
+});
+
+test('D-98B: public copy does not claim HumanX proves/decides/verifies truth automatically', () => {
+  const banned = [
+    'we prove the truth',
+    'proves the truth',
+    'decides the truth',
+    'verifies truth automatically',
+    'automatically verifies truth',
+    'HumanX verifies what is true',
+  ];
+  const hits = banned.filter(p => appSrc.includes(p) || indexSrc.includes(p));
+  assert.ok(
+    hits.length === 0,
+    `public copy must not overclaim truth determination — found: ${hits.join(', ')}`
+  );
+});
+
+test('D-98B: Truths helper keeps "what is asserted, not whether it is correct"', () => {
+  assert.ok(
+    appSrc.includes('what is asserted, not whether it is correct'),
+    'Truths helperText must keep the D-92C honesty framing'
+  );
+});
+
+test('D-98B: Review-only moderation wording remains in review helper (not leaked elsewhere)', () => {
+  // "Approve makes an item public" is review-mode helper copy; must still exist
+  assert.ok(
+    appSrc.includes('Approve') && appSrc.includes('Pending') && appSrc.includes('are not public'),
+    'review helperText must keep moderation explanation (Pending/Approve)'
+  );
+});
+
+test('D-98B: verdict-qualifier CSS rule defined', () => {
+  assert.ok(
+    cssSrc.includes('.verdict-qualifier'),
+    'styles.css must define .verdict-qualifier rule'
+  );
+});
+
+test('D-98B: no backend/D1/wrangler/deploy references added in onboarding copy', () => {
+  // The verdict qualifier and helper text are display-only
+  assert.ok(
+    indexSrc.includes('verdict-qualifier') &&
+    !indexSrc.includes('wrangler') && !indexSrc.includes('d1 execute'),
+    'onboarding copy must remain display-only — no backend/deploy references'
   );
 });
 
