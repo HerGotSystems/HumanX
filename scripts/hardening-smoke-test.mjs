@@ -781,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2159,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -2675,6 +2675,110 @@ test('D-98B: no backend/D1/wrangler/deploy references added in onboarding copy',
     indexSrc.includes('verdict-qualifier') &&
     !indexSrc.includes('wrangler') && !indexSrc.includes('d1 execute'),
     'onboarding copy must remain display-only — no backend/deploy references'
+  );
+});
+
+// ── Section 43 — D-100B: Study/Claim verdict and score clarity ────────────────
+
+test('D-100B: Study view carries a verdict qualifier', () => {
+  const start = appSrc.indexOf('function renderStudy');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('study-verdict-qualifier'),
+    'renderStudy must include a study-verdict-qualifier near the verdict/meters'
+  );
+});
+
+test('D-100B: verdict qualifier says pressure-test label, not an automatic truth ruling', () => {
+  assert.ok(
+    appSrc.includes('pressure-test label') && appSrc.includes('not an automatic truth ruling'),
+    'Study verdict qualifier must state it is a pressure-test label, not an automatic truth ruling'
+  );
+});
+
+test('D-100B: score framing mentions current submitted packet / not absolute certainty', () => {
+  assert.ok(
+    appSrc.includes('submitted packet') && appSrc.includes('not absolute certainty'),
+    'Study score legend must frame scores as the current submitted packet, not absolute certainty'
+  );
+});
+
+test('D-100B: meter() emits a title tooltip', () => {
+  const start = appSrc.indexOf('function meter(');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes('title="${tip}"') && body.includes('Evidence score reflects'),
+    'meter() must emit a per-meter title tooltip explaining the score'
+  );
+});
+
+test('D-100B: meter tooltips cover Evidence, Testability, Survivability', () => {
+  assert.ok(
+    appSrc.includes('Evidence score reflects submitted support quality and quantity.') &&
+    appSrc.includes('Testability reflects how directly the claim can be checked.') &&
+    appSrc.includes('Survivability reflects how well the claim holds under pressure.'),
+    'meter() tooltips must cover Evidence, Testability, and Survivability'
+  );
+});
+
+test('D-100B: Evidence/Testability/Survivability meter labels remain present in Study', () => {
+  const start = appSrc.indexOf('function renderStudy');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    body.includes("meter('Evidence',selected.evidenceScore)") &&
+    body.includes("meter('Testability',selected.testability)") &&
+    body.includes("meter('Survivability',selected.survivability)"),
+    'Study meter labels Evidence/Testability/Survivability must remain'
+  );
+});
+
+test('D-100B: verdict colour/class logic (cls) is not removed', () => {
+  assert.ok(
+    appSrc.includes("function cls(s){if(s==='Proven'||String(s).includes('Supported')") &&
+    appSrc.includes("return'b-green'") && appSrc.includes("return'b-red'"),
+    'cls() verdict→colour mapping must remain intact (no recolour/removal in D-100B)'
+  );
+});
+
+test('D-100B: arena/study helperText reinforces verdict framing', () => {
+  assert.ok(
+    appSrc.includes('Verdicts are pressure-test labels, not automatic truth rulings.'),
+    'arena/study helperText must reinforce that verdicts are pressure-test labels'
+  );
+});
+
+test('D-100B: D-98B global searchbar verdict qualifier remains present', () => {
+  assert.ok(
+    indexSrc.includes('not automatic truth rulings') && indexSrc.includes('verdict-qualifier'),
+    'D-98B searchbar verdict qualifier must remain'
+  );
+});
+
+test('D-100B: D-97B Truth visible / NOT VERIFIED protections remain present', () => {
+  assert.ok(
+    appSrc.includes("label=truthCtx?'visible':'Public'") &&
+    !cssSrc.includes('.truth-not-verified{font-size:8px}'),
+    'D-97B Truth "visible" badge and strengthened NOT VERIFIED must remain'
+  );
+});
+
+test('D-100B: .study-verdict-qualifier CSS rule defined', () => {
+  assert.ok(
+    cssSrc.includes('.study-verdict-qualifier'),
+    'styles.css must define .study-verdict-qualifier'
+  );
+});
+
+test('D-100B: no backend/D1/wrangler/deploy references added in meter()', () => {
+  const start = appSrc.indexOf('function meter(');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  assert.ok(
+    !body.includes('/api/') && !body.includes('wrangler') && !/\bd1\b/i.test(body),
+    'meter() must remain display-only — no backend references'
   );
 });
 
