@@ -51,6 +51,10 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
+### `D102A_FINAL_RELEASE_CHECKPOINT.md` ⭐ START HERE
+Canonical single-page checkpoint after the completed D-93→D-101 public safety/clarity run — main HEAD `e698ea3`, deployed Worker `5a73a625`, static baseline **328/24/39**. Summarizes all eight completed improvements (Truth-derived Review context, category-echo guard, Review inspect scroll, card-row Approve confirmation, Truth visible/not-verified clarity, onboarding terminology qualifier, Study verdict/score qualifier, commandbar/error-recovery polish), production operating rules, known live moderation state (SMALL INDEFERENT TRUTH visible/borderline; its claim pending; personal-belief deferred), and recommends **D-103A — Evidence quality / source display audit** as the next branch. Flagged as a good stopping point.
+**Read when:** opening any new session — start here before re-reading per-pass docs.
+
 ### `PROJECT_STATE.md`
 Single-page checkpoint updated after D-34. Covers current functional state, known-good check counts (100/24/39), full batch history A-2 → D-34, backend/D1 safety rules, and known limitations (Windows schannel local TLS — mitigated by D-32 CI workflow, first run confirmed green in D-33, updated to Node 24 in D-34).
 **Read when:** starting any new session, picking up after a gap, or orienting before any frontend or backend task.
