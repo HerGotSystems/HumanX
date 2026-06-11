@@ -781,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2159,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -3254,6 +3254,71 @@ test('D-111B: no backend/D1/wrangler/deploy references added in renderSubmit', (
   assert.ok(
     !body.includes('wrangler') && !/\bd1 execute\b/i.test(body),
     'renderSubmit must remain display-only'
+  );
+});
+
+// ── Section 52 — D-112B: mobile tab navigation affordance ─────────────────────
+
+function setModeBody() {
+  const start = appSrc.indexOf('function setMode(m)');
+  return start === -1 ? '' : appSrc.slice(start, start + 600);
+}
+
+test('D-112B: .tabs keeps horizontal overflow / touch scrolling on mobile', () => {
+  assert.ok(
+    cssSrc.includes('flex-wrap:nowrap;overflow-x:auto') && cssSrc.includes('-webkit-overflow-scrolling:touch'),
+    'mobile .tabs must keep overflow-x:auto + touch scrolling'
+  );
+});
+
+test('D-112B: mobile tab strip has an edge fade affordance (mask/gradient)', () => {
+  assert.ok(
+    cssSrc.includes('mask-image:linear-gradient(to right') && cssSrc.includes('-webkit-mask-image:linear-gradient(to right'),
+    'mobile .tabs must define a right-edge mask/gradient fade cue'
+  );
+});
+
+test('D-112B: scrollbar-hidden behavior preserved alongside the new cue', () => {
+  assert.ok(
+    cssSrc.includes('scrollbar-width:none') && cssSrc.includes('.tabs::-webkit-scrollbar{display:none}'),
+    'hidden scrollbar must remain (the fade cue replaces it)'
+  );
+});
+
+test('D-112B: setMode scrolls the active tab into view', () => {
+  const body = setModeBody();
+  assert.ok(
+    body.includes('scrollIntoView') && body.includes("getElementById('tab-'+m)"),
+    'setMode must scroll the active tab (#tab-<m>) into view'
+  );
+});
+
+test('D-112B: setMode guards a missing active tab safely', () => {
+  const body = setModeBody();
+  assert.ok(
+    body.includes('if(_activeTab)') || /\?\.\s*scrollIntoView/.test(body),
+    'setMode must guard against a missing tab element before scrolling'
+  );
+});
+
+test('D-112B: setMode still toggles .active on the mode tab', () => {
+  assert.ok(setModeBody().includes("_activeTab.classList.add('active')"), 'setMode must still mark the active tab');
+});
+
+test('D-112B: D-111 submit trust note remains present', () => {
+  assert.ok(appSrc.includes('submit-trust-note') && appSrc.includes('not an automatic verdict'), 'submit trust note must remain');
+});
+
+test('D-112B: all 9 nav tabs remain in index.html', () => {
+  const n = (indexSrc.match(/id="tab-/g) || []).length;
+  assert.ok(n === 9, `nav must keep all 9 tabs (found ${n})`);
+});
+
+test('D-112B: no backend/D1/wrangler/deploy references added in setMode', () => {
+  const body = setModeBody();
+  assert.ok(
+    !body.includes('wrangler') && !body.includes('/api/') && !/\bd1 execute\b/i.test(body),
+    'setMode must remain client-side nav only'
   );
 });
 

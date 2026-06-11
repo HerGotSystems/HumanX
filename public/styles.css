@@ -116,7 +116,7 @@
 .mode-vault #filter,.mode-truths #filter{display:none}
 .mode-home .sidepanel,.mode-submit .sidepanel,.mode-export .sidepanel{display:none}
 .mode-home .layout,.mode-submit .layout,.mode-export .layout{grid-template-columns:1fr}
-@media(max-width:900px){.tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;margin-bottom:4px;gap:4px}.tabs::-webkit-scrollbar{display:none}.tab{padding:6px 9px;font-size:11px;white-space:nowrap;flex-shrink:0}.statusline{margin-top:0}.searchbar input{padding:6px 8px}.searchbar select{min-width:110px;padding:6px 8px}}
+@media(max-width:900px){.tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;margin-bottom:4px;gap:4px;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent)}.tabs::-webkit-scrollbar{display:none}.tab{padding:6px 9px;font-size:11px;white-space:nowrap;flex-shrink:0}.statusline{margin-top:0}.searchbar input{padding:6px 8px}.searchbar select{min-width:110px;padding:6px 8px}}
 @media(max-width:600px){main{padding:6px;gap:5px}.tab{padding:5px 8px;font-size:10px}.brand strong{font-size:13px}}
 /* Review queue polish */
 .review-page{display:flex;flex-direction:column;gap:10px;padding-bottom:24px}
