@@ -781,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -789,7 +789,7 @@ test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => 
 });
 
 test('docs/README.md documents worker route count: 39 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('39 passed, 0 failed') || readmeSrc.includes('48 passed, 0 failed'), 'docs/README.md must document worker route static check expected count of 39');
+  assert.ok(readmeSrc.includes('39 passed, 0 failed') || readmeSrc.includes('48 passed, 0 failed') || readmeSrc.includes('56 passed, 0 failed'), 'docs/README.md must document worker route static check expected count of 39');
 });
 
 test('docs/README.md mentions MODULE_TYPELESS_PACKAGE_JSON as non-blocking', () => {
@@ -2159,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -3054,6 +3054,46 @@ test('D-104F: Worker evidence route validates body.sourceUrl (no raw cleanText i
     workerSrc.includes('httpUrlOrNull(body.sourceUrl)') &&
     !workerSrc.includes("cleanText(body.sourceUrl || '',500)"),
     '/api/evidence must route body.sourceUrl through httpUrlOrNull, not insert it raw'
+  );
+});
+
+// ── Section 48 — D-106B: admin secret hygiene + debug hardening ───────────────
+
+let gitignoreSrc106 = '';
+try { gitignoreSrc106 = readFileSync(path.join(__dirname, '../.gitignore'), 'utf8'); } catch { gitignoreSrc106 = ''; }
+
+test('D-106B: .gitignore exists and ignores local env/secret files', () => {
+  assert.ok(
+    gitignoreSrc106.includes('.dev.vars') && gitignoreSrc106.includes('.env') && gitignoreSrc106.includes('.env.*'),
+    '.gitignore must ignore .dev.vars and .env/.env.*'
+  );
+});
+
+test('D-106B: /api/debug is admin-gated in Worker', () => {
+  const m = workerSrc.match(/url\.pathname === '\/api\/debug'[\s\S]{0,200}?debugState\(request, env\)/);
+  assert.ok(m && m[0].includes('requireAdmin(request, env)'), '/api/debug must require admin before debugState');
+});
+
+test('D-106B: requireAdmin uses safeEqual and no raw equality remains', () => {
+  assert.ok(
+    workerSrc.includes('function safeEqual(') &&
+    /function requireAdmin[\s\S]{0,200}safeEqual\(/.test(workerSrc) &&
+    !workerSrc.includes('admin !== (env.HUMANX_ADMIN_TOKEN'),
+    'requireAdmin must use safeEqual; raw simple-equality must be gone'
+  );
+});
+
+test('D-106B: requireAdmin remains fail-closed on missing admin token env', () => {
+  assert.ok(
+    /function requireAdmin[\s\S]{0,220}!expected/.test(workerSrc),
+    'requireAdmin must fail closed when HUMANX_ADMIN_TOKEN is missing/empty'
+  );
+});
+
+test('D-106B: no HUMANX_ADMIN_TOKEN value literal committed in Worker', () => {
+  assert.ok(
+    !/HUMANX_ADMIN_TOKEN\s*[=:]\s*['"][A-Za-z0-9_\-]{8,}['"]/.test(workerSrc),
+    'HUMANX_ADMIN_TOKEN must never be assigned a literal value'
   );
 });
 
