@@ -43,14 +43,16 @@ public/index.html
 Current active frontend:
 
 ```text
-public/app-v9.js
+public/app-v10.js
 ```
 
-`index.html` currently loads:
+`public/index.html` currently loads:
 
 ```html
-<script src="/app-v9.js?v=12"></script>
+<script src="/app-v10.js?v=5"></script>
 ```
+
+> Legacy bundles `public/app-v3.js` through `public/app-v9.js` were removed as orphaned static assets in **D-109B** (not loaded by any served HTML; preserved in git history).
 
 ## Current Working State
 
@@ -82,7 +84,7 @@ Confirmed working:
 
 ## Current UI
 
-`app-v9.js` shows Study Claim as:
+`app-v10.js` shows Study Claim as:
 
 ```text
 Evidence | Pressure | Tests | Analysis
