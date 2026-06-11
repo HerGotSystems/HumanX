@@ -781,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2159,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -2861,10 +2861,10 @@ test('D-103B: missing source renders "no source provided"', () => {
 });
 
 test('D-103B: source link still renders an anchor when source exists', () => {
-  const start = appSrc.indexOf('function sourceLink(');
-  const body = appSrc.slice(start, start + 320);
+  const start = appSrc.indexOf('function sourceLink(url)');
+  const body = appSrc.slice(start, start + 600);
   assert.ok(
-    body.includes('rel="noopener noreferrer">${safe}</a>'),
+    body.includes('rel="noopener noreferrer">${e}</a>'),
     'sourceLink must still render the source URL as a link when present'
   );
 });
@@ -2912,6 +2912,118 @@ test('D-103B: no backend/D1/wrangler/deploy references added in quality helpers'
   assert.ok(
     !body.includes('/api/') && !body.includes('wrangler') && !/\bd1\b/i.test(body),
     'evidence quality helpers must remain display-only'
+  );
+});
+
+// ── Section 46 — D-104B: Evidence source link sanitisation ────────────────────
+
+// Re-derive safeHttpUrl from source for behavioral testing (mirrors app-v10.js)
+function safeHttpUrlRef(url){const s=String(url||'').trim();if(!s)return null;try{const u=new URL(s);if(u.protocol==='http:'||u.protocol==='https:')return u.href;return null;}catch(_){return null;}}
+
+test('D-104B: safeHttpUrl helper exists in app-v10.js', () => {
+  assert.ok(appSrc.includes('function safeHttpUrl(url)'), 'safeHttpUrl helper must be defined');
+});
+
+test('D-104B: safeHttpUrl only allows http: and https:', () => {
+  const body = appSrc.slice(appSrc.indexOf('function safeHttpUrl(url)'), appSrc.indexOf('function safeHttpUrl(url)') + 240);
+  assert.ok(
+    body.includes("u.protocol==='http:'") && body.includes("u.protocol==='https:'") && body.includes('new URL('),
+    'safeHttpUrl must whitelist http:/https: via new URL()'
+  );
+});
+
+test('D-104B: safeHttpUrl behavior — allows http/https, rejects unsafe/malformed', () => {
+  assert.ok(safeHttpUrlRef('https://example.com'), 'https must be allowed');
+  assert.ok(safeHttpUrlRef('http://example.com/p?q=1'), 'http must be allowed');
+  assert.equal(safeHttpUrlRef('javascript:alert(1)'), null, 'javascript: rejected');
+  assert.equal(safeHttpUrlRef('data:text/html,x'), null, 'data: rejected');
+  assert.equal(safeHttpUrlRef('vbscript:x'), null, 'vbscript: rejected');
+  assert.equal(safeHttpUrlRef('blob:https://x/y'), null, 'blob: rejected');
+  assert.equal(safeHttpUrlRef('file:///etc/passwd'), null, 'file: rejected');
+  assert.equal(safeHttpUrlRef('//example.com'), null, 'protocol-relative rejected');
+  assert.equal(safeHttpUrlRef('example.com'), null, 'scheme-less rejected');
+  assert.equal(safeHttpUrlRef('mailto:x@y.com'), null, 'mailto rejected (http/https only)');
+  assert.equal(safeHttpUrlRef(''), null, 'empty rejected');
+});
+
+test('D-104B: sourceLink uses safeHttpUrl before rendering href', () => {
+  const start = appSrc.indexOf('function sourceLink(url)');
+  const body = appSrc.slice(start, start + 600);
+  assert.ok(
+    body.includes('safeHttpUrl(raw)') && body.includes('if(safe)'),
+    'sourceLink must call safeHttpUrl and branch on the result before emitting an href'
+  );
+});
+
+test('D-104B: sourceLink only emits href inside the safe branch', () => {
+  const start = appSrc.indexOf('function sourceLink(url)');
+  const body = appSrc.slice(start, start + 600);
+  // The only href in sourceLink must be the escaped safe URL (${e})
+  const hrefCount = (body.match(/href="/g) || []).length;
+  assert.ok(hrefCount === 1 && body.includes('href="${e}"'), 'sourceLink must emit exactly one href, the escaped safe URL');
+});
+
+test('D-104B: unsafe source rendered as non-clickable text with neutral note', () => {
+  const start = appSrc.indexOf('function sourceLink(url)');
+  const body = appSrc.slice(start, start + 600);
+  assert.ok(
+    body.includes('ev-bad-source') && body.includes('not a valid web address') && body.includes('${esc(raw)}'),
+    'unsafe source must render escaped raw text with a "not a valid web address" note, no href'
+  );
+});
+
+test('D-104B: anchor retains rel="noopener noreferrer" and target=_blank', () => {
+  const start = appSrc.indexOf('function sourceLink(url)');
+  const body = appSrc.slice(start, start + 600);
+  assert.ok(
+    body.includes('rel="noopener noreferrer"') && body.includes('target="_blank"'),
+    'safe-branch anchor must keep target=_blank and rel=noopener noreferrer'
+  );
+});
+
+test('D-104B: no source provided behavior remains (D-103B regression)', () => {
+  const start = appSrc.indexOf('function sourceLink(url)');
+  const body = appSrc.slice(start, start + 600);
+  assert.ok(body.includes('no source provided') && body.includes('ev-no-source'), 'no-source indicator must remain');
+});
+
+test('D-104B: no verified/trusted source wording added', () => {
+  assert.ok(
+    !appSrc.includes('verified source') && !appSrc.includes('trusted source'),
+    'no source verification/trust wording'
+  );
+});
+
+test('D-104B: unsafe-source note avoids scary wording (malicious/blocked)', () => {
+  const start = appSrc.indexOf('function sourceLink(url)');
+  const body = appSrc.slice(start, start + 600);
+  assert.ok(
+    !/malicious|blocked|dangerous|unsafe link/i.test(body),
+    'unsafe-source wording must stay neutral (no malicious/blocked/dangerous)'
+  );
+});
+
+test('D-104B: D-103B evidence quality behavior remains present', () => {
+  assert.ok(
+    appSrc.includes('function evidenceQualityLabel(q)') && appSrc.includes("vibes:'weak argument'") &&
+    appSrc.includes('function evidenceQualityClass(q)'),
+    'D-103B quality label/class helpers must remain'
+  );
+});
+
+test('D-104B: bad-source CSS rules defined', () => {
+  assert.ok(
+    cssSrc.includes('.ev-bad-source'),
+    'styles.css must define .ev-bad-source'
+  );
+});
+
+test('D-104B: no backend/D1/wrangler/deploy references added in sanitiser', () => {
+  const start = appSrc.indexOf('function safeHttpUrl(url)');
+  const body = appSrc.slice(start, start + 800);
+  assert.ok(
+    !body.includes('/api/') && !body.includes('wrangler') && !/\bd1\b/i.test(body),
+    'sanitiser must remain client-side display-only'
   );
 });
 
