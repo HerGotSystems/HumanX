@@ -1,0 +1,27 @@
+# ── Secrets / local env (never commit) ──────────────────────────────────────
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# ── Cloudflare / Wrangler ────────────────────────────────────────────────────
+.wrangler/
+
+# ── Build / deps / coverage ──────────────────────────────────────────────────
+node_modules/
+dist/
+coverage/
+
+# ── OS / editor junk ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/

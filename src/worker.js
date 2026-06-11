@@ -29,7 +29,7 @@ export default {
       if (url.pathname === '/api/ai/analyse') return json({ error: 'RUNPACK_MODE', legacy_error: 'AIP_MODE', message: 'HumanX is RunPack-first. Public users copy a task packet and run it with their own AI. Owner API credits are not used for public analysis.' }, 402);
       if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
       if (!env.DB) return fallbackApi(request, url);
-      if (url.pathname === '/api/debug' && request.method === 'GET') return debugState(request, env);
+      if (url.pathname === '/api/debug' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return debugState(request, env); }
       if (url.pathname === '/api/seed' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return seedDemoClaims(request, env); }
       if (url.pathname === '/api/import-seed' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; const mode = url.searchParams.get('mode') || 'dry-run'; if (mode !== 'dry-run' && mode !== 'apply') return json({ error:'INVALID_MODE', message:"mode must be 'dry-run' or 'apply'" },400); return json(await importSeedData(env, { dryRun: mode !== 'apply' })); }
       if (url.pathname === '/api/import-truths' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; const mode = url.searchParams.get('mode') || 'dry-run'; if (mode !== 'dry-run' && mode !== 'apply') return json({ error:'INVALID_MODE', message:"mode must be 'dry-run' or 'apply'" },400); return json(await importTruthSeeds(env, { dryRun: mode !== 'apply' })); }
@@ -174,7 +174,8 @@ async function readJson(request) { try { return await request.json(); } catch { 
 function json(data, status=200) { return new Response(JSON.stringify(data,null,2),{ status, headers:{ 'content-type':'application/json; charset=utf-8', ...CORS } }); }
 function requireUserId(request) { const userId=cleanId(request.headers.get('x-humanx-user')||''); if (!userId) throw new Error('MISSING_PSEUDONYMOUS_USER'); return userId; }
 async function requireUser(request, env) { const userId=requireUserId(request); if (env?.DB) { const row=await env.DB.prepare(`SELECT is_shadow_banned FROM users WHERE id=?`).bind(userId).first(); if (Number(row?.is_shadow_banned||0)===1) throw new Error('USER_SHADOW_BANNED'); } return userId; }
-function requireAdmin(request, env) { const admin=request.headers.get('x-humanx-admin') || ''; if (!admin || admin !== (env.HUMANX_ADMIN_TOKEN || '')) return json({ error:'ADMIN_REQUIRED' },403); return null; }
+function safeEqual(a, b) { const x=String(a==null?'':a); const y=String(b==null?'':b); if (!x.length || !y.length) return false; const n=Math.max(x.length, y.length); let diff=x.length ^ y.length; for (let i=0;i<n;i++){ diff |= (x.charCodeAt(i)||0) ^ (y.charCodeAt(i)||0); } return diff === 0; }
+function requireAdmin(request, env) { const admin=request.headers.get('x-humanx-admin') || ''; const expected=env.HUMANX_ADMIN_TOKEN || ''; if (!expected || !safeEqual(admin, expected)) return json({ error:'ADMIN_REQUIRED' },403); return null; }
 function makeId(prefix) { return `${prefix}_${crypto.randomUUID().replaceAll('-', '').slice(0,18)}`; }
 function cleanId(v) { return String(v || '').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,80); }
 function cleanText(v,max) { return String(v || '').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max); }

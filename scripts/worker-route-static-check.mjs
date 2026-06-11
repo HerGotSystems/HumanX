@@ -345,6 +345,66 @@ async function main() {
     fail('D-104F must not alter the evidence schema');
   }
 
+  // ── D-106B: admin secret hygiene + debug route hardening ────────────────────
+  console.log('');
+  console.log('  D-106B admin secret hygiene + debug hardening:');
+
+  // .gitignore present and ignores local env / secret files
+  let gitignoreSrc = '';
+  try { gitignoreSrc = await readFile(abs('.gitignore'), 'utf8'); } catch { gitignoreSrc = ''; }
+  if (gitignoreSrc && /(^|\n)\.dev\.vars(\n|$)/.test(gitignoreSrc) && /(^|\n)\.env(\n|$)/.test(gitignoreSrc) && gitignoreSrc.includes('.env.*')) {
+    pass('.gitignore exists and ignores .dev.vars and .env/.env.*');
+  } else {
+    fail('.gitignore must exist and ignore .dev.vars and .env/.env.*');
+  }
+
+  // /api/debug is admin-gated
+  const debugMatch = workerSrc.match(/url\.pathname === '\/api\/debug'[\s\S]{0,200}?debugState\(request, env\)/);
+  if (debugMatch && /requireAdmin\(request, env\)/.test(debugMatch[0])) {
+    pass('/api/debug route requires requireAdmin before debugState');
+  } else {
+    fail('/api/debug must call requireAdmin before returning debugState');
+  }
+
+  // debug response shape preserved (debugState still exists and returns counts)
+  if (workerSrc.includes('async function debugState') && /debugState[\s\S]{0,800}counts/.test(workerSrc)) {
+    pass('debugState response shape (counts) preserved after gating');
+  } else {
+    fail('debugState must remain and keep its counts response shape');
+  }
+
+  // safeEqual helper present and used by requireAdmin; no raw simple-equality compare remains
+  if (workerSrc.includes('function safeEqual(')) {
+    pass('safeEqual timing-safe-ish helper defined');
+  } else {
+    fail('safeEqual helper must be defined');
+  }
+  if (/function requireAdmin[\s\S]{0,200}safeEqual\(/.test(workerSrc)) {
+    pass('requireAdmin uses safeEqual for token comparison');
+  } else {
+    fail('requireAdmin must compare via safeEqual');
+  }
+  if (!workerSrc.includes('admin !== (env.HUMANX_ADMIN_TOKEN')) {
+    pass('no raw `admin !== env.HUMANX_ADMIN_TOKEN` comparison remains');
+  } else {
+    fail('raw simple-equality admin comparison must be removed');
+  }
+
+  // requireAdmin remains fail-closed on missing env token
+  if (/function requireAdmin[\s\S]{0,220}!expected/.test(workerSrc)) {
+    pass('requireAdmin fail-closes when HUMANX_ADMIN_TOKEN env is missing/empty');
+  } else {
+    fail('requireAdmin must fail closed when the admin token env var is missing');
+  }
+
+  // No secret literal committed: HUMANX_ADMIN_TOKEN must never be assigned a value in tracked code/docs
+  const tokenAssign = /HUMANX_ADMIN_TOKEN\s*[=:]\s*['"][A-Za-z0-9_\-]{8,}['"]/;
+  if (!tokenAssign.test(workerSrc)) {
+    pass('no HUMANX_ADMIN_TOKEN value literal assigned in src/worker.js');
+  } else {
+    fail('HUMANX_ADMIN_TOKEN must never be assigned a literal value');
+  }
+
   // ── Summary ────────────────────────────────────────────────────────────────
 
   const total = passed + failed;
