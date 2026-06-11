@@ -282,6 +282,69 @@ async function main() {
     }
   }
 
+  // ── D-104F: evidence source URL validation ──────────────────────────────────
+  console.log('');
+  console.log('  D-104F evidence source URL validation:');
+
+  if (/function httpUrlOrNull\s*\(/.test(workerSrc)) {
+    pass('httpUrlOrNull helper defined in src/worker.js');
+  } else {
+    fail('httpUrlOrNull helper missing', 'D-104F must add a Worker-side source URL validator');
+  }
+
+  const helperIdx = workerSrc.indexOf('function httpUrlOrNull');
+  const helperBody = helperIdx === -1 ? '' : workerSrc.slice(helperIdx, helperIdx + 320);
+  if (helperBody.includes('new URL(') && helperBody.includes('catch')) {
+    pass('httpUrlOrNull uses new URL() inside try/catch');
+  } else {
+    fail('httpUrlOrNull must parse with new URL() inside try/catch');
+  }
+
+  if (helperBody.includes("'http:'") && helperBody.includes("'https:'")) {
+    pass('httpUrlOrNull whitelists only http: and https:');
+  } else {
+    fail('httpUrlOrNull must whitelist http: and https: only');
+  }
+
+  if (helperBody.includes('return null')) {
+    pass('httpUrlOrNull returns null for disallowed/invalid URLs (coerce-to-null, not reject)');
+  } else {
+    fail('httpUrlOrNull must return null for disallowed/invalid URLs');
+  }
+
+  if (workerSrc.includes('httpUrlOrNull(body.sourceUrl)')) {
+    pass('/api/evidence write path routes body.sourceUrl through httpUrlOrNull');
+  } else {
+    fail('/api/evidence must validate body.sourceUrl via httpUrlOrNull');
+  }
+
+  if (!workerSrc.includes("cleanText(body.sourceUrl || '',500)")) {
+    pass('/api/evidence no longer inserts raw cleanText(body.sourceUrl) directly');
+  } else {
+    fail('/api/evidence still inserts the raw cleaned sourceUrl without scheme validation');
+  }
+
+  // Pressure route must remain free of source_url handling
+  if (!/INSERT INTO pressure_points[\s\S]{0,400}source_url/.test(workerSrc)) {
+    pass('pressure_points insert still has no source_url column (unchanged)');
+  } else {
+    fail('pressure_points insert unexpectedly references source_url');
+  }
+
+  // Neutrality: no verification/trust wording introduced near the helper
+  if (!/verified source|trusted source/i.test(workerSrc)) {
+    pass('no "verified source" / "trusted source" wording in Worker');
+  } else {
+    fail('Worker must not claim source verification/trust');
+  }
+
+  // No new migration/schema reference introduced by this patch
+  if (!/ALTER TABLE evidence[\s\S]{0,60}source/i.test(workerSrc)) {
+    pass('no evidence source_url schema/migration change in Worker');
+  } else {
+    fail('D-104F must not alter the evidence schema');
+  }
+
   // ── Summary ────────────────────────────────────────────────────────────────
 
   const total = passed + failed;
