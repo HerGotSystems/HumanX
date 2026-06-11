@@ -781,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2159,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -2779,6 +2779,43 @@ test('D-100B: no backend/D1/wrangler/deploy references added in meter()', () => 
   assert.ok(
     !body.includes('/api/') && !body.includes('wrangler') && !/\bd1\b/i.test(body),
     'meter() must remain display-only — no backend references'
+  );
+});
+
+// ── Section 44 — D-101B: Public journey minor polish ──────────────────────────
+
+test('D-101B: .commandbar CSS rule defined', () => {
+  assert.ok(
+    cssSrc.includes('.commandbar'),
+    'styles.css must define a .commandbar rule'
+  );
+});
+
+test('D-101B: .commandbar uses flex / wrap / gap layout', () => {
+  const i = cssSrc.indexOf('.commandbar{');
+  assert.ok(i !== -1, '.commandbar must have a rule block');
+  const block = cssSrc.slice(i, cssSrc.indexOf('}', i));
+  assert.ok(
+    block.includes('display:flex') && block.includes('flex-wrap:wrap') && block.includes('gap:'),
+    '.commandbar must use display:flex, flex-wrap:wrap, and a gap'
+  );
+});
+
+test('D-101B: renderError includes a Back to Home recovery action', () => {
+  const start = appSrc.indexOf('function renderError');
+  const body = appSrc.slice(start, start + 400);
+  assert.ok(
+    body.includes("setMode('home')") && body.includes('Back to Home'),
+    'renderError must offer a Back to Home recovery button calling setMode(home)'
+  );
+});
+
+test('D-101B: no backend/D1/wrangler/deploy references added in renderError', () => {
+  const start = appSrc.indexOf('function renderError');
+  const body = appSrc.slice(start, start + 400);
+  assert.ok(
+    !body.includes('/api/') && !body.includes('wrangler') && !/\bd1\b/i.test(body),
+    'renderError must remain display-only — no backend/deploy references'
   );
 });
 
