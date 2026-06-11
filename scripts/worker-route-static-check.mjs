@@ -349,13 +349,15 @@ async function main() {
   console.log('');
   console.log('  D-106B admin secret hygiene + debug hardening:');
 
-  // .gitignore present and ignores local env / secret files
+  // .gitignore present and ignores local env / secret files (CRLF-tolerant: split on \r?\n)
   let gitignoreSrc = '';
   try { gitignoreSrc = await readFile(abs('.gitignore'), 'utf8'); } catch { gitignoreSrc = ''; }
-  if (gitignoreSrc && /(^|\n)\.dev\.vars(\n|$)/.test(gitignoreSrc) && /(^|\n)\.env(\n|$)/.test(gitignoreSrc) && gitignoreSrc.includes('.env.*')) {
-    pass('.gitignore exists and ignores .dev.vars and .env/.env.*');
+  const giLines = gitignoreSrc.split(/\r?\n/).map(l => l.trim());
+  const giHas = (p) => giLines.includes(p);
+  if (gitignoreSrc && giHas('.dev.vars') && giHas('.env') && giHas('.env.*') && giHas('!.env.example') && giHas('secrets/') && giHas('.wrangler/')) {
+    pass('.gitignore exists and ignores local env/secret files (.dev.vars, .env, .env.*, secrets/, .wrangler/; keeps .env.example)');
   } else {
-    fail('.gitignore must exist and ignore .dev.vars and .env/.env.*');
+    fail('.gitignore must exist and ignore .dev.vars, .env, .env.*, secrets/, .wrangler/ (and keep !.env.example)');
   }
 
   // /api/debug is admin-gated
