@@ -781,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2159,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -2816,6 +2816,102 @@ test('D-101B: no backend/D1/wrangler/deploy references added in renderError', ()
   assert.ok(
     !body.includes('/api/') && !body.includes('wrangler') && !/\bd1\b/i.test(body),
     'renderError must remain display-only — no backend/deploy references'
+  );
+});
+
+// ── Section 45 — D-103B: Evidence quality and source clarity ──────────────────
+
+test('D-103B: evidenceQualityLabel maps vibes to "weak argument"', () => {
+  assert.ok(
+    appSrc.includes('function evidenceQualityLabel(q)') && appSrc.includes("vibes:'weak argument'"),
+    'evidenceQualityLabel must map "vibes" to "weak argument"'
+  );
+});
+
+test('D-103B: evidenceQualityClass tier logic defined', () => {
+  assert.ok(
+    appSrc.includes('function evidenceQualityClass(q)'),
+    'evidenceQualityClass helper must exist'
+  );
+});
+
+test('D-103B: quality tier classes cover strong/mid/weak/neutral', () => {
+  assert.ok(
+    appSrc.includes("'ev-q-strong'") && appSrc.includes("'ev-q-mid'") &&
+    appSrc.includes("'ev-q-weak'") && appSrc.includes("'ev-q-neutral'"),
+    'evidenceQualityClass must return tier classes for strong/mid/weak/neutral'
+  );
+});
+
+test('D-103B: evidence pill applies the quality tier class', () => {
+  const n = appSrc.split('class="pill ${evidenceQualityClass(e.quality)}">').length - 1;
+  assert.ok(
+    n >= 2,
+    `evidence meta pills must apply the quality tier class (found ${n}, expected >= 2)`
+  );
+});
+
+test('D-103B: missing source renders "no source provided"', () => {
+  const start = appSrc.indexOf('function sourceLink(');
+  const body = appSrc.slice(start, start + 320);
+  assert.ok(
+    body.includes('no source provided') && body.includes('ev-no-source'),
+    'sourceLink must render a muted "no source provided" indicator when URL is absent'
+  );
+});
+
+test('D-103B: source link still renders an anchor when source exists', () => {
+  const start = appSrc.indexOf('function sourceLink(');
+  const body = appSrc.slice(start, start + 320);
+  assert.ok(
+    body.includes('rel="noopener noreferrer">${safe}</a>'),
+    'sourceLink must still render the source URL as a link when present'
+  );
+});
+
+test('D-103B: no "verified source" / "trusted source" wording added', () => {
+  assert.ok(
+    !appSrc.includes('verified source') && !appSrc.includes('trusted source'),
+    'evidence display must not imply HumanX verified or trusted a source'
+  );
+});
+
+test('D-103B: evidence score / verdict calculation not touched (cls + meter intact)', () => {
+  assert.ok(
+    appSrc.includes("function cls(s){if(s==='Proven'||String(s).includes('Supported')") &&
+    appSrc.includes('v=Math.max(0,Math.min(100,Number(v||0)))'),
+    'cls() verdict mapping and meter() value clamping must remain unchanged'
+  );
+});
+
+test('D-103B: reused evidence rendering still exists', () => {
+  assert.ok(
+    appSrc.includes('function reusedEvidenceHtml') && appSrc.includes('Reused from vault'),
+    'reused evidence grouping/rendering must be preserved'
+  );
+});
+
+test('D-103B: D-100B Study verdict/score qualifier remains present', () => {
+  assert.ok(
+    appSrc.includes('Verdict is a pressure-test label, not an automatic truth ruling.'),
+    'D-100B Study verdict/score qualifier must remain'
+  );
+});
+
+test('D-103B: quality tier CSS rules defined', () => {
+  assert.ok(
+    cssSrc.includes('.pill.ev-q-strong') && cssSrc.includes('.pill.ev-q-weak') &&
+    cssSrc.includes('.ev-no-source'),
+    'styles.css must define quality tier classes and the no-source indicator'
+  );
+});
+
+test('D-103B: no backend/D1/wrangler/deploy references added in quality helpers', () => {
+  const start = appSrc.indexOf('function evidenceQualityLabel(q)');
+  const body = appSrc.slice(start, start + 700);
+  assert.ok(
+    !body.includes('/api/') && !body.includes('wrangler') && !/\bd1\b/i.test(body),
+    'evidence quality helpers must remain display-only'
   );
 });
 
