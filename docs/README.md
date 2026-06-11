@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D102A_FINAL_RELEASE_CHECKPOINT.md` ⭐ START HERE
+### `D105A_EVIDENCE_SOURCE_TRUST_FINAL_CHECKPOINT.md` ⭐ START HERE
+Newest checkpoint — covers the D-103/D-104 evidence-display + source-URL safety/security arc on top of the D-93→D-101 run. Repo HEAD `446892e`, deployed Worker `0bb54517`, static baseline **357/24/48**. Summarises D-103 evidence quality tiers (`vibes`→"weak argument", strong/mid/weak/neutral pills, "no source provided"), D-104B frontend `sourceLink` XSS render-sanitisation, and D-104F Worker `httpUrlOrNull` storage validation (coerce-to-null on `/api/evidence`). Records live safety guarantees, explicit non-goals (no verification claims/badges, no blocklists, no link previews, no D1 cleanup, no evidence hiding), and the **do-not-regress rules** (never put unvalidated URLs in `href`; both layers stay http/https-only; invalid optional source must not block submission; presence ≠ reliability; weak ≠ fake; provided ≠ verified). Lists optional future audits.
+**Read when:** opening any new session — start here; then `D102A_FINAL_RELEASE_CHECKPOINT.md` for the earlier D-93→D-101 public-clarity run.
+
+### `D102A_FINAL_RELEASE_CHECKPOINT.md`
 Canonical single-page checkpoint after the completed D-93→D-101 public safety/clarity run — main HEAD `e698ea3`, deployed Worker `5a73a625`, static baseline **328/24/39**. Summarizes all eight completed improvements (Truth-derived Review context, category-echo guard, Review inspect scroll, card-row Approve confirmation, Truth visible/not-verified clarity, onboarding terminology qualifier, Study verdict/score qualifier, commandbar/error-recovery polish), production operating rules, known live moderation state (SMALL INDEFERENT TRUTH visible/borderline; its claim pending; personal-belief deferred), and recommends **D-103A — Evidence quality / source display audit** as the next branch. Flagged as a good stopping point.
 **Read when:** opening any new session — start here before re-reading per-pass docs.
 
