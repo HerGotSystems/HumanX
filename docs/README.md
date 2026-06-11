@@ -89,6 +89,10 @@ Deployment record for D-96B (PR #118) — main HEAD `fa24c92`, feature commit `8
 Deployment record for D-97B (PR #119) — main HEAD `d506cd9`, feature commit `a97e2fc`. Documents what went live (public Truth trust-signal clarity: visibility badge reframed from green "Public" to neutral "visible", NOT VERIFIED badge strengthened 8px→11px bold caution-yellow, linked-claim chip changed from green "→ claim exists" to muted "claim derived"; claims/study keep green "Public"; admin-only controls stay gated), user-confirmed live verification, safety confirmations (no D1/schema/admin mutations), static checks 299/24/39, and the standing Wrangler/D1 explicit-approval rule.
 **Read when:** verifying what is currently deployed, or confirming the public Truth trust-signal clarity changes are live.
 
+### `D98D_LIVE_DEPLOYMENT_VERIFICATION.md`
+Deployment record for D-98B (PR #120) — main HEAD `33626ac`, feature commit `660e1d6`, Worker version `9f8c2821`, Wrangler 4.99.0. Documents what went live (public onboarding terminology clarity: Truth→Claim wording unified to "Pressure-test as Claim" with "Send to Claim Review" removed; verdict-label qualifier "Verdicts are pressure-test labels, not automatic truth rulings." added beside the searchbar filter; hero/Belief Engine no-overclaim framing preserved and regression-locked), user-confirmed live verification, safety confirmations (no D1/schema/admin mutations), static checks 312/24/39, and the standing Wrangler/D1 explicit-approval rule.
+**Read when:** verifying what is currently deployed, or confirming the public onboarding terminology clarity changes are live.
+
 ### `LOCAL_STATIC_CHECKS_USAGE.md`
 Simple usage guide for running the two local static check scripts before or after risky changes. Covers both `scripts/belief-engine-static-check.mjs` (24 hard checks) and `scripts/worker-route-static-check.mjs` (35 hard checks): exact run commands, safety properties, when to run each, what they do not prove, relationship to smoke tests, and stop conditions.
 **Read when:** before running either static check script, or before/after any Belief Engine or Worker route change.
