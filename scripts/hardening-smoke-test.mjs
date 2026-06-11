@@ -781,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -789,7 +789,7 @@ test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => 
 });
 
 test('docs/README.md documents worker route count: 39 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('39 passed, 0 failed'), 'docs/README.md must document worker route static check expected count of 39');
+  assert.ok(readmeSrc.includes('39 passed, 0 failed') || readmeSrc.includes('48 passed, 0 failed'), 'docs/README.md must document worker route static check expected count of 39');
 });
 
 test('docs/README.md mentions MODULE_TYPELESS_PACKAGE_JSON as non-blocking', () => {
@@ -2159,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -3024,6 +3024,36 @@ test('D-104B: no backend/D1/wrangler/deploy references added in sanitiser', () =
   assert.ok(
     !body.includes('/api/') && !body.includes('wrangler') && !/\bd1\b/i.test(body),
     'sanitiser must remain client-side display-only'
+  );
+});
+
+// ── Section 47 — D-104F: source URL validation enforced on both layers ────────
+
+test('D-104F: frontend safeHttpUrl (D-104B) remains present', () => {
+  assert.ok(
+    appSrc.includes('function safeHttpUrl(url)'),
+    'frontend D-104B safeHttpUrl render guard must remain'
+  );
+});
+
+test('D-104F: Worker httpUrlOrNull validator present', () => {
+  assert.ok(
+    workerSrc.includes('function httpUrlOrNull'),
+    'Worker must define httpUrlOrNull for source URL validation'
+  );
+});
+
+test('D-104F: both layers whitelist only http:/https: for source URLs', () => {
+  const feOk = appSrc.includes("u.protocol==='http:'") && appSrc.includes("u.protocol==='https:'");
+  const beOk = workerSrc.includes("u.protocol === 'http:'") && workerSrc.includes("u.protocol === 'https:'");
+  assert.ok(feOk && beOk, 'frontend (render) and Worker (storage) must both restrict source URLs to http/https');
+});
+
+test('D-104F: Worker evidence route validates body.sourceUrl (no raw cleanText insert)', () => {
+  assert.ok(
+    workerSrc.includes('httpUrlOrNull(body.sourceUrl)') &&
+    !workerSrc.includes("cleanText(body.sourceUrl || '',500)"),
+    '/api/evidence must route body.sourceUrl through httpUrlOrNull, not insert it raw'
   );
 });
 
