@@ -437,6 +437,8 @@
 /* HumanX shared input form system */
 .form-panel{max-width:520px}
 .compact-form{padding:10px 14px}
+.truth-add-summary{cursor:pointer;font-size:11px;text-transform:none;color:var(--blue);padding:4px 0;font-weight:600}
+@media(min-width:601px){.truth-add-details>summary{display:none}.truth-add-details>*:not(summary){display:revert}}
 .hx-form{display:grid;gap:5px}
 .hx-form button.primary{margin-top:3px}
 .hx-form .review-first-note{margin:0}
