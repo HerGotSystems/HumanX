@@ -47,7 +47,7 @@
 .cc-step-n{display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(87,184,255,.12);border:1px solid #57b8ff33;color:var(--blue);font-size:10px;font-weight:700;flex-shrink:0;margin-bottom:1px}
 .cc-step-arrow{align-self:center;color:var(--line);font-size:16px;flex-shrink:0;padding:0 2px}
 @media(max-width:900px){.cc-hero{grid-template-columns:1fr}.cc-hero-right{display:none}}
-@media(max-width:600px){.cc-title{font-size:34px}.cc-step-arrow{display:none}.cc-step{flex:0 0 calc(50% - 3px)}.cc-card-grid{grid-template-columns:1fr 1fr}.cc-stat-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.cc-title{font-size:34px}.cc-step-arrow{display:none}.cc-step{flex:0 0 calc(50% - 3px)}.cc-card-grid{grid-template-columns:1fr 1fr}.cc-stat-grid{grid-template-columns:1fr 1fr}.cc-card-when{display:none}}
 @media(max-width:400px){.cc-card-grid{grid-template-columns:1fr}.cc-step{flex:0 0 100%}}
 /* Claim card readability */
 .claim-card{border-left:3px solid var(--line)}
