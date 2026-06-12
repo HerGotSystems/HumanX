@@ -781,7 +781,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2159,7 +2159,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -3383,6 +3383,99 @@ test('D-113B: D-112 active-tab scroll-into-view remains', () => {
 test('D-113B: no backend/D1/wrangler/deploy references added in CSS density change', () => {
   // The density rule is CSS-only; sanity-check the styles file has no script-y leakage.
   assert.ok(!cssSrc.includes('wrangler') && !cssSrc.includes('/api/'), 'styles.css must remain pure CSS');
+});
+
+// ── Section 54 — D-114B: Truths add-form mobile collapse ─────────────────────
+
+function renderTruthsBody() {
+  const start = appSrc.indexOf('function renderTruths');
+  return start === -1 ? '' : appSrc.slice(start, start + 2800);
+}
+
+test('D-114B: Add-a-Truth form wrapped in .truth-add-details', () => {
+  assert.ok(
+    renderTruthsBody().includes('<details class="truth-add-details">'),
+    'Truths add form must be wrapped in <details class="truth-add-details">'
+  );
+});
+
+test('D-114B: details has a summary with add-truth wording', () => {
+  const body = renderTruthsBody();
+  assert.ok(
+    body.includes('<summary class="truth-add-summary">') && /Add a (public )?Truth/.test(body),
+    'details must include a <summary> with clear add-truth wording'
+  );
+});
+
+test('D-114B: form field IDs unchanged', () => {
+  assert.ok(
+    appSrc.includes('id="truthStatement"') && appSrc.includes('id="truthCategory"') &&
+    appSrc.includes('id="truthOrigin"') && appSrc.includes('id="truthType"'),
+    'truthStatement/truthCategory/truthOrigin/truthType IDs must be unchanged'
+  );
+});
+
+test('D-114B: submitTruth() call and function unchanged', () => {
+  assert.ok(
+    appSrc.includes('onclick="submitTruth()"') &&
+    appSrc.includes("function submitTruth(){const statement=document.getElementById('truthStatement')"),
+    'submitTruth wiring and field reads must be unchanged'
+  );
+});
+
+test('D-114B: mobile default collapsed (no open attr on the details wrapper)', () => {
+  const body = renderTruthsBody();
+  assert.ok(
+    !body.includes('truth-add-details" open') && !body.includes('truth-add-details open'),
+    'truth-add-details must not carry the open attribute (collapsed by default on mobile)'
+  );
+});
+
+test('D-114B: desktop ≥601px force-expands and hides the summary', () => {
+  assert.ok(
+    cssSrc.includes('@media(min-width:601px){.truth-add-details>summary{display:none}.truth-add-details>*:not(summary){display:revert}}'),
+    'desktop media query must force-expand the form and hide the summary'
+  );
+});
+
+test('D-114B: form remains above the truth list', () => {
+  const body = renderTruthsBody();
+  assert.ok(
+    body.indexOf('truth-add-details') !== -1 && body.indexOf('truth-add-details') < body.indexOf('truth-grid-container'),
+    'the add form must render above the truth grid'
+  );
+});
+
+test('D-114B: empty-state "form above" copy remains valid', () => {
+  assert.ok(appSrc.includes('Use the form above to record'), 'empty-state "form above" copy must remain');
+});
+
+test('D-114B: "Public means visible, not proven" framing remains', () => {
+  assert.ok(appSrc.includes('Public means visible, not proven'), 'Truths trust framing must remain');
+});
+
+test('D-114B: D-111 submit trust note remains', () => {
+  assert.ok(appSrc.includes('submit-trust-note') && appSrc.includes('not an automatic verdict'), 'submit trust note must remain');
+});
+
+test('D-114B: D-112 tab edge cue + active-tab scroll remain', () => {
+  assert.ok(
+    cssSrc.includes('mask-image:linear-gradient(to right') && appSrc.includes('_activeTab.scrollIntoView'),
+    'D-112 mobile tab affordance must remain'
+  );
+});
+
+test('D-114B: D-113 .cc-card-when mobile-hide rule remains', () => {
+  const mediaBlocks = cssSrc.match(/@media\(max-width:\d+px\)\{[\s\S]*?\}\s*\}/g) || [];
+  assert.ok(mediaBlocks.some(b => /\.cc-card-when\{display:none\}/.test(b)), 'D-113B Home card mobile rule must remain');
+});
+
+test('D-114B: no backend/D1/wrangler/deploy references added in renderTruths', () => {
+  const body = renderTruthsBody();
+  assert.ok(
+    !body.includes('wrangler') && !/\bd1 execute\b/i.test(body),
+    'renderTruths must remain display-only'
+  );
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
