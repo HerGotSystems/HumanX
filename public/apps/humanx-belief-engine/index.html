@@ -380,6 +380,24 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
   .q-responses{flex-wrap:wrap}
   .resp-btn{min-width:calc(20% - 8px)}
 }
+
+/* ── RESULT LAYERS (v2 restructure) ── */
+.result-layer{margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:20px;background:rgba(16,19,29,.4);overflow:hidden}
+.result-layer[open]{border-color:var(--line)}
+.result-layer-summary{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;list-style:none;user-select:none;margin:0}
+.result-layer-summary::-webkit-details-marker{display:none}
+.result-layer[open] .result-layer-summary{color:var(--text);border-bottom:1px solid var(--line)}
+.result-layer-summary::after{content:'↓';font-size:12px;opacity:.5;margin-left:8px;flex-shrink:0}
+.result-layer[open] .result-layer-summary::after{content:'↑'}
+.rl-body{padding:14px}
+.rl-body .results-stack{margin-bottom:0}
+.results-summary-strip{background:rgba(16,19,29,.7);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin-bottom:20px}
+.result-next-section{background:rgba(87,184,255,.04);border:1px solid rgba(87,184,255,.18);border-radius:20px;padding:22px 24px;margin-bottom:20px}
+.result-next-section h2{font-family:'Syne',sans-serif;font-size:14px;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.result-next-section p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px}
+.next-action-row{display:flex;gap:10px;flex-wrap:wrap}
+.next-action-link{flex:1;min-width:140px;border:1px solid rgba(87,184,255,.3);background:rgba(87,184,255,.06);color:var(--blue);border-radius:13px;padding:11px 14px;font-size:13px;text-align:center;text-decoration:none;display:block;transition:background .15s,border-color .15s}
+.next-action-link:hover{background:rgba(87,184,255,.12);border-color:rgba(87,184,255,.5)}
 </style>
 </head>
 <body>
@@ -527,27 +545,20 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
 
 <!-- RESULTS -->
 <div id="screen-results" class="screen hidden">
-  <div class="results-wrap dashboard-wrap">
-    <div class="results-hero dashboard-hero">
+  <div class="results-wrap">
+    <div class="results-hero">
       <h1>Your Belief Architecture</h1>
       <p class="results-framing" style="font-size:13px;color:var(--muted);max-width:560px;margin:6px auto 0;line-height:1.5">This is a map of pressure patterns from your answers — not a diagnosis. Use it as a mirror, not a verdict.</p>
-      <p id="results-tagline"></p>
     </div>
 
-    <div class="results-dashboard">
-      <section class="panel compact-panel dash-card visual-card">
-        <h2>Worldview Radar</h2>
+    <!-- LAYER 1: Always-visible summary — radar + profile snapshot -->
+    <div class="results-overview">
+      <section class="panel compact-panel visual-card">
+        <h2>Pressure Map</h2>
         <canvas id="radar-canvas" width="360" height="360"></canvas>
         <div id="result-mode-pill" class="mode-pill"></div>
       </section>
-
-      <section class="panel compact-panel dash-card visual-card">
-        <h2>Contradiction Constellation</h2>
-        <canvas id="constellation-canvas" width="320" height="320" style="display:block;margin:0 auto"></canvas>
-        <div id="constellation-legend" style="margin-top:10px"></div>
-      </section>
-
-      <section class="panel compact-panel dash-card span-2 snapshot-card">
+      <section class="panel compact-panel snapshot-card">
         <h2>Profile Snapshot</h2>
         <div class="snapshot-grid">
           <div class="snapshot-section snapshot-dna">
@@ -559,62 +570,108 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
             <div id="frag-panel"></div>
           </div>
           <div class="snapshot-section snapshot-archetypes">
-            <h3>Top Archetypes</h3>
+            <h3>Closest Alignments</h3>
             <div class="align-list compact-scroll small-scroll" id="align-list"></div>
           </div>
         </div>
       </section>
-
-      <section class="panel compact-panel dash-card span-2">
-        <h2>Core Dimensions</h2>
-        <div class="dim-bars" id="dim-bars"></div>
-      </section>
-
-      <section class="panel compact-panel dash-card span-2">
-        <h2>Psychological Dimensions</h2>
-        <div class="dim-bars" id="forensic-dim-bars"></div>
-        <p class="panel-note">These reflect belief structure — where beliefs came from and how they're held — not what they are.</p>
-      </section>
-
-      <section class="panel compact-panel dash-card">
-        <h2>Forensic Meta-Scores</h2>
-        <div class="meta-grid meta-grid-compact" id="meta-grid"></div>
-      </section>
-
-      <section class="panel compact-panel dash-card">
-        <h2>Behavioral Profile</h2>
-        <div id="behavior-panel" class="compact-scroll behavior-scroll"></div>
-      </section>
-
-      <section class="panel compact-panel dash-card">
-        <h2>Belief Origin Load</h2>
-        <div id="origin-report" class="compact-scroll detail-scroll"></div>
-      </section>
-
-      <section class="panel compact-panel dash-card">
-        <h2>Stress Test Readout</h2>
-        <div id="stress-report" class="compact-scroll detail-scroll"></div>
-      </section>
-
-      <div id="gap-panel-wrap" class="dash-insert span-2"></div>
-
-      <section class="panel compact-panel dash-card span-2">
-        <h2>Contradiction Scan</h2>
-        <div class="contra-list compact-scroll contradiction-scroll" id="contra-list"></div>
-      </section>
-
-      <div id="timeline-result-panel" class="dash-insert span-2"></div>
-
-      <section class="panel compact-panel dash-card span-2 share-panel">
-        <h2>Share Card</h2>
-        <canvas id="share-canvas" width="900" height="500"></canvas>
-        <div class="results-actions">
-          <button class="btn-action" onclick="downloadShare()">Download PNG</button>
-          <button class="btn-action" onclick="copyShareText()">Copy Summary</button>
-          <button class="btn-action" onclick="retake()">Retake</button>
-        </div>
-      </section>
     </div>
+
+    <!-- Dominant-signal strip (tagline written by JS) -->
+    <div class="results-summary-strip">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px">Dominant signals</div>
+      <p id="results-tagline" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text);margin:0"></p>
+    </div>
+
+    <!-- LAYER 2: Expandable detail sections -->
+
+    <details class="result-layer">
+      <summary class="result-layer-summary">Dimensions &amp; Structure</summary>
+      <div class="rl-body results-stack">
+        <section class="panel compact-panel">
+          <h2>Core Dimensions</h2>
+          <div class="dim-bars" id="dim-bars"></div>
+        </section>
+        <section class="panel compact-panel">
+          <h2>Identity Attachment</h2>
+          <div class="dim-bars" id="forensic-dim-bars"></div>
+          <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5">These reflect belief structure — where beliefs came from and how they're held — not what they are.</p>
+        </section>
+      </div>
+    </details>
+
+    <details class="result-layer">
+      <summary class="result-layer-summary">Structural Snapshot &amp; Origin</summary>
+      <div class="rl-body">
+        <div class="results-stack" style="margin-bottom:14px">
+          <section class="panel compact-panel">
+            <h2>Structural Snapshot</h2>
+            <div class="meta-grid meta-grid-compact" id="meta-grid"></div>
+          </section>
+          <section class="panel compact-panel">
+            <h2>Belief Origin Load</h2>
+            <div id="origin-report" class="compact-scroll detail-scroll"></div>
+          </section>
+        </div>
+        <section class="panel compact-panel">
+          <h2>Stress Test Readout</h2>
+          <div id="stress-report" class="compact-scroll detail-scroll"></div>
+        </section>
+      </div>
+    </details>
+
+    <details class="result-layer">
+      <summary class="result-layer-summary">Pressure Responses</summary>
+      <div class="rl-body">
+        <section class="panel compact-panel">
+          <h2>Under Pressure</h2>
+          <div id="behavior-panel" class="compact-scroll behavior-scroll"></div>
+        </section>
+      </div>
+    </details>
+
+    <!-- Contradiction response starts open — highest immediate value -->
+    <details class="result-layer" open>
+      <summary class="result-layer-summary">Contradiction Response</summary>
+      <div class="rl-body results-stack">
+        <section class="panel compact-panel visual-card">
+          <h2>Contradiction Constellation</h2>
+          <canvas id="constellation-canvas" width="320" height="320" style="display:block;margin:0 auto"></canvas>
+          <div id="constellation-legend" style="margin-top:10px"></div>
+        </section>
+        <section class="panel compact-panel">
+          <h2>Contradiction Scan</h2>
+          <div class="contra-list compact-scroll contradiction-scroll" id="contra-list"></div>
+        </section>
+      </div>
+    </details>
+
+    <!-- Dynamic inserts — populated by JS when identity/timeline data is present -->
+    <div id="gap-panel-wrap" class="dash-insert"></div>
+    <div id="timeline-result-panel" class="dash-insert"></div>
+
+    <!-- LAYER 3: What to test next -->
+    <div class="result-next-section">
+      <h2>What to Test Next</h2>
+      <p>Your map shows where belief is under structural pressure. Examine the patterns that surprised you — especially any contradictions. The next step is pressure-testing specific beliefs as public Claims in HumanX and seeing what evidence others bring. Use this as a starting point, not a verdict.</p>
+      <div class="next-action-row">
+        <a href="https://humanx.rinkimirikata.com/#claims" class="next-action-link" target="_blank" rel="noopener noreferrer">Browse Claims</a>
+        <a href="https://humanx.rinkimirikata.com/#submit" class="next-action-link" target="_blank" rel="noopener noreferrer">Submit a Claim</a>
+        <a href="https://humanx.rinkimirikata.com/#truths" class="next-action-link" target="_blank" rel="noopener noreferrer">Browse Truths</a>
+      </div>
+    </div>
+
+    <!-- Export & Share — humanx-bridge.js injects "Send to HumanX" into .results-actions -->
+    <section class="panel compact-panel share-panel">
+      <h2>Export &amp; Share</h2>
+      <canvas id="share-canvas" width="900" height="500"></canvas>
+      <p style="font-size:12px;color:var(--muted);margin:12px 0 0;line-height:1.5">Download or copy your pressure map. "Send to HumanX" saves a snapshot to your session — it does not publish anything automatically.</p>
+      <div class="results-actions">
+        <button class="btn-action" onclick="downloadShare()">Download PNG</button>
+        <button class="btn-action" onclick="copyShareText()">Copy Summary</button>
+        <button class="btn-action" onclick="retake()">Retake</button>
+      </div>
+    </section>
   </div>
 </div>
 
