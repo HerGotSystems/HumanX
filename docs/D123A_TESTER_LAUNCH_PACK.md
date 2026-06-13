@@ -1,9 +1,13 @@
 # D-123A — Tester Launch Pack
 
 **Date:** 2026-06-13  
-**Live URL:** https://humanx.veltrusky-michal.workers.dev  
-**Version:** Guarded beta — invitation only  
+**Amended:** 2026-06-13 (D-123B — canonical URL corrected; launch status updated to not-yet-inviting)  
+**Canonical public URL:** https://humanx.rinkimirikata.com  
+**Worker origin (technical fallback only):** https://humanx.rinkimirikata.com  
+**Version:** Guarded internal beta — owner review only. External tester invites not yet issued.  
 **Mode:** DOCS ONLY — no mutation, no deploy, no admin token.
+
+> **Status note (D-123B):** This pack is drafted and ready but invites are not being sent yet. The canonical public URL has been corrected to `humanx.rinkimirikata.com`. The next phase is improvement work before external testers are invited. When ready, use this pack with the corrected URL below.
 
 ---
 
@@ -15,7 +19,7 @@
 >
 > You can browse public claims, add evidence, or run the Belief Engine privately in your browser.
 >
-> Link: https://humanx.veltrusky-michal.workers.dev
+> Link: https://humanx.rinkimirikata.com
 >
 > It's rough. Nothing is permanent. Tell me what feels confusing.
 
@@ -38,7 +42,7 @@
 >
 > A few things it is not: it's not a fact-checker, not a debate forum, not a diagnosis tool, and not an AI that decides what's true. It records and organises what gets asserted — that's it.
 >
-> Link: https://humanx.veltrusky-michal.workers.dev
+> Link: https://humanx.rinkimirikata.com
 >
 > If you try it, I'd love to know: what was confusing, what felt wrong, what you'd want to do that you couldn't.
 >
@@ -188,9 +192,12 @@ Ask testers these specific questions:
 
 ## 10. Owner Checklist Before Inviting Testers
 
+> **Not yet inviting testers (as of D-123B).** Complete the next-upgrade phase first (see D-123B). Return to this checklist when improvement work is done.
+
 Work through this list before sending any invite:
 
-- [ ] Confirm https://humanx.veltrusky-michal.workers.dev loads and shows "D1 live"
+- [ ] Complete Belief Engine upgrade and onboarding improvement (D-123B next-upgrade phase)
+- [ ] Confirm https://humanx.rinkimirikata.com loads and shows "D1 live" (custom domain smoke check — not yet verified)
 - [ ] Confirm `/api/health` returns `ok: true`, `mode: d1-live`
 - [ ] Confirm Home page Belief Engine card reads "It helps separate personal certainty, inherited ideas, identity pressure, and what could change your mind."
 - [ ] Confirm Belief Engine intro reads "This is not a test you pass or fail."
@@ -200,6 +207,7 @@ Work through this list before sending any invite:
 - [ ] Decide how many testers to invite (recommend 2–5 for first wave)
 - [ ] Decide how testers will send you feedback (email, DM, form — not via the site itself)
 - [ ] Brief testers on the warning not to submit private information (section 7 above)
+- [ ] Verify custom domain smoke at https://humanx.rinkimirikata.com (separate task — do not skip)
 - [ ] Do not post the URL publicly
 - [ ] Keep the tester list small until the first wave's feedback is reviewed
 
