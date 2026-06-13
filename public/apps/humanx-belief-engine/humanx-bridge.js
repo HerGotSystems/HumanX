@@ -109,7 +109,7 @@
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || data.error || 'HumanX save failed');
       if (btn) btn.textContent = 'Saved to HumanX ✓';
-      alert('Saved to HumanX. Open the main HumanX app → Belief / Drift to see the snapshot.');
+      alert('Snapshot saved to HumanX. Open the main app → Drift to see it. It is not published; turning it into a Truth or Claim enters Review before becoming visible to others. Nothing has been proven or verified.');
       return data;
     } catch (err) {
       if (btn) {
@@ -130,7 +130,12 @@
     btn.type = 'button';
     btn.textContent = 'Send to HumanX';
     btn.onclick = sendBeliefEngineToHumanX;
+    const note = document.createElement('p');
+    note.id = 'send-humanx-note';
+    note.style.cssText = 'font-size:11px;color:#8c97ad;line-height:1.5;margin:10px 0 4px;';
+    note.textContent = 'This saves a snapshot to your HumanX session. It does not publish it immediately. Turning it into a Truth or Claim enters Review before becoming visible to others.';
     actions.insertBefore(btn, actions.firstChild);
+    if (!document.getElementById('send-humanx-note')) actions.insertBefore(note, btn);
   }
 
   window.buildHumanXBeliefSnapshot = buildHumanXBeliefSnapshot;

@@ -43,7 +43,7 @@ Expected results:
 
 **Note:** A `MODULE_TYPELESS_PACKAGE_JSON` warning may appear during `hardening-smoke-test.mjs`. This is non-blocking and does not affect the pass count.
 
-**Live write smoke tests require explicit per-session user approval before running.** Do not run them routinely.
+**Caution: live write smoke tests require explicit per-session user approval before running.** Do not run them routinely.
 
 ---
 
