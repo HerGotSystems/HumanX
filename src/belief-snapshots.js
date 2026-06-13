@@ -6,6 +6,8 @@ export async function saveBeliefSnapshot(request, env, helpers) {
   const raw = body.snapshot || body.result || body.raw || body;
   const snapshot = typeof raw === 'string' ? safeParse(raw) : raw;
   if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) return json({ error: 'BAD_BELIEF_SNAPSHOT' }, 400);
+  const MAX_SNAPSHOT_BYTES = 65536;
+  if (JSON.stringify(snapshot).length > MAX_SNAPSHOT_BYTES) return json({ error: 'BAD_BELIEF_SNAPSHOT_TOO_LARGE', message: 'Snapshot payload exceeds 64 KB limit.' }, 400);
 
   await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`)
     .bind(userId, `anon-${userId.slice(-6)}`, Date.now())
