@@ -44,10 +44,11 @@
     }));
 
     const contradictionTexts = contradictions.map(c => `${c.title || 'Contradiction'}: ${c.desc || ''}`.trim());
+    // Raw free-text timeline answers (fearTrue, isolate, identity) are excluded from the
+    // default payload — they contain sensitive personal content typed by the user and must
+    // not leave the browser without explicit opt-in. Only derived moral-scenario labels
+    // from meta.stress are included (those come from predefined choice buttons, not text).
     const stressPoints = [];
-    if (timeline.fearTrue) stressPoints.push(`Afraid might be true: ${timeline.fearTrue}`);
-    if (timeline.isolate) stressPoints.push(`Would isolate you: ${timeline.isolate}`);
-    if (timeline.identity) stressPoints.push(`Would break identity: ${timeline.identity}`);
     if (meta.stress && Array.isArray(meta.stress)) stressPoints.push(...meta.stress.map(x => Array.isArray(x) ? x.join(': ') : String(x)));
 
     const label = topAlignments[0]?.name ? `Belief Engine Profile — ${topAlignments[0].name}` : 'Belief Engine Full Profile';
@@ -55,8 +56,10 @@
 
     return {
       label,
-      engineVersion: 'humanx-belief-engine-v1.0-bridge',
+      engineVersion: 'humanx-belief-engine-v2.0',
       source: 'standalone-humanx-belief-engine',
+      includesTimeline: false,
+      runMode: s.profileMode || 'main',
       dominantPattern: topAlignments[0]?.name || topDimension(scores),
       summary,
       beliefCount: 77,
@@ -72,7 +75,7 @@
         scores,
         alignments,
         contradictions,
-        timeline,
+        // raw.timeline excluded — contains sensitive free-text typed by the user
         identity,
         answers: s.answers || {},
         profileMode: s.profileMode || 'main',
@@ -133,7 +136,7 @@
     const note = document.createElement('p');
     note.id = 'send-humanx-note';
     note.style.cssText = 'font-size:11px;color:#8c97ad;line-height:1.5;margin:10px 0 4px;';
-    note.textContent = 'This saves a snapshot to your HumanX session. It does not publish it immediately. Turning it into a Truth or Claim enters Review before becoming visible to others.';
+    note.textContent = 'Saved: dimension scores, alignment patterns, contradiction summary, and moral-scenario responses. Not saved: private timeline text or free-text answers you typed. Nothing is published — the snapshot enters your Drift for your own review only.';
     actions.insertBefore(btn, actions.firstChild);
     if (!document.getElementById('send-humanx-note')) actions.insertBefore(note, btn);
   }
