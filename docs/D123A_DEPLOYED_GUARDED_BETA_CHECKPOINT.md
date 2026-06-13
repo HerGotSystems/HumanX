@@ -1,9 +1,10 @@
 # D-123A — Deployed Guarded Beta Checkpoint
 
 **Date:** 2026-06-13  
+**Amended:** 2026-06-13 (D-123B — canonical URL correction; launch posture updated to owner-review-only)  
 **Mode:** DOCS ONLY — no code changes, no deploy, no Wrangler, no D1, no production query, no admin token, no live write, no mutation.
 
-> Purpose: Capture the current deployed HumanX state as a stable baseline before inviting the first small controlled tester group.
+> Purpose: Capture the current deployed HumanX state as a stable baseline for owner review. External tester invites are not issued yet — see D-123B for next-upgrade plan and corrected URL.
 
 ---
 
@@ -11,7 +12,8 @@
 
 | Field | Value |
 |---|---|
-| Live URL | https://humanx.veltrusky-michal.workers.dev |
+| Canonical public URL | https://humanx.rinkimirikata.com |
+| Worker origin (technical fallback) | https://humanx.veltrusky-michal.workers.dev |
 | Deployed Worker version | `fec949c4-fe26-4f95-9c74-6f5fc960f4e4` |
 | Main HEAD at checkpoint | `c15b4f9` (Merge PR #145 — D-122B post-deploy smoke) |
 | Static baseline | `416 / 24 / 56` (hardening / belief-engine / worker-route) |
@@ -38,9 +40,12 @@ No schema changes. No admin-token change. No breaking API shape changes.
 
 ## 3. Launch Posture
 
-**Guarded beta. Not a public mass launch.**
+**Deployed guarded internal beta — owner review only. Not yet inviting external testers.**
 
-- A small number of invited testers only.
+*(Amended D-123B: launch posture corrected from "ready to invite testers" to "owner review / pre-improvement phase.")*
+
+- No external tester invites issued yet. The system is available at the canonical URL but is not being promoted.
+- Next phase: improvement work (Belief Engine upgrade, onboarding, Review ergonomics) before any external invite.
 - No public link posted to social media, forums, or aggregators.
 - No claim of AI truth-determination, diagnosis, or score of personal worth.
 - No payment or monetization.
@@ -113,7 +118,7 @@ These remain not started and require explicit authorisation before execution:
 | Live oversized snapshot rejection test | Deferred | Explicit approval required |
 | Live RunPack write / rate-limit test | Deferred | Explicit approval required |
 
-These deferrals do not block the guarded beta launch. All are covered by source-level audit evidence.
+These deferrals do not block owner-internal review. All are covered by source-level audit evidence. They remain open for resolution before external tester invites are issued.
 
 ---
 
