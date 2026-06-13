@@ -389,7 +389,8 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
   <div class="intro-logo">HumanX</div>
   <div class="intro-h1">Belief<br/>Engine</div>
   <p class="intro-sub">Most people do not actually know what they believe. They know what they were told. They know what their group believes. They know what sounds correct.</p>
-  <p class="intro-hook">This exposes the <span>actual architecture</span>.</p>
+  <p class="intro-hook">This is not a test you <span>pass or fail</span>.</p>
+  <p class="intro-sub">It maps the structure around a belief: where it came from, how strongly it is tied to identity, what pressure it survives, and what could change it. The result is a pressure map, not a label.</p>
   <div class="intro-stats">
     <div class="intro-stat"><b>77</b><span>Statements</span></div>
     <div class="intro-stat"><b>19</b><span>Dimensions</span></div>
@@ -397,7 +398,7 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
     <div class="intro-stat"><b>36</b><span>Contradictions Checked</span></div>
   </div>
   <button class="btn-primary" onclick="startQuiz()">Begin Mapping</button>
-  <p class="intro-note">No correct answers. No religion assigned. ~12 minutes.<br/>
+  <p class="intro-note">No correct answers. No religion assigned. No diagnosis. No score of your worth. ~10–12 minutes.<br/>You can use it privately, or later choose to send a snapshot into HumanX Review.<br/>
   <span style="color:rgba(87,184,255,.7)">Stored in this browser only. Nothing leaves your device unless you export it.</span></p>
   <div id="existing-btn" class="existing-result hidden" onclick="showResults()">
     ↩ View previous results
@@ -529,6 +530,7 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
   <div class="results-wrap dashboard-wrap">
     <div class="results-hero dashboard-hero">
       <h1>Your Belief Architecture</h1>
+      <p class="results-framing" style="font-size:13px;color:var(--muted);max-width:560px;margin:6px auto 0;line-height:1.5">This is a map of pressure patterns from your answers — not a diagnosis. Use it as a mirror, not a verdict.</p>
       <p id="results-tagline"></p>
     </div>
 
