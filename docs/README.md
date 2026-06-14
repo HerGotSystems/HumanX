@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D127E_DEPLOY_SMOKE_CHECKPOINT.md` ⭐ CURRENT — DEPLOYED / OWNER SMOKE PASS
+### `D127F_TESTER_CLAIM_BUILDER_INVITE_PACK.md` ⭐ CURRENT — NEXT: D-127G tester feedback triage
+Safe tester invite/update pack for the live Claim Builder release (D-126B + D-127B + D-127C + D-127D). Includes short and long invite messages (canonical URL only), tester instructions covering the full builder flow (Steps 1–3, Truth route, Review context), 10 feedback questions specific to the builder, per-tester capture template, stop conditions, and owner rules (no admin token, no Worker URL). Docs-only — no product code, backend, schema, D1, or Wrangler changes.
+**Read when:** inviting or updating testers about the Claim Builder; planning D-127G feedback triage.
+
+### `D127E_DEPLOY_SMOKE_CHECKPOINT.md` — DEPLOYED / OWNER SMOKE PASS
 Deploy/smoke checkpoint for stacked D-126B + D-127B + D-127C + D-127D release. Pre-deploy checks passed (416/24/56, syntax OK) at HEAD `6ec6fae`. CC/CI Wrangler was blocked by VPN/proxy; owner manually deployed. Owner smoke result: **PASS** ("all works"). Live release covers D-126B polish (nav label, Review hint, friendly toasts), D-127B Claim Builder 3-step flow, D-127C Truth route save, D-127D Review builder context panel. Recommended next: D-127F tester-facing Claim Builder invite/update or D-128 structured builder persistence design.
 **Read when:** checking release status or planning next task.
 
