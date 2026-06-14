@@ -181,7 +181,7 @@ Each cycle defines what to do, what to observe, and how to grade each item.
 | 5d | Open Truths tab | Is at least one Truth visible? |
 | 5e | Read a Truth card | Does it clearly say "repeated assertion, not verified fact" or equivalent? |
 | 5f | Open Review tab (no token) | Does it show only the gate prompt — no queue contents? |
-| 5g | Try navigating to `/api/health` | Does it return `ok: true, mode: d1-live`? |
+| 5g | Try navigating to `/api/graph-status` | Does it return a graph object with claim, truth, and evidence counts? |
 | 5h | Try navigating to `/api/debug` | Does it return a 401/403 or an admin-gated response — no raw debug output? |
 
 **PASS:** Public content visible; no raw admin/debug data exposed; Review gate holds without token; health endpoint confirms D1 live.  
