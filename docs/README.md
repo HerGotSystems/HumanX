@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D128D_REVIEW_API_BUILDER_CONTEXT.md` ⭐ CURRENT — REVIEW API READ PATH — NEXT: D-128E frontend payload or D-128F Review UI
+### `D128E_FRONTEND_STRUCTURED_PAYLOAD.md` ⭐ CURRENT — FRONTEND PAYLOAD MERGED — NEXT: D-128F Review UI structured fallback
+Frontend now sends structured `claim_builder` field alongside legacy `initialEvidence` sentinel. New `builderPayload()` helper maps `_bs` state to D-128C shape (`route`, `rawText`, `why`, `scope`, `falsifier`, `draftClaim`, `finalClaim`, `category`, `claimType`, `systemFlags`). Both `submitBuilderClaim()` and `submitBuilderTruth()` include it. `initialEvidence` sentinel kept for D-127D fallback compatibility. Non-builder `saveClaim()` unchanged. No Worker change. No Review UI change. No schema change. No deploy. Checks: syntax OK, 416/24/56 pass.
+**Read when:** reviewing frontend payload or planning D-128F Review UI.
+
+### `D128D_REVIEW_API_BUILDER_CONTEXT.md` — MERGED
 Review API now attaches optional structured `claimBuilderContext` to claim and truth rows in the admin-only `/api/review` response. New helpers: `safeJsonArray()`, `mapClaimBuilderContext()`, `attachClaimBuilderContexts()` in `src/claim-builder-contexts.js`. Per-row point-lookups (most recent context, `created_at DESC`); failures non-fatal. Public endpoints unchanged. D-127D legacy parser fallback untouched. No frontend payload change. No Review UI change. No schema/migration change. No deploy. Checks: syntax OK, 416/24/56 pass.
 **Read when:** reviewing Review API read path or planning D-128E/F.
 
