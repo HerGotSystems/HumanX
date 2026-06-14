@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D127C_BUILDER_TRUTH_ROUTE_SAVE.md` ⭐ CURRENT — NEXT: deploy D-126B+D-127B+D-127C
+### `D127D_REVIEW_BUILDER_CONTEXT_VISIBILITY.md` ⭐ CURRENT — NEXT: D-127E deploy checkpoint or structured builder persistence
+Surfaces Claim Builder submission context in the Review inspect panel. `parseClaimBuilderContext()` parses the D-127B plain-text block from `initialEvidence`; `reviewBuilderContextHtml()` renders ORIGINAL USER TEXT, WHY, SCOPE, PRESSURE/FALSIFIER, and SYSTEM FLAGS as a blue-tinted panel. Injected into `renderReviewInspectPanel()` between quality hints and decision buttons. Review-only — no public page change. No backend/schema/D1/Wrangler/deploy changes. CSS: 6 new rules. All 416/24/56 checks pass. Deploy required (frontend assets).
+**Read when:** reviewing builder context visibility in Review, or planning D-127E.
+
+### `D127C_BUILDER_TRUTH_ROUTE_SAVE.md` — MERGED (see D-127D for Review context)
 Wires up the Truth route save in the Claim Builder. `submitBuilderTruth()` POSTs `_bs.raw` to the existing `/api/truths` endpoint (`review_state='review'` guaranteed). Step 2 truth-route note gains a real "Save as Truth for Review" button. Step 3 DECISION row is now route-aware: truth route shows both badge types plus explanatory copy and two action buttons; claim route unchanged. CSS: `.builder-route-actions` and `.builder-truth-note`. No backend/schema/D1/Wrangler/deploy changes. All 416 smoke + 24 static + 56 worker-route checks pass. Deploy required (frontend assets).
 **Read when:** reviewing the builder Truth route or planning the next deploy.
 
