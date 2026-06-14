@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D128B_CLAIM_BUILDER_CONTEXT_MIGRATION_DRAFT.md` ⭐ CURRENT — MIGRATION DRAFT ONLY — NOT APPLIED
+### `D128H_MIGRATION_STATE_REPAIR_PLAN.md` ⭐ CURRENT — MIGRATION STATE REPAIR PLANNING — NO LIVE REPAIR YET
+Migration-state repair plan after D1 audit revealed schema drift and migration replay failure. `wrangler d1 migrations apply` is blocked: `0003_full_schema.sql` attempts `CREATE UNIQUE INDEX idx_evidence_claim_links_unique` but 4 duplicate `(evidence_id, claim_id)` pairs exist in `evidence_claim_links`. No runtime code or live D1 changes made. Companion SQL draft `migrations/manual_repair_dedupe_evidence_claim_links.sql` provides audit, preview, dry-run DELETE, post-delete verification, and index creation queries. No live execution has occurred. Owner must review, approve backup, and authorise each step. `claim_builder_contexts` table still does not exist — D-128C blocked until migration unblocked.
+**Read when:** planning migration repair, reviewing dedupe strategy, or resuming D-128C after migration is unblocked.
+
+### `D128B_CLAIM_BUILDER_CONTEXT_MIGRATION_DRAFT.md` — MIGRATION DRAFT — NOT APPLIED (blocked by D-128H repair)
 Draft SQL migration for `claim_builder_contexts` table (`migrations/0006_claim_builder_contexts.sql`). Adds 16-column table (target_type, target_id, route, version, raw_text, why, scope, falsifier, draft_claim, final_claim, category, claim_type, system_flags_json, timestamps) plus 3 indexes. Migration file exists in repo but has NOT been executed against production D1 — no live schema change. Next step (D-128C worker write-path) requires explicit owner approval to apply the migration first.
 **Read when:** planning D-128C or reviewing migration before applying.
 
