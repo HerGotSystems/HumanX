@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D128_STRUCTURED_BUILDER_PERSISTENCE_DESIGN.md` ⭐ CURRENT — NEXT: D-128B migration draft only
+### `D128B_CLAIM_BUILDER_CONTEXT_MIGRATION_DRAFT.md` ⭐ CURRENT — MIGRATION DRAFT ONLY — NOT APPLIED
+Draft SQL migration for `claim_builder_contexts` table (`migrations/0006_claim_builder_contexts.sql`). Adds 16-column table (target_type, target_id, route, version, raw_text, why, scope, falsifier, draft_claim, final_claim, category, claim_type, system_flags_json, timestamps) plus 3 indexes. Migration file exists in repo but has NOT been executed against production D1 — no live schema change. Next step (D-128C worker write-path) requires explicit owner approval to apply the migration first.
+**Read when:** planning D-128C or reviewing migration before applying.
+
+### `D128_STRUCTURED_BUILDER_PERSISTENCE_DESIGN.md` — MERGED (see D-128B for migration draft)
 Design/spec for structured Claim Builder persistence. Recommends a dedicated `claim_builder_contexts` table to separate builder metadata (original text, why, scope, falsifier, flags, route) from the `initialEvidence` plain-text channel used in D-127B. Defines payload shape for both claim and truth routes, Review/public/RunPack visibility boundaries, and the migration strategy. Preserves D-127D plain-text parser as a legacy fallback for existing items. Docs/design only — no product code, backend, schema, D1, or deploy changes.
 **Read when:** planning D-128B migration or reviewing builder persistence design.
 
