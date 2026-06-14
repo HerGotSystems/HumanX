@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D126A_BETA_PRODUCT_CHECKPOINT.md` ⭐ CURRENT — D-125 RELEASED. NEXT: D-126B
+### `D126B_POLISH_BACKLOG_BATCH.md` ⭐ CURRENT — NEXT: D-126C
+Polish batch clearing B1–B6 from D-126A backlog. B1: rate-limit toast now reads "Too many submissions. Try again in about an hour." B2: CLAIM_TOO_SHORT now shows friendly copy. B3: nav tab "Beliefs" → "Belief Engine". B4: Review no-token hint extended to "Review is owner-only." B5: deferred (source-label density requires logic change). B6: D-125A doc row 5g `/api/health` → `/api/graph-status`. Files: `app-v10.js`, `index.html`, `D125A` doc. **Deploy required** (frontend assets changed). Checks: 24/24, syntax OK, 416/416. Recommended next: D-126C onboarding.
+**Read when:** reviewing D-126B polish changes or planning D-126C.
+
+### `D126A_BETA_PRODUCT_CHECKPOINT.md` — D-125 RELEASED
 Beta product checkpoint after D-125 owner-as-tester hardening release. Live Worker `3ab9c7c5-b034-4ae5-8108-12ecb51734e7`, owner smoke PASS. Captures full feature state (claim pipeline, Review, Belief Engine v2, Drift, public browsing, AIP export), trust/safety posture (review-first, source safety, rate limiting, snapshot isolation), six low-priority backlog items (B1–B6: rate-limit toast, CLAIM_TOO_SHORT copy, nav label, review hint, vault density, /api/health doc typo). Five next-build options (D-126B polish → D-126C onboarding → D-126D admin ergonomics → D-126E seed content → D-126F abuse hardening). **Recommendation: D-126B first.** Checks: 24/24 static, syntax OK, 416/416 smoke.
 **Read when:** starting any new build task; reviewing beta status before tester invite.
 
