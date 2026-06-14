@@ -1,4 +1,5 @@
 import { meaningKey } from './meaning-key.js';
+import { cleanClaimBuilderContext, insertClaimBuilderContext } from './claim-builder-contexts.js';
 
 export async function listTruths(request, env, helpers) {
   const { json } = helpers;
@@ -38,7 +39,7 @@ export async function createTruth(request, env, helpers) {
   const now = Date.now();
   const existing = await env.DB.prepare(`SELECT * FROM truths WHERE normalized_statement=?`).bind(normalized).first();
 
-  if (existing) return repeatExistingTruth(env, json, existing.id, now);
+  if (existing) return repeatExistingTruth(env, json, makeId, userId, existing.id, now, body.claim_builder);
 
   const id = makeId('tru');
   try {
@@ -68,15 +69,34 @@ export async function createTruth(request, env, helpers) {
     if (!isUniqueConstraintError(err)) throw err;
     const raced = await env.DB.prepare(`SELECT id FROM truths WHERE normalized_statement=?`).bind(normalized).first();
     if (!raced?.id) throw err;
-    return repeatExistingTruth(env, json, raced.id, now);
+    return repeatExistingTruth(env, json, makeId, userId, raced.id, now, body.claim_builder);
+  }
+
+  if (body.claim_builder) {
+    const ctx = cleanClaimBuilderContext(body.claim_builder);
+    if (ctx) {
+      try {
+        await insertClaimBuilderContext(env, makeId, { targetType: 'truth', targetId: id, userId, context: ctx });
+      } catch (cbcErr) {
+        throw new Error(`SERVER_ERROR: builder context insert failed — ${String(cbcErr?.message || cbcErr)}`);
+      }
+    }
   }
 
   const row = await env.DB.prepare(`SELECT t.*, u.handle FROM truths t LEFT JOIN users u ON u.id=t.user_id WHERE t.id=?`).bind(id).first();
   return json({ ok: true, truth: mapTruth(row) });
 }
 
-async function repeatExistingTruth(env, json, truthId, now = Date.now()) {
+async function repeatExistingTruth(env, json, makeId, userId, truthId, now = Date.now(), claimBuilderRaw = null) {
   await env.DB.prepare(`UPDATE truths SET repetition_score=repetition_score+1, updated_at=? WHERE id=?`).bind(now, truthId).run();
+  if (claimBuilderRaw) {
+    const ctx = cleanClaimBuilderContext(claimBuilderRaw);
+    if (ctx) {
+      try {
+        await insertClaimBuilderContext(env, makeId, { targetType: 'truth', targetId: truthId, userId, context: ctx });
+      } catch (_) { /* repeated-truth context insert is non-fatal */ }
+    }
+  }
   const row = await env.DB.prepare(`SELECT t.*, u.handle FROM truths t LEFT JOIN users u ON u.id=t.user_id WHERE t.id=?`).bind(truthId).first();
   return json({ ok: true, repeated: true, truth: mapTruth(row) });
 }

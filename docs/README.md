@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D128H_MIGRATION_STATE_REPAIR_PLAN.md` ⭐ CURRENT — MIGRATION STATE REPAIR PLANNING — NO LIVE REPAIR YET
+### `D128C_WORKER_WRITE_PATH.md` ⭐ CURRENT — WORKER WRITE PATH MERGED — NEXT: D-128D Review API read path
+Worker write path for structured Claim Builder context. New helper module `src/claim-builder-contexts.js` exports `cleanClaimBuilderContext()` (validates/clips, returns null if absent or invalid) and `insertClaimBuilderContext()` (inserts one `cbc_*` row). `/api/claims` POST writes context for new claims only (not existing/duplicate). `/api/truths` POST writes context for both new and repeated truths. `claim_builder_contexts` table is already live in production D1. Legacy D-127B/D-127D `initialEvidence` fallback untouched. No frontend payload change yet. No Review API/UI change yet. No deploy yet. Checks: syntax OK, 416/24/56 pass.
+**Read when:** reviewing write-path implementation or planning D-128D/E/F.
+
+### `D128H_MIGRATION_STATE_REPAIR_PLAN.md` — COMPLETED (migration unblocked, table live)
 Migration-state repair plan after D1 audit revealed schema drift and migration replay failure. `wrangler d1 migrations apply` is blocked: `0003_full_schema.sql` attempts `CREATE UNIQUE INDEX idx_evidence_claim_links_unique` but 4 duplicate `(evidence_id, claim_id)` pairs exist in `evidence_claim_links`. No runtime code or live D1 changes made. Companion SQL draft `migrations/manual_repair_dedupe_evidence_claim_links.sql` provides audit, preview, dry-run DELETE, post-delete verification, and index creation queries. No live execution has occurred. Owner must review, approve backup, and authorise each step. `claim_builder_contexts` table still does not exist — D-128C blocked until migration unblocked.
 **Read when:** planning migration repair, reviewing dedupe strategy, or resuming D-128C after migration is unblocked.
 
