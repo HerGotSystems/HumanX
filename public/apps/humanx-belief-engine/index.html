@@ -422,7 +422,7 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
     <div class="intro-stat"><b>36</b><span>Contradictions Checked</span></div>
   </div>
   <button class="btn-primary" onclick="startQuiz()">Begin Mapping</button>
-  <p class="intro-note">No correct answers. No religion assigned. No diagnosis. No score of your worth. ~10–12 minutes.<br/>You can use it privately, or later choose to send a snapshot into HumanX Review.<br/>
+  <p class="intro-note">No correct answers. No religion assigned. No diagnosis. No score of your worth. ~10–12 minutes.<br/>You can use it privately, or later choose to send a snapshot to HumanX — it will appear in your Drift, not published.<br/>
   <span style="color:rgba(87,184,255,.7)">Stored in this browser only. Nothing leaves your device unless you export it.</span></p>
   <div id="existing-btn" class="existing-result hidden">
     <div class="existing-main" onclick="showResults()">
@@ -479,7 +479,7 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
     </div>
 
     <div class="id-nav">
-      <button class="btn-primary" style="padding:14px 36px;font-size:16px" onclick="confirmIdentity()">Start the test →</button>
+      <button class="btn-primary" style="padding:14px 36px;font-size:16px" onclick="confirmIdentity()">Continue →</button>
     </div>
   </div>
 </div>
@@ -494,6 +494,7 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
     <div class="timeline-intro">
       <h2>Belief Timeline</h2>
       <p>Most analysis treats beliefs as static. Yours aren't. Three quick scored questions, then your own words. All optional.</p>
+      <p style="font-size:11px;color:rgba(87,184,255,.6);margin-top:8px;line-height:1.5">Your written answers stay in this browser only — nothing typed here is sent anywhere, even if you later click "Send to HumanX".</p>
     </div>
 
     <div class="timeline-era" style="background:rgba(160,102,255,.05);border-color:rgba(160,102,255,.2)">
@@ -2488,7 +2489,7 @@ function renderGapPanel(scores){
   // Gap summary text
   let summary='';
   if(bigGaps.length===0){
-    summary='Your declared identity and your actual belief architecture are broadly consistent. Your self-knowledge appears accurate.';
+    summary='Your declared identity and your scored belief profile broadly align — no major gaps detected.';
   } else {
     const over=bigGaps.filter(d=>d.delta>0).map(d=>d.label);
     const under=bigGaps.filter(d=>d.delta<0).map(d=>d.label);
