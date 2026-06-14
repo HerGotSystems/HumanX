@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D127F_TESTER_CLAIM_BUILDER_INVITE_PACK.md` ⭐ CURRENT — NEXT: D-127G tester feedback triage
+### `D128_STRUCTURED_BUILDER_PERSISTENCE_DESIGN.md` ⭐ CURRENT — NEXT: D-128B migration draft only
+Design/spec for structured Claim Builder persistence. Recommends a dedicated `claim_builder_contexts` table to separate builder metadata (original text, why, scope, falsifier, flags, route) from the `initialEvidence` plain-text channel used in D-127B. Defines payload shape for both claim and truth routes, Review/public/RunPack visibility boundaries, and the migration strategy. Preserves D-127D plain-text parser as a legacy fallback for existing items. Docs/design only — no product code, backend, schema, D1, or deploy changes.
+**Read when:** planning D-128B migration or reviewing builder persistence design.
+
+### `D127F_TESTER_CLAIM_BUILDER_INVITE_PACK.md` — MERGED
 Safe tester invite/update pack for the live Claim Builder release (D-126B + D-127B + D-127C + D-127D). Includes short and long invite messages (canonical URL only), tester instructions covering the full builder flow (Steps 1–3, Truth route, Review context), 10 feedback questions specific to the builder, per-tester capture template, stop conditions, and owner rules (no admin token, no Worker URL). Docs-only — no product code, backend, schema, D1, or Wrangler changes.
 **Read when:** inviting or updating testers about the Claim Builder; planning D-127G feedback triage.
 
