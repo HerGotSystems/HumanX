@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D127D_REVIEW_BUILDER_CONTEXT_VISIBILITY.md` ⭐ CURRENT — NEXT: D-127E deploy checkpoint or structured builder persistence
+### `D127E_DEPLOY_SMOKE_CHECKPOINT.md` ⭐ CURRENT — DEPLOY REQUIRED (owner manual step)
+Deploy/smoke checkpoint for stacked D-126B + D-127B + D-127C + D-127D release. Pre-deploy checks all pass (416/24/56, syntax OK) at HEAD `6ec6fae`. Wrangler deploy blocked in CI environment (VPN/proxy blocks `api.cloudflare.com`) — owner must run `npx wrangler deploy` manually from a terminal with direct Cloudflare access. Includes full owner smoke checklist: site load, D-126B polish (nav label, Review hint), Claim Builder happy path (Steps 1–3, claim submit), Truth route (Step 2 and Step 3 buttons, truth save), Review builder context panel (E1–E6), no-regression checks (F1–F5), and stop conditions.
+**Read when:** ready to deploy; running owner smoke after deploy.
+
+### `D127D_REVIEW_BUILDER_CONTEXT_VISIBILITY.md` — MERGED
 Surfaces Claim Builder submission context in the Review inspect panel. `parseClaimBuilderContext()` parses the D-127B plain-text block from `initialEvidence`; `reviewBuilderContextHtml()` renders ORIGINAL USER TEXT, WHY, SCOPE, PRESSURE/FALSIFIER, and SYSTEM FLAGS as a blue-tinted panel. Injected into `renderReviewInspectPanel()` between quality hints and decision buttons. Review-only — no public page change. No backend/schema/D1/Wrangler/deploy changes. CSS: 6 new rules. All 416/24/56 checks pass. Deploy required (frontend assets).
 **Read when:** reviewing builder context visibility in Review, or planning D-127E.
 
