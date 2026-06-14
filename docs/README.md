@@ -51,6 +51,10 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
+### `D124N_FIRST_TESTER_INVITE_PACK.md` ⭐ SEND THIS TO TESTERS
+First guarded tester invite pack for Belief Engine v2. Contains: short and long invite messages (canonical URL only), tester instructions (BE flow, Send to HumanX, saved-results, Clear, Start Over, mobile), 10 feedback questions, owner rules (max 1–3 trusted testers, no admin token, no Worker URL), per-tester feedback capture template with severity guide, stop conditions (framing/privacy/mobile failures), and next-step trigger for D-124O triage. Invite max 1–3 trusted testers. Do not share link publicly.
+**Read when:** ready to send tester invites; resume after first-wave feedback to plan D-124O triage.
+
 ### `D124M_POSTDEPLOY_OWNER_SMOKE.md` ⭐ DEPLOY VERIFIED — PASS WITH NOTES
 Post-deploy owner smoke checkpoint for the D-124 Belief Engine tester-check. Deployed version `ff886046-714a-4756-92b4-ddaa2908959b`. Owner confirmed: production loads, D1 live, Belief Engine result renders, Drift captures two full profiles with comparison delta, mobile fresh flow works, mobile-created claim reaches Review queue, admin view operational. Two notes: (N1) admin screenshots must not be shared publicly; (N2) incognito no-token Review gate check still needed before inviting external testers. Verdict: **PASS WITH NOTES**. Next: D-124N first tester invite after N2 check.
 **Read when:** checking post-deploy status or starting tester invite planning.
