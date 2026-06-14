@@ -51,8 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
+### `D124L_OWNER_BROWSER_CHECKLIST.md` ⭐ RUN THIS BEFORE INVITING TESTERS
+Practical step-by-step browser checklist for the owner to verify the live site after an explicit deploy decision. Covers: production health, Home card copy, Belief Engine intro/flow, timeline local-data note, saved-result / Clear / Start Over, Send-to-HumanX note, mobile 390px + 768px, public content, Review admin-gate, and a fill-in-the-blank PASS / BLOCKED final judgement. Run in a normal browser window then repeat mobile steps on a phone or DevTools responsive mode.
+**Read when:** ready to run the manual deploy check before sending tester invites.
+
 ### `D124I_BELIEF_ENGINE_PRE_TESTER_READINESS_AUDIT.md` ⭐ BELIEF ENGINE CURRENT STATE
-Pre-tester readiness audit after D-124B–H upgrade chain. Verdict: **READY WITH NOTES**. All automated checks pass (24/24 static, syntax OK, 416/416 smoke). Privacy boundaries confirmed complete across all five surfaces. Saved-result paths deterministic after D-124G. One stale doc cell corrected (BELIEF_ENGINE_TEST_PLAN.md `engineVersion`). Remaining pre-invite items: manual mobile QA at 390px + 768px, production health check, Home card copy check, public claim visible, Review tab admin-gate.
+Pre-tester readiness audit after D-124B–H upgrade chain. Verdict: **READY WITH NOTES**. All automated checks pass (24/24 static, syntax OK, 416/416 smoke). Privacy boundaries confirmed complete across all five surfaces. Saved-result paths deterministic after D-124G. One stale doc cell corrected (BELIEF_ENGINE_TEST_PLAN.md `engineVersion`). Remaining pre-invite items: run `D124L_OWNER_BROWSER_CHECKLIST.md` against live site after deploy.
 **Read when:** starting any Belief Engine session or planning tester invite. See `D123A_TESTER_LAUNCH_PACK.md` for the full pre-invite owner checklist.
 
 ### `D121A_PRE_TESTER_LAUNCH_CHECKPOINT.md` ⭐ START HERE (overall product state)
