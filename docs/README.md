@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D128E_FRONTEND_STRUCTURED_PAYLOAD.md` ⭐ CURRENT — FRONTEND PAYLOAD MERGED — NEXT: D-128F Review UI structured fallback
+### `D128F_REVIEW_UI_STRUCTURED_BUILDER_CONTEXT.md` ⭐ CURRENT — REVIEW UI STRUCTURED-FIRST DISPLAY READY — NEXT: D-128H deploy (D-128C through D-128F)
+Review inspect panel now prefers `item.claimBuilderContext` (structured, from D-128D API) over the legacy `parseClaimBuilderContext()` path. Both paths show a source badge (green `structured` / yellow `legacy parsed`). No backend change. No schema change. No deploy. Checks: syntax OK, 416/24/56 pass.
+**Read when:** reviewing the Review UI builder context display or planning the D-128H deploy.
+
+### `D128E_FRONTEND_STRUCTURED_PAYLOAD.md` — MERGED — FRONTEND PAYLOAD
 Frontend now sends structured `claim_builder` field alongside legacy `initialEvidence` sentinel. New `builderPayload()` helper maps `_bs` state to D-128C shape (`route`, `rawText`, `why`, `scope`, `falsifier`, `draftClaim`, `finalClaim`, `category`, `claimType`, `systemFlags`). Both `submitBuilderClaim()` and `submitBuilderTruth()` include it. `initialEvidence` sentinel kept for D-127D fallback compatibility. Non-builder `saveClaim()` unchanged. No Worker change. No Review UI change. No schema change. No deploy. Checks: syntax OK, 416/24/56 pass.
 **Read when:** reviewing frontend payload or planning D-128F Review UI.
 
