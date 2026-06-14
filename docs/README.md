@@ -51,9 +51,9 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D127E_DEPLOY_SMOKE_CHECKPOINT.md` ⭐ CURRENT — DEPLOY REQUIRED (owner manual step)
-Deploy/smoke checkpoint for stacked D-126B + D-127B + D-127C + D-127D release. Pre-deploy checks all pass (416/24/56, syntax OK) at HEAD `6ec6fae`. Wrangler deploy blocked in CI environment (VPN/proxy blocks `api.cloudflare.com`) — owner must run `npx wrangler deploy` manually from a terminal with direct Cloudflare access. Includes full owner smoke checklist: site load, D-126B polish (nav label, Review hint), Claim Builder happy path (Steps 1–3, claim submit), Truth route (Step 2 and Step 3 buttons, truth save), Review builder context panel (E1–E6), no-regression checks (F1–F5), and stop conditions.
-**Read when:** ready to deploy; running owner smoke after deploy.
+### `D127E_DEPLOY_SMOKE_CHECKPOINT.md` ⭐ CURRENT — DEPLOYED / OWNER SMOKE PASS
+Deploy/smoke checkpoint for stacked D-126B + D-127B + D-127C + D-127D release. Pre-deploy checks passed (416/24/56, syntax OK) at HEAD `6ec6fae`. CC/CI Wrangler was blocked by VPN/proxy; owner manually deployed. Owner smoke result: **PASS** ("all works"). Live release covers D-126B polish (nav label, Review hint, friendly toasts), D-127B Claim Builder 3-step flow, D-127C Truth route save, D-127D Review builder context panel. Recommended next: D-127F tester-facing Claim Builder invite/update or D-128 structured builder persistence design.
+**Read when:** checking release status or planning next task.
 
 ### `D127D_REVIEW_BUILDER_CONTEXT_VISIBILITY.md` — MERGED
 Surfaces Claim Builder submission context in the Review inspect panel. `parseClaimBuilderContext()` parses the D-127B plain-text block from `initialEvidence`; `reviewBuilderContextHtml()` renders ORIGINAL USER TEXT, WHY, SCOPE, PRESSURE/FALSIFIER, and SYSTEM FLAGS as a blue-tinted panel. Injected into `renderReviewInspectPanel()` between quality hints and decision buttons. Review-only — no public page change. No backend/schema/D1/Wrangler/deploy changes. CSS: 6 new rules. All 416/24/56 checks pass. Deploy required (frontend assets).

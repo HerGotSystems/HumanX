@@ -62,12 +62,21 @@ npx wrangler deploy
 
 ---
 
+## Owner Manual Deploy Result
+
+Wrangler was blocked in the CC/CI environment (VPN/proxy blocking `api.cloudflare.com`). The owner manually ran `npx wrangler deploy` from a local terminal with direct Cloudflare access.
+
+- **Deployed by:** owner (manual)
+- **Deployed Worker version:** not captured by assistant
+- **Owner smoke result:** PASS
+- **Owner report:** "all works"
+- **Live release covers:** D-126B · D-127B · D-127C · D-127D
+- **Blocker reported:** none
+
 ## Post-deploy Worker Version
 
-*(Owner: fill in after deploy)*
-
 ```
-Deployed Worker version: ________________________________
+Deployed Worker version: not captured by assistant
 ```
 
 ---
@@ -154,8 +163,8 @@ Stop and do not proceed to tester invite if:
 *(Owner: fill in after smoke run)*
 
 ```
-Deploy result: PASS / BLOCKED / PARTIAL
-Notes:
+Deploy result: PASS
+Notes: Owner manually deployed and confirmed all smoke paths work.
 ```
 
 ---
