@@ -1464,6 +1464,23 @@ function getStorageKey(){
   if(state.profileMode==='sandbox') return 'humanx_belief_sandbox_latest';
   return 'humanx_belief_anonymous_latest';
 }
+// Returns the most-recently saved run across all known single-record keys, by ts.
+// Falls back to first valid record found if no ts field present.
+// Silently ignores missing or malformed keys so a corrupt entry never breaks the intro.
+function getLatestSavedRun(){
+  const keys=['humanx_belief_main','humanx_belief_sandbox_latest','humanx_belief_anonymous_latest','humanx_belief'];
+  let best=null;
+  for(const key of keys){
+    try{
+      const raw=localStorage.getItem(key);
+      if(!raw) continue;
+      const d=JSON.parse(raw);
+      if(!d||typeof d!=='object'||!d.scores) continue;
+      if(!best||(d.ts||0)>(best.ts||0)) best=d;
+    }catch{}
+  }
+  return best;
+}
 function getModeLabel(mode=state.profileMode){
   return mode==='main'?'Main Profile':mode==='sandbox'?'Sandbox Test':'Anonymous Voice';
 }
@@ -1581,9 +1598,8 @@ function finishQuiz(){
   scrollTopNow();
 }
 function showResults(){
-  const saved=localStorage.getItem('humanx_belief_main')||localStorage.getItem('humanx_belief');
-  if(!saved)return;
-  const d=JSON.parse(saved);
+  const d=getLatestSavedRun();
+  if(!d)return;
   state.answers=d.answers;
   state.identity=d.identity||{worldview:[],political:null,settled:null,godCount:null};
   state.timeline=d.timeline||{};
@@ -1817,8 +1833,7 @@ function chipPair(label, desc, isActive, toggleFn, isSolo, extraClass=''){
 }
 
 function renderIntro(){
-  const saved=localStorage.getItem('humanx_belief');
-  $id('existing-btn').classList.toggle('hidden',!saved);
+  $id('existing-btn').classList.toggle('hidden',!getLatestSavedRun());
 }
 
 function renderQuiz(){
