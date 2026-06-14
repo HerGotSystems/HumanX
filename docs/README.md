@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D128F_REVIEW_UI_STRUCTURED_BUILDER_CONTEXT.md` ⭐ CURRENT — REVIEW UI STRUCTURED-FIRST DISPLAY READY — NEXT: D-128H deploy (D-128C through D-128F)
+### `D128H_DEPLOY_CHECKLIST.md` ⭐ CURRENT — DEPLOY CHECKLIST READY — NEXT: Owner runs `wrangler deploy`
+Pre-deploy verification passed at `49571ac`. All 4 static checks green. D-128C/D/E/F chain confirmed merged. Checklist doc includes D1 state checks, deploy command, and 7-step owner smoke procedure. No runtime change in this task.
+**Read when:** about to deploy or reviewing deploy status.
+
+### `D128F_REVIEW_UI_STRUCTURED_BUILDER_CONTEXT.md` — MERGED — REVIEW UI STRUCTURED-FIRST DISPLAY
 Review inspect panel now prefers `item.claimBuilderContext` (structured, from D-128D API) over the legacy `parseClaimBuilderContext()` path. Both paths show a source badge (green `structured` / yellow `legacy parsed`). No backend change. No schema change. No deploy. Checks: syntax OK, 416/24/56 pass.
 **Read when:** reviewing the Review UI builder context display or planning the D-128H deploy.
 
