@@ -679,7 +679,7 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
       <div class="results-actions">
         <button class="btn-action" onclick="downloadShare()">Download PNG</button>
         <button class="btn-action" onclick="copyShareText()">Copy Summary</button>
-        <button class="btn-action" onclick="retake()">Retake</button>
+        <button class="btn-action" onclick="retake()">Start Over</button>
       </div>
     </section>
   </div>
@@ -2360,6 +2360,7 @@ function renderTimelinePanel(){
 
   p.innerHTML=`<div class="panel" style="margin-bottom:20px">
     <h2>Belief Timeline</h2>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5">Your written responses — stored in this browser only. Not included in snapshots sent to HumanX.</p>
     ${driftLabel||driverLabel||costLabel?`
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
       ${driftLabel?`<span class="badge b-blue" style="font-size:11px">Drift: ${escHtml(driftLabel.split('—')[0].trim())}</span>`:''}
