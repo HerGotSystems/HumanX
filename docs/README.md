@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D126B_POLISH_BACKLOG_BATCH.md` ⭐ CURRENT — NEXT: D-126C
+### `D127A_CLAIM_BUILDER_DESIGN_SPEC.md` ⭐ CURRENT — NEXT: D-127B
+Design/spec-only checkpoint for turning HumanX submission into a Claim Builder. Defines the three-step flow: Step 1 Raw Thought, Step 2 Make it Testable, Step 3 Final Claim. Accepts messy human text first; extends existing `claimQualityHints()` into builder flags; detects Claim vs Truth route; proposes future `claim_builder` object without schema changes; keeps Review-first publication; keeps RunPack later in Study mode; defines future Review card sections (CLAIM, ORIGINAL USER TEXT, WHY USER THINKS THIS, SCOPE, PRESSURE/FALSIFIER, SYSTEM FLAGS, DECISION) and later admin actions (Convert to Truth, Request Sharpening). **Docs/design only — no frontend/backend/schema/deploy changes.** Recommended next: D-127B client-only builder prototype.
+**Read when:** implementing or reviewing the Claim Builder direction.
+
+### `D126B_POLISH_BACKLOG_BATCH.md` — D-126B MERGED. DEPLOY STILL REQUIRED
 Polish batch clearing B1–B6 from D-126A backlog. B1: rate-limit toast now reads "Too many submissions. Try again in about an hour." B2: CLAIM_TOO_SHORT now shows friendly copy. B3: nav tab "Beliefs" → "Belief Engine". B4: Review no-token hint extended to "Review is owner-only." B5: deferred (source-label density requires logic change). B6: D-125A doc row 5g `/api/health` → `/api/graph-status`. Files: `app-v10.js`, `index.html`, `D125A` doc. **Deploy required** (frontend assets changed). Checks: 24/24, syntax OK, 416/416. Recommended next: D-126C onboarding.
 **Read when:** reviewing D-126B polish changes or planning D-126C.
 
