@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D125G_MOBILE_LAYOUT_AUDIT.md` ⭐ CURRENT — D-125 CHAIN COMPLETE
+### `D126A_BETA_PRODUCT_CHECKPOINT.md` ⭐ CURRENT — D-125 RELEASED. NEXT: D-126B
+Beta product checkpoint after D-125 owner-as-tester hardening release. Live Worker `3ab9c7c5-b034-4ae5-8108-12ecb51734e7`, owner smoke PASS. Captures full feature state (claim pipeline, Review, Belief Engine v2, Drift, public browsing, AIP export), trust/safety posture (review-first, source safety, rate limiting, snapshot isolation), six low-priority backlog items (B1–B6: rate-limit toast, CLAIM_TOO_SHORT copy, nav label, review hint, vault density, /api/health doc typo). Five next-build options (D-126B polish → D-126C onboarding → D-126D admin ergonomics → D-126E seed content → D-126F abuse hardening). **Recommendation: D-126B first.** Checks: 24/24 static, syntax OK, 416/416 smoke.
+**Read when:** starting any new build task; reviewing beta status before tester invite.
+
+### `D125G_MOBILE_LAYOUT_AUDIT.md` — D-125 CHAIN COMPLETE
 Mobile layout stress audit (Cycle 6). One CSS patch: `#radar-canvas` in Belief Engine `index.html` — added `max-width:100%;height:auto` to prevent 360px canvas overflowing 342px content width at 390px viewport. All other surfaces (nav tabs, card grids, review admin bar, study/vault/truths grids, RunPack actions) verified responsive at 390px and 768px. No stop conditions. Three non-blocking notes (constellation 2-col at 390px, quiz resp-dot tap size, `/api/health` vs `/api/graph-status` doc discrepancy). Verdict: **PATCHED**. Checks: 24/24 static, syntax OK, 416/416 smoke. **D-125 chain is complete. No D-125H needed.**
 **Read when:** checking D-125G mobile audit results or confirming D-125 chain status.
 
