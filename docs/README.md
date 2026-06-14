@@ -51,6 +51,10 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
+### `D124M_POSTDEPLOY_OWNER_SMOKE.md` ⭐ DEPLOY VERIFIED — PASS WITH NOTES
+Post-deploy owner smoke checkpoint for the D-124 Belief Engine tester-check. Deployed version `ff886046-714a-4756-92b4-ddaa2908959b`. Owner confirmed: production loads, D1 live, Belief Engine result renders, Drift captures two full profiles with comparison delta, mobile fresh flow works, mobile-created claim reaches Review queue, admin view operational. Two notes: (N1) admin screenshots must not be shared publicly; (N2) incognito no-token Review gate check still needed before inviting external testers. Verdict: **PASS WITH NOTES**. Next: D-124N first tester invite after N2 check.
+**Read when:** checking post-deploy status or starting tester invite planning.
+
 ### `D124L_OWNER_BROWSER_CHECKLIST.md` ⭐ RUN THIS BEFORE INVITING TESTERS
 Practical step-by-step browser checklist for the owner to verify the live site after an explicit deploy decision. Covers: production health, Home card copy, Belief Engine intro/flow, timeline local-data note, saved-result / Clear / Start Over, Send-to-HumanX note, mobile 390px + 768px, public content, Review admin-gate, and a fill-in-the-blank PASS / BLOCKED final judgement. Run in a normal browser window then repeat mobile steps on a phone or DevTools responsive mode.
 **Read when:** ready to run the manual deploy check before sending tester invites.
