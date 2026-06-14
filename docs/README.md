@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D128C_WORKER_WRITE_PATH.md` ⭐ CURRENT — WORKER WRITE PATH MERGED — NEXT: D-128D Review API read path
+### `D128D_REVIEW_API_BUILDER_CONTEXT.md` ⭐ CURRENT — REVIEW API READ PATH — NEXT: D-128E frontend payload or D-128F Review UI
+Review API now attaches optional structured `claimBuilderContext` to claim and truth rows in the admin-only `/api/review` response. New helpers: `safeJsonArray()`, `mapClaimBuilderContext()`, `attachClaimBuilderContexts()` in `src/claim-builder-contexts.js`. Per-row point-lookups (most recent context, `created_at DESC`); failures non-fatal. Public endpoints unchanged. D-127D legacy parser fallback untouched. No frontend payload change. No Review UI change. No schema/migration change. No deploy. Checks: syntax OK, 416/24/56 pass.
+**Read when:** reviewing Review API read path or planning D-128E/F.
+
+### `D128C_WORKER_WRITE_PATH.md` — MERGED
 Worker write path for structured Claim Builder context. New helper module `src/claim-builder-contexts.js` exports `cleanClaimBuilderContext()` (validates/clips, returns null if absent or invalid) and `insertClaimBuilderContext()` (inserts one `cbc_*` row). `/api/claims` POST writes context for new claims only (not existing/duplicate). `/api/truths` POST writes context for both new and repeated truths. `claim_builder_contexts` table is already live in production D1. Legacy D-127B/D-127D `initialEvidence` fallback untouched. No frontend payload change yet. No Review API/UI change yet. No deploy yet. Checks: syntax OK, 416/24/56 pass.
 **Read when:** reviewing write-path implementation or planning D-128D/E/F.
 
