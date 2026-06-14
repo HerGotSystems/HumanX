@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D127A_CLAIM_BUILDER_DESIGN_SPEC.md` ⭐ CURRENT — NEXT: D-127B
+### `D127B_CLAIM_BUILDER_CLIENT_PROTOTYPE.md` ⭐ CURRENT — NEXT: D-127C
+Client-only Claim Builder prototype. Replaces single-form `renderSubmit()` with a 3-step builder: Step 1 Raw Thought (raw text + why + scope + falsifier), Step 2 Make It Testable (flags, route advisory, editable draft, category/type), Step 3 Final Claim (summary card + submit). New functions: `claimBuilderFlags()` (11 patterns), `claimBuilderRoute()`, `claimBuilderDraft()` (light cleaner), `renderBuilderFlags()`, `submitBuilderClaim()` (posts to existing `/api/claims` with builder context in `initialEvidence`). State in `_bs` object. Truth route is advisory-only (no write in D-127B). CSS: 22 new rules for builder, steps, flags, original panel, route advisory, summary card. No backend/schema/D1/Wrangler/deploy changes. All 416 smoke + 24 static + 56 worker-route checks pass. Deploy required (frontend assets). Recommended next: D-127C Truth-route save.
+**Read when:** implementing or reviewing the Claim Builder or planning D-127C.
+
+### `D127A_CLAIM_BUILDER_DESIGN_SPEC.md` — DESIGN SPEC (see D-127B for implementation)
 Design/spec-only checkpoint for turning HumanX submission into a Claim Builder. Defines the three-step flow: Step 1 Raw Thought, Step 2 Make it Testable, Step 3 Final Claim. Accepts messy human text first; extends existing `claimQualityHints()` into builder flags; detects Claim vs Truth route; proposes future `claim_builder` object without schema changes; keeps Review-first publication; keeps RunPack later in Study mode; defines future Review card sections (CLAIM, ORIGINAL USER TEXT, WHY USER THINKS THIS, SCOPE, PRESSURE/FALSIFIER, SYSTEM FLAGS, DECISION) and later admin actions (Convert to Truth, Request Sharpening). **Docs/design only — no frontend/backend/schema/deploy changes.** Recommended next: D-127B client-only builder prototype.
 **Read when:** implementing or reviewing the Claim Builder direction.
 
