@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D121A_PRE_TESTER_LAUNCH_CHECKPOINT.md` ⭐ START HERE
-Newest consolidation checkpoint after the D-115→D-120 planning/checkpoint run. Records HumanX as a working public beta / early MVP, not a finished product; consolidates D-115A through D-120A; confirms D-116B, D-117B, and D-118B are not started; sets the safest next task as **D-117B — read-only normal-user QA browsing run**; preserves exact authorisation phrases and standing no-Wrangler/no-D1/no-admin-token/no-mutation rules.
-**Read when:** opening any new session — start here. Then read D-115A for product-readiness detail, D-116A for the D1 audit plan, D-117A for normal-user QA, D-118A for moderator/admin QA, D-119A for Belief Engine onboarding, and D-120A for abuse/rate-limit/account decisions.
+### `D124I_BELIEF_ENGINE_PRE_TESTER_READINESS_AUDIT.md` ⭐ BELIEF ENGINE CURRENT STATE
+Pre-tester readiness audit after D-124B–H upgrade chain. Verdict: **READY WITH NOTES**. All automated checks pass (24/24 static, syntax OK, 416/416 smoke). Privacy boundaries confirmed complete across all five surfaces. Saved-result paths deterministic after D-124G. One stale doc cell corrected (BELIEF_ENGINE_TEST_PLAN.md `engineVersion`). Remaining pre-invite items: manual mobile QA at 390px + 768px, production health check, Home card copy check, public claim visible, Review tab admin-gate.
+**Read when:** starting any Belief Engine session or planning tester invite. See `D123A_TESTER_LAUNCH_PACK.md` for the full pre-invite owner checklist.
+
+### `D121A_PRE_TESTER_LAUNCH_CHECKPOINT.md` ⭐ START HERE (overall product state)
+Consolidation checkpoint after the D-115→D-120 planning/checkpoint run. Records HumanX as a working public beta / early MVP, not a finished product; consolidates D-115A through D-120A; confirms D-116B, D-117B, and D-118B are not started; sets the safest next task as **D-117B — read-only normal-user QA browsing run**; preserves exact authorisation phrases and standing no-Wrangler/no-D1/no-admin-token/no-mutation rules. **Note:** for Belief Engine readiness specifically, D-124I supersedes this document.
+**Read when:** opening any new session — start here for overall product state. For Belief Engine state, read D-124I instead.
 
 ### `D115A_POST_POLISH_PRODUCT_READINESS_CHECKPOINT.md`
 Product-readiness checkpoint after the D-111→D-114 public/mobile UX polish increment. Freezes repo input `bf53c97`, deployed Worker `3fe7ab7f-b603-407b-b7b8-31111956a3ea`, and static baseline **416/24/56**. Verdict: HumanX is a working public beta / early MVP, not a finished product. Summarises beta-ready areas (public browsing, claim submission, evidence/pressure/tests, Truths, Review, mobile UX), launch blockers (post-D-114 journey proof, read-only D1/data-quality audit, abuse/rate-limit/account decisions, Belief Engine onboarding, docs checkpoint chain), do-not-regress rules, and the safest next priorities: D-116 read-only D1/data audit plan, D-117 normal-user journey QA, D-118 moderator/admin journey QA, D-119 Belief Engine onboarding pass, D-120 abuse/rate-limit/account audit.

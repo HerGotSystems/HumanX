@@ -2,12 +2,15 @@
 
 **Date:** 2026-06-13  
 **Amended:** 2026-06-13 (D-123B — canonical URL corrected; launch status updated to not-yet-inviting)  
+**Amended:** 2026-06-14 (D-124J — Belief Engine v2 upgrade complete; tester focus and pre-invite checklist updated)  
 **Canonical public URL:** https://humanx.rinkimirikata.com  
-**Worker origin (technical fallback only):** https://humanx.rinkimirikata.com  
+**Worker origin (technical fallback only):** https://humanx.veltrusky-michal.workers.dev  
 **Version:** Guarded internal beta — owner review only. External tester invites not yet issued.  
 **Mode:** DOCS ONLY — no mutation, no deploy, no admin token.
 
 > **Status note (D-123B):** This pack is drafted and ready but invites are not being sent yet. The canonical public URL has been corrected to `humanx.rinkimirikata.com`. The next phase is improvement work before external testers are invited. When ready, use this pack with the corrected URL below.
+
+> **Status note (D-124J):** Belief Engine v2 upgrade chain (D-124B–I) is complete. Verdict: READY WITH NOTES. The Belief Engine is ready for a first guarded tester session once the deploy-readiness pre-invite checklist below (section 10) is cleared. Do not invite testers before completing that checklist. Do not share the Worker origin URL with testers — use the canonical URL only.
 
 ---
 
@@ -102,6 +105,11 @@ Ask testers these specific questions:
 **Belief Engine**
 - Was it clear that the Belief Engine runs in your browser and nothing is sent unless you choose to?
 - Did "Send to HumanX" feel risky or ambiguous? What did you think it would do?
+- Did the result screen feel like a diagnosis or a map? Did any language feel like it was judging you?
+- If you came back after completing the quiz, did "View previous results" make sense? Did you understand what "Clear" would do?
+- Did "Start Over" make it obvious you'd be starting fresh (and losing the saved result)?
+- After reading the result, was it clear which parts of your written answers (timeline questions) stayed in your browser vs what might be sent?
+- Did the result scroll feel too long on the device you used? Which sections did you look at first?
 
 **General**
 - What's your one-line description of what HumanX does? (This tells you if the framing landed.)
@@ -131,6 +139,18 @@ Ask testers these specific questions:
 > Do not submit private information — medical, legal, financial, personal beliefs that could identify you, or information about other people. This is a public beta, not a private journal.
 >
 > The Belief Engine runs entirely in your browser. Your responses to the questions are not sent anywhere unless you explicitly click "Send to HumanX" at the end of the session.
+
+### What does "Send to HumanX" actually send?
+
+> If you click "Send to HumanX" at the end of the Belief Engine, here is what is and is not included:
+>
+> **Sent:** dimension scores, alignment patterns (which worldview traditions your answers resemble), contradiction summary, and moral-scenario responses (these are multiple-choice, not free-text).
+>
+> **Not sent:** anything you typed. The timeline free-text fields (childhood beliefs, fears, identity questions) stay in your browser only and are never included in the snapshot.
+>
+> **What it does:** saves a private snapshot to your HumanX session. It does not publish anything. You can see it in the Drift section of the main app. To turn it into a public Claim or Truth, you would need to do that explicitly — and it enters Review before becoming visible to anyone else.
+>
+> If you are not comfortable clicking "Send to HumanX", the Belief Engine is still fully functional without it. You can download a PNG of the result or copy a text summary — neither of those sends anything to HumanX.
 
 ---
 
@@ -192,22 +212,31 @@ Ask testers these specific questions:
 
 ## 10. Owner Checklist Before Inviting Testers
 
-> **Not yet inviting testers (as of D-123B).** Complete the next-upgrade phase first (see D-123B). Return to this checklist when improvement work is done.
+> **Not yet inviting testers (as of D-124J).** The Belief Engine v2 upgrade is complete (READY WITH NOTES — D-124I). Remaining blockers are the deploy-readiness items below. Complete all unchecked items before sending any invite.
 
 Work through this list before sending any invite:
 
-- [ ] Complete Belief Engine upgrade and onboarding improvement (D-123B next-upgrade phase)
-- [ ] Confirm https://humanx.rinkimirikata.com loads and shows "D1 live" (custom domain smoke check — not yet verified)
+**Belief Engine upgrade (D-124J)**
+- [x] Complete Belief Engine upgrade and onboarding improvement — D-124B through D-124I complete (result screen, privacy payload, intro controls, saved-result determinism, UX copy, pre-tester audit)
+
+**Deploy-readiness (verify live before inviting)**
+- [ ] Confirm https://humanx.rinkimirikata.com loads without error
 - [ ] Confirm `/api/health` returns `ok: true`, `mode: d1-live`
+- [ ] Manual mobile QA: open Belief Engine on a phone at 390px — confirm intro, quiz, and result screen all render without horizontal overflow or unreadable text
+- [ ] Manual tablet QA: open Belief Engine at 768px — confirm result screen layout is usable
 - [ ] Confirm Home page Belief Engine card reads "It helps separate personal certainty, inherited ideas, identity pressure, and what could change your mind."
 - [ ] Confirm Belief Engine intro reads "This is not a test you pass or fail."
+- [ ] Confirm "View previous results" block is hidden on a fresh browser (empty localStorage)
 - [ ] Confirm at least one public claim is visible in the Claims list
-- [ ] Confirm Review tab requires admin token (shows "admin required" / 403 — not a queue)
+- [ ] Confirm Review tab requires admin token (shows "admin required" / 403 — not a queue visible to testers)
 - [ ] Confirm you have working access to the Review queue via admin token (you will need it to moderate tester submissions)
-- [ ] Decide how many testers to invite (recommend 2–5 for first wave)
+
+**Invite logistics**
+- [ ] Decide how many testers to invite (recommend 1–3 for first wave — keep it small)
 - [ ] Decide how testers will send you feedback (email, DM, form — not via the site itself)
 - [ ] Brief testers on the warning not to submit private information (section 7 above)
-- [ ] Verify custom domain smoke at https://humanx.rinkimirikata.com (separate task — do not skip)
+- [ ] Brief testers that "Send to HumanX" is optional — section 6 has the exact wording
+- [ ] Do not share the Worker origin URL with testers — use https://humanx.rinkimirikata.com only
 - [ ] Do not post the URL publicly
 - [ ] Keep the tester list small until the first wave's feedback is reviewed
 
