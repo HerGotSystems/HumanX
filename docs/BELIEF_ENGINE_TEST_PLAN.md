@@ -127,7 +127,7 @@ The following bridge payload fields must not change their values:
 | Field | Current value | Used for |
 |---|---|---|
 | `source` | `'standalone-humanx-belief-engine'` | `isFullBeliefProfile` primary check |
-| `engineVersion` | `'humanx-belief-engine-v1.0-bridge'` | `isFullBeliefProfile` fallback check |
+| `engineVersion` | `'humanx-belief-engine-v2.0'` | `isFullBeliefProfile` fallback check (updated D-124C; check is `.includes('humanx-belief-engine')` so both v1 and v2 snapshots classify correctly) |
 | `label` | `'Belief Engine Profile — {topAlignment.name}'` | `isFullBeliefProfile` third check |
 
 If any of these values change, **all previously saved full profiles will be
