@@ -570,6 +570,8 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .builder-route{padding:8px 12px;border-radius:8px;font-size:12px;margin:10px 0;line-height:1.5}
 .builder-route-claim{background:rgba(57,255,159,.06);border:1px solid rgba(57,255,159,.2)}
 .builder-route-truth{background:rgba(255,200,0,.06);border:1px solid rgba(255,200,0,.2)}
+.builder-route-actions{margin:6px 0 10px}
+.builder-truth-note{color:var(--muted);font-style:italic;margin:6px 0 10px}
 .builder-summary{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:12px 0}
 .builder-summary-row{display:flex;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
 .builder-summary-row:last-child{border-bottom:none}

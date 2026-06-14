@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D127B_CLAIM_BUILDER_CLIENT_PROTOTYPE.md` ⭐ CURRENT — NEXT: D-127C
+### `D127C_BUILDER_TRUTH_ROUTE_SAVE.md` ⭐ CURRENT — NEXT: deploy D-126B+D-127B+D-127C
+Wires up the Truth route save in the Claim Builder. `submitBuilderTruth()` POSTs `_bs.raw` to the existing `/api/truths` endpoint (`review_state='review'` guaranteed). Step 2 truth-route note gains a real "Save as Truth for Review" button. Step 3 DECISION row is now route-aware: truth route shows both badge types plus explanatory copy and two action buttons; claim route unchanged. CSS: `.builder-route-actions` and `.builder-truth-note`. No backend/schema/D1/Wrangler/deploy changes. All 416 smoke + 24 static + 56 worker-route checks pass. Deploy required (frontend assets).
+**Read when:** reviewing the builder Truth route or planning the next deploy.
+
+### `D127B_CLAIM_BUILDER_CLIENT_PROTOTYPE.md` — MERGED (see D-127C for Truth route)
 Client-only Claim Builder prototype. Replaces single-form `renderSubmit()` with a 3-step builder: Step 1 Raw Thought (raw text + why + scope + falsifier), Step 2 Make It Testable (flags, route advisory, editable draft, category/type), Step 3 Final Claim (summary card + submit). New functions: `claimBuilderFlags()` (11 patterns), `claimBuilderRoute()`, `claimBuilderDraft()` (light cleaner), `renderBuilderFlags()`, `submitBuilderClaim()` (posts to existing `/api/claims` with builder context in `initialEvidence`). State in `_bs` object. Truth route is advisory-only (no write in D-127B). CSS: 22 new rules for builder, steps, flags, original panel, route advisory, summary card. No backend/schema/D1/Wrangler/deploy changes. All 416 smoke + 24 static + 56 worker-route checks pass. Deploy required (frontend assets). Recommended next: D-127C Truth-route save.
 **Read when:** implementing or reviewing the Claim Builder or planning D-127C.
 
