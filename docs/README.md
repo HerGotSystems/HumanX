@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D125F_PUBLIC_BROWSING_AUDIT.md` ⭐ CURRENT — CYCLE 5 COMPLETE. NEXT: D-125G
+### `D125G_MOBILE_LAYOUT_AUDIT.md` ⭐ CURRENT — D-125 CHAIN COMPLETE
+Mobile layout stress audit (Cycle 6). One CSS patch: `#radar-canvas` in Belief Engine `index.html` — added `max-width:100%;height:auto` to prevent 360px canvas overflowing 342px content width at 390px viewport. All other surfaces (nav tabs, card grids, review admin bar, study/vault/truths grids, RunPack actions) verified responsive at 390px and 768px. No stop conditions. Three non-blocking notes (constellation 2-col at 390px, quiz resp-dot tap size, `/api/health` vs `/api/graph-status` doc discrepancy). Verdict: **PATCHED**. Checks: 24/24 static, syntax OK, 416/416 smoke. **D-125 chain is complete. No D-125H needed.**
+**Read when:** checking D-125G mobile audit results or confirming D-125 chain status.
+
+### `D125F_PUBLIC_BROWSING_AUDIT.md` — CYCLE 5 COMPLETE
 Public content browsing audit (Cycle 5). No patches needed. All public-list routes filter `COALESCE(review_state,'public')='public'` (claims, truths, evidence). Belief snapshots scoped to `user_id`. "Public means visible, not proven" framing in truths page and both verdict-qualifier surfaces. Source links: `safeHttpUrl()` blocks non-http/https URLs; `rel="noopener noreferrer"` on valid links. Admin UI gated at both client (`!!adminToken()`) and server (`requireAdmin()`). RunPack blocked for non-public claims. Three non-blocking notes: `/api/health` vs `/api/graph-status` discrepancy in D-125A docs, reused evidence source label can be dense. Verdict: **PASS**. Checks: 24/24 static, syntax OK, 416/416 smoke.
 **Read when:** starting D-125G (mobile layout stress) or reviewing public browsing audit results.
 
