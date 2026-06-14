@@ -58,10 +58,16 @@ button,input,select{font:inherit}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(255,59,92,.5)}
 .intro-note{font-size:12px;color:var(--muted);margin-top:16px;font-style:italic}
 .existing-result{
-  margin-top:24px;padding:12px 24px;border:1px solid var(--line);border-radius:14px;
-  background:rgba(87,184,255,.05);cursor:pointer;font-size:13px;color:var(--blue);
+  margin-top:24px;padding:12px 18px 12px 24px;border:1px solid var(--line);border-radius:14px;
+  background:rgba(87,184,255,.05);font-size:13px;color:var(--blue);
+  display:flex;align-items:center;gap:12px;
 }
-.existing-result:hover{background:rgba(87,184,255,.1)}
+.existing-result:hover{background:rgba(87,184,255,.08)}
+.existing-main{cursor:pointer;text-align:left;flex:1}
+.existing-note{display:block;font-size:10px;color:rgba(87,184,255,.5);margin-top:3px;line-height:1.4}
+.existing-clear{border:1px solid rgba(255,59,92,.25);background:transparent;color:rgba(255,59,92,.55);
+  border-radius:8px;padding:5px 11px;cursor:pointer;font-size:11px;flex-shrink:0;transition:all .15s;white-space:nowrap}
+.existing-clear:hover{background:rgba(255,59,92,.1);color:var(--red);border-color:rgba(255,59,92,.5)}
 
 /* ── IDENTITY ── */
 .id-wrap{width:100%;max-width:680px;margin:0 auto;padding:32px 24px}
@@ -418,8 +424,12 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
   <button class="btn-primary" onclick="startQuiz()">Begin Mapping</button>
   <p class="intro-note">No correct answers. No religion assigned. No diagnosis. No score of your worth. ~10–12 minutes.<br/>You can use it privately, or later choose to send a snapshot into HumanX Review.<br/>
   <span style="color:rgba(87,184,255,.7)">Stored in this browser only. Nothing leaves your device unless you export it.</span></p>
-  <div id="existing-btn" class="existing-result hidden" onclick="showResults()">
-    ↩ View previous results
+  <div id="existing-btn" class="existing-result hidden">
+    <div class="existing-main" onclick="showResults()">
+      ↩ View previous results
+      <span class="existing-note">saved in this browser · includes any answers you typed · not synced</span>
+    </div>
+    <button class="existing-clear" onclick="clearSavedResults()">Clear</button>
   </div>
 </div>
 
@@ -1514,9 +1524,15 @@ function retake(){
   state.answers={};state.scores=null;state.alignments=null;state.contradictions=null;
   state.timeline={childBelief:'',teenChange:'',adultBelief:'',biggest:'',fearTrue:'',isolate:'',identity:''};
   localStorage.removeItem(getStorageKey());
+  localStorage.removeItem('humanx_belief'); // remove legacy pointer so intro button hides correctly
   state.phase='quiz';state.catIndex=0;
   render();
   scrollTopNow();
+}
+function clearSavedResults(){
+  ['humanx_belief','humanx_belief_main','humanx_belief_sandbox_latest','humanx_belief_anonymous_latest',
+   'humanx_belief_sandbox_runs','humanx_belief_anonymous_runs'].forEach(k=>localStorage.removeItem(k));
+  $id('existing-btn').classList.add('hidden');
 }
 function prevCat(){
   if(state.catIndex>0){state.catIndex--;render();}
