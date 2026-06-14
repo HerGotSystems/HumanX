@@ -51,13 +51,17 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D125D_DRIFT_SAVED_RESULTS_AUDIT.md` ⭐ CURRENT — CYCLE 3 COMPLETE. NEXT: D-125E
-Drift and saved-results audit (Cycle 3). One patch: drift verdict badge `cls(verdict)` → `b-yellow` — removed misleading green/red colouring on neutral change metrics ("pressure rising" was green, "stability falling" was red). Nine check areas: profile classification, delta framing, empty/single states, bridge/Drift distinction, saved-result controls, privacy boundaries, promote flows, mobile CSS, stop conditions. Verdict: **PATCHED**. Checks: 24/24 static, syntax OK, 416/416 smoke. No stop conditions triggered.
-**Read when:** starting D-125E (Claim submission + Review audit) or reviewing Drift audit results.
+### `D125E_CLAIM_REVIEW_AUDIT.md` ⭐ CURRENT — CYCLE 4 COMPLETE. NEXT: D-125F
+Claim submission and Review audit (Cycle 4). No patches needed. All checks pass: review-first clarity across 4 independent surfaces on submit, public/private boundary enforced at both client and worker (`review_state='review'` on insert, `COALESCE(review_state,'public')='public'` filter on GET), Review gate confirmed gated at client + server (`requireAdmin()`, constant-time token compare, 403 without token), approve/reject both two-step, "public/visible" language throughout (never "proven/verified"), rate-limit (8/hr/IP) and near-duplicate scan present. Two low-priority friction notes: rate-limit toast has no retry window; `CLAIM_TOO_SHORT` error shows raw error code. Verdict: **PASS**. Checks: 24/24 static, syntax OK, 416/416 smoke.
+**Read when:** starting D-125F (public content browsing audit) or reviewing submission/Review audit results.
+
+### `D125D_DRIFT_SAVED_RESULTS_AUDIT.md` — CYCLE 3 COMPLETE
+Drift and saved-results audit (Cycle 3). One patch: drift verdict badge `cls(verdict)` → `b-yellow`. Verdict: **PATCHED**. Checks: 24/24 static, syntax OK, 416/416 smoke. No stop conditions triggered.
+**Read when:** reviewing Drift audit results.
 
 ### `D125A_OWNER_TESTER_HARDENING_PLAN.md` — ACTIVE TESTING POSTURE
-Owner-as-tester product hardening plan. Replaces external tester assumption: owner runs six structured test cycles (Home/onboarding, Belief Engine full run, Drift/saved results, Claim submission + Review, public content browsing, mobile layout stress) against the live site, simulating six personas (fresh mobile anonymous, returning desktop, incognito no-token, hostile/spammy submitter, confused normal user, admin reviewer). Each cycle has PASS/FRICTION/BLOCKER grading. Backlog categories: clarity/copy, mobile layout, privacy/trust, Review/admin ergonomics, Drift usefulness, public content quality, abuse guardrails. Seven stop conditions defined. Cycles 1–3 complete (D-125B/C/D). Next: D-125E cycle 4 (Claim submission + Review audit).
-**Read when:** starting any owner-testing session or planning a new hardening task (D-125E through D-125G).
+Owner-as-tester product hardening plan. Six cycles, six personas. Cycles 1–4 complete (D-125B/C/D/E). Next: D-125F cycle 5 (public content browsing).
+**Read when:** starting any owner-testing session or planning a new hardening task (D-125F through D-125G).
 
 ### `D124N_FIRST_TESTER_INVITE_PACK.md` ⭐ SEND THIS TO TESTERS
 First guarded tester invite pack for Belief Engine v2. Contains: short and long invite messages (canonical URL only), tester instructions (BE flow, Send to HumanX, saved-results, Clear, Start Over, mobile), 10 feedback questions, owner rules (max 1–3 trusted testers, no admin token, no Worker URL), per-tester feedback capture template with severity guide, stop conditions (framing/privacy/mobile failures), and next-step trigger for D-124O triage. Invite max 1–3 trusted testers. Do not share link publicly.
