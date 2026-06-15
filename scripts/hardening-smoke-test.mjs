@@ -480,6 +480,7 @@ import path from 'node:path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+const cbcSrc = readFileSync(path.join(__dirname, '../src/claim-builder-contexts.js'), 'utf8');
 
 // Extract just the reviewCleanup function body for targeted checks.
 const cleanupMatch = workerSrc.match(/async function reviewCleanup[\s\S]*?\n(?=async function )/);
@@ -4143,6 +4144,82 @@ test('D-130B: no new review sub-route introduced by this patch', () => {
   assert.ok(
     unexpected.length === 0,
     `No unexpected /api/review/* routes should exist; found: ${unexpected.join(', ')}`
+  );
+});
+
+// ── Section 47 — D-130C: Claim Builder context field-name hardening ───────────
+
+console.log('\n47. D-130C: Claim Builder context field-name hardening');
+
+test('D-130C: cleanClaimBuilderContext accepts correct camelCase whyUserThinksThis (primary)', () => {
+  const idx = cbcSrc.indexOf('function cleanClaimBuilderContext(');
+  const end = cbcSrc.indexOf('\nexport function ', idx + 1);
+  const body = cbcSrc.slice(idx, end);
+  assert.ok(
+    body.includes('raw.whyUserThinksThis'),
+    'cleanClaimBuilderContext must accept correct camelCase whyUserThinksThis as primary fallback'
+  );
+});
+
+test('D-130C: cleanClaimBuilderContext retains legacy typo whyUserThinkThis (backward compat)', () => {
+  const idx = cbcSrc.indexOf('function cleanClaimBuilderContext(');
+  const end = cbcSrc.indexOf('\nexport function ', idx + 1);
+  const body = cbcSrc.slice(idx, end);
+  assert.ok(
+    body.includes('raw.whyUserThinkThis'),
+    'cleanClaimBuilderContext must retain legacy typo whyUserThinkThis fallback for backward compatibility'
+  );
+});
+
+test('D-130C: cleanClaimBuilderContext retains snake_case why_user_thinks_this fallback', () => {
+  const idx = cbcSrc.indexOf('function cleanClaimBuilderContext(');
+  const end = cbcSrc.indexOf('\nexport function ', idx + 1);
+  const body = cbcSrc.slice(idx, end);
+  assert.ok(
+    body.includes('raw.why_user_thinks_this'),
+    'cleanClaimBuilderContext must retain raw.why_user_thinks_this as a fallback'
+  );
+});
+
+test('D-130C: cleanClaimBuilderContext retains short why fallback (current frontend)', () => {
+  const idx = cbcSrc.indexOf('function cleanClaimBuilderContext(');
+  const end = cbcSrc.indexOf('\nexport function ', idx + 1);
+  const body = cbcSrc.slice(idx, end);
+  assert.ok(
+    body.includes('raw.why'),
+    'cleanClaimBuilderContext must retain raw.why as final fallback (current frontend sends this)'
+  );
+});
+
+test('D-130C: correct camelCase whyUserThinksThis appears before legacy typo in fallback chain', () => {
+  const idx = cbcSrc.indexOf('function cleanClaimBuilderContext(');
+  const end = cbcSrc.indexOf('\nexport function ', idx + 1);
+  const body = cbcSrc.slice(idx, end);
+  const correctPos = body.indexOf('raw.whyUserThinksThis');
+  const typoPos = body.indexOf('raw.whyUserThinkThis');
+  assert.ok(
+    correctPos < typoPos,
+    'whyUserThinksThis (correct) must appear before whyUserThinkThis (typo) in the fallback chain'
+  );
+});
+
+test('D-130C: cleanClaimBuilderContext has finalClaim compatibility comment', () => {
+  const idx = cbcSrc.indexOf('function cleanClaimBuilderContext(');
+  const end = cbcSrc.indexOf('\nexport function ', idx + 1);
+  const body = cbcSrc.slice(idx, end);
+  assert.ok(
+    body.includes('finalClaim') && (body.includes('alias') || body.includes('finalization') || body.includes('draftClaim')),
+    'cleanClaimBuilderContext must have a comment explaining finalClaim === draftClaim behaviour'
+  );
+});
+
+test('D-130C: mapClaimBuilderContext still returns correct whyUserThinksThis key', () => {
+  const idx = cbcSrc.indexOf('export function mapClaimBuilderContext(');
+  const end = cbcSrc.indexOf('\nexport ', idx + 1);
+  const body = cbcSrc.slice(idx, end);
+  assert.ok(
+    body.includes('whyUserThinksThis: row.why_user_thinks_this'),
+    'mapClaimBuilderContext must still map DB column why_user_thinks_this to camelCase whyUserThinksThis'
   );
 });
 
