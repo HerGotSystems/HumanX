@@ -120,10 +120,10 @@
 @media(max-width:600px){main{padding:6px;gap:5px}.tab{padding:5px 8px;font-size:10px}.brand strong{font-size:13px}}
 /* Review queue polish */
 .review-page{display:flex;flex-direction:column;gap:10px;padding-bottom:24px}
-.review-header{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86)}
+.review-header{padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86)}
 .review-header-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
 .review-header h2{margin:0;font-size:18px}
-.review-admin-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:10px 14px}
+.review-admin-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;padding:7px 12px}
 .review-header-left{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .review-admin-bar h2{margin:0;font-size:17px}
 .review-token-panel{padding:10px}
@@ -132,7 +132,7 @@
 .review-token-form button{flex-shrink:0;white-space:nowrap}
 /* Review state filter bar */
 .review-filter-bar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0 4px}
-.review-filter-chip{background:#0b0e16;border:1px solid var(--line);color:var(--muted);padding:6px 11px;border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:border-color .12s,color .12s}
+.review-filter-chip{background:#0b0e16;border:1px solid var(--line);color:var(--muted);padding:4px 9px;border-radius:999px;font-size:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:border-color .12s,color .12s}
 .review-filter-chip:hover{border-color:var(--blue);color:var(--text)}
 .review-filter-chip-active{border-color:var(--blue);color:var(--blue);background:rgba(87,184,255,.08)}
 .review-filter-count{background:rgba(87,184,255,.15);color:var(--blue);border-radius:999px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:.04em}
@@ -603,4 +603,10 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .rctx-bc-row b{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:2px}
 .rctx-bc-row p{font-size:10px;color:#c8d0e0;margin:0;line-height:1.35;word-break:break-word}
 .rctx-flags{display:flex;flex-wrap:wrap;gap:3px}
-.rctx-builder-missing{opacity:.5}
+.rctx-builder-missing{opacity:.5}.review-overview-strip{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:2px 0 5px}
+.rov-pill{font-size:10px;font-weight:600;padding:2px 7px;border-radius:999px;background:#0b0e18;border:1px solid var(--line);color:var(--muted)}
+.rov-pending{border-color:#ffd16640;color:#ffd166}
+.rov-pub{border-color:#39ff9f40;color:#39ff9f}
+.rov-rej{border-color:#ff3b5c40;color:#ff3b5c}
+.rov-pressure{border-color:#f0a83a40;color:#f0a83a}
+.rov-sep{width:1px;height:10px;background:var(--line);margin:0 2px}

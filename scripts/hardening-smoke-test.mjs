@@ -3954,6 +3954,144 @@ test('D-129E: D-129D compact inspector class still present', () => {
   );
 });
 
+// ── Section 45 — D-129F: Compact filter/status bar + queue overview ───────────
+
+console.log('\n45. D-129F: Compact review filter/status bar + queue overview');
+
+test('D-129F: renderReviewFilterBar adds review-filter-compact class to wrapper', () => {
+  const idx = appSrc.indexOf('function renderReviewFilterBar(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('review-filter-compact'),
+    'renderReviewFilterBar must add review-filter-compact marker class to wrapper div'
+  );
+});
+
+test('D-129F: renderReviewOverviewStrip function defined in app', () => {
+  assert.ok(
+    appSrc.includes('function renderReviewOverviewStrip('),
+    'renderReviewOverviewStrip must be defined in app-v10.js'
+  );
+});
+
+test('D-129F: renderReviewOverviewStrip emits review-overview-strip wrapper', () => {
+  const idx = appSrc.indexOf('function renderReviewOverviewStrip(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('review-overview-strip'),
+    'renderReviewOverviewStrip must output div with class review-overview-strip'
+  );
+});
+
+test('D-129F: renderReviewOverviewStrip derives pending/public/rejected counts client-side', () => {
+  const idx = appSrc.indexOf('function renderReviewOverviewStrip(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("review_state||i.reviewState") &&
+    body.includes("rov-pending") &&
+    body.includes("rov-pub") &&
+    body.includes("rov-rej"),
+    'renderReviewOverviewStrip must compute pending/public/rejected from review_state field with rov-* pill classes'
+  );
+});
+
+test('D-129F: renderReviewOverviewStrip shows type breakdown (claim/truth/evidence/pressure)', () => {
+  const idx = appSrc.indexOf('function renderReviewOverviewStrip(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("target_type||i.targetType") &&
+    body.includes("pressure"),
+    'renderReviewOverviewStrip must derive type breakdown from target_type field'
+  );
+});
+
+test('D-129F: renderReviewOverviewStrip does not fetch (no fetch call inside)', () => {
+  const idx = appSrc.indexOf('function renderReviewOverviewStrip(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    !body.includes('fetch(') && !body.includes('await '),
+    'renderReviewOverviewStrip must not make any backend fetch — counts derived client-side only'
+  );
+});
+
+test('D-129F: renderReviewList wires overview strip between filter bar and audit', () => {
+  const idx = appSrc.indexOf('function renderReviewList(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('renderReviewOverviewStrip(all)') &&
+    body.includes('bar+overview+audit'),
+    'renderReviewList must call renderReviewOverviewStrip and insert overview between bar and audit'
+  );
+});
+
+test('D-129F: existing review filter chips still rendered in filter bar', () => {
+  const idx = appSrc.indexOf('function renderReviewFilterBar(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('review-filter-chips') && body.includes("setReviewFilter("),
+    'renderReviewFilterBar must still output review-filter-chips and setReviewFilter calls'
+  );
+});
+
+test('D-129F: sort select still wired in filter bar', () => {
+  const idx = appSrc.indexOf('function renderReviewFilterBar(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('review-sort-select') && body.includes('setReviewSort(this.value)'),
+    'renderReviewFilterBar must still include sort select wired to setReviewSort'
+  );
+});
+
+test('D-129F: CSS defines review-overview-strip', () => {
+  assert.ok(cssSrc.includes('.review-overview-strip'), '.review-overview-strip must be defined in styles.css');
+});
+
+test('D-129F: CSS defines rov-pill for overview count pills', () => {
+  assert.ok(cssSrc.includes('.rov-pill'), '.rov-pill must be defined in styles.css');
+});
+
+test('D-129F: CSS defines rov-pending color class', () => {
+  assert.ok(cssSrc.includes('.rov-pending'), '.rov-pending color class must be defined in styles.css');
+});
+
+test('D-129F: D-129E review-card-compact still in reviewCard (not regressed)', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('review-card-compact'),
+    'D-129E review-card-compact class must still be present in reviewCard'
+  );
+});
+
+test('D-129F: D-129D review-inspect-compact still in renderReviewInspectPanel (not regressed)', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('review-inspect-compact'),
+    'D-129D review-inspect-compact class must still be present in renderReviewInspectPanel'
+  );
+});
+
+test('D-129F: D-129C renderReviewInspectContext still wired in renderReviewList (not regressed)', () => {
+  const idx = appSrc.indexOf('function renderReviewList(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('renderReviewInspectContext(inspectedReviewItem)'),
+    'D-129C right context panel swap must still be present in renderReviewList'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
