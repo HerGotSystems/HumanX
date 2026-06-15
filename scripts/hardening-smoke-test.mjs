@@ -3741,6 +3741,108 @@ test('D-129C: D-129B single action row preserved', () => {
   );
 });
 
+// ── Section 43 — D-129D: Compact review inspector density ────────────────────
+
+console.log('\n43. D-129D: Compact review inspector density');
+
+test('D-129D: renderReviewInspectPanel adds review-inspect-compact class to panel', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('review-inspect-compact'),
+    'renderReviewInspectPanel return template must include review-inspect-compact class'
+  );
+});
+
+test('D-129D: CSS defines review-inspect-compact', () => {
+  assert.ok(cssSrc.includes('.review-inspect-compact'), '.review-inspect-compact must be defined in styles.css');
+});
+
+test('D-129D: inspect fields grid uses compact minmax (≤150px)', () => {
+  assert.ok(
+    cssSrc.includes('minmax(140px') || cssSrc.includes('minmax(130px') || cssSrc.includes('minmax(120px'),
+    '.review-inspect-fields must use minmax ≤ 150px for denser column layout'
+  );
+});
+
+test('D-129D: inspect panel padding is compact (≤10px)', () => {
+  const panelRule = cssSrc.match(/\.review-inspect-panel\{[^}]+\}/);
+  assert.ok(
+    panelRule && (panelRule[0].includes('padding:10px') || panelRule[0].includes('padding:8px') || panelRule[0].includes('padding:9px')),
+    '.review-inspect-panel padding must be ≤ 10px for compact density'
+  );
+});
+
+test('D-129D: inspect field card padding is compact (≤7px)', () => {
+  const fieldRule = cssSrc.match(/\.review-inspect-field\{[^}]+\}/);
+  assert.ok(
+    fieldRule && (
+      fieldRule[0].includes('padding:5px') || fieldRule[0].includes('padding:4px') ||
+      fieldRule[0].includes('padding:6px 7px') || fieldRule[0].includes('padding:5px 7px')
+    ),
+    '.review-inspect-field padding must be compact (≤ 7px) for dense layout'
+  );
+});
+
+test('D-129D: builder context uses compact padding/margin (≤7px)', () => {
+  const rule = cssSrc.match(/\.review-builder-context\{[^}]+\}/);
+  assert.ok(
+    rule && (rule[0].includes('padding:7px') || rule[0].includes('padding:6px') || rule[0].includes('padding:5px')),
+    '.review-builder-context padding must be ≤ 7px'
+  );
+});
+
+test('D-129D: builder row p font-size is compact (≤10px)', () => {
+  const rule = cssSrc.match(/\.review-builder-row p\{[^}]+\}/);
+  assert.ok(
+    rule && (rule[0].includes('font-size:10px') || rule[0].includes('font-size:9px')),
+    '.review-builder-row p font-size must be ≤ 10px for compact density'
+  );
+});
+
+test('D-129D: inspect actions row still has Approve/Keep/Reject buttons wired', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('btn-approve review-inspect-approve') &&
+    body.includes('btn-keep') &&
+    body.includes('review-inspect-reject'),
+    'inspect panel action row must still contain Approve/Keep Pending/Reject controls after density pass'
+  );
+});
+
+test('D-129D: inspect metadata fields still include ID and State', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("fields.push(['ID'") && body.includes("fields.push(['State'"),
+    'inspect panel must still render ID and State metadata fields'
+  );
+});
+
+test('D-129D: D-129C right context panel still swaps on inspect open/close', () => {
+  const idx = appSrc.indexOf('function renderReviewList(');
+  const body = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    body.includes('renderReviewInspectContext(inspectedReviewItem)') &&
+    body.includes('helperText()'),
+    'D-129C context panel swap must remain after density pass'
+  );
+});
+
+test('D-129D: builder context rows use compact markup (rctx-bc-row or review-builder-row)', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('reviewBuilderContextHtml(item)'),
+    'inspect panel must still call reviewBuilderContextHtml for structured builder context'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
