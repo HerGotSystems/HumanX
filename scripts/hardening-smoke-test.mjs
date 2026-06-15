@@ -2293,10 +2293,14 @@ test('D-95B: inspectReviewItem scrollIntoView is guarded — only fires when pan
   );
 });
 
-test('D-95B: top-actions Approve in inspect panel has review-inspect-approve class', () => {
+test('D-95B: bottom-actions Approve in inspect panel has review-inspect-approve class', () => {
+  const start = appSrc.indexOf('function renderReviewInspectPanel');
+  const end = appSrc.indexOf('\nfunction ', start + 1);
+  const body = appSrc.slice(start, end);
+  const bottomIdx = body.indexOf('review-inspect-actions');
   assert.ok(
-    appSrc.includes('review-inspect-top-actions"><button class="btn-approve review-inspect-approve"'),
-    'top-actions Approve button must include review-inspect-approve class for visual consistency with bottom Approve'
+    bottomIdx !== -1 && body.slice(bottomIdx).includes('btn-approve review-inspect-approve'),
+    'bottom-actions Approve button must include review-inspect-approve class in review-inspect-actions div'
   );
 });
 
@@ -2381,15 +2385,14 @@ test('D-96B: reviewDecisionUI clears pendingApproveReviewId on success', () => {
   );
 });
 
-test('D-96B: inspect panel top-actions Approve still calls reviewDecisionUI directly', () => {
+test('D-96B: inspect panel action row Approve calls reviewDecisionUI directly', () => {
   const start = appSrc.indexOf('function renderReviewInspectPanel');
   const end = appSrc.indexOf('\nfunction ', start + 1);
   const body = appSrc.slice(start, end);
   assert.ok(
-    body.includes('review-inspect-top-actions') &&
     body.includes('btn-approve review-inspect-approve') &&
     body.includes("onclick=\"reviewDecisionUI('${esc(type)}','${esc(id)}','public')\">Approve"),
-    'inspect panel top-actions Approve must still call reviewDecisionUI directly — deliberate review path'
+    'inspect panel action row Approve must call reviewDecisionUI directly — deliberate review path'
   );
 });
 
@@ -3542,10 +3545,9 @@ test('D-129A: inspect panel still has its own Approve / Keep Pending / Reject co
   const idx = appSrc.indexOf('function renderReviewInspectPanel(');
   const body = appSrc.slice(idx, idx + 12000);
   assert.ok(
-    body.includes('review-inspect-top-actions') &&
     body.includes('review-inspect-actions') &&
     body.includes('btn-approve review-inspect-approve'),
-    'renderReviewInspectPanel must keep its own top and bottom decision controls'
+    'renderReviewInspectPanel must keep its bottom decision row with approve/keep/reject controls'
   );
 });
 
@@ -3556,6 +3558,72 @@ test('D-129A: existing review actions (Approve/Keep/Reject) still wired to revie
     appSrc.includes("'rejected'") &&
     appSrc.includes("'review'"),
     'reviewDecisionUI must still be wired for public/rejected/review decisions'
+  );
+});
+
+// ── Section 41 — D-129B: Review inspector action dedupe ──────────────────────
+
+console.log('\n41. D-129B: Review inspector action dedupe');
+
+test('D-129B: inspect panel has no top-actions duplicate row', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const body = appSrc.slice(idx, idx + 12000);
+  assert.ok(
+    !body.includes('review-inspect-top-actions'),
+    'renderReviewInspectPanel must not contain a review-inspect-top-actions row — top duplicate removed'
+  );
+});
+
+test('D-129B: inspect panel has exactly one review-inspect-actions row', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const body = appSrc.slice(idx, idx + 12000);
+  const first = body.indexOf('review-inspect-actions');
+  const second = body.indexOf('review-inspect-actions', first + 1);
+  assert.ok(first !== -1 && second === -1, 'renderReviewInspectPanel must have exactly one review-inspect-actions div');
+});
+
+test('D-129B: bottom action row has Approve, Keep Pending, Reject, and Mark Duplicate', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const body = appSrc.slice(idx, idx + 12000);
+  // The bottom row uses ${rejectSection}/${dupSection} template vars — verify those vars are defined
+  // and the action div includes approve + keep + the section vars
+  const actIdx = body.indexOf('review-inspect-actions');
+  const actSection = body.slice(actIdx, actIdx + 600);
+  assert.ok(
+    actSection.includes('btn-approve review-inspect-approve') &&
+    actSection.includes('btn-keep') &&
+    actSection.includes('${rejectSection}') &&
+    actSection.includes('${dupSection}'),
+    'bottom action row must contain Approve, Keep Pending, and ${rejectSection}/${dupSection} variables'
+  );
+});
+
+test('D-129B: Open Study View still present in bottom action row', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const body = appSrc.slice(idx, idx + 12000);
+  const actIdx = body.indexOf('review-inspect-actions');
+  const actSection = body.slice(actIdx, actIdx + 600);
+  assert.ok(
+    actSection.includes('${studyBtn}'),
+    'bottom action row must still include ${studyBtn} variable for Open Study View'
+  );
+});
+
+test('D-129B: non-inspected card action row (review-actions) still rendered for non-selected cards', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const body = appSrc.slice(idx, idx + 5400);
+  assert.ok(
+    body.includes('class="review-actions"'),
+    'reviewCard must still render .review-actions div for card-level actions'
+  );
+});
+
+test('D-129B: D-129A anchor scroll behavior preserved after dedupe', () => {
+  assert.ok(
+    appSrc.includes('function scrollToReviewAnchor(') &&
+    appSrc.includes('scrollToReviewAnchor(_anchorId)') &&
+    appSrc.includes('scrollToReviewAnchor(claimId)'),
+    'D-129A anchor scroll must remain intact after top-actions removal'
   );
 });
 
