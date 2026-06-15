@@ -4493,20 +4493,22 @@ test('D-134B: truth review query excludes public, archived, and rejected states'
   );
 });
 
-test('D-134B: truth review query requires linked claim to exist when linked_claim_id is set', () => {
+test('D-134B/C: truth review query guards against orphan linked_claim_id', () => {
   const idx = workerSrc.indexOf('async function reviewQueue(');
   const end = workerSrc.indexOf('\nasync function ', idx + 1);
   const body = workerSrc.slice(idx, end);
   const truthsStart = body.indexOf('const truths=');
   const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
   const truthsQ = body.slice(truthsStart, truthsEnd);
+  // D-134C uses LEFT JOIN + c.id IS NOT NULL instead of EXISTS
   assert.ok(
-    truthsQ.includes('linked_claim_id IS NULL') && truthsQ.includes('EXISTS'),
-    'truth review query must use EXISTS sub-select to verify linked claim is present when linked_claim_id is set'
+    (truthsQ.includes('linked_claim_id IS NULL') && truthsQ.includes('EXISTS')) ||
+    (truthsQ.includes('LEFT JOIN claims') && truthsQ.includes('c.id IS NOT NULL')),
+    'truth review query must guard against orphan linked_claim_id (via EXISTS or LEFT JOIN + IS NOT NULL)'
   );
 });
 
-test('D-134B: truth review linked-claim EXISTS check excludes archived and duplicate claims', () => {
+test('D-134B/C: truth review orphan guard does not use truths.claim_id (non-existent column)', () => {
   const idx = workerSrc.indexOf('async function reviewQueue(');
   const end = workerSrc.indexOf('\nasync function ', idx + 1);
   const body = workerSrc.slice(idx, end);
@@ -4514,8 +4516,8 @@ test('D-134B: truth review linked-claim EXISTS check excludes archived and dupli
   const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
   const truthsQ = body.slice(truthsStart, truthsEnd);
   assert.ok(
-    truthsQ.includes("NOT IN ('archived','duplicate')"),
-    'linked-claim EXISTS check must exclude archived and duplicate claim states'
+    !truthsQ.includes('t.claim_id') && !truthsQ.includes('truths.claim_id'),
+    'truth review query must not reference truths.claim_id — that column does not exist in production'
   );
 });
 
@@ -4571,6 +4573,104 @@ test('D-134B: no D1 migration added for this change', () => {
     !existsSync(path.join(__dirname, '../migrations/0010_orphan_truths.sql')) &&
     !existsSync(path.join(__dirname, '../migrations/0010_d134b.sql')),
     'D-134B must not require a D1 migration'
+  );
+});
+
+// ── Section 52 — D-134C: truth review open-study path fix ────────────────────
+
+test('D-134C: truth review query uses LEFT JOIN to get linked_claim_review_state', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const truthsStart = body.indexOf('const truths=');
+  const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
+  const truthsQ = body.slice(truthsStart, truthsEnd);
+  assert.ok(
+    truthsQ.includes('LEFT JOIN claims c ON c.id=t.linked_claim_id') &&
+    truthsQ.includes('linked_claim_review_state'),
+    'truth review query must LEFT JOIN claims and expose linked_claim_review_state'
+  );
+});
+
+test('D-134C: truth review query hard-excludes truths with completely missing linked claim', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const truthsStart = body.indexOf('const truths=');
+  const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
+  const truthsQ = body.slice(truthsStart, truthsEnd);
+  assert.ok(
+    truthsQ.includes('t.linked_claim_id IS NULL') && truthsQ.includes('c.id IS NOT NULL'),
+    'truth review query must exclude truths whose linked_claim_id has no matching claim row'
+  );
+});
+
+test('D-134C: truth review query does not reference non-existent truths.claim_id column', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const truthsStart = body.indexOf('const truths=');
+  const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
+  const truthsQ = body.slice(truthsStart, truthsEnd);
+  assert.ok(
+    !truthsQ.includes('t.claim_id') && !truthsQ.includes('truths.claim_id'),
+    'truth review query must not reference truths.claim_id — column does not exist in production schema'
+  );
+});
+
+test('D-134C: inspect panel Linked Claim button gated on linked_claim_review_state===public', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('linked_claim_review_state') && body.includes("==='public'"),
+    'renderReviewInspectPanel must gate Linked Claim button on linked_claim_review_state===public'
+  );
+});
+
+test('D-134C: Study Linked Claim action button gated on linked_claim_review_state===public', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  // studyBtn for truths must check linked_claim_review_state before rendering Study Linked Claim
+  const studyBtnIdx = body.indexOf('Study Linked Claim');
+  const studyBtnCtx = body.slice(Math.max(0, studyBtnIdx - 200), studyBtnIdx + 50);
+  assert.ok(
+    studyBtnCtx.includes('linked_claim_review_state'),
+    'Study Linked Claim button must be conditional on linked_claim_review_state'
+  );
+});
+
+test('D-134C: standalone truths (linked_claim_id IS NULL) still appear in review queue', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const truthsStart = body.indexOf('const truths=');
+  const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
+  const truthsQ = body.slice(truthsStart, truthsEnd);
+  assert.ok(
+    truthsQ.includes('t.linked_claim_id IS NULL'),
+    'standalone truths (linked_claim_id IS NULL) must remain eligible for review'
+  );
+});
+
+test('D-134C: truth approve/reject actions still available regardless of linked claim state', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  // The approve/reject buttons use reviewDecisionUI with type and id — not gated on linked claim
+  assert.ok(
+    body.includes("reviewDecisionUI('${esc(type)}','${esc(id)}','public')") ||
+    body.includes('reviewDecisionUI(') ,
+    'truth approve/reject actions must be present in inspect panel regardless of linked claim state'
+  );
+});
+
+test('D-134C: no D1 migration added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0010_d134c.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0010_truth_review.sql')),
+    'D-134C must not require a D1 migration'
   );
 });
 
