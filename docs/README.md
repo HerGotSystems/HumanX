@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D130E_REVIEW_PATH_HARDENING_CHECKPOINT.md` ⭐ CURRENT — D-130 HARDENING COMPLETE — NEXT: Owner smoke + `wrangler deploy`
+### `D131A_OWNER_SMOKE_POST_D130.md` ⭐ CURRENT — DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
+Owner confirmed production good after D-130 deploy. Admin Review, structured builder context, approve/keep/reject/mark-duplicate, queue anchor, public pages — all pass. Baseline: 498/24/56.
+**Read when:** starting new feature work or returning after time away.
+
+### `D130E_REVIEW_PATH_HARDENING_CHECKPOINT.md` — D-130 HARDENING BASELINE
 D-130A–D review-path hardening chain. Audit (no FAILs), review queue cap comment+tests, builder context `whyUserThinksThis` typo fix (backward-safe), review escaping regression tests. No schema/route/layout changes. Checks: syntax OK, 498/24/56 pass.
-**Read when:** about to deploy D-130 changes or reviewing hardening baseline.
+**Read when:** reviewing D-130 hardening history or test baseline.
 
 ### `D129G_ADMIN_REVIEW_ERGONOMICS_CHECKPOINT.md` — D-129 CHAIN COMPLETE (superseded by D-130E for current deploy)
 D-129A–F Admin Review ergonomics chain merged. Anchor-after-moderation, deduplicated inspector action row, item-specific right context panel, compact inspector density, compact queue cards (ev/ts/sv scores, builder chip), always-visible filter overview strip. Frontend only — no backend/schema/D1 changes. Checks: syntax OK, 479/24/56 pass.
