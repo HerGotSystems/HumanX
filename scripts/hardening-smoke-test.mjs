@@ -4223,6 +4223,80 @@ test('D-130C: mapClaimBuilderContext still returns correct whyUserThinksThis key
   );
 });
 
+// ── Section 48 — D-130D: Review-path escaping regression coverage ─────────────
+
+console.log('\n48. D-130D: Review-path escaping regression');
+
+test('D-130D: resolveSimilarUI escapes near_duplicate_of before modal insertion', () => {
+  const idx = appSrc.indexOf('function resolveSimilarUI(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('esc(nearDup)'),
+    'resolveSimilarUI must wrap nearDup in esc() before inserting into modal HTML'
+  );
+});
+
+test('D-130D: resolveSimilarUI never inserts raw nearDup into template literal', () => {
+  const idx = appSrc.indexOf('function resolveSimilarUI(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    !body.includes('${nearDup}'),
+    'resolveSimilarUI must not interpolate nearDup directly — only esc(nearDup) is permitted'
+  );
+});
+
+test('D-130D: renderReviewInspectContext row labels and values go through esc()', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectContext(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('esc(k)') && body.includes('esc(v)'),
+    'renderReviewInspectContext rowsHtml must escape both key (k) and value (v) via esc()'
+  );
+});
+
+test('D-130D: renderReviewInspectContext builder flags cast to string and escaped', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectContext(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('esc(String(f))'),
+    'renderReviewInspectContext must cast each flag to String and escape it'
+  );
+});
+
+test('D-130D: reviewCard escapes latest_report_reason before HTML insertion', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('esc(item.latest_report_reason)'),
+    'reviewCard must escape item.latest_report_reason via esc() before inserting into HTML'
+  );
+});
+
+test('D-130D: reviewCard never inserts raw latest_report_reason into template literal', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    !body.includes('${item.latest_report_reason}'),
+    'reviewCard must not interpolate item.latest_report_reason directly — must use esc()'
+  );
+});
+
+test('D-130D: renderReviewInspectContext builder rawText is truncated then escaped', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectContext(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('esc(trunc(sc.rawText') || body.includes('esc(trunc(ctx.original'),
+    'renderReviewInspectContext must truncate then escape builder rawText/original before insertion'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
