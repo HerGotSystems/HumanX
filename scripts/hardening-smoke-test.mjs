@@ -4419,6 +4419,65 @@ test('D-132A: initReviewKb contains no fetch() calls', () => {
   assert.ok(!body.includes('fetch('), 'initReviewKb must not make any fetch() calls — decision routing via reviewDecisionUI only');
 });
 
+// ── Section 50 — D-134A: rejected excluded from active review queue ───────────
+
+test('D-134A: reviewQueue claims query excludes archived, duplicate, and rejected', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes("NOT IN ('archived','duplicate','rejected')"),
+    "reviewQueue claims query must exclude 'rejected' alongside 'archived' and 'duplicate'"
+  );
+});
+
+test('D-134A: reviewQueue claims query does not use old two-item exclusion for claims', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    !body.includes("NOT IN ('archived','duplicate') AND (COALESCE(c.review_state"),
+    "reviewQueue claims query must not use the old two-item NOT IN list for claims"
+  );
+});
+
+test('D-134A: reject decision still sets review_state to rejected', () => {
+  const idx = workerSrc.indexOf('async function reviewDecision(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes("'rejected'"),
+    'reviewDecision must still be able to set review_state to rejected'
+  );
+});
+
+test('D-134A: reviewCleanup still requires rejected state before archive', () => {
+  const idx = workerSrc.indexOf('async function reviewCleanup(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes("CLEANUP_REQUIRES_REJECTED") || body.includes("!=='rejected'"),
+    'reviewCleanup must still gate on review_state===rejected before allowing archive'
+  );
+});
+
+test('D-134A: no D1 migration file added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0010_rejected_queue.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0010_d134a.sql')),
+    'D-134A must not require a D1 migration'
+  );
+});
+
+test('D-134A: no new API route added for rejected queue', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  assert.ok(idx > -1, 'reviewQueue function must still exist');
+  assert.ok(
+    !workerSrc.includes("'/api/review/rejected'"),
+    'D-134A must not add a new /api/review/rejected route'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
