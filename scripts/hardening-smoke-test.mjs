@@ -3627,6 +3627,120 @@ test('D-129B: D-129A anchor scroll behavior preserved after dedupe', () => {
   );
 });
 
+// ── Section 42 — D-129C: Useful review context panel ─────────────────────────
+
+console.log('\n42. D-129C: Useful review context panel');
+
+test('D-129C: renderReviewInspectContext function is defined', () => {
+  assert.ok(
+    appSrc.includes('function renderReviewInspectContext('),
+    'renderReviewInspectContext must be defined'
+  );
+});
+
+test('D-129C: renderReviewList updates #casefile with inspect context when item is open', () => {
+  const idx = appSrc.indexOf('function renderReviewList(');
+  const body = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    body.includes('casefile') &&
+    body.includes('renderReviewInspectContext(inspectedReviewItem)') &&
+    body.includes('helperText()'),
+    'renderReviewList must swap #casefile between renderReviewInspectContext and helperText based on inspectedReviewItem'
+  );
+});
+
+test('D-129C: renderReviewList falls back to helperText when no item inspected', () => {
+  const idx = appSrc.indexOf('function renderReviewList(');
+  const body = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    body.includes('inspectedReviewItem?renderReviewInspectContext(inspectedReviewItem):helperText()'),
+    'renderReviewList must use ternary: inspectedReviewItem ? renderReviewInspectContext : helperText'
+  );
+});
+
+test('D-129C: renderReviewInspectContext renders item type, state, and title', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectContext(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('rctx-head') &&
+    body.includes('rctx-title') &&
+    body.includes('displayTitle'),
+    'renderReviewInspectContext must render type/state badges (rctx-head) and title (rctx-title)'
+  );
+});
+
+test('D-129C: renderReviewInspectContext renders evidence/testability/survivability scores for claims', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectContext(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('evidence_score') && body.includes('evidenceScore') &&
+    body.includes('testability') && body.includes('survivability'),
+    'renderReviewInspectContext must include evidence/testability/survivability score fields'
+  );
+});
+
+test('D-129C: renderReviewInspectContext renders structured builder context with rctx-builder class', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectContext(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('rctx-builder') &&
+    body.includes('structured') &&
+    body.includes('legacy') &&
+    body.includes('no builder context'),
+    'renderReviewInspectContext must handle structured/legacy/missing builder context states'
+  );
+});
+
+test('D-129C: renderReviewInspectContext truncates long text fields', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectContext(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('trunc(') && body.includes('…'),
+    'renderReviewInspectContext must truncate long text fields to keep panel compact'
+  );
+});
+
+test('D-129C: renderReviewInspectContext does not contain action buttons', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectContext(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    !body.includes('btn-approve') && !body.includes('btn-reject') && !body.includes('btn-keep') &&
+    !body.includes('reviewDecisionUI'),
+    'renderReviewInspectContext must not contain any moderation action buttons or reviewDecisionUI calls'
+  );
+});
+
+test('D-129C: rctx-panel CSS class defined in styles.css', () => {
+  assert.ok(cssSrc.includes('.rctx-panel'), '.rctx-panel must be defined in styles.css');
+});
+
+test('D-129C: rctx-builder CSS class defined in styles.css', () => {
+  assert.ok(cssSrc.includes('.rctx-builder'), '.rctx-builder must be defined in styles.css');
+});
+
+test('D-129C: D-129A anchor scroll preserved after context panel addition', () => {
+  assert.ok(
+    appSrc.includes('scrollToReviewAnchor(_anchorId)') &&
+    appSrc.includes('scrollToReviewAnchor(claimId)'),
+    'D-129A anchor scrolls must remain intact'
+  );
+});
+
+test('D-129C: D-129B single action row preserved', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const body = appSrc.slice(idx, idx + 12000);
+  assert.ok(
+    !body.includes('review-inspect-top-actions') &&
+    body.includes('review-inspect-actions'),
+    'D-129B single bottom action row must remain — no top-actions re-introduced'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

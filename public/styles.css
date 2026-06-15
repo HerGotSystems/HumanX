@@ -587,3 +587,17 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .review-builder-row p{margin:0;color:#c8d0e0;font-size:11px;line-height:1.45}
 .review-builder-flags{display:flex;gap:5px;flex-wrap:wrap}
 .review-builder-source-badge{font-size:9px;letter-spacing:.06em;padding:1px 5px;border-radius:4px;margin-left:auto}
+.rctx-panel{padding:0}
+.rctx-head{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.rctx-title{font-size:11px;color:var(--text);line-height:1.35;margin:0 0 8px;word-break:break-word}
+.rctx-rows{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.rctx-row{display:flex;justify-content:space-between;gap:6px;font-size:10px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.rctx-label{color:var(--muted);white-space:nowrap}
+.rctx-val{color:var(--text);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%}
+.rctx-builder{background:#080b12;border:1px solid var(--line);border-radius:8px;padding:7px;margin-top:4px}
+.rctx-builder-head{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
+.rctx-bc-row{margin-bottom:5px}
+.rctx-bc-row b{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:2px}
+.rctx-bc-row p{font-size:10px;color:#c8d0e0;margin:0;line-height:1.35;word-break:break-word}
+.rctx-flags{display:flex;flex-wrap:wrap;gap:3px}
+.rctx-builder-missing{opacity:.5}
