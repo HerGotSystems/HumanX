@@ -3478,6 +3478,87 @@ test('D-114B: no backend/D1/wrangler/deploy references added in renderTruths', (
   );
 });
 
+// ── Section 40 — D-129A: Review moderation anchor ergonomics ─────────────────
+
+console.log('\n40. D-129A: Review moderation anchor ergonomics');
+
+test('D-129A: scrollToReviewAnchor is defined and assigned to window', () => {
+  assert.ok(
+    appSrc.includes('function scrollToReviewAnchor(') &&
+    appSrc.includes('window.scrollToReviewAnchor=scrollToReviewAnchor'),
+    'scrollToReviewAnchor must be defined and exposed on window'
+  );
+});
+
+test('D-129A: scrollToReviewAnchor falls back through inspect-panel → card-by-id → first card', () => {
+  const body = appSrc.slice(appSrc.indexOf('function scrollToReviewAnchor('));
+  const fn = body.slice(0, body.indexOf('\n') || 500);
+  assert.ok(
+    fn.includes('.review-inspect-panel') &&
+    fn.includes('data-review-id') &&
+    fn.includes('.review-card'),
+    'scrollToReviewAnchor must try inspect-panel, then data-review-id card, then first .review-card'
+  );
+});
+
+test('D-129A: reviewDecisionUI captures anchor id before action and scrolls after render', () => {
+  const idx = appSrc.indexOf('async function reviewDecisionUI(');
+  const body = appSrc.slice(idx, idx + 1000);
+  assert.ok(
+    body.includes('_anchorId=inspectedReviewItem') &&
+    body.includes('scrollToReviewAnchor(_anchorId)'),
+    'reviewDecisionUI must capture anchor before action and call scrollToReviewAnchor after renderReviewList'
+  );
+});
+
+test('D-129A: markDuplicateUI scrolls to anchor after renderReviewList', () => {
+  const idx = appSrc.indexOf('async function markDuplicateUI(');
+  const body = appSrc.slice(idx, idx + 1600);
+  assert.ok(
+    body.includes('scrollToReviewAnchor(claimId)'),
+    'markDuplicateUI onConfirm must call scrollToReviewAnchor(claimId) after renderReviewList'
+  );
+});
+
+test('D-129A: reviewCard adds data-review-id attribute to article element', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const body = appSrc.slice(idx, idx + 5400);
+  assert.ok(
+    body.includes('data-review-id="${esc(id)}"'),
+    'reviewCard must set data-review-id on article for anchor lookup'
+  );
+});
+
+test('D-129A: inspected card suppresses duplicate Approve/Keep/Reject — only shows Inspect toggle', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const body = appSrc.slice(idx, idx + 5400);
+  assert.ok(
+    body.includes('isSelected?\'\':`${approveBtn}'),
+    'reviewCard must omit primary action buttons when card is selected/inspected (isSelected suppresses them)'
+  );
+});
+
+test('D-129A: inspect panel still has its own Approve / Keep Pending / Reject controls', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const body = appSrc.slice(idx, idx + 12000);
+  assert.ok(
+    body.includes('review-inspect-top-actions') &&
+    body.includes('review-inspect-actions') &&
+    body.includes('btn-approve review-inspect-approve'),
+    'renderReviewInspectPanel must keep its own top and bottom decision controls'
+  );
+});
+
+test('D-129A: existing review actions (Approve/Keep/Reject) still wired to reviewDecisionUI', () => {
+  assert.ok(
+    appSrc.includes("onclick=\"reviewDecisionUI(") &&
+    appSrc.includes("'public'") &&
+    appSrc.includes("'rejected'") &&
+    appSrc.includes("'review'"),
+    'reviewDecisionUI must still be wired for public/rejected/review decisions'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
