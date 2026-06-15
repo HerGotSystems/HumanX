@@ -4297,6 +4297,128 @@ test('D-130D: renderReviewInspectContext builder rawText is truncated then escap
   );
 });
 
+// ── Section 49 — D-132A: keyboard shortcuts ───────────────────────────────────
+
+test('D-132A: initReviewKb function defined in app', () => {
+  assert.ok(appSrc.includes('function initReviewKb('), 'initReviewKb must be defined');
+});
+
+test('D-132A: _reviewKbBound guard prevents double-bind', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(body.includes('_reviewKbBound'), '_reviewKbBound guard must be present in initReviewKb');
+});
+
+test('D-132A: mode===review gate fires before any action', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(body.includes("mode!=='review'"), "initReviewKb handler must gate on mode!=='review'");
+});
+
+test('D-132A: modal-open guard prevents action when hx-modal present', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(body.includes("getElementById('hx-modal')"), 'initReviewKb must check for open hx-modal');
+});
+
+test('D-132A: input-focused guard skips handler when INPUT/TEXTAREA/SELECT focused', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('isContentEditable') && body.includes("tagName==='INPUT'"),
+    'initReviewKb must skip when active element is INPUT/TEXTAREA/SELECT/contentEditable'
+  );
+});
+
+test('D-132A: _reviewKbInFlight guard prevents re-entrant key handling', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(body.includes('_reviewKbInFlight'), '_reviewKbInFlight must be used in initReviewKb handler');
+});
+
+test('D-132A: a key maps to public via reviewDecisionUI', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("key==='a'") && body.includes("'public'"),
+    "initReviewKb must map 'a' to decision 'public'"
+  );
+});
+
+test('D-132A: k key maps to review (keep pending) via reviewDecisionUI', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("key==='k'") && body.includes("'review'"),
+    "initReviewKb must map 'k' to decision 'review'"
+  );
+});
+
+test('D-132A: r key maps to rejected via reviewDecisionUI', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("key==='r'") && body.includes("'rejected'"),
+    "initReviewKb must map 'r' to decision 'rejected'"
+  );
+});
+
+test('D-132A: ] and ArrowRight advance to next item', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("key===']'") && body.includes("key==='ArrowRight'"),
+    "initReviewKb must handle ']' and 'ArrowRight' for next navigation"
+  );
+});
+
+test('D-132A: [ and ArrowLeft go to previous item', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("key==='['") && body.includes("key==='ArrowLeft'"),
+    "initReviewKb must handle '[' and 'ArrowLeft' for prev navigation"
+  );
+});
+
+test('D-132A: Escape closes inspect panel via inspectReviewItem', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("key==='Escape'") && body.includes('inspectReviewItem'),
+    "initReviewKb must call inspectReviewItem on Escape"
+  );
+});
+
+test('D-132A: KB hint rendered in renderReviewInspectPanel', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(body.includes('review-kb-hint'), 'renderReviewInspectPanel must include review-kb-hint element');
+});
+
+test('D-132A: .review-kb-hint style defined in CSS', () => {
+  assert.ok(cssSrc.includes('.review-kb-hint'), '.review-kb-hint must be styled in styles.css');
+});
+
+test('D-132A: initReviewKb contains no fetch() calls', () => {
+  const idx = appSrc.indexOf('function initReviewKb(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(!body.includes('fetch('), 'initReviewKb must not make any fetch() calls — decision routing via reviewDecisionUI only');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
