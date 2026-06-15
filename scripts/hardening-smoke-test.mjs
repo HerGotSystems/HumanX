@@ -4478,6 +4478,102 @@ test('D-134A: no new API route added for rejected queue', () => {
   );
 });
 
+// ── Section 51 — D-134B: orphan truths excluded from active review queue ──────
+
+test('D-134B: truth review query excludes public, archived, and rejected states', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const truthsStart = body.indexOf('const truths=');
+  const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
+  const truthsQ = body.slice(truthsStart, truthsEnd);
+  assert.ok(
+    truthsQ.includes("NOT IN ('public','archived','rejected')"),
+    "truth review query must exclude 'rejected' alongside 'public' and 'archived'"
+  );
+});
+
+test('D-134B: truth review query requires linked claim to exist when linked_claim_id is set', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const truthsStart = body.indexOf('const truths=');
+  const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
+  const truthsQ = body.slice(truthsStart, truthsEnd);
+  assert.ok(
+    truthsQ.includes('linked_claim_id IS NULL') && truthsQ.includes('EXISTS'),
+    'truth review query must use EXISTS sub-select to verify linked claim is present when linked_claim_id is set'
+  );
+});
+
+test('D-134B: truth review linked-claim EXISTS check excludes archived and duplicate claims', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const truthsStart = body.indexOf('const truths=');
+  const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
+  const truthsQ = body.slice(truthsStart, truthsEnd);
+  assert.ok(
+    truthsQ.includes("NOT IN ('archived','duplicate')"),
+    'linked-claim EXISTS check must exclude archived and duplicate claim states'
+  );
+});
+
+test('D-134B: standalone truths (linked_claim_id IS NULL) are still included in review queue', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const truthsStart = body.indexOf('const truths=');
+  const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
+  const truthsQ = body.slice(truthsStart, truthsEnd);
+  assert.ok(
+    truthsQ.includes('linked_claim_id IS NULL'),
+    'truths with no linked claim (linked_claim_id IS NULL) must still be eligible for review'
+  );
+});
+
+test('D-134B: no mutation of truth rows introduced — only SELECT changed', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const truthsStart = body.indexOf('const truths=');
+  const truthsEnd = body.indexOf('const evidenceItems=', truthsStart);
+  const truthsQ = body.slice(truthsStart, truthsEnd);
+  assert.ok(
+    !truthsQ.includes('UPDATE truths') && !truthsQ.includes('DELETE FROM truths'),
+    'reviewQueue must not mutate truth rows — read-only SELECT only'
+  );
+});
+
+test('D-134B: claims review query still present and unchanged from D-134A', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes("NOT IN ('archived','duplicate','rejected')") &&
+    body.includes("COALESCE(c.review_state,'public')!='public'"),
+    'claims review query must still be present with D-134A rejected exclusion'
+  );
+});
+
+test('D-134B: evidence and pressure review queries still present', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes('const evidenceItems=') && body.includes('const pressureItems='),
+    'evidence and pressure review queries must still be present in reviewQueue'
+  );
+});
+
+test('D-134B: no D1 migration added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0010_orphan_truths.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0010_d134b.sql')),
+    'D-134B must not require a D1 migration'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
