@@ -4092,6 +4092,60 @@ test('D-129F: D-129C renderReviewInspectContext still wired in renderReviewList 
   );
 });
 
+// ── Section 46 — D-130B: Review queue cap behaviour documentation ─────────────
+
+console.log('\n46. D-130B: Review queue cap behaviour');
+
+test('D-130B: reviewQueue combines up to 400 rows then slices to 100', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes('.slice(0,100)'),
+    'reviewQueue must still apply .slice(0,100) on the combined review array'
+  );
+});
+
+test('D-130B: reviewQueue has inline comment explaining the cap/sort/slice behaviour', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes('individually capped') && body.includes('sliced to 100'),
+    'reviewQueue must have a comment explaining per-source cap and combined slice-to-100'
+  );
+});
+
+test('D-130B: reviewQueue comment documents evidence created_at fallback', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes('created_at') && body.includes('evidence') && body.includes('updated_at'),
+    'reviewQueue comment must mention evidence/created_at fallback for the sort'
+  );
+});
+
+test('D-130B: combined review sort still uses updated_at||created_at fallback', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes('b.updated_at||b.created_at') || body.includes('updated_at||b.created_at'),
+    'reviewQueue combined sort must still fall back from updated_at to created_at'
+  );
+});
+
+test('D-130B: no new review sub-route introduced by this patch', () => {
+  const reviewRoutes = [...workerSrc.matchAll(/pathname === '\/api\/review\/([^']+)'/g)].map(m => m[1]);
+  const expected = ['decision', 'cleanup', 'mark-duplicate', 'resolve-similar'];
+  const unexpected = reviewRoutes.filter(r => !expected.includes(r));
+  assert.ok(
+    unexpected.length === 0,
+    `No unexpected /api/review/* routes should exist; found: ${unexpected.join(', ')}`
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
