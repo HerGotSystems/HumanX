@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `416 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `479 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `56 passed, 0 failed (56 hard checks)` |
 
@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D128H_DEPLOY_CHECKLIST.md` ⭐ CURRENT — DEPLOY CHECKLIST READY — NEXT: Owner runs `wrangler deploy`
+### `D129G_ADMIN_REVIEW_ERGONOMICS_CHECKPOINT.md` ⭐ CURRENT — D-129 CHAIN COMPLETE — NEXT: Owner smoke + `wrangler deploy`
+D-129A–F Admin Review ergonomics chain merged. Anchor-after-moderation, deduplicated inspector action row, item-specific right context panel, compact inspector density, compact queue cards (ev/ts/sv scores, builder chip), always-visible filter overview strip. Frontend only — no backend/schema/D1 changes. Checks: syntax OK, 479/24/56 pass.
+**Read when:** about to deploy D-129 changes or reviewing Admin Review UX state.
+
+### `D128H_DEPLOY_CHECKLIST.md` — DEPLOY CHECKLIST (superseded by D-129G for current deploy)
 Pre-deploy verification passed at `49571ac`. All 4 static checks green. D-128C/D/E/F chain confirmed merged. Checklist doc includes D1 state checks, deploy command, and 7-step owner smoke procedure. No runtime change in this task.
-**Read when:** about to deploy or reviewing deploy status.
+**Read when:** reviewing D-128 deploy history or D1 migration state.
 
 ### `D128F_REVIEW_UI_STRUCTURED_BUILDER_CONTEXT.md` — MERGED — REVIEW UI STRUCTURED-FIRST DISPLAY
 Review inspect panel now prefers `item.claimBuilderContext` (structured, from D-128D API) over the legacy `parseClaimBuilderContext()` path. Both paths show a source badge (green `structured` / yellow `legacy parsed`). No backend change. No schema change. No deploy. Checks: syntax OK, 416/24/56 pass.
