@@ -3534,7 +3534,8 @@ test('D-129A: reviewCard adds data-review-id attribute to article element', () =
 
 test('D-129A: inspected card suppresses duplicate Approve/Keep/Reject — only shows Inspect toggle', () => {
   const idx = appSrc.indexOf('function reviewCard(');
-  const body = appSrc.slice(idx, idx + 5400);
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
   assert.ok(
     body.includes('isSelected?\'\':`${approveBtn}'),
     'reviewCard must omit primary action buttons when card is selected/inspected (isSelected suppresses them)'
@@ -3840,6 +3841,116 @@ test('D-129D: builder context rows use compact markup (rctx-bc-row or review-bui
   assert.ok(
     body.includes('reviewBuilderContextHtml(item)'),
     'inspect panel must still call reviewBuilderContextHtml for structured builder context'
+  );
+});
+
+// ── Section 44 — D-129E: Compact review queue cards ──────────────────────────
+
+console.log('\n44. D-129E: Compact review queue cards');
+
+test('D-129E: reviewCard adds review-card-compact class to article', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('review-card-compact'),
+    'reviewCard must include review-card-compact class on article element'
+  );
+});
+
+test('D-129E: reviewCard renders builder context chip (rc-builder-chip) in card head', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('builderChip') && body.includes('rc-builder-chip'),
+    'reviewCard must compute builderChip and render it with rc-builder-chip class in card head'
+  );
+});
+
+test('D-129E: reviewCard builder chip detects structured builder context', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('claimBuilderContext') && body.includes('rawText'),
+    'reviewCard builderChip detection must check claimBuilderContext.rawText for structured context'
+  );
+});
+
+test('D-129E: reviewCard builder chip detects legacy builder context', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('Claim Builder context:'),
+    'reviewCard must detect legacy builder context via "Claim Builder context:" string'
+  );
+});
+
+test('D-129E: reviewCard scoreHint for claims shows ev/ts/sv scores', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('ev:') && body.includes('ts:') && body.includes('sv:'),
+    'reviewCard scoreHint for claims must show ev/ts/sv score prefixes for dense scanning'
+  );
+});
+
+test('D-129E: CSS defines rc-builder-chip class', () => {
+  assert.ok(cssSrc.includes('.rc-builder-chip'), '.rc-builder-chip must be defined in styles.css');
+});
+
+test('D-129E: CSS review-card-title font-size is compact (≤13px)', () => {
+  const rule = cssSrc.match(/\.review-card-title\{[^}]+\}/);
+  assert.ok(
+    rule && (
+      rule[0].includes('font-size:12px') || rule[0].includes('font-size:11px') ||
+      rule[0].includes('font-size:13px') || rule[0].includes('font-size:10px')
+    ),
+    '.review-card-title font-size must be ≤ 13px for compact card density'
+  );
+});
+
+test('D-129E: non-inspected card still has Approve/Keep Pending/Reject wired', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('requestApproveReview') &&
+    body.includes('btn-keep') &&
+    body.includes('requestRejectReview'),
+    'non-inspected card must still wire Approve/Keep Pending/Reject actions'
+  );
+});
+
+test('D-129E: inspected card suppresses Approve/Keep/Reject (D-129A preserved)', () => {
+  const idx = appSrc.indexOf('function reviewCard(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes("isSelected?'':`${approveBtn}"),
+    'D-129A inspected card duplicate action suppression must be preserved'
+  );
+});
+
+test('D-129E: D-129C right context panel still active', () => {
+  const idx = appSrc.indexOf('function renderReviewList(');
+  const body = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    body.includes('renderReviewInspectContext(inspectedReviewItem)'),
+    'D-129C right context panel swap must remain intact'
+  );
+});
+
+test('D-129E: D-129D compact inspector class still present', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel(');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('review-inspect-compact'),
+    'D-129D review-inspect-compact marker class must remain in renderReviewInspectPanel'
   );
 });
 
