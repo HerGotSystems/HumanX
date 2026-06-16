@@ -24,7 +24,12 @@ export async function convertTruthToClaim(request, env, helpers) {
     const now = Date.now();
     const linkId = await ensureTruthClaimLink(env, helpers, truthId, existing.id, userId, body.bridgeNote || 'Matched existing claim during truth conversion.', now);
     await syncTruthLinkState(env, truthId, existing.id, now);
-    return json({ ok: true, existing: true, truth: { id: truth.id, statement: truth.statement }, claim: existing, bridge: { truthId, claimId: existing.id, linkId } });
+    // Only include claimId in bridge when claim is navigable (public); review-state claims cannot be fetched by getClaim
+    const isPublic = (existing.review_state || 'public') === 'public';
+    const bridgePayload = isPublic
+      ? { truthId, claimId: existing.id, linkId }
+      : { truthId, linkId };
+    return json({ ok: true, existing: true, truth: { id: truth.id, statement: truth.statement }, claim: existing, bridge: bridgePayload });
   }
 
   const now = Date.now();
@@ -47,7 +52,12 @@ export async function convertTruthToClaim(request, env, helpers) {
     if (!raced) throw err;
     const linkId = await ensureTruthClaimLink(env, helpers, truthId, raced.id, userId, body.bridgeNote || 'Matched raced claim during truth conversion.', now);
     await syncTruthLinkState(env, truthId, raced.id, now);
-    return json({ ok: true, existing: true, raced: true, truth: { id: truth.id, statement: truth.statement }, claim: raced, bridge: { truthId, claimId: raced.id, linkId } });
+    // Only include claimId when raced claim is public; non-public (review/rejected) claims cannot be fetched by getClaim
+    const racedIsPublic = (raced.review_state || 'public') === 'public';
+    const racedBridge = racedIsPublic
+      ? { truthId, claimId: raced.id, linkId }
+      : { truthId, linkId };
+    return json({ ok: true, existing: true, raced: true, truth: { id: truth.id, statement: truth.statement }, claim: raced, bridge: racedBridge });
   }
 
   let linkId;
@@ -109,8 +119,14 @@ async function syncTruthLinkState(env, truthId, claimId, now) {
 }
 
 async function findExistingClaim(env, truthId, truth) {
+  // Only return claims that getClaim can serve (public or NULL review_state).
+  // Non-public linked claims (rejected, duplicate, archived, review) must not be
+  // treated as "existing" — they cannot be navigated to and pressure-test should
+  // create a fresh review claim instead.
   if (truth.linked_claim_id) {
-    const linked = await env.DB.prepare(`SELECT *, NULL AS link_id FROM claims WHERE id=?`).bind(truth.linked_claim_id).first();
+    const linked = await env.DB.prepare(
+      `SELECT *, NULL AS link_id FROM claims WHERE id=? AND COALESCE(review_state,'public')='public'`
+    ).bind(truth.linked_claim_id).first();
     if (linked) return linked;
   }
 
@@ -118,7 +134,7 @@ async function findExistingClaim(env, truthId, truth) {
     SELECT c.*, l.id AS link_id
     FROM truth_claim_links l
     JOIN claims c ON c.id=l.claim_id
-    WHERE l.truth_id=?
+    WHERE l.truth_id=? AND COALESCE(c.review_state,'public')='public'
     ORDER BY l.created_at ASC
     LIMIT 1
   `).bind(truthId).first();
@@ -131,7 +147,7 @@ async function findExistingClaim(env, truthId, truth) {
   const byKey = await env.DB.prepare(`
     SELECT *, NULL AS link_id
     FROM claims
-    WHERE normalized_claim=? AND type='Truth-Derived'
+    WHERE normalized_claim=? AND type='Truth-Derived' AND COALESCE(review_state,'public')='public'
     ORDER BY created_at ASC
     LIMIT 1
   `).bind(normalizeClaim(cleanClaim)).first();
@@ -140,7 +156,7 @@ async function findExistingClaim(env, truthId, truth) {
   const sameText = await env.DB.prepare(`
     SELECT *, NULL AS link_id
     FROM claims
-    WHERE claim IN (?, ?, ?) AND type='Truth-Derived'
+    WHERE claim IN (?, ?, ?) AND type='Truth-Derived' AND COALESCE(review_state,'public')='public'
     ORDER BY created_at ASC
     LIMIT 1
   `).bind(cleanClaim, legacyClaim, accidentalXClaim).first();

@@ -4674,6 +4674,114 @@ test('D-134C: no D1 migration added for this change', () => {
   );
 });
 
+// ── Section 52 — D-134D: Truths page pressure-test CLAIM_NOT_FOUND fix ───────
+
+const truthClaimBridgeSrc = readFileSync(path.join(__dirname, '../src/truth-claim-bridge.js'), 'utf8');
+
+test('D-134D: findExistingClaim filters linked_claim_id to public claims only', () => {
+  const idx = truthClaimBridgeSrc.indexOf('async function findExistingClaim(');
+  const end = truthClaimBridgeSrc.indexOf('\nasync function ', idx + 1);
+  const body = truthClaimBridgeSrc.slice(idx, end);
+  assert.ok(
+    body.includes("linked_claim_id") && body.includes("COALESCE(review_state,'public')='public'"),
+    'findExistingClaim must filter linked_claim_id lookup to public claims only'
+  );
+});
+
+test('D-134D: findExistingClaim filters truth_claim_links table to public claims only', () => {
+  const idx = truthClaimBridgeSrc.indexOf('async function findExistingClaim(');
+  const end = truthClaimBridgeSrc.indexOf('\nasync function ', idx + 1);
+  const body = truthClaimBridgeSrc.slice(idx, end);
+  assert.ok(
+    body.includes('truth_claim_links') && body.includes("COALESCE(c.review_state,'public')='public'"),
+    'findExistingClaim truth_claim_links lookup must filter to public claims only'
+  );
+});
+
+test('D-134D: findExistingClaim filters normalized_claim lookup to public claims only', () => {
+  const idx = truthClaimBridgeSrc.indexOf('async function findExistingClaim(');
+  const end = truthClaimBridgeSrc.indexOf('\nasync function ', idx + 1);
+  const body = truthClaimBridgeSrc.slice(idx, end);
+  const normalizedIdx = body.indexOf("normalized_claim=?");
+  const normalizedCtx = body.slice(normalizedIdx, normalizedIdx + 120);
+  assert.ok(
+    normalizedCtx.includes("COALESCE(review_state,'public')='public'"),
+    'findExistingClaim normalized_claim lookup must filter to public claims only'
+  );
+});
+
+test('D-134D: existing-claim bridge path omits claimId when claim is non-public', () => {
+  const idx = truthClaimBridgeSrc.indexOf('const isPublic = ');
+  assert.ok(idx >= 0, 'convertTruthToClaim must guard bridge claimId behind isPublic check');
+  const ctx = truthClaimBridgeSrc.slice(idx, idx + 180);
+  assert.ok(
+    ctx.includes("(existing.review_state || 'public') === 'public'"),
+    "bridge must check (existing.review_state || 'public') === 'public' before including claimId"
+  );
+});
+
+test('D-134D: raced-claim bridge path omits claimId when raced claim is non-public', () => {
+  const idx = truthClaimBridgeSrc.indexOf('const racedIsPublic = ');
+  assert.ok(idx >= 0, 'UNIQUE catch path must guard bridge claimId behind racedIsPublic check');
+  const ctx = truthClaimBridgeSrc.slice(idx, idx + 180);
+  assert.ok(
+    ctx.includes("(raced.review_state || 'public') === 'public'"),
+    "raced bridge must check (raced.review_state || 'public') === 'public' before including claimId"
+  );
+});
+
+test('D-134D: convertTruth shows "Claim already in Review queue." when existing but no claimId in bridge', () => {
+  const idx = appSrc.indexOf('async function convertTruth(');
+  const body = idx >= 0 ? appSrc.slice(idx, idx + 700) : '';
+  assert.ok(
+    body.includes('Claim already in Review queue.'),
+    'convertTruth must show "Claim already in Review queue." when existing claim is not navigable'
+  );
+});
+
+test('D-134D: convertTruth toast distinguishes navigable vs non-navigable existing claims', () => {
+  const idx = appSrc.indexOf('async function convertTruth(');
+  const body = idx >= 0 ? appSrc.slice(idx, idx + 700) : '';
+  assert.ok(
+    body.includes('bridge?.claimId') && body.includes('Existing claim opened in Study.') && body.includes('Claim already in Review queue.'),
+    'convertTruth must check bridge?.claimId to distinguish navigable (Study) vs non-navigable (Review queue) cases'
+  );
+});
+
+test('D-134D: convertTruth still calls selectClaim only when bridge.claimId is present', () => {
+  const idx = appSrc.indexOf('async function convertTruth(');
+  const body = idx >= 0 ? appSrc.slice(idx, idx + 700) : '';
+  assert.ok(
+    body.includes('if(data.bridge?.claimId)') || body.includes('if (data.bridge?.claimId)'),
+    'convertTruth must guard selectClaim call behind data.bridge?.claimId'
+  );
+});
+
+test('D-134D: CLAIM_NOT_FOUND is not returned by convertTruthToClaim itself', () => {
+  assert.ok(
+    !truthClaimBridgeSrc.includes("'CLAIM_NOT_FOUND'") && !truthClaimBridgeSrc.includes('"CLAIM_NOT_FOUND"'),
+    'truth-claim-bridge.js must not return CLAIM_NOT_FOUND — that error belongs only in getClaim'
+  );
+});
+
+test('D-134D: getClaim still returns CLAIM_NOT_FOUND for non-public claims (guard preserved)', () => {
+  const idx = workerSrc.indexOf('async function getClaim(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes('CLAIM_NOT_FOUND') && body.includes("!=='public'"),
+    'getClaim must still return CLAIM_NOT_FOUND for non-public claims'
+  );
+});
+
+test('D-134D: no D1 migration added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0011_d134d.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0011_truth_pressure.sql')),
+    'D-134D must not require a D1 migration'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
