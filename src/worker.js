@@ -98,7 +98,7 @@ async function reviewCleanup(request, env) {
   // ── fetch row ─────────────────────────────────────────────────────────────
   let row;
   if (targetType==='claim') {
-    row=await env.DB.prepare(`SELECT c.id,c.claim,c.review_state,c.status_locked,u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(targetId).first();
+    row=await env.DB.prepare(`SELECT c.id,c.claim,c.review_state,c.status_locked,u.handle,(SELECT tcl.truth_id FROM truth_claim_links tcl WHERE tcl.claim_id=c.id ORDER BY tcl.created_at ASC LIMIT 1) AS source_truth_id FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(targetId).first();
     if (!row) return json({ error:'CLAIM_NOT_FOUND' },404);
   } else if (targetType==='pressure') {
     row=await env.DB.prepare(`SELECT p.id,p.title,p.body,p.review_state,u.handle FROM pressure_points p LEFT JOIN users u ON u.id=p.user_id WHERE p.id=?`).bind(targetId).first();
@@ -127,13 +127,15 @@ async function reviewCleanup(request, env) {
   const keywordMatch=text.includes('smoke')||/\btest\b/.test(text)||text.includes('automated write')||text.includes('automated smoke');
   // signal 2: id pattern — only meaningful for claim seeds, not for pressure (prs_ prefix is always present)
   const idPatternMatch=targetType!=='pressure'&&(/^clm_seed_/.test(id)||/^HX-\d/i.test(id));
-  // signal 3: known dev/test handles (new)
+  // signal 3: known dev/test handles
   const DEV_HANDLES=new Set(['humanx-seed','anon-o_seed','anon-xksavy','anon-73d9y2','anon-ek3562']);
   const handleMatch=DEV_HANDLES.has(handle);
-  const isArtefact=keywordMatch||idPatternMatch||handleMatch;
+  // signal 4: truth-derived from a seed truth (source_truth_id starts with tru_seed_) — claim type only
+  const sourceTruthSeedMatch=targetType==='claim'&&/^tru_seed_/.test(row.source_truth_id||'');
+  const isArtefact=keywordMatch||idPatternMatch||handleMatch||sourceTruthSeedMatch;
   if (isArtefact) {
     // normal archive path
-    const archiveCategory=keywordMatch?'test_keyword':idPatternMatch?'dev_seed_id':'dev_handle';
+    const archiveCategory=keywordMatch?'test_keyword':idPatternMatch?'dev_seed_id':handleMatch?'dev_handle':'seed_truth_derived';
     const now=Date.now();
     if (targetType==='claim') { await env.DB.prepare(`UPDATE claims SET review_state='archived',updated_at=? WHERE id=?`).bind(now,targetId).run(); }
     else if (targetType==='pressure') { await env.DB.prepare(`UPDATE pressure_points SET review_state='archived',updated_at=? WHERE id=?`).bind(now,targetId).run(); }

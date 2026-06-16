@@ -5161,6 +5161,111 @@ test('D-135A: no D1 migration added for this change', () => {
   );
 });
 
+// ── Section 56 — D-135B: archive rejected truth-derived test claims ───────────
+
+test('D-135B: reviewCleanup claim fetch includes source_truth_id via truth_claim_links subquery', () => {
+  // reviewCleanup function contains the claim fetch query with source_truth_id subquery
+  assert.ok(
+    workerSrc.includes('source_truth_id') && workerSrc.includes('truth_claim_links') && workerSrc.includes('sourceTruthSeedMatch'),
+    'reviewCleanup claim fetch must include source_truth_id subquery from truth_claim_links'
+  );
+});
+
+test('D-135B: reviewCleanup defines sourceTruthSeedMatch signal for tru_seed_ prefix', () => {
+  assert.ok(
+    workerSrc.includes('sourceTruthSeedMatch') && workerSrc.includes('tru_seed_'),
+    'reviewCleanup must define sourceTruthSeedMatch using tru_seed_ prefix check'
+  );
+});
+
+test('D-135B: sourceTruthSeedMatch is included in isArtefact condition', () => {
+  const idx = workerSrc.indexOf('const isArtefact=');
+  const slice = workerSrc.slice(idx, idx + 200);
+  assert.ok(
+    slice.includes('sourceTruthSeedMatch'),
+    'isArtefact condition must include sourceTruthSeedMatch'
+  );
+});
+
+test('D-135B: archive category for seed_truth_derived path is correct', () => {
+  assert.ok(
+    workerSrc.includes("'seed_truth_derived'"),
+    'reviewCleanup must use seed_truth_derived as archive category for sourceTruthSeedMatch path'
+  );
+});
+
+test('D-135B: sourceTruthSeedMatch only applies to claim target type', () => {
+  const idx = workerSrc.indexOf('sourceTruthSeedMatch');
+  const slice = workerSrc.slice(idx, idx + 100);
+  assert.ok(
+    slice.includes("targetType==='claim'"),
+    'sourceTruthSeedMatch must be gated to claim target type only'
+  );
+});
+
+test('D-135B: cleanup still requires rejected state (shared state gate)', () => {
+  assert.ok(
+    workerSrc.includes("currentState!=='rejected'") && workerSrc.includes('CLEANUP_REQUIRES_REJECTED'),
+    'reviewCleanup must still require rejected state before any archive action'
+  );
+});
+
+test('D-135B: PROTECTED_SEEDS blocklist still present', () => {
+  assert.ok(
+    workerSrc.includes('PROTECTED_SEEDS') && workerSrc.includes('CLEANUP_PROTECTED_SEED'),
+    'reviewCleanup must still protect seed claim IDs from cleanup'
+  );
+});
+
+test('D-135B: cleanup archives claims via UPDATE claims SET review_state=archived', () => {
+  assert.ok(
+    workerSrc.includes("UPDATE claims SET review_state='archived'"),
+    'reviewCleanup must archive claims via UPDATE SET review_state=archived (not DELETE)'
+  );
+});
+
+test('D-135B: pressure cleanup still present and unchanged', () => {
+  assert.ok(
+    workerSrc.includes("UPDATE pressure_points SET review_state='archived'"),
+    'reviewCleanup must still archive pressure_points (D-134F path must not be broken)'
+  );
+});
+
+test('D-135B: isSuspectedTestArtefact checks tru_seed_ source_truth_id', () => {
+  // find the function definition (not just references)
+  const idx = appSrc.indexOf('function isSuspectedTestArtefact');
+  assert.ok(idx !== -1, 'isSuspectedTestArtefact function must exist');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes('source_truth_id') && slice.includes('tru_seed_'),
+    'isSuspectedTestArtefact must return true for items with source_truth_id starting with tru_seed_'
+  );
+});
+
+test('D-135B: isSuspectedTestArtefact seed_truth check appears before text keyword check', () => {
+  const idx = appSrc.indexOf('function isSuspectedTestArtefact');
+  const slice = appSrc.slice(idx, idx + 600);
+  const seedIdx = slice.indexOf('tru_seed_');
+  const smokeIdx = slice.indexOf("'smoke'");
+  assert.ok(seedIdx !== -1 && smokeIdx !== -1 && seedIdx < smokeIdx,
+    'tru_seed_ check must appear before keyword text check in isSuspectedTestArtefact');
+});
+
+test('D-135B: inspect panel archive action is gated on state===rejected AND isSuspectedTestArtefact', () => {
+  assert.ok(
+    appSrc.includes("state==='rejected'&&isSuspectedTestArtefact(item)"),
+    'inspect panel must only show archive button when state is rejected AND isSuspectedTestArtefact returns true'
+  );
+});
+
+test('D-135B: no D1 migration added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_d135b.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0015_d135b.sql')),
+    'D-135B must not require a D1 migration'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
