@@ -5055,6 +5055,112 @@ test('D-134F: no D1 migration added for this change', () => {
   );
 });
 
+// ── Section 55 — D-135A: review queue provenance diagnostics ─────────────────
+
+test('D-135A: reviewQueue claims SELECT includes user handle via JOIN users', () => {
+  assert.ok(
+    workerSrc.includes("LEFT JOIN users u ON u.id=c.user_id") ||
+    workerSrc.includes("JOIN users u ON u.id=c.user_id"),
+    'reviewQueue claims SELECT must JOIN users for handle'
+  );
+});
+
+test('D-135A: reviewQueue claims SELECT exposes u.handle', () => {
+  assert.ok(
+    workerSrc.includes("u.handle"),
+    'reviewQueue claims SELECT must include u.handle'
+  );
+});
+
+test('D-135A: reviewQueue claims SELECT exposes source_truth_id via truth_claim_links subquery', () => {
+  assert.ok(
+    workerSrc.includes('source_truth_id') && workerSrc.includes('truth_claim_links'),
+    'reviewQueue claims SELECT must include source_truth_id via truth_claim_links subquery'
+  );
+});
+
+test('D-135A: reviewQueue evidence SELECT includes user_id and handle', () => {
+  const idx = workerSrc.indexOf("'evidence' AS target_type");
+  assert.ok(idx !== -1, 'reviewQueue must have evidence SELECT');
+  const slice = workerSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes('e.user_id') && slice.includes('u.handle'),
+    'reviewQueue evidence SELECT must include e.user_id and u.handle'
+  );
+});
+
+test('D-135A: renderReviewInspectPanel shows User ID for claims', () => {
+  assert.ok(
+    appSrc.includes("'User ID'") && appSrc.includes('review-provenance-uid'),
+    'renderReviewInspectPanel must show User ID with review-provenance-uid class for claims'
+  );
+});
+
+test('D-135A: renderReviewInspectPanel shows Source Truth for truth-derived claims', () => {
+  assert.ok(
+    appSrc.includes("source_truth_id") && appSrc.includes("'Source Truth'"),
+    'renderReviewInspectPanel must show Source Truth field when source_truth_id is present'
+  );
+});
+
+test('D-135A: renderReviewInspectPanel shows Normalized Key for claims', () => {
+  assert.ok(
+    appSrc.includes("normalized_claim") && appSrc.includes("'Normalized Key'"),
+    'renderReviewInspectPanel must show Normalized Key field for claims'
+  );
+});
+
+test('D-135A: renderReviewInspectPanel shows Submitted By handle for evidence', () => {
+  // Verify evidence section has Claim ID followed by Submitted By
+  const evidenceClaimIdx = appSrc.indexOf("'Claim ID',esc(item.claim_id)");
+  const evidenceHandleIdx = appSrc.indexOf("'Submitted By',esc(item.handle)");
+  assert.ok(evidenceClaimIdx !== -1, 'renderReviewInspectPanel evidence must have Claim ID field');
+  assert.ok(evidenceHandleIdx > evidenceClaimIdx, 'renderReviewInspectPanel evidence must show Submitted By after Claim ID');
+});
+
+test('D-135A: renderReviewInspectPanel shows Submitted By and User ID for truths', () => {
+  // truth section: Converted Claims appears before Submitted By
+  const convertedIdx = appSrc.indexOf("'Converted Claims'");
+  const truthHandleIdx = appSrc.indexOf("'Submitted By',esc(item.handle)", convertedIdx);
+  assert.ok(convertedIdx !== -1, 'truth section must have Converted Claims field');
+  assert.ok(truthHandleIdx !== -1 && truthHandleIdx > convertedIdx, 'truth section must show Submitted By after Converted Claims');
+});
+
+test('D-135A: renderReviewInspectContext shows Submitted By, User ID, Source Truth for claims', () => {
+  const idx = appSrc.indexOf('renderReviewInspectContext');
+  const slice = appSrc.slice(idx, idx + 3000);
+  assert.ok(
+    slice.includes("'Submitted By',item.handle") && slice.includes("'User ID',item.user_id") && slice.includes("'Source Truth',item.source_truth_id"),
+    'renderReviewInspectContext claim section must include Submitted By, User ID, Source Truth'
+  );
+});
+
+test('D-135A: renderReviewInspectContext shows Submitted By and User ID for truths', () => {
+  const idx = appSrc.indexOf('renderReviewInspectContext');
+  const slice = appSrc.slice(idx, idx + 3000);
+  const originIdx = slice.indexOf("'Origin',item.origin");
+  const truthHandleIdx = slice.indexOf("'Submitted By',item.handle", originIdx);
+  assert.ok(originIdx !== -1, 'renderReviewInspectContext truth section must have Origin field');
+  assert.ok(truthHandleIdx !== -1 && truthHandleIdx > originIdx, 'renderReviewInspectContext truth section must show Submitted By after Origin');
+});
+
+test('D-135A: provenance fields are admin-panel only (not in public getClaim endpoint)', () => {
+  const getClaimIdx = workerSrc.indexOf("pathname==='/api/claims/'");
+  const getClaimSlice = getClaimIdx !== -1 ? workerSrc.slice(getClaimIdx, getClaimIdx + 1200) : '';
+  assert.ok(
+    !getClaimSlice.includes('source_truth_id') && !getClaimSlice.includes('u.handle AS handle'),
+    'getClaim public endpoint must not expose provenance fields (source_truth_id, handle from users)'
+  );
+});
+
+test('D-135A: no D1 migration added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_d135a.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_provenance.sql')),
+    'D-135A must not require a D1 migration'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
