@@ -41,7 +41,7 @@ export default {
       if (url.pathname === '/api/evidence-vault' && request.method === 'GET') return await listEvidenceVault(request, env, { json });
       if (url.pathname === '/api/truths' && request.method === 'GET') return await listTruths(request, env, { json });
       if (url.pathname === '/api/truths' && request.method === 'POST') return await createTruth(request, env, { readJson, cleanText, cleanId, json, requireUser: async (req) => requireUser(req, env), makeId });
-      if (url.pathname === '/api/truth-to-claim' && request.method === 'POST') return await convertTruthToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId });
+      if (url.pathname === '/api/truth-to-claim' && request.method === 'POST') return await convertTruthToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, isAdmin: () => requireAdmin(request, env) === null });
       if (url.pathname === '/api/evidence-attach' && request.method === 'POST') return await attachEvidenceToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId });
       if (url.pathname === '/api/graph-status' && request.method === 'GET') return await graphStatus(request, env, { json });
       if (url.pathname === '/api/analysis' && request.method === 'POST') return await addAnalysisResult(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId });
@@ -94,12 +94,15 @@ async function reviewCleanup(request, env) {
   const targetType=cleanText(body.target_type||'',30).toLowerCase();
   const targetId=cleanId(body.target_id||'');
   if (!targetId) return json({ error:'TARGET_ID_REQUIRED' },400);
-  if (!['claim','truth'].includes(targetType)) return json({ error:'BAD_TARGET_TYPE', allowed:['claim','truth'] },400);
+  if (!['claim','truth','pressure'].includes(targetType)) return json({ error:'BAD_TARGET_TYPE', allowed:['claim','truth','pressure'] },400);
   // ── fetch row ─────────────────────────────────────────────────────────────
   let row;
   if (targetType==='claim') {
     row=await env.DB.prepare(`SELECT c.id,c.claim,c.review_state,c.status_locked,u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(targetId).first();
     if (!row) return json({ error:'CLAIM_NOT_FOUND' },404);
+  } else if (targetType==='pressure') {
+    row=await env.DB.prepare(`SELECT p.id,p.title,p.body,p.review_state,u.handle FROM pressure_points p LEFT JOIN users u ON u.id=p.user_id WHERE p.id=?`).bind(targetId).first();
+    if (!row) return json({ error:'PRESSURE_NOT_FOUND' },404);
   } else {
     row=await env.DB.prepare(`SELECT id,statement,review_state,status_locked FROM truths WHERE id=?`).bind(targetId).first();
     if (!row) return json({ error:'TRUTH_NOT_FOUND' },404);
@@ -107,20 +110,23 @@ async function reviewCleanup(request, env) {
   // ── state gate ────────────────────────────────────────────────────────────
   const currentState=row.review_state||'review';
   if (currentState!=='rejected') return json({ error:'CLEANUP_REQUIRES_REJECTED', current_state:currentState },400);
-  // ── protected seed blocklist ──────────────────────────────────────────────
+  // ── protected seed blocklist (claims only) ────────────────────────────────
   const PROTECTED_SEEDS=new Set(['clm_seed_55e17c22e13e','clm_seed_8e095b6f6d30','clm_seed_c4e0335e7aae','clm_seed_8ad9ff121579','clm_seed_7fb1c24747c2']);
   if (PROTECTED_SEEDS.has(targetId)) return json({ error:'CLEANUP_PROTECTED_SEED' },400);
-  // ── status lock gate ──────────────────────────────────────────────────────
+  // ── status lock gate (claims and truths only — pressure_points has no status_locked) ────
   if (row.status_locked) return json({ error:'CLEANUP_REQUIRES_NOT_LOCKED' },400);
   // ── artefact detection (v2) ───────────────────────────────────────────────
   const id=row.id||'';
   const handle=String(row.handle||'').toLowerCase();
-  const rawText=String(row.claim||row.statement||'');
+  // pressure items expose title+body; claims use claim text; truths use statement
+  const rawText=targetType==='pressure'
+    ? String((row.title||'')+' '+(row.body||'')).trim()
+    : String(row.claim||row.statement||'');
   const text=rawText.toLowerCase();
   // signal 1: text keywords (original)
   const keywordMatch=text.includes('smoke')||/\btest\b/.test(text)||text.includes('automated write')||text.includes('automated smoke');
-  // signal 2: id pattern (new)
-  const idPatternMatch=/^clm_seed_/.test(id)||/^HX-\d/i.test(id);
+  // signal 2: id pattern — only meaningful for claim seeds, not for pressure (prs_ prefix is always present)
+  const idPatternMatch=targetType!=='pressure'&&(/^clm_seed_/.test(id)||/^HX-\d/i.test(id));
   // signal 3: known dev/test handles (new)
   const DEV_HANDLES=new Set(['humanx-seed','anon-o_seed','anon-xksavy','anon-73d9y2','anon-ek3562']);
   const handleMatch=DEV_HANDLES.has(handle);
@@ -130,6 +136,7 @@ async function reviewCleanup(request, env) {
     const archiveCategory=keywordMatch?'test_keyword':idPatternMatch?'dev_seed_id':'dev_handle';
     const now=Date.now();
     if (targetType==='claim') { await env.DB.prepare(`UPDATE claims SET review_state='archived',updated_at=? WHERE id=?`).bind(now,targetId).run(); }
+    else if (targetType==='pressure') { await env.DB.prepare(`UPDATE pressure_points SET review_state='archived',updated_at=? WHERE id=?`).bind(now,targetId).run(); }
     else { await env.DB.prepare(`UPDATE truths SET review_state='archived',updated_at=? WHERE id=?`).bind(now,targetId).run(); }
     return json({ ok:true, target_type:targetType, target_id:targetId, action:'archived', previous_state:currentState, new_state:'archived', archive_policy:'test_artifact_v2', archive_reason:archiveCategory });
   }
@@ -150,6 +157,7 @@ async function reviewCleanup(request, env) {
     if (!junkHeuristicPass) return json({ error:'CLEANUP_JUNK_OVERRIDE_REJECTED', message:'junk_override heuristic did not match — use normal archive path or review this item manually' },400);
     const now=Date.now();
     if (targetType==='claim') { await env.DB.prepare(`UPDATE claims SET review_state='archived',updated_at=? WHERE id=?`).bind(now,targetId).run(); }
+    else if (targetType==='pressure') { await env.DB.prepare(`UPDATE pressure_points SET review_state='archived',updated_at=? WHERE id=?`).bind(now,targetId).run(); }
     else { await env.DB.prepare(`UPDATE truths SET review_state='archived',updated_at=? WHERE id=?`).bind(now,targetId).run(); }
     return json({ ok:true, target_type:targetType, target_id:targetId, action:'archived', previous_state:currentState, new_state:'archived', archive_policy:'junk_override_v1', archive_reason:reason });
   }

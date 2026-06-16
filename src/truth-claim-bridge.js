@@ -1,9 +1,13 @@
 import { meaningKey } from './meaning-key.js';
 
 export async function convertTruthToClaim(request, env, helpers) {
-  const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
+  const { readJson, cleanId, cleanText, json, requireUser, makeId, isAdmin } = helpers;
   const userId = await requireUser(request);
-  await safeRateLimit(request, env, `truth-claim:${ip(request)}`, 8, 3600000);
+  // Admin/owner requests skip the per-IP rate limit — they are managing content, not submitting public spam.
+  // Public rate limit is still applied for all other requests.
+  if (!isAdmin || !isAdmin()) {
+    await safeRateLimit(request, env, `truth-claim:${ip(request)}`, 8, 3600000);
+  }
   const body = await readJson(request);
 
   const truthId = cleanId(body.truthId || body.truth_id || '');

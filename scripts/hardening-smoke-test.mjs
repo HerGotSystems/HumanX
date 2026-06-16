@@ -4893,6 +4893,168 @@ test('D-134E: no D1 migration added for this change', () => {
   );
 });
 
+// ── Section 54 — D-134F: pressure cleanup + owner truth rate limit ───────────
+
+// Part A: review cleanup pressure support
+
+test('D-134F: reviewCleanup allowed types now includes pressure', () => {
+  const idx = workerSrc.indexOf('async function reviewCleanup(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes("'pressure'") && body.includes("BAD_TARGET_TYPE"),
+    "reviewCleanup must include 'pressure' in allowed types"
+  );
+  assert.ok(
+    body.includes("allowed:['claim','truth','pressure']") ||
+    body.includes("allowed: ['claim','truth','pressure']"),
+    "BAD_TARGET_TYPE error must list pressure as allowed"
+  );
+});
+
+test('D-134F: reviewCleanup pressure path fetches from pressure_points table', () => {
+  const idx = workerSrc.indexOf('async function reviewCleanup(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes('pressure_points p LEFT JOIN users u'),
+    'reviewCleanup pressure branch must fetch from pressure_points with user handle JOIN'
+  );
+});
+
+test('D-134F: reviewCleanup pressure path uses title+body for rawText', () => {
+  const idx = workerSrc.indexOf('async function reviewCleanup(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes("targetType==='pressure'") && body.includes('row.title') && body.includes('row.body'),
+    "reviewCleanup must use title+body as rawText for pressure items"
+  );
+});
+
+test('D-134F: reviewCleanup pressure cleanup archives via UPDATE pressure_points', () => {
+  const idx = workerSrc.indexOf('async function reviewCleanup(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes("UPDATE pressure_points SET review_state='archived',updated_at=? WHERE id=?"),
+    "reviewCleanup must archive pressure items via UPDATE pressure_points SET review_state='archived'"
+  );
+});
+
+test('D-134F: reviewCleanup pressure cleanup requires rejected state (state gate shared)', () => {
+  const idx = workerSrc.indexOf('async function reviewCleanup(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  // state gate runs before the type-specific archive branch; check it precedes the archive UPDATE
+  const stateGateIdx = body.indexOf('CLEANUP_REQUIRES_REJECTED');
+  const archiveIdx = body.indexOf("UPDATE pressure_points SET review_state='archived'");
+  assert.ok(
+    stateGateIdx >= 0 && archiveIdx >= 0 && stateGateIdx < archiveIdx,
+    'reviewCleanup state gate (CLEANUP_REQUIRES_REJECTED) must appear before pressure archive UPDATE'
+  );
+});
+
+test('D-134F: reviewCleanup id pattern skipped for pressure (prs_ is not a seed marker)', () => {
+  const idx = workerSrc.indexOf('async function reviewCleanup(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  assert.ok(
+    body.includes("targetType!=='pressure'") && body.includes('idPatternMatch'),
+    "reviewCleanup must skip id pattern signal for pressure items"
+  );
+});
+
+test('D-134F: junk_override path also archives pressure_points', () => {
+  const idx = workerSrc.indexOf('async function reviewCleanup(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  // Should have two occurrences of UPDATE pressure_points (artefact path + junk_override path)
+  const firstIdx = body.indexOf("UPDATE pressure_points SET review_state='archived'");
+  const secondIdx = body.indexOf("UPDATE pressure_points SET review_state='archived'", firstIdx + 1);
+  assert.ok(
+    secondIdx >= 0,
+    'junk_override path must also archive pressure_points (two UPDATE pressure_points occurrences)'
+  );
+});
+
+test('D-134F: BAD_TARGET_TYPE is not returned for pressure target type', () => {
+  // Verify that the type guard lists pressure as valid
+  const idx = workerSrc.indexOf('async function reviewCleanup(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const body = workerSrc.slice(idx, end);
+  const guardIdx = body.indexOf("BAD_TARGET_TYPE");
+  const guardCtx = body.slice(guardIdx - 80, guardIdx + 80);
+  assert.ok(
+    guardCtx.includes('pressure'),
+    "BAD_TARGET_TYPE guard must include pressure in allowed list so it is not returned for pressure"
+  );
+});
+
+// Part B: truth pressure-test admin rate limit bypass
+
+test('D-134F: /api/truth-to-claim route passes isAdmin helper to bridge', () => {
+  const routeCtx = workerSrc.slice(
+    workerSrc.indexOf("'/api/truth-to-claim'"),
+    workerSrc.indexOf("'/api/truth-to-claim'") + 300
+  );
+  assert.ok(
+    routeCtx.includes('isAdmin') && routeCtx.includes('requireAdmin'),
+    "/api/truth-to-claim route must pass isAdmin helper (using requireAdmin) to convertTruthToClaim"
+  );
+});
+
+test('D-134F: bridge skips rate limit for admin requests', () => {
+  assert.ok(
+    truthClaimBridgeSrc.includes('if (!isAdmin || !isAdmin())'),
+    "bridge must guard safeRateLimit behind (!isAdmin || !isAdmin()) to allow admin bypass"
+  );
+});
+
+test('D-134F: bridge still calls safeRateLimit for non-admin (public rate limit preserved)', () => {
+  // safeRateLimit call must exist inside the isAdmin guard branch
+  const guardIdx = truthClaimBridgeSrc.indexOf('if (!isAdmin || !isAdmin())');
+  const ctx = truthClaimBridgeSrc.slice(guardIdx, guardIdx + 120);
+  assert.ok(
+    ctx.includes('safeRateLimit'),
+    'bridge must call safeRateLimit inside the non-admin branch (public rate limit preserved)'
+  );
+});
+
+test('D-134F: convertTruth sends admin header when adminToken() is present', () => {
+  const idx = appSrc.indexOf('async function convertTruth(');
+  const body = idx >= 0 ? appSrc.slice(idx, idx + 400) : '';
+  assert.ok(
+    body.includes('adminToken()') && body.includes('adminHeaders()'),
+    'convertTruth must send adminHeaders() when adminToken() is available'
+  );
+});
+
+test('D-134F: convertTruth admin header is conditional — not sent for normal users', () => {
+  const idx = appSrc.indexOf('async function convertTruth(');
+  const body = idx >= 0 ? appSrc.slice(idx, idx + 400) : '';
+  // Must have a conditional check before adminHeaders
+  assert.ok(
+    body.includes('if(adminToken())') || body.includes('if (adminToken())'),
+    'convertTruth must gate adminHeaders behind if(adminToken()) — normal users must not send admin header'
+  );
+});
+
+test('D-134F: safeRateLimit function still exists in truth-claim-bridge (rate limit not removed)', () => {
+  assert.ok(
+    truthClaimBridgeSrc.includes('async function safeRateLimit('),
+    'safeRateLimit must still be defined in truth-claim-bridge.js — rate limit must not be removed'
+  );
+});
+
+test('D-134F: no D1 migration added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0013_d134f.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0013_pressure_cleanup.sql')),
+    'D-134F must not require a D1 migration'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
