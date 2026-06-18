@@ -648,6 +648,7 @@ test('reviewQueue returns archived_claims and archived_truths', () => {
 
 // Frontend: archived cards and filter must not be added.
 const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+const truthsSrc = readFileSync(path.join(__dirname, '../src/truths.js'), 'utf8');
 
 test('frontend loadReviewQueue stores archived_total from response', () => {
   assert.ok(appSrc.includes('archived_total:data.archived_total'), 'loadReviewQueue must propagate archived_total');
@@ -5887,6 +5888,156 @@ test('D-137B: no frontend Me tab or My HumanX UI added yet', () => {
   assert.ok(
     !appSrc.includes('my-humanx') && !appSrc.includes('myHumanX') && !appSrc.includes("setMode('me')") && !appSrc.includes('tab-me'),
     'D-137B is backend-only — no frontend references to the My HumanX dashboard should exist yet'
+  );
+});
+
+// ── Section 61 — D-137C: truth card claimed-state clarity ─────────────────────
+
+test('D-137C: listTruths exposes linked_claim_review_state via LEFT JOIN claims', () => {
+  assert.ok(
+    truthsSrc.includes('LEFT JOIN claims c ON c.id=t.linked_claim_id') &&
+    truthsSrc.includes('AS linked_claim_review_state'),
+    'listTruths SQL must join claims on linked_claim_id and expose linked_claim_review_state'
+  );
+});
+
+test('D-137C: linked_claim_review_state is NULL (not falsely "public") when no claim is linked', () => {
+  assert.ok(
+    truthsSrc.includes('CASE WHEN t.linked_claim_id IS NOT NULL THEN COALESCE(c.review_state,\'public\') ELSE NULL END'),
+    'listTruths must only resolve a review state when a claim is actually linked, never default to public for truths with no derived claim'
+  );
+});
+
+test('D-137C: mapTruth exposes linkedClaimReviewState to the frontend', () => {
+  assert.ok(
+    truthsSrc.includes('linkedClaimReviewState: t.linked_claim_review_state || null'),
+    'mapTruth must expose linkedClaimReviewState'
+  );
+});
+
+test('D-137C: truthClaimStateMeta defines state-specific badges for all five claim states', () => {
+  assert.ok(
+    appSrc.includes("public:['CLAIM PUBLIC','b-green']") &&
+    appSrc.includes("review:['CLAIM IN REVIEW','b-yellow']") &&
+    appSrc.includes("rejected:['CLAIM REJECTED','b-red']") &&
+    appSrc.includes("archived:['CLAIM ARCHIVED','b-muted']") &&
+    appSrc.includes("duplicate:['CLAIM DUPLICATE','b-purple']"),
+    'TRUTH_CLAIM_STATE_BADGES must define a state-specific badge for public/review/rejected/archived/duplicate'
+  );
+});
+
+test('D-137C: truthCard no longer renders the generic "claim derived" chip', () => {
+  assert.ok(
+    !appSrc.includes('truth-linked-chip">claim derived<'),
+    'the old generic "claim derived" chip must be replaced by the state-specific badge'
+  );
+});
+
+test('D-137C: rejected/archived/duplicate states render a non-primary, muted button (not a fresh-submit look)', () => {
+  const idx = appSrc.indexOf('function truthClaimStateMeta');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes("btnClass:'truth-claim-btn-muted',btnLabel,btnAction:`convertTruth('${esc(t.id)}')`") &&
+    slice.includes("rejected:'Rejected pressure-test',archived:'Archived pressure-test',duplicate:'Duplicate pressure-test'"),
+    'rejected/archived/duplicate states must use the muted button class and state-specific labels, not the primary submit button'
+  );
+});
+
+test('D-137C: review state button reads "Already in Review" and is muted, not primary', () => {
+  const idx = appSrc.indexOf('function truthClaimStateMeta');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes("btnClass:'truth-claim-btn-muted',btnLabel:'Already in Review'"),
+    'review state must show "Already in Review" with the muted button class'
+  );
+});
+
+test('D-137C: public claim state opens claim study, not a fresh pressure-test submission', () => {
+  const idx = appSrc.indexOf('function truthClaimStateMeta');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes("btnClass:'primary',btnLabel:'Open Claim Study →',btnAction:`openTruthClaimStudy('${esc(claimId)}')`"),
+    'public claim state must open the existing claim study via openTruthClaimStudy, not call convertTruth again'
+  );
+});
+
+test('D-137C: no-claim-yet state still shows the original fresh submit button', () => {
+  const idx = appSrc.indexOf('function truthClaimStateMeta');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes("btnClass:'primary',btnLabel:'Pressure-test as Claim →',btnAction:`convertTruth('${esc(t.id)}')`"),
+    'truths with no derived claim yet must keep the original primary "Pressure-test as Claim →" button'
+  );
+});
+
+test('D-137C: openTruthClaimStudy navigates via selectClaim and sets correct back-navigation origin', () => {
+  assert.ok(
+    appSrc.includes("async function openTruthClaimStudy(claimId){lastModeBeforeStudy='truths';mode='arena';") &&
+    appSrc.includes('await selectClaim(claimId)'),
+    'openTruthClaimStudy must set lastModeBeforeStudy to truths and call selectClaim'
+  );
+});
+
+test('D-137C: backToArena returns to the Truths tab when origin was truths', () => {
+  assert.ok(
+    appSrc.includes("else if(_origin==='truths'){setMode('truths');}"),
+    'backToArena must special-case the truths origin so Back from claim study returns to Truths, not Claims'
+  );
+});
+
+test('D-137C: openTruthClaimStudy is exposed on window for inline onclick handlers', () => {
+  assert.ok(
+    appSrc.includes('window.openTruthClaimStudy=openTruthClaimStudy'),
+    'openTruthClaimStudy must be exposed on window'
+  );
+});
+
+test('D-137C: no CLAIM_NOT_FOUND regression — getClaim route and public-only filter unchanged', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname.match(/^\\/api\\/claims\\/[^/]+$/) && request.method === 'GET') return await getClaim(request, env, url.pathname.split('/').pop())"),
+    'GET /api/claims/:id route must remain unchanged — non-public claims still correctly 404 rather than ever being reachable from the truth card UI'
+  );
+});
+
+test('D-137C: rejected/archived/duplicate truth-card buttons never call openTruthClaimStudy (cannot 404 on a non-public claim)', () => {
+  const idx = appSrc.indexOf('function truthClaimStateMeta');
+  const endIdx = appSrc.indexOf('\nasync function openTruthClaimStudy', idx);
+  const slice = appSrc.slice(idx, endIdx === -1 ? idx + 2000 : endIdx);
+  const nonPublicBranches = slice.split('btnAction:`convertTruth').length - 1;
+  assert.ok(
+    nonPublicBranches >= 3,
+    'rejected/archived/duplicate/review branches must route through convertTruth (existing-state toast), never openTruthClaimStudy, since those claims are not fetchable via getClaim'
+  );
+});
+
+test('D-137C: existing truth-claim-bridge state-detection logic is unmodified', () => {
+  assert.ok(
+    truthClaimBridgeSrc.includes('async function findExistingClaim(env, truthId, truth)') &&
+    truthClaimBridgeSrc.includes('async function findNonPublicExistingClaim(env, truthId, truth)'),
+    'src/truth-claim-bridge.js bridge-state-detection functions must remain unmodified by this frontend/listing-only patch'
+  );
+});
+
+test('D-137C: My HumanX backend endpoint is unaffected by this patch', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)"),
+    '/api/my-humanx route must remain present and unmodified'
+  );
+});
+
+test('D-137C: invite auth routes are unaffected by this patch', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/auth/invite/create'") &&
+    workerSrc.includes("url.pathname === '/api/auth/invite/redeem'"),
+    'invite auth routes must remain present and unmodified'
+  );
+});
+
+test('D-137C: no D1 migration added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0012_d137c.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0012_truth_claim_state.sql')),
+    'D-137C must not require a D1 migration — linked_claim_id and claims.review_state already exist'
   );
 });
 

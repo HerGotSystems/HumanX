@@ -630,3 +630,6 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .admin-invite-code-row{display:flex;align-items:center;gap:8px}
 .admin-invite-code{background:#080b12;border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:12px;color:var(--green);letter-spacing:.02em}
 .admin-invite-created{margin:4px 0 0}
+.truth-claim-state-badge{font-weight:700}
+.truth-claim-btn-muted{background:#0b0e16;opacity:.7;cursor:default}
+.truth-claim-btn-muted:hover{opacity:.85}

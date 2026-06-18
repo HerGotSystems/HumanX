@@ -7,10 +7,18 @@ export async function listTruths(request, env, helpers) {
   const q = `%${String(url.searchParams.get('q') || '').slice(0, 80)}%`;
   const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit') || 60)));
 
+  // D-137C: expose the derived pressure-test claim's review_state so the frontend
+  // can show a state-specific badge/button instead of a generic "claim derived" chip.
+  // truths.linked_claim_id reliably tracks the single canonical derived claim per
+  // truth — convertTruthToClaim() always finds-or-reuses an existing linked claim
+  // rather than creating a second one (see src/truth-claim-bridge.js), so a plain
+  // join here mirrors exactly what another pressure-test attempt would resolve to.
   const rows = await env.DB.prepare(`
-    SELECT t.*, u.handle
+    SELECT t.*, u.handle,
+      CASE WHEN t.linked_claim_id IS NOT NULL THEN COALESCE(c.review_state,'public') ELSE NULL END AS linked_claim_review_state
     FROM truths t
     LEFT JOIN users u ON u.id=t.user_id
+    LEFT JOIN claims c ON c.id=t.linked_claim_id
     WHERE COALESCE(t.review_state,'public')='public'
       AND (t.statement LIKE ? OR t.category LIKE ? OR t.origin LIKE ? OR t.truth_type LIKE ?)
     ORDER BY t.repetition_score DESC, t.created_at DESC
@@ -119,6 +127,7 @@ function mapTruth(t) {
     repetitionScore: t.repetition_score || 1,
     pressureScore: t.pressure_score || 0,
     linkedClaimId: t.linked_claim_id,
+    linkedClaimReviewState: t.linked_claim_review_state || null,
     reviewState: t.review_state || 'review',
     createdAt: t.created_at,
     updatedAt: t.updated_at,
