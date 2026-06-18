@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `498 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `655 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `56 passed, 0 failed (56 hard checks)` |
 
@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D131A_OWNER_SMOKE_POST_D130.md` ⭐ CURRENT — DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
-Owner confirmed production good after D-130 deploy. Admin Review, structured builder context, approve/keep/reject/mark-duplicate, queue anchor, public pages — all pass. Baseline: 498/24/56.
+### `D136E_INVITE_AUTH_CHECKPOINT.md` ⭐ CURRENT — INVITE AUTH DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
+D-136A audit → D-136B backend (migration 0010, `/api/me`, `/api/auth/invite/create`, `/api/auth/invite/redeem`) → D-136C public account panel + invite redeem → D-136D admin invite-code creator panel. Owner confirmed: admin creates invite code in Review, user redeems in account panel, panel shows VERIFIED with display name/email/handle, anonymous flow still works, no email sending (expected). Known limitation carried forward: `x-humanx-user` still unsigned/spoofable, no cookies, no magic links, no email sending, `handle` uniqueness not enforced. Baseline: 655/24/56. Recommended next: D-137A — My HumanX personal dashboard audit.
 **Read when:** starting new feature work or returning after time away.
+
+### `D131A_OWNER_SMOKE_POST_D130.md` — D-131 OWNER SMOKE (superseded by D-136E for current deploy)
+Owner confirmed production good after D-130 deploy. Admin Review, structured builder context, approve/keep/reject/mark-duplicate, queue anchor, public pages — all pass. Baseline: 498/24/56.
+**Read when:** reviewing D-131 history.
 
 ### `D130E_REVIEW_PATH_HARDENING_CHECKPOINT.md` — D-130 HARDENING BASELINE
 D-130A–D review-path hardening chain. Audit (no FAILs), review queue cap comment+tests, builder context `whyUserThinksThis` typo fix (backward-safe), review escaping regression tests. No schema/route/layout changes. Checks: syntax OK, 498/24/56 pass.
