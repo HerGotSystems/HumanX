@@ -3316,9 +3316,9 @@ test('D-112B: D-111 submit trust note remains present', () => {
   assert.ok(appSrc.includes('submit-trust-note') && appSrc.includes('not an automatic verdict'), 'submit trust note must remain');
 });
 
-test('D-112B: all 9 nav tabs remain in index.html', () => {
+test('D-112B: all original 9 nav tabs remain in index.html (D-137D added a 10th: Me)', () => {
   const n = (indexSrc.match(/id="tab-/g) || []).length;
-  assert.ok(n === 9, `nav must keep all 9 tabs (found ${n})`);
+  assert.ok(n === 10, `nav must keep all 9 original tabs plus the D-137D Me tab (found ${n})`);
 });
 
 test('D-112B: no backend/D1/wrangler/deploy references added in setMode', () => {
@@ -5884,10 +5884,10 @@ test('D-137B: existing routes (session, claims, truths, review) remain present',
   );
 });
 
-test('D-137B: no frontend Me tab or My HumanX UI added yet', () => {
+test('D-137B: backend endpoint exists independently of the frontend (D-137D added the UI later)', () => {
   assert.ok(
-    !appSrc.includes('my-humanx') && !appSrc.includes('myHumanX') && !appSrc.includes("setMode('me')") && !appSrc.includes('tab-me'),
-    'D-137B is backend-only — no frontend references to the My HumanX dashboard should exist yet'
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)"),
+    'D-137B /api/my-humanx route must remain present regardless of frontend additions'
   );
 });
 
@@ -6038,6 +6038,216 @@ test('D-137C: no D1 migration added for this change', () => {
     !existsSync(path.join(__dirname, '../migrations/0012_d137c.sql')) &&
     !existsSync(path.join(__dirname, '../migrations/0012_truth_claim_state.sql')),
     'D-137C must not require a D1 migration — linked_claim_id and claims.review_state already exist'
+  );
+});
+
+// ── Section 62 — D-137D: My HumanX dashboard frontend ──────────────────────────
+
+test('D-137D: Me nav tab exists in index.html', () => {
+  assert.ok(
+    indexSrc.includes('id="tab-me"') && indexSrc.includes('onclick="setMode(\'me\')">Me<'),
+    'index.html must contain a Me nav tab calling setMode(\'me\')'
+  );
+});
+
+test('D-137D: mode "me" is wired into render() dispatch', () => {
+  assert.ok(
+    appSrc.includes("if(mode==='me')return renderMe();"),
+    'render() must dispatch to renderMe() when mode is me'
+  );
+});
+
+test('D-137D: renderMe calls GET /api/my-humanx', () => {
+  const idx = appSrc.indexOf('async function renderMe()');
+  assert.ok(idx !== -1, 'renderMe function must exist');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes("api('/api/my-humanx')"),
+    'renderMe must call api(\'/api/my-humanx\')'
+  );
+});
+
+test('D-137D: renderMe sends x-humanx-user via the shared api()/headers() helpers (no override)', () => {
+  const idx = appSrc.indexOf('async function renderMe()');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes("await api('/api/my-humanx')") && !slice.includes("api('/api/my-humanx',{headers:"),
+    'renderMe must not override the default headers() (which sets x-humanx-user) for this call'
+  );
+});
+
+test('D-137D: renderMe shows loading and error states without forcing login', () => {
+  const idx = appSrc.indexOf('async function renderMe()');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('Loading My HumanX') && slice.includes('My HumanX unavailable') && slice.includes('catch(e)'),
+    'renderMe must show a loading message and a non-fatal error state, never block on auth'
+  );
+});
+
+test('D-137D: account card renders Verified and Anonymous states', () => {
+  assert.ok(
+    appSrc.includes("function meAccountCardHtml") &&
+    appSrc.includes("verified?'Verified':'Anonymous'"),
+    'meAccountCardHtml must render Verified or Anonymous depending on user.verified'
+  );
+});
+
+test('D-137D: account card shows display name/email/handle/user id', () => {
+  const idx = appSrc.indexOf('function meAccountCardHtml');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('u.display_name') && slice.includes('u.email') && slice.includes('Handle:') && slice.includes('User ID:'),
+    'meAccountCardHtml must show display_name, email, handle, and user id'
+  );
+});
+
+test('D-137D: counts render for claims, truths, evidence, and pressure', () => {
+  const idx = appSrc.indexOf('function renderMeHtml');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes("meCountsRow('Claims',counts.claims)") &&
+    slice.includes("meCountsRow('Truths',counts.truths)") &&
+    slice.includes("meCountsRow('Evidence',counts.evidence)") &&
+    slice.includes("meCountsRow('Pressure',counts.pressure)"),
+    'renderMeHtml must render a counts row for claims, truths, evidence, and pressure'
+  );
+});
+
+test('D-137D: counts row renders all five review states', () => {
+  assert.ok(
+    appSrc.includes('const ME_STATE_LABELS={public:\'Public\',review:\'Review\',rejected:\'Rejected\',archived:\'Archived\',duplicate:\'Duplicate\'}'),
+    'ME_STATE_LABELS must cover public/review/rejected/archived/duplicate'
+  );
+});
+
+test('D-137D: recent claims, truths, evidence, and pressure sections render', () => {
+  const idx = appSrc.indexOf('function renderMeHtml');
+  const slice = appSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('Recent Claims') && slice.includes('Recent Truths') && slice.includes('Recent Evidence') && slice.includes('Recent Pressure'),
+    'renderMeHtml must render Recent Claims/Truths/Evidence/Pressure sections'
+  );
+});
+
+test('D-137D: belief snapshots section renders', () => {
+  const idx = appSrc.indexOf('function renderMeHtml');
+  const slice = appSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('Belief Snapshots') && slice.includes('meBeliefSnapshotsHtml(data.belief_snapshots)'),
+    'renderMeHtml must render a Belief Snapshots section from data.belief_snapshots'
+  );
+});
+
+test('D-137D: only public claim rows render an open-study button; non-public rows do not call selectClaim', () => {
+  const idx = appSrc.indexOf('function meRecentClaimsHtml');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('const isPublic=state===\'public\'') &&
+    slice.includes('${isPublic?`<button class="btn-mini" onclick="openMyClaimStudy('),
+    'meRecentClaimsHtml must only render the Open Study button for isPublic rows'
+  );
+  // openMyClaimStudy is the only path to selectClaim from this list — confirm it's conditional, not unconditional
+  const unconditionalSelectClaim = /<button[^>]*onclick="openMyClaimStudy\('\$\{esc\(c\.id\)\}'\)"[^>]*>Open Study/.test(slice) && !slice.includes('isPublic?');
+  assert.ok(!unconditionalSelectClaim, 'the Open Study button must remain gated behind isPublic, never unconditional');
+});
+
+test('D-137D: evidence and pressure rows show parent claim id as plain text, never as a clickable open action', () => {
+  const evIdx = appSrc.indexOf('function meRecentEvidenceHtml');
+  const evSlice = appSrc.slice(evIdx, evIdx + 500);
+  const prIdx = appSrc.indexOf('function meRecentPressureHtml');
+  const prSlice = appSrc.slice(prIdx, prIdx + 500);
+  assert.ok(
+    evSlice.includes('<code class="me-item-parent"') && !evSlice.includes('onclick="openMyClaimStudy') && !evSlice.includes('onclick="selectClaim'),
+    'evidence rows must show claim_id as plain <code>, never as a clickable claim-open action'
+  );
+  assert.ok(
+    prSlice.includes('<code class="me-item-parent"') && !prSlice.includes('onclick="openMyClaimStudy') && !prSlice.includes('onclick="selectClaim'),
+    'pressure rows must show claim_id as plain <code>, never as a clickable claim-open action'
+  );
+});
+
+test('D-137D: truth rows only offer navigation for public truths', () => {
+  const idx = appSrc.indexOf('function meRecentTruthsHtml');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('const isPublic=state===\'public\'') &&
+    slice.includes("${isPublic?`<button class=\"btn-mini\" onclick=\"setMode('truths')\">"),
+    'meRecentTruthsHtml must only offer the View in Truths action for public rows'
+  );
+});
+
+test('D-137D: no public profile or share UI added', () => {
+  const idx = appSrc.indexOf('// D-137D: My HumanX personal dashboard frontend.');
+  const endIdx = appSrc.indexOf('async function renderMe()', idx) + 1000;
+  const slice = appSrc.slice(idx, endIdx);
+  const codeOnly = slice.split('\n').filter(l => !l.trim().startsWith('//')).join('\n').toLowerCase();
+  assert.ok(
+    !codeOnly.includes('share') && !codeOnly.includes('public profile') && !codeOnly.includes('copy link'),
+    'My HumanX dashboard code must not introduce share buttons or a public profile (outside of explanatory comments)'
+  );
+});
+
+test('D-137D: My HumanX call never accepts a target-user parameter', () => {
+  const idx = appSrc.indexOf('async function renderMe()');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    !slice.includes('userId=') && !slice.includes('?user=') && !slice.includes('targetUser'),
+    'renderMe must never pass a target user id — always implicitly scoped via x-humanx-user'
+  );
+});
+
+test('D-137D: backToArena and renderStudy recognize the me origin for correct back-navigation', () => {
+  assert.ok(
+    appSrc.includes("else if(_origin==='me'){setMode('me');}") &&
+    appSrc.includes("lastModeBeforeStudy==='me'?'← Back to My HumanX'"),
+    'backToArena and renderStudy must handle the me origin'
+  );
+});
+
+test('D-137D: openMyClaimStudy is exposed on window for inline onclick handlers', () => {
+  assert.ok(
+    appSrc.includes('window.openMyClaimStudy=openMyClaimStudy'),
+    'openMyClaimStudy must be exposed on window'
+  );
+});
+
+test('D-137D: existing pages (Home, Claims, Truths, Review) are preserved in the render dispatch', () => {
+  assert.ok(
+    appSrc.includes("if(mode==='home')return renderHome()") &&
+    appSrc.includes("if(mode==='truths')return renderTruths()") &&
+    appSrc.includes("if(mode==='review')return renderReview()"),
+    'render() must still dispatch Home/Truths/Review unchanged'
+  );
+});
+
+test('D-137D: account panel (D-136C) and admin invite creator (D-136D) are unmodified', () => {
+  assert.ok(
+    appSrc.includes('function accountPanelHtml') && appSrc.includes('function renderAdminInvitePanel'),
+    'account panel and admin invite creator functions must remain present and unmodified'
+  );
+});
+
+test('D-137D: D-137C truth claim state clarity is preserved', () => {
+  assert.ok(
+    appSrc.includes('function truthClaimStateMeta') && appSrc.includes('TRUTH_CLAIM_STATE_BADGES'),
+    'D-137C truth-card claim-state logic must remain present and unmodified'
+  );
+});
+
+test('D-137D: no backend route changes — worker.js route block is unmodified', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)") &&
+    !workerSrc.includes('/api/my-humanx/'),
+    'D-137D is frontend-only — the /api/my-humanx route must remain exactly as D-137B defined it'
+  );
+});
+
+test('D-137D: no D1 migration added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0012_d137d.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0012_my_humanx_ui.sql')),
+    'D-137D must not require a D1 migration'
   );
 });
 

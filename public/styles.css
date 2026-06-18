@@ -633,3 +633,18 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .truth-claim-state-badge{font-weight:700}
 .truth-claim-btn-muted{background:#0b0e16;opacity:.7;cursor:default}
 .truth-claim-btn-muted:hover{opacity:.85}
+.me-account-card{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.me-account-head{margin-bottom:4px}
+.me-account-name{margin:2px 0 0;font-size:15px;font-weight:700;color:var(--text)}
+.me-account-sub{margin:0}
+.me-counts-panel{margin-bottom:8px}
+.me-count-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
+.me-count-label{font-size:11px;color:var(--muted);min-width:60px}
+.me-count-chips{display:flex;flex-wrap:wrap;gap:4px}
+.me-count-chip{font-size:9px}
+.me-item-list{display:flex;flex-direction:column;gap:6px}
+.me-item-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;background:#080b12;border:1px solid var(--line);border-radius:9px;padding:7px 9px}
+.me-item-text{flex:1;min-width:120px;font-size:12px;color:var(--text)}
+.me-item-parent{font-size:9px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:6px;padding:2px 5px}
+.me-item-meta{color:var(--muted)}
+.me-empty{margin:4px 0}
