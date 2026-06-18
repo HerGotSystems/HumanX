@@ -5440,10 +5440,12 @@ test('D-136B: existing createOrGetUser function body is unchanged', () => {
   );
 });
 
-test('D-136B: no frontend forced-login gate added (app-v10.js unchanged for this patch)', () => {
+test('D-136B: no forced-login gate added — frontend account panel (D-136C) is additive, not blocking', () => {
+  // D-136B shipped backend-only. D-136C (later) added the account panel referencing these
+  // endpoints, but it must remain non-blocking — see D-136C's "no forced-login gate" test below.
   assert.ok(
-    !appSrc.includes('redeemInviteCode') && !appSrc.includes('/api/auth/invite') && !appSrc.includes('/api/me'),
-    'D-136B is backend-only — no frontend references to invite/me endpoints should exist yet'
+    appSrc.includes('redeemInviteUI') && appSrc.includes('/api/me'),
+    'frontend account panel (D-136C) should reference the D-136B endpoints once added'
   );
 });
 
@@ -5453,6 +5455,159 @@ test('D-136B: createInviteCode does not expose the admin token in its response',
   assert.ok(
     !slice.includes('HUMANX_ADMIN_TOKEN') && !slice.includes('x-humanx-admin'),
     'createInviteCode must not echo back the admin token or admin header'
+  );
+});
+
+// ── Section 58 — D-136C: frontend account invite redeem panel ─────────────────
+
+test('D-136C: account panel render function exists', () => {
+  assert.ok(
+    appSrc.includes('function renderAccountPanel') && appSrc.includes('function accountPanelHtml'),
+    'renderAccountPanel and accountPanelHtml functions must exist'
+  );
+});
+
+test('D-136C: loadMe calls GET /api/me with the current x-humanx-user identity', () => {
+  const idx = appSrc.indexOf('async function loadMe');
+  assert.ok(idx !== -1, 'loadMe function must exist');
+  const slice = appSrc.slice(idx, appSrc.indexOf('\n', idx + 1) + 200);
+  assert.ok(
+    slice.includes("api('/api/me')"),
+    'loadMe must call api(\'/api/me\') which sends x-humanx-user via the shared headers() helper'
+  );
+});
+
+test('D-136C: api() helper always attaches x-humanx-user (loadMe inherits it, no separate header logic)', () => {
+  assert.ok(
+    appSrc.includes("function headers(){return{'content-type':'application/json','x-humanx-user':user?.id||''}}") &&
+    appSrc.includes("async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{...headers(),...(opts.headers||{})}})"),
+    'api() must merge in headers() (which sets x-humanx-user) for every call, including /api/me'
+  );
+});
+
+test('D-136C: anonymous state renders with handle and user id', () => {
+  const idx = appSrc.indexOf('function accountPanelHtml');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes('account-state-anon') && slice.includes("'Anonymous'") === false && slice.includes('>Anonymous<'),
+    'accountPanelHtml must render an anonymous state block with the Anonymous label'
+  );
+  assert.ok(slice.includes('User ID:'), 'anonymous state must show the user id');
+});
+
+test('D-136C: verified state renders with display_name/email/handle', () => {
+  const idx = appSrc.indexOf('function accountPanelHtml');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes('account-state-verified') && slice.includes('>Verified<'),
+    'accountPanelHtml must render a verified state block with the Verified label'
+  );
+  assert.ok(
+    slice.includes('accountUser.display_name') && slice.includes('accountUser.email') && slice.includes('Handle:'),
+    'verified state must show display_name, email, and handle'
+  );
+});
+
+test('D-136C: redeem form posts to /api/auth/invite/redeem', () => {
+  assert.ok(
+    appSrc.includes("api('/api/auth/invite/redeem',{method:'POST'"),
+    'redeemInviteUI must POST to /api/auth/invite/redeem'
+  );
+});
+
+test('D-136C: redeem body includes code, email, and displayName', () => {
+  const idx = appSrc.indexOf('async function redeemInviteUI');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes('code,email,displayName'),
+    'redeemInviteUI request body must include code, email, and displayName'
+  );
+});
+
+test('D-136C: redeem success refreshes /api/me state', () => {
+  const idx = appSrc.indexOf('async function redeemInviteUI');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes('await loadMe()'),
+    'redeemInviteUI must call loadMe() after a successful redeem to refresh account state'
+  );
+});
+
+test('D-136C: redeem shows a success or error toast', () => {
+  const idx = appSrc.indexOf('async function redeemInviteUI');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes("toast('Invite redeemed") && slice.includes("toast(e.message||'Invite redeem failed.')"),
+    'redeemInviteUI must toast on both success and failure'
+  );
+});
+
+test('D-136C: no admin invite-create route used by the public account panel', () => {
+  assert.ok(
+    !appSrc.includes('/api/auth/invite/create'),
+    'public frontend must never call the admin-only invite/create endpoint'
+  );
+});
+
+test('D-136C: account panel does not display is_admin', () => {
+  const idx = appSrc.indexOf('function accountPanelHtml');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    !slice.includes('is_admin'),
+    'accountPanelHtml must never reference or display is_admin'
+  );
+});
+
+test('D-136C: account panel does not expose the admin token', () => {
+  const idx = appSrc.indexOf('function accountPanelHtml');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    !slice.includes('adminToken') && !slice.includes('LS_ADMIN') && !slice.includes('x-humanx-admin'),
+    'accountPanelHtml must never reference the admin token or admin header'
+  );
+});
+
+test('D-136C: no forced-login gate added — boot() still proceeds without verification', () => {
+  const idx = appSrc.indexOf('async function boot()');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('loadMe().catch(()=>{})') && slice.includes('await Promise.all([loadGraphStatus(),loadClaims(false)])'),
+    'boot() must call loadMe() non-blockingly and continue the normal anonymous boot sequence regardless of its outcome'
+  );
+});
+
+test('D-136C: localUser() behavior is unchanged', () => {
+  assert.ok(
+    appSrc.includes("function localUser(){let u=JSON.parse(localStorage.getItem(LS_USER)||'null');if(!u){u={id:'usr_'+crypto.randomUUID().replaceAll('-','').slice(0,18),handle:'anon-'+Math.random().toString(36).slice(2,8)};localStorage.setItem(LS_USER,JSON.stringify(u))}return u}"),
+    'localUser() must remain unmodified for backward compatibility'
+  );
+});
+
+test('D-136C: account panel toggle and redeem functions are exposed on window for inline onclick handlers', () => {
+  assert.ok(
+    appSrc.includes('window.toggleAccountPanel=toggleAccountPanel') && appSrc.includes('window.redeemInviteUI=redeemInviteUI'),
+    'toggleAccountPanel and redeemInviteUI must be exposed on window'
+  );
+});
+
+test('D-136C: account panel container exists in index.html and starts hidden', () => {
+  assert.ok(
+    indexSrc.includes('id="account-panel"') && indexSrc.includes('class="account-panel-popover"') && /id="account-panel"[^>]*hidden/.test(indexSrc),
+    'index.html must contain a hidden #account-panel container'
+  );
+});
+
+test('D-136C: who badge click opens the account panel without navigating away', () => {
+  assert.ok(
+    indexSrc.includes('id="who"') && indexSrc.includes('onclick="toggleAccountPanel()"'),
+    '#who badge must call toggleAccountPanel() on click'
+  );
+});
+
+test('D-136C: styles.css defines account panel popover styling', () => {
+  assert.ok(
+    cssSrc.includes('.account-panel-popover') && cssSrc.includes('.account-redeem') && cssSrc.includes('.account-state-verified') && cssSrc.includes('.account-state-anon'),
+    'styles.css must define account panel popover and state styling'
   );
 });
 
