@@ -37,6 +37,7 @@ export default {
       if (url.pathname === '/api/claim-vote' && request.method === 'POST') return await voteClaim(request, env, { readJson, cleanId, json, requireUser: async (req) => requireUser(req, env), makeId });
       if (url.pathname === '/api/session' && request.method === 'POST') return await createOrGetUser(request, env);
       if (url.pathname === '/api/me' && request.method === 'GET') return await getMe(request, env);
+      if (url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env);
       if (url.pathname === '/api/auth/invite/create' && request.method === 'POST') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return await createInviteCode(request, env); }
       if (url.pathname === '/api/auth/invite/redeem' && request.method === 'POST') return await redeemInviteCode(request, env);
       if (url.pathname === '/api/claims' && request.method === 'GET') return await listClaims(request, env);
@@ -90,6 +91,60 @@ async function getMe(request, env) {
   // is_admin and any admin-token material are intentionally omitted from this response.
   const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?`).bind(userId).first();
   return json({ user });
+}
+
+// D-137B: My HumanX personal dashboard backend.
+// Always scoped to the requester's own x-humanx-user identity — never accepts
+// a caller-supplied target user id, so this endpoint cannot be used to read
+// another user's content even though the identity header itself remains
+// unsigned/spoofable (carried-forward limitation, see docs/D136E_INVITE_AUTH_CHECKPOINT.md).
+
+const MY_HUMANX_REVIEW_STATES = ['public', 'review', 'rejected', 'archived', 'duplicate'];
+
+async function userContentCounts(env, table, userIdColumn, userId) {
+  // table/userIdColumn are always one of our own fixed internal constants below,
+  // never derived from request input — safe to interpolate.
+  const rows = await env.DB.prepare(
+    `SELECT COALESCE(review_state,'public') AS state, COUNT(*) AS n FROM ${table} WHERE ${userIdColumn}=? GROUP BY COALESCE(review_state,'public')`
+  ).bind(userId).all();
+  const counts = {};
+  for (const s of MY_HUMANX_REVIEW_STATES) counts[s] = 0;
+  for (const r of (rows.results || [])) { if (Object.prototype.hasOwnProperty.call(counts, r.state)) counts[r.state] = r.n; }
+  return counts;
+}
+
+async function myHumanX(request, env) {
+  const userId = requireUserId(request);
+  await ensureUser(env, userId);
+
+  const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?`).bind(userId).first();
+
+  const [claimCounts, truthCounts, evidenceCounts, pressureCounts] = await Promise.all([
+    userContentCounts(env, 'claims', 'user_id', userId),
+    userContentCounts(env, 'truths', 'user_id', userId),
+    userContentCounts(env, 'evidence', 'user_id', userId),
+    userContentCounts(env, 'pressure_points', 'user_id', userId),
+  ]);
+
+  const [claimsRows, truthsRows, evidenceRows, pressureRows, beliefRows] = await Promise.all([
+    env.DB.prepare(`SELECT id, claim, category, type AS claim_type, status, review_state, evidence_score, testability, survivability, created_at, updated_at FROM claims WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 20`).bind(userId).all(),
+    env.DB.prepare(`SELECT id, statement, category, origin, review_state, created_at, updated_at FROM truths WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 20`).bind(userId).all(),
+    // evidence has no updated_at column — sort by created_at only.
+    env.DB.prepare(`SELECT id, claim_id, title, quality AS type, source_url, review_state, created_at FROM evidence WHERE user_id=? ORDER BY created_at DESC LIMIT 20`).bind(userId).all(),
+    env.DB.prepare(`SELECT id, claim_id, title, body, severity, review_state, created_at, updated_at FROM pressure_points WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 20`).bind(userId).all(),
+    env.DB.prepare(`SELECT id, label, stability_score, openness_score, pressure_score, created_at FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC LIMIT 10`).bind(userId).all(),
+  ]);
+
+  return json({
+    ok: true,
+    user,
+    counts: { claims: claimCounts, truths: truthCounts, evidence: evidenceCounts, pressure: pressureCounts },
+    claims: claimsRows.results || [],
+    truths: truthsRows.results || [],
+    evidence: evidenceRows.results || [],
+    pressure: pressureRows.results || [],
+    belief_snapshots: beliefRows.results || [],
+  });
 }
 
 async function createInviteCode(request, env) {

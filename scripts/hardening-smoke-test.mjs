@@ -1399,6 +1399,7 @@ console.log('\n30. D-90B: Pressure point moderation backend');
 
 const migSrc0009 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0009_add_pressure_review_state.sql'), 'utf8'); } catch { return ''; } })();
 const migSrc0010 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0010_invite_auth.sql'), 'utf8'); } catch { return ''; } })();
+const migSrc0011 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0011_user_content_indexes.sql'), 'utf8'); } catch { return ''; } })();
 
 test('D-90B: migration 0009 file exists', () => {
   assert.ok(migSrc0009.length > 0, 'migrations/0009_add_pressure_review_state.sql must exist');
@@ -5739,6 +5740,153 @@ test('D-136D: styles.css defines admin invite panel styling', () => {
   assert.ok(
     cssSrc.includes('.admin-invite-panel') && cssSrc.includes('.admin-invite-code') && cssSrc.includes('.admin-invite-result'),
     'styles.css must define admin invite panel styling'
+  );
+});
+
+// ── Section 60 — D-137B: My HumanX dashboard backend ───────────────────────────
+
+test('D-137B: migration 0011 file exists', () => {
+  assert.ok(migSrc0011.length > 0, 'migrations/0011_user_content_indexes.sql must exist');
+});
+
+test('D-137B: migration 0011 adds all five user_id indexes', () => {
+  const idxs = [
+    'CREATE INDEX IF NOT EXISTS idx_claims_user_id ON claims(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_truths_user_id ON truths(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_evidence_user_id ON evidence(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_pressure_points_user_id ON pressure_points(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_home_tests_user_id ON home_tests(user_id)',
+  ];
+  assert.ok(idxs.every(i => migSrc0011.includes(i)), 'migration 0011 must create all five user_id indexes');
+});
+
+test('D-137B: GET /api/my-humanx route exists and dispatches to myHumanX', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)"),
+    '/api/my-humanx route must exist and dispatch to myHumanX'
+  );
+});
+
+test('D-137B: myHumanX requires/uses x-humanx-user via requireUserId', () => {
+  const idx = workerSrc.indexOf('async function myHumanX');
+  assert.ok(idx !== -1, 'myHumanX function must exist');
+  const slice = workerSrc.slice(idx, idx + 300);
+  assert.ok(
+    slice.includes('requireUserId(request)'),
+    'myHumanX must resolve the requester via requireUserId(request)'
+  );
+});
+
+test('D-137B: myHumanX does not accept a caller-supplied target user id', () => {
+  const idx = workerSrc.indexOf('async function myHumanX');
+  const endIdx = workerSrc.indexOf('\nasync function', idx + 1);
+  const slice = workerSrc.slice(idx, endIdx === -1 ? idx + 3000 : endIdx);
+  assert.ok(
+    !slice.includes('body.userId') && !slice.includes('body.user_id') && !slice.includes('url.searchParams.get') && !slice.includes('readJson'),
+    'myHumanX must never read a target user id from the request body or query string — always scoped to the requester\'s own identity'
+  );
+});
+
+test('D-137B: response includes ok, user, counts, and content lists', () => {
+  const idx = workerSrc.indexOf('async function myHumanX');
+  const endIdx = workerSrc.indexOf('\nasync function', idx + 1);
+  const slice = workerSrc.slice(idx, endIdx === -1 ? idx + 3000 : endIdx);
+  assert.ok(
+    slice.includes('ok: true') &&
+    slice.includes('user,') &&
+    slice.includes('counts: { claims: claimCounts, truths: truthCounts, evidence: evidenceCounts, pressure: pressureCounts }') &&
+    slice.includes('claims: claimsRows.results') &&
+    slice.includes('truths: truthsRows.results') &&
+    slice.includes('evidence: evidenceRows.results') &&
+    slice.includes('pressure: pressureRows.results') &&
+    slice.includes('belief_snapshots: beliefRows.results'),
+    'myHumanX response must include ok, user, counts, claims, truths, evidence, pressure, belief_snapshots'
+  );
+});
+
+test('D-137B: counts normalize null review_state to public', () => {
+  assert.ok(
+    workerSrc.includes("COALESCE(review_state,'public') AS state") &&
+    workerSrc.includes("GROUP BY COALESCE(review_state,'public')"),
+    'userContentCounts must normalize null review_state to public via COALESCE'
+  );
+});
+
+test('D-137B: counts include zero values for missing states', () => {
+  const idx = workerSrc.indexOf('async function userContentCounts');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('MY_HUMANX_REVIEW_STATES') && slice.includes('counts[s] = 0'),
+    'userContentCounts must pre-fill every known state with 0 before applying actual counts'
+  );
+});
+
+test('D-137B: every content query filters by the current user_id', () => {
+  assert.ok(
+    workerSrc.includes('FROM claims WHERE user_id=?') &&
+    workerSrc.includes('FROM truths WHERE user_id=?') &&
+    workerSrc.includes('FROM evidence WHERE user_id=?') &&
+    workerSrc.includes('FROM pressure_points WHERE user_id=?') &&
+    workerSrc.includes('FROM belief_snapshots WHERE user_id=?'),
+    'every content table query must filter by user_id=? bound to the requester\'s own id'
+  );
+});
+
+test('D-137B: claims, truths, evidence, pressure lists are capped at LIMIT 20 and belief_snapshots at LIMIT 10', () => {
+  assert.ok(
+    workerSrc.includes('FROM claims WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 20') &&
+    workerSrc.includes('FROM truths WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 20') &&
+    workerSrc.includes('FROM evidence WHERE user_id=? ORDER BY created_at DESC LIMIT 20') &&
+    workerSrc.includes('FROM pressure_points WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 20') &&
+    workerSrc.includes('FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC LIMIT 10'),
+    'content list queries must be capped per the documented limits'
+  );
+});
+
+test('D-137B: lists sort newest first, using updated_at where available else created_at', () => {
+  assert.ok(
+    workerSrc.includes('ORDER BY COALESCE(updated_at,created_at) DESC') &&
+    workerSrc.includes('FROM evidence WHERE user_id=? ORDER BY created_at DESC'),
+    'lists must sort DESC by updated_at falling back to created_at, except evidence which has no updated_at column'
+  );
+});
+
+test('D-137B: myHumanX omits is_admin and admin token material', () => {
+  const idx = workerSrc.indexOf('async function myHumanX');
+  const endIdx = workerSrc.indexOf('\nasync function', idx + 1);
+  const slice = workerSrc.slice(idx, endIdx === -1 ? idx + 3000 : endIdx);
+  const codeOnly = slice.split('\n').filter(l => !l.trim().startsWith('//')).join('\n');
+  assert.ok(
+    !codeOnly.includes('is_admin') && !codeOnly.includes('HUMANX_ADMIN_TOKEN') && !codeOnly.includes('x-humanx-admin'),
+    'myHumanX must never select, reference, or return is_admin or admin token material'
+  );
+});
+
+test('D-137B: GET /api/me remains unchanged', () => {
+  const idx = workerSrc.indexOf('async function getMe');
+  const slice = workerSrc.slice(idx, idx + 200);
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/me' && request.method === 'GET') return await getMe(request, env)") &&
+    slice.includes('const userId = requireUserId(request);') &&
+    slice.includes('await ensureUser(env, userId);'),
+    '/api/me route and getMe implementation must remain unchanged'
+  );
+});
+
+test('D-137B: existing routes (session, claims, truths, review) remain present', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/session' && request.method === 'POST'") &&
+    workerSrc.includes("url.pathname === '/api/claims' && request.method === 'GET'") &&
+    workerSrc.includes("url.pathname === '/api/truths' && request.method === 'GET'") &&
+    workerSrc.includes("url.pathname === '/api/review' && request.method === 'GET'"),
+    'existing routes must remain present and unmodified by this patch'
+  );
+});
+
+test('D-137B: no frontend Me tab or My HumanX UI added yet', () => {
+  assert.ok(
+    !appSrc.includes('my-humanx') && !appSrc.includes('myHumanX') && !appSrc.includes("setMode('me')") && !appSrc.includes('tab-me'),
+    'D-137B is backend-only — no frontend references to the My HumanX dashboard should exist yet'
   );
 });
 
