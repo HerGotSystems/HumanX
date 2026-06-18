@@ -5543,9 +5543,13 @@ test('D-136C: redeem shows a success or error toast', () => {
 });
 
 test('D-136C: no admin invite-create route used by the public account panel', () => {
+  // D-136D later added an admin-only invite-create panel elsewhere in the file (renderAdminInvitePanel/
+  // createInviteCodeUI) — scope this check to the public accountPanelHtml function specifically.
+  const idx = appSrc.indexOf('function accountPanelHtml');
+  const slice = appSrc.slice(idx, idx + 1500);
   assert.ok(
-    !appSrc.includes('/api/auth/invite/create'),
-    'public frontend must never call the admin-only invite/create endpoint'
+    !slice.includes('/api/auth/invite/create'),
+    'public account panel must never call the admin-only invite/create endpoint'
   );
 });
 
@@ -5608,6 +5612,133 @@ test('D-136C: styles.css defines account panel popover styling', () => {
   assert.ok(
     cssSrc.includes('.account-panel-popover') && cssSrc.includes('.account-redeem') && cssSrc.includes('.account-state-verified') && cssSrc.includes('.account-state-anon'),
     'styles.css must define account panel popover and state styling'
+  );
+});
+
+// ── Section 59 — D-136D: admin invite-code creator panel ──────────────────────
+
+test('D-136D: admin invite panel render function exists', () => {
+  assert.ok(
+    appSrc.includes('function renderAdminInvitePanel'),
+    'renderAdminInvitePanel function must exist'
+  );
+});
+
+test('D-136D: admin invite panel is only rendered when an admin token is present', () => {
+  assert.ok(
+    appSrc.includes('${token?renderAdminInvitePanel():\'\'}'),
+    'renderReview() must only call renderAdminInvitePanel() when an admin token is present'
+  );
+});
+
+test('D-136D: invite create calls POST /api/auth/invite/create', () => {
+  assert.ok(
+    appSrc.includes("api('/api/auth/invite/create',{method:'POST'"),
+    'createInviteCodeUI must POST to /api/auth/invite/create'
+  );
+});
+
+test('D-136D: invite create request includes x-humanx-admin via adminHeaders()', () => {
+  const idx = appSrc.indexOf('async function createInviteCodeUI');
+  assert.ok(idx !== -1, 'createInviteCodeUI function must exist');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes("api('/api/auth/invite/create',{method:'POST',headers:adminHeaders()"),
+    'createInviteCodeUI must send adminHeaders() (which includes x-humanx-admin) with the request'
+  );
+});
+
+test('D-136D: createInviteCodeUI guards against a missing admin token before calling the API', () => {
+  const idx = appSrc.indexOf('async function createInviteCodeUI');
+  const slice = appSrc.slice(idx, idx + 200);
+  assert.ok(
+    slice.includes('if(!adminToken())'),
+    'createInviteCodeUI must check adminToken() and toast an error before attempting the request'
+  );
+});
+
+test('D-136D: public account panel (accountPanelHtml) does not call invite create', () => {
+  const idx = appSrc.indexOf('function accountPanelHtml');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    !slice.includes('/api/auth/invite/create') && !slice.includes('createInviteCodeUI'),
+    'accountPanelHtml must never reference the admin-only invite-create endpoint or its handler'
+  );
+});
+
+test('D-136D: generated invite code is rendered into the result area', () => {
+  const idx = appSrc.indexOf('async function createInviteCodeUI');
+  const slice = appSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('admin-invite-code') && slice.includes('adminInviteResult'),
+    'createInviteCodeUI must render the generated code into #adminInviteResult'
+  );
+});
+
+test('D-136D: copy code button exists and is wired to clipboard', () => {
+  assert.ok(
+    appSrc.includes('function copyAdminInviteCode') &&
+    appSrc.includes('navigator.clipboard') &&
+    appSrc.includes('Copy code'),
+    'copyAdminInviteCode must exist and the result UI must include a Copy code button'
+  );
+});
+
+test('D-136D: no email-sending wording appears anywhere in the admin invite panel', () => {
+  const idx = appSrc.indexOf('function renderAdminInvitePanel');
+  const createIdx = appSrc.indexOf('async function createInviteCodeUI');
+  const slice = appSrc.slice(idx, createIdx + 900);
+  const lower = slice.toLowerCase();
+  assert.ok(
+    !lower.includes('email sent') && !lower.includes('we will email') && !lower.includes('email has been sent') && !lower.includes('sending email'),
+    'admin invite panel must not claim that email is sent — codes are manual-share only'
+  );
+  assert.ok(
+    slice.includes('no email is sent'),
+    'admin invite panel should explicitly state that no email is sent'
+  );
+});
+
+test('D-136D: existing redeem flow still posts to /api/auth/invite/redeem', () => {
+  assert.ok(
+    appSrc.includes("api('/api/auth/invite/redeem',{method:'POST'"),
+    'redeemInviteUI must still POST to /api/auth/invite/redeem (unchanged by this patch)'
+  );
+});
+
+test('D-136D: account panel (D-136C) is unmodified by this patch', () => {
+  assert.ok(
+    appSrc.includes('function accountPanelHtml') && appSrc.includes('function toggleAccountPanel') && appSrc.includes('function renderAccountPanel'),
+    'account panel functions from D-136C must still be present'
+  );
+});
+
+test('D-136D: anonymous flow (localUser, /api/session) is unmodified by this patch', () => {
+  assert.ok(
+    appSrc.includes("function localUser(){let u=JSON.parse(localStorage.getItem(LS_USER)||'null');if(!u){u={id:'usr_'+crypto.randomUUID().replaceAll('-','').slice(0,18),handle:'anon-'+Math.random().toString(36).slice(2,8)};localStorage.setItem(LS_USER,JSON.stringify(u))}return u}") &&
+    workerSrc.includes("async function createOrGetUser(request, env) { const body = await readJson(request); const now = Date.now(); const userId = cleanId(body.id) || makeId('usr');"),
+    'localUser() and /api/session backend must remain unmodified'
+  );
+});
+
+test('D-136D: review actions (decision/cleanup/mark-duplicate) are unmodified by this patch', () => {
+  assert.ok(
+    appSrc.includes('function reviewDecisionUI') && appSrc.includes('function reviewCleanupUI') && appSrc.includes('function markDuplicateUI'),
+    'review action functions must still be present and unmodified'
+  );
+});
+
+test('D-136D: createInviteCodeUI and copyAdminInviteCode are exposed on window', () => {
+  assert.ok(
+    appSrc.includes('window.createInviteCodeUI=createInviteCodeUI') && appSrc.includes('window.copyAdminInviteCode=copyAdminInviteCode'),
+    'createInviteCodeUI and copyAdminInviteCode must be exposed on window for inline onclick handlers'
+  );
+});
+
+test('D-136D: styles.css defines admin invite panel styling', () => {
+  assert.ok(
+    cssSrc.includes('.admin-invite-panel') && cssSrc.includes('.admin-invite-code') && cssSrc.includes('.admin-invite-result'),
+    'styles.css must define admin invite panel styling'
   );
 });
 
