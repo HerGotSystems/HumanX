@@ -43,6 +43,9 @@ It does not propose changes. It does not define new endpoints.
 | Method | Path | Purpose | Visibility | D1 tables touched | Risk notes |
 |---|---|---|---|---|---|
 | POST | `/api/session` | Creates or retrieves a pseudonymous user by ID | Public | `users` | No authentication. ID is caller-supplied or auto-generated. Fingerprint hash stored but not validated |
+| GET | `/api/me` | Returns the current user row (D-136B) | Public (requires `x-humanx-user`) | `users` | Same identity model as `/api/session` — `x-humanx-user` is unsigned and spoofable (known limitation, no cookie/magic-link yet). Response omits `is_admin` and any admin-token material |
+| POST | `/api/auth/invite/create` | Mints a single-use invite code (D-136B) | **Admin only** | `invite_codes` | Requires `x-humanx-admin`. Does not echo back the admin token |
+| POST | `/api/auth/invite/redeem` | Redeems an invite code to verify the current `x-humanx-user` row with an email (D-136B) | Public (requires `x-humanx-user`) | `users`, `invite_codes` | Rate-limited (8/hr/IP). Single-use, atomic claim via guarded `UPDATE ... WHERE redeemed_by IS NULL`. Enforces email uniqueness. Never sets `is_admin`. Upgrades the existing anonymous row in place — never mints a new user id |
 
 ### Claims
 

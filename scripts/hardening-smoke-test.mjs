@@ -1398,6 +1398,7 @@ test('D-89D: USER_SHADOW_BANNED still maps to 403 after refactor (D-89D)', () =>
 console.log('\n30. D-90B: Pressure point moderation backend');
 
 const migSrc0009 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0009_add_pressure_review_state.sql'), 'utf8'); } catch { return ''; } })();
+const migSrc0010 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0010_invite_auth.sql'), 'utf8'); } catch { return ''; } })();
 
 test('D-90B: migration 0009 file exists', () => {
   assert.ok(migSrc0009.length > 0, 'migrations/0009_add_pressure_review_state.sql must exist');
@@ -5263,6 +5264,195 @@ test('D-135B: no D1 migration added for this change', () => {
     !existsSync(path.join(__dirname, '../migrations/0014_d135b.sql')) &&
     !existsSync(path.join(__dirname, '../migrations/0015_d135b.sql')),
     'D-135B must not require a D1 migration'
+  );
+});
+
+// ── Section 57 — D-136B: invite-code auth backend foundation ──────────────────
+
+test('D-136B: migration 0010 file exists', () => {
+  assert.ok(migSrc0010.length > 0, 'migrations/0010_invite_auth.sql must exist');
+});
+
+test('D-136B: migration 0010 adds email, verified, verified_at, display_name to users', () => {
+  assert.ok(
+    migSrc0010.includes('ALTER TABLE users ADD COLUMN email TEXT') &&
+    migSrc0010.includes('ALTER TABLE users ADD COLUMN verified INTEGER DEFAULT 0') &&
+    migSrc0010.includes('ALTER TABLE users ADD COLUMN verified_at INTEGER') &&
+    migSrc0010.includes('ALTER TABLE users ADD COLUMN display_name TEXT'),
+    'migration 0010 must add email, verified, verified_at, display_name columns to users'
+  );
+});
+
+test('D-136B: migration 0010 adds partial unique email index', () => {
+  assert.ok(
+    migSrc0010.includes('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique') &&
+    migSrc0010.includes('ON users(email) WHERE email IS NOT NULL'),
+    'migration 0010 must add a partial unique index on users.email'
+  );
+});
+
+test('D-136B: migration 0010 creates invite_codes table with required columns', () => {
+  const reqCols = ['code TEXT PRIMARY KEY', 'created_by TEXT', 'created_at INTEGER', 'redeemed_by TEXT', 'redeemed_at INTEGER', 'email_hint TEXT', 'expires_at INTEGER', 'revoked INTEGER DEFAULT 0'];
+  assert.ok(
+    migSrc0010.includes('CREATE TABLE IF NOT EXISTS invite_codes') &&
+    reqCols.every(c => migSrc0010.includes(c)),
+    'migration 0010 must create invite_codes table with all required columns'
+  );
+});
+
+test('D-136B: migration 0010 adds idx_invite_codes_redeemed_by index', () => {
+  assert.ok(
+    migSrc0010.includes('CREATE INDEX IF NOT EXISTS idx_invite_codes_redeemed_by') &&
+    migSrc0010.includes('ON invite_codes(redeemed_by)'),
+    'migration 0010 must add idx_invite_codes_redeemed_by index'
+  );
+});
+
+test('D-136B: migration 0010 does not add a UNIQUE constraint on users.handle', () => {
+  assert.ok(
+    !/handle\s+TEXT\s+UNIQUE/i.test(migSrc0010) && !migSrc0010.includes('idx_users_handle_unique'),
+    'migration 0010 must not add handle uniqueness (explicitly deferred per task scope)'
+  );
+});
+
+test('D-136B: POST /api/auth/invite/create route exists and is requireAdmin protected', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/auth/invite/create'") &&
+    /url\.pathname === '\/api\/auth\/invite\/create'[\s\S]{0,120}?requireAdmin\(request, env\)/.test(workerSrc),
+    'invite create route must exist and call requireAdmin before createInviteCode'
+  );
+});
+
+test('D-136B: POST /api/auth/invite/redeem route exists', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/auth/invite/redeem'") &&
+    workerSrc.includes('redeemInviteCode(request, env)'),
+    'invite redeem route must exist and dispatch to redeemInviteCode'
+  );
+});
+
+test('D-136B: GET /api/me route exists', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/me'") &&
+    workerSrc.includes('getMe(request, env)'),
+    '/api/me route must exist and dispatch to getMe'
+  );
+});
+
+test('D-136B: redeemInviteCode never writes is_admin', () => {
+  const idx = workerSrc.indexOf('async function redeemInviteCode');
+  assert.ok(idx !== -1, 'redeemInviteCode function must exist');
+  const slice = workerSrc.slice(idx, workerSrc.indexOf('\n}', idx) + 2);
+  const codeOnly = slice.split('\n').filter(l => !l.trim().startsWith('//')).join('\n');
+  assert.ok(
+    !codeOnly.includes('is_admin'),
+    'redeemInviteCode must never reference or write is_admin (outside of explanatory comments)'
+  );
+});
+
+test('D-136B: redeemInviteCode validates email format before redemption', () => {
+  assert.ok(
+    workerSrc.includes('function isValidEmail') && workerSrc.includes('isValidEmail(email)') && workerSrc.includes("error: 'INVALID_EMAIL'"),
+    'redeemInviteCode must validate email format and return INVALID_EMAIL on failure'
+  );
+});
+
+test('D-136B: redeemInviteCode rejects already-redeemed, revoked, and expired codes', () => {
+  const idx = workerSrc.indexOf('async function redeemInviteCode');
+  const slice = workerSrc.slice(idx, workerSrc.indexOf('\n}', idx) + 2);
+  assert.ok(
+    slice.includes("error: 'INVITE_ALREADY_REDEEMED'") &&
+    slice.includes("error: 'INVITE_REVOKED'") &&
+    slice.includes("error: 'INVITE_EXPIRED'"),
+    'redeemInviteCode must reject already-redeemed, revoked, and expired invite codes'
+  );
+});
+
+test('D-136B: redeemInviteCode marks invite redeemed atomically via guarded UPDATE', () => {
+  assert.ok(
+    workerSrc.includes('UPDATE invite_codes SET redeemed_by=?, redeemed_at=?') &&
+    workerSrc.includes('WHERE code=? AND redeemed_by IS NULL AND revoked=0') &&
+    workerSrc.includes('claim.meta.changes === 0'),
+    'redeemInviteCode must atomically claim the invite via a guarded UPDATE and check meta.changes'
+  );
+});
+
+test('D-136B: redeemInviteCode updates the existing x-humanx-user row (no new user id minted)', () => {
+  const idx = workerSrc.indexOf('async function redeemInviteCode');
+  const slice = workerSrc.slice(idx, workerSrc.indexOf('\n}', idx) + 2);
+  assert.ok(
+    slice.includes('requireUser(request, env)') &&
+    slice.includes('UPDATE users SET email=?, verified=1, verified_at=?, display_name=COALESCE(?,display_name) WHERE id=?') &&
+    !slice.includes("makeId('usr')"),
+    'redeemInviteCode must read the existing userId via requireUser and UPDATE that same row — never mint a new user id'
+  );
+});
+
+test('D-136B: redeemInviteCode enforces email uniqueness against other users', () => {
+  assert.ok(
+    workerSrc.includes('SELECT id FROM users WHERE email=? AND id!=?') &&
+    workerSrc.includes("error: 'EMAIL_ALREADY_IN_USE'"),
+    'redeemInviteCode must check for existing email on another user and reject duplicates'
+  );
+});
+
+test('D-136B: redeemInviteCode is rate-limited', () => {
+  const idx = workerSrc.indexOf('async function redeemInviteCode');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('safeRateLimit(request, env, `invite-redeem:'),
+    'redeemInviteCode must call safeRateLimit to slow down brute-force code guessing'
+  );
+});
+
+test('D-136B: getMe omits is_admin and any admin token material', () => {
+  const idx = workerSrc.indexOf('async function getMe');
+  assert.ok(idx !== -1, 'getMe function must exist');
+  const slice = workerSrc.slice(idx, workerSrc.indexOf('\n}', idx) + 2);
+  const codeOnly = slice.split('\n').filter(l => !l.trim().startsWith('//')).join('\n');
+  assert.ok(
+    !codeOnly.includes('is_admin') && !codeOnly.includes('HUMANX_ADMIN_TOKEN'),
+    'getMe must not select or return is_admin or admin token material (outside of explanatory comments)'
+  );
+});
+
+test('D-136B: getMe returns the documented user field set', () => {
+  const idx = workerSrc.indexOf('async function getMe');
+  const slice = workerSrc.slice(idx, workerSrc.indexOf('\n}', idx) + 2);
+  const fields = ['id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at'];
+  assert.ok(
+    fields.every(f => slice.includes(f)),
+    'getMe must SELECT the documented field set'
+  );
+});
+
+test('D-136B: existing /api/session route still present and unmodified in routing', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/session' && request.method === 'POST') return await createOrGetUser(request, env)"),
+    '/api/session route must continue to dispatch to createOrGetUser unchanged'
+  );
+});
+
+test('D-136B: existing createOrGetUser function body is unchanged', () => {
+  assert.ok(
+    workerSrc.includes("async function createOrGetUser(request, env) { const body = await readJson(request); const now = Date.now(); const userId = cleanId(body.id) || makeId('usr');"),
+    'createOrGetUser must remain unmodified for backward compatibility'
+  );
+});
+
+test('D-136B: no frontend forced-login gate added (app-v10.js unchanged for this patch)', () => {
+  assert.ok(
+    !appSrc.includes('redeemInviteCode') && !appSrc.includes('/api/auth/invite') && !appSrc.includes('/api/me'),
+    'D-136B is backend-only — no frontend references to invite/me endpoints should exist yet'
+  );
+});
+
+test('D-136B: createInviteCode does not expose the admin token in its response', () => {
+  const idx = workerSrc.indexOf('async function createInviteCode');
+  const slice = workerSrc.slice(idx, workerSrc.indexOf('\n}', idx) + 2);
+  assert.ok(
+    !slice.includes('HUMANX_ADMIN_TOKEN') && !slice.includes('x-humanx-admin'),
+    'createInviteCode must not echo back the admin token or admin header'
   );
 });
 

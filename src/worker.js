@@ -36,6 +36,9 @@ export default {
       if (url.pathname === '/api/import-truths' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; const mode = url.searchParams.get('mode') || 'dry-run'; if (mode !== 'dry-run' && mode !== 'apply') return json({ error:'INVALID_MODE', message:"mode must be 'dry-run' or 'apply'" },400); return json(await importTruthSeeds(env, { dryRun: mode !== 'apply' })); }
       if (url.pathname === '/api/claim-vote' && request.method === 'POST') return await voteClaim(request, env, { readJson, cleanId, json, requireUser: async (req) => requireUser(req, env), makeId });
       if (url.pathname === '/api/session' && request.method === 'POST') return await createOrGetUser(request, env);
+      if (url.pathname === '/api/me' && request.method === 'GET') return await getMe(request, env);
+      if (url.pathname === '/api/auth/invite/create' && request.method === 'POST') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return await createInviteCode(request, env); }
+      if (url.pathname === '/api/auth/invite/redeem' && request.method === 'POST') return await redeemInviteCode(request, env);
       if (url.pathname === '/api/claims' && request.method === 'GET') return await listClaims(request, env);
       if (url.pathname === '/api/claims' && request.method === 'POST') return await createClaim(request, env);
       if (url.pathname === '/api/evidence-vault' && request.method === 'GET') return await listEvidenceVault(request, env, { json });
@@ -75,6 +78,84 @@ export default {
 async function debugState(request, env) { const tables = ['users','claims','evidence','pressure_points','reports','aip_packets','rate_limits','analysis_results','belief_snapshots','truths','truth_claim_links','evidence_claim_links','claim_votes','evidence_votes','truth_votes','home_tests','duplicate_signatures']; const counts = {}; for (const table of tables) { try { const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first(); counts[table] = row?.n ?? 0; } catch (err) { counts[table] = `ERROR: ${err.message}`; } } const latest = await env.DB.prepare(`SELECT id, claim, status, review_state, created_at FROM claims ORDER BY created_at DESC LIMIT 5`).all().catch(err => ({ error: err.message, results: [] })); return json({ ok: true, counts, latest: latest.results || [], latest_error: latest.error || null }); }
 async function seedDemoClaims(request, env) { await ensureUser(env, 'usr_demo_seed'); const existing = await env.DB.prepare(`SELECT COUNT(*) AS n FROM claims`).first(); if ((existing?.n || 0) > 0) return json({ ok: true, message: 'Database already has claims. Seed not needed.', count: existing.n }); const now = Date.now(); for (const c of demoClaims()) await env.DB.prepare(`INSERT OR IGNORE INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(c.id,'usr_demo_seed',c.claim,c.category,c.type,c.status,c.evidenceScore,c.survivability,c.testability,c.contradictions,now,now,'public').run(); return json({ ok: true, seeded: demoClaims().length }); }
 async function createOrGetUser(request, env) { const body = await readJson(request); const now = Date.now(); const userId = cleanId(body.id) || makeId('usr'); const handle = cleanHandle(body.handle) || `anon-${userId.slice(-6)}`; const fingerprint = String(body.fingerprintHash || '').slice(0,128); await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, fingerprint_hash, created_at) VALUES (?, ?, ?, ?)`).bind(userId,handle,fingerprint,now).run(); let user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned, is_admin FROM users WHERE id=?`).bind(userId).first(); if (!user) { await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`).bind(userId,`anon-${userId.slice(-6)}`,now).run(); user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned, is_admin FROM users WHERE id=?`).bind(userId).first(); } return json({ user }); }
+
+// D-136B: invite-code auth foundation.
+// Identity is still the unsigned x-humanx-user header (known limitation —
+// see docs/README.md). Verification only upgrades the existing anonymous
+// row in place; it never mints a new user id and never touches is_admin.
+
+async function getMe(request, env) {
+  const userId = requireUserId(request);
+  await ensureUser(env, userId);
+  // is_admin and any admin-token material are intentionally omitted from this response.
+  const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?`).bind(userId).first();
+  return json({ user });
+}
+
+async function createInviteCode(request, env) {
+  const body = await readJson(request);
+  const note = cleanText(body.note || '', 200);
+  const emailHint = cleanText(body.emailHint || '', 200);
+  const expiresAt = Number.isFinite(Number(body.expiresAt)) && Number(body.expiresAt) > 0 ? Number(body.expiresAt) : null;
+  const code = `inv_${crypto.randomUUID().replaceAll('-', '').slice(0, 24)}`;
+  const now = Date.now();
+  await env.DB.prepare(`INSERT INTO invite_codes (code, created_by, created_at, email_hint, expires_at, revoked) VALUES (?,?,?,?,?,?)`)
+    .bind(code, note || 'admin', now, emailHint || null, expiresAt, 0).run();
+  const invite = await env.DB.prepare(`SELECT code, created_by, created_at, redeemed_by, redeemed_at, email_hint, expires_at, revoked FROM invite_codes WHERE code=?`).bind(code).first();
+  return json({ ok: true, code, invite });
+}
+
+function isValidEmail(v) {
+  const s = String(v || '').trim();
+  if (s.length < 5 || s.length > 254) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+}
+
+async function redeemInviteCode(request, env) {
+  const userId = await requireUser(request, env);
+  await safeRateLimit(request, env, `invite-redeem:${ip(request)}`, 8, 3600000);
+  const body = await readJson(request);
+  const code = cleanId(body.code || '');
+  const email = String(body.email || '').trim().toLowerCase();
+  const displayName = body.displayName != null ? cleanText(body.displayName, 80) : null;
+  if (!code) return json({ error: 'CODE_REQUIRED' }, 400);
+  if (!isValidEmail(email)) return json({ error: 'INVALID_EMAIL' }, 400);
+
+  await ensureUser(env, userId);
+
+  const invite = await env.DB.prepare(`SELECT code, redeemed_by, revoked, expires_at FROM invite_codes WHERE code=?`).bind(code).first();
+  if (!invite) return json({ error: 'INVITE_NOT_FOUND' }, 404);
+  if (invite.revoked) return json({ error: 'INVITE_REVOKED' }, 400);
+  if (invite.redeemed_by) return json({ error: 'INVITE_ALREADY_REDEEMED' }, 400);
+  if (invite.expires_at && Number(invite.expires_at) < Date.now()) return json({ error: 'INVITE_EXPIRED' }, 400);
+
+  const emailOwner = await env.DB.prepare(`SELECT id FROM users WHERE email=? AND id!=?`).bind(email, userId).first();
+  if (emailOwner) return json({ error: 'EMAIL_ALREADY_IN_USE' }, 400);
+
+  const now = Date.now();
+  // Atomic single-use claim: only succeeds if the code is still unredeemed/unrevoked/unexpired
+  // at the moment of the UPDATE — closes the race window between the read above and this write.
+  const claim = await env.DB.prepare(`
+    UPDATE invite_codes SET redeemed_by=?, redeemed_at=?
+    WHERE code=? AND redeemed_by IS NULL AND revoked=0 AND (expires_at IS NULL OR expires_at>=?)
+  `).bind(userId, now, code, now).run();
+  if (!claim.meta || claim.meta.changes === 0) return json({ error: 'INVITE_ALREADY_REDEEMED' }, 400);
+
+  try {
+    // Never writes is_admin — verification only ever sets email/verified/verified_at/display_name.
+    await env.DB.prepare(`UPDATE users SET email=?, verified=1, verified_at=?, display_name=COALESCE(?,display_name) WHERE id=?`)
+      .bind(email, now, displayName, userId).run();
+  } catch (err) {
+    // Roll back the invite claim so the code remains usable if the user update fails
+    // (e.g. a raced email-uniqueness violation that slipped past the pre-check above).
+    await env.DB.prepare(`UPDATE invite_codes SET redeemed_by=NULL, redeemed_at=NULL WHERE code=?`).bind(code).run().catch(() => {});
+    if (isUniqueConstraintError(err)) return json({ error: 'EMAIL_ALREADY_IN_USE' }, 400);
+    throw err;
+  }
+
+  const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?`).bind(userId).first();
+  return json({ ok: true, user });
+}
 async function listClaims(request, env) { const url = new URL(request.url); const q = `%${String(url.searchParams.get('q') || '').slice(0,80)}%`; const status = String(url.searchParams.get('status') || 'all'); const limit = Math.min(50,Math.max(1,Number(url.searchParams.get('limit') || 30))); const rows = status === 'all' ? await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE COALESCE(c.review_state,'public')='public' AND c.claim LIKE ? ORDER BY c.created_at DESC LIMIT ?`).bind(q,limit).all() : await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE COALESCE(c.review_state,'public')='public' AND c.status=? AND c.claim LIKE ? ORDER BY c.created_at DESC LIMIT ?`).bind(status,q,limit).all(); return json({ claims: mapClaims(rows.results || []) }); }
 async function getClaim(request, env, claimId) { const claim = await env.DB.prepare(`SELECT c.*, u.handle FROM claims c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?`).bind(claimId).first(); if (!claim) return json({ error: 'CLAIM_NOT_FOUND' }, 404); if ((claim.review_state||'public')!=='public') return json({error:'CLAIM_NOT_FOUND'},404); const analyses = await listAnalysisForClaim(env, claimId); const directEvidence = await env.DB.prepare(`SELECT e.*, u.handle, 'direct' AS link_type FROM evidence e LEFT JOIN users u ON u.id=e.user_id WHERE e.claim_id=? AND COALESCE(e.review_state,'public')='public'`).bind(claimId).all(); const reusedEvidence = await env.DB.prepare(`SELECT e.*, u.handle, l.stance AS linked_stance, l.link_note, 'reused' AS link_type FROM evidence_claim_links l JOIN evidence e ON e.id=l.evidence_id LEFT JOIN users u ON u.id=e.user_id WHERE l.claim_id=? AND COALESCE(e.review_state,'public')='public'`).bind(claimId).all(); const evidence = [...(directEvidence.results || []), ...(reusedEvidence.results || [])].sort((a,b)=>(b.created_at||0)-(a.created_at||0)); const pressure = await env.DB.prepare(`SELECT p.*, u.handle FROM pressure_points p LEFT JOIN users u ON u.id=p.user_id WHERE p.claim_id=? AND COALESCE(p.review_state,'public')='public' ORDER BY p.created_at DESC`).bind(claimId).all(); const tests = await env.DB.prepare(`SELECT t.*, u.handle FROM home_tests t LEFT JOIN users u ON u.id=t.user_id WHERE t.claim_id=? ORDER BY t.created_at DESC`).bind(claimId).all(); const lineage = await claimLineage(env, claimId, evidence, analyses, pressure.results || [], tests.results || []); return json({ claim: mapClaim(claim), evidence, pressure: pressure.results || [], tests: tests.results || [], analyses: analyses || [], lineage }); }
 async function claimLineage(env, claimId, evidence, analyses, pressure, tests) { const lineageErrors = []; const truthRows = await safeAll(env, 'truth_claim_links', `SELECT t.id,t.statement,t.category,t.origin,t.truth_type,t.confidence_label,t.repetition_score,t.pressure_score,l.id AS link_id,l.bridge_note,l.created_at AS linked_at FROM truth_claim_links l JOIN truths t ON t.id=l.truth_id WHERE l.claim_id=? ORDER BY l.created_at ASC`, claimId); const directTruthRows = await safeAll(env, 'truths.linked_claim_id', `SELECT t.id,t.statement,t.category,t.origin,t.truth_type,t.confidence_label,t.repetition_score,t.pressure_score,NULL AS link_id,'Linked directly from truth record.' AS bridge_note,t.updated_at AS linked_at FROM truths t WHERE t.linked_claim_id=? ORDER BY t.updated_at ASC`, claimId); if (truthRows.error) lineageErrors.push(truthRows.error); if (directTruthRows.error) lineageErrors.push(directTruthRows.error); const truths = dedupeById([...(truthRows.results || []), ...(directTruthRows.results || [])]); const evidenceLinks = (evidence || []).map(e => ({ id:e.id, title:e.title, stance:e.linked_stance || e.stance || 'support', linkType:e.link_type || 'direct', quality:e.quality || '', sourceUrl:e.source_url || e.sourceUrl || '' })); return { beliefs: [], truths, evidenceLinks, analysisCount:(analyses || []).length, pressureCount:(pressure || []).length, testCount:(tests || []).length, errors: lineageErrors }; }
