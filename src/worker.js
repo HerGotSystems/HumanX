@@ -40,6 +40,7 @@ export default {
       if (url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env);
       if (url.pathname === '/api/my-humanx/archive' && request.method === 'POST') return await archiveMyHumanXItem(request, env);
       if (url.pathname === '/api/my-humanx/export' && request.method === 'GET') return await exportMyHumanX(request, env);
+      if (url.pathname === '/api/my-humanx/profile-settings' && request.method === 'POST') return await saveProfileSettings(request, env);
       if (url.pathname === '/api/auth/invite/create' && request.method === 'POST') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return await createInviteCode(request, env); }
       if (url.pathname === '/api/auth/invite/redeem' && request.method === 'POST') return await redeemInviteCode(request, env);
       if (url.pathname === '/api/claims' && request.method === 'GET') return await listClaims(request, env);
@@ -119,7 +120,10 @@ async function myHumanX(request, env) {
   const userId = requireUserId(request);
   await ensureUser(env, userId);
 
-  const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?`).bind(userId).first();
+  // D-140B: widened for the Profile Settings panel — profile_public/profile_slug/
+  // profile_bio are owner-visible only here (and via the settings save response).
+  // No public read endpoint exposes these yet — see docs/D140A audit.
+  const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at, profile_public, profile_slug, profile_bio FROM users WHERE id=?`).bind(userId).first();
 
   const [claimCounts, truthCounts, evidenceCounts, pressureCounts] = await Promise.all([
     userContentCounts(env, 'claims', 'user_id', userId),
@@ -257,6 +261,51 @@ async function exportMyHumanX(request, env) {
       ...CORS,
     },
   });
+}
+
+// D-140B: public profile settings foundation. This endpoint only ever saves
+// the caller's own settings — it does not make anything public by itself.
+// No public read route exists yet; profile_public/profile_slug/profile_bio
+// are only ever returned to the owner (myHumanX(), this endpoint's response).
+const PROFILE_SLUG_RESERVED = new Set(['admin','api','me','review','claims','truths','evidence','runpack','belief','login','logout','settings','profile']);
+
+function validateProfileSlug(raw) {
+  const slug = String(raw || '').trim().toLowerCase();
+  if (!slug) return { error: 'SLUG_REQUIRED' };
+  if (!/^[a-z0-9-]{3,40}$/.test(slug)) return { error: 'SLUG_INVALID' };
+  if (slug.startsWith('-') || slug.endsWith('-')) return { error: 'SLUG_INVALID' };
+  if (slug.includes('--')) return { error: 'SLUG_INVALID' };
+  if (PROFILE_SLUG_RESERVED.has(slug)) return { error: 'SLUG_RESERVED' };
+  return { slug };
+}
+
+async function saveProfileSettings(request, env) {
+  const userId = requireUserId(request);
+  await ensureUser(env, userId);
+  const body = await readJson(request);
+  const profilePublic = (body.profile_public === true || body.profile_public === 1 || body.profile_public === '1' || body.profile_public === 'true') ? 1 : 0;
+  const bio = cleanText(body.profile_bio || '', 240);
+
+  let slug = null;
+  if (profilePublic) {
+    // slug is required only when the profile is being made public.
+    const v = validateProfileSlug(body.profile_slug);
+    if (v.error) return json({ error: v.error }, 400);
+    slug = v.slug;
+  }
+  // When profile_public=0, the slug is always stored as NULL — a slug that
+  // isn't attached to a public profile shouldn't stay reserved against the
+  // unique index, and there is nothing for it to label while private.
+
+  try {
+    await env.DB.prepare(`UPDATE users SET profile_public=?, profile_slug=?, profile_bio=? WHERE id=?`).bind(profilePublic, slug, bio || null, userId).run();
+  } catch (err) {
+    const message = String(err && err.message ? err.message : err);
+    if (message.toUpperCase().includes('UNIQUE') || message.includes('idx_users_profile_slug')) return json({ error: 'SLUG_TAKEN' }, 409);
+    throw err;
+  }
+
+  return json({ ok: true, profile_public: profilePublic, profile_slug: slug, profile_bio: bio || null });
 }
 
 async function createInviteCode(request, env) {

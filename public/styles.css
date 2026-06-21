@@ -665,3 +665,9 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .me-mirror-tension-list,.me-mirror-question-list{margin:4px 0 0;padding-left:16px;font-size:11px;color:var(--muted)}
 .me-mirror-tension-list li,.me-mirror-question-list li{margin:3px 0}
 @media (max-width:640px){.me-mirror-grid{grid-template-columns:1fr}}
+.me-profile-settings label{display:block;font-size:11px;color:var(--muted);margin:8px 0 3px}
+.me-profile-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);margin-top:4px}
+.me-profile-toggle input{width:auto}
+.me-profile-preview{background:#080b12;border:1px solid var(--line);border-radius:10px;padding:9px;margin-top:8px}
+.me-profile-preview-slug{margin:2px 0;font-size:12px;font-weight:700;color:var(--blue)}
+.me-profile-actions{display:flex;gap:8px;margin-top:10px}

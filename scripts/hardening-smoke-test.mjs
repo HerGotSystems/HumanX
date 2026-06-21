@@ -1403,6 +1403,7 @@ const migSrc0009 = (() => { try { return readFileSync(path.join(__dirname, '../m
 const migSrc0010 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0010_invite_auth.sql'), 'utf8'); } catch { return ''; } })();
 const migSrc0011 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0011_user_content_indexes.sql'), 'utf8'); } catch { return ''; } })();
 const migSrc0012 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0012_user_owned_archive_export.sql'), 'utf8'); } catch { return ''; } })();
+const migSrc0013 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0013_public_profile_foundation.sql'), 'utf8'); } catch { return ''; } })();
 
 test('D-90B: migration 0009 file exists', () => {
   assert.ok(migSrc0009.length > 0, 'migrations/0009_add_pressure_review_state.sql must exist');
@@ -6719,14 +6720,23 @@ test('D-138C: belief snapshots deferred — no archive action added to meBeliefS
   );
 });
 
-test('D-138C: no public profile/share/comments UI added', () => {
+test('D-138C: no public profile/share/comments UI added to the archive/export controls themselves', () => {
+  // D-140B later added a separate Profile Settings panel elsewhere in the
+  // file (between exportMyHumanXData and meArchiveItemUI) — that's an
+  // intentional, audited addition, not a regression of this guard. Scope
+  // this check to each D-138C function's own body, not the gap between them.
   const archiveIdx = appSrc.indexOf('function meArchiveItemUI');
+  const archiveEndIdx = appSrc.indexOf('\nfunction meProfilePreviewBodyHtml', archiveIdx);
+  const archiveSlice = appSrc.slice(archiveIdx, archiveEndIdx > -1 ? archiveEndIdx : archiveIdx + 700).toLowerCase();
   const exportIdx = appSrc.indexOf('async function exportMyHumanXData');
-  const slice = appSrc.slice(Math.min(archiveIdx, exportIdx), Math.max(archiveIdx, exportIdx) + 700).toLowerCase();
-  assert.ok(
-    !slice.includes('share') && !slice.includes('public profile') && !slice.includes('comment'),
-    'D-138C archive/export controls must not introduce share buttons, a public profile, or comments'
-  );
+  const exportEndIdx = appSrc.indexOf('\n// D-140B', exportIdx);
+  const exportSlice = appSrc.slice(exportIdx, exportEndIdx > -1 ? exportEndIdx : exportIdx + 700).toLowerCase();
+  for (const slice of [archiveSlice, exportSlice]) {
+    assert.ok(
+      !slice.includes('share') && !slice.includes('public profile') && !slice.includes('comment'),
+      'D-138C archive/export controls must not introduce share buttons, a public profile, or comments'
+    );
+  }
 });
 
 test('D-138C: no action menu wiring added outside My HumanX (review queue cleanup/mark-duplicate UI untouched)', () => {
@@ -6955,6 +6965,243 @@ test('D-139B: existing Me filters/show-all, archive, and export are preserved', 
     appSrc.includes('function meFilterBarHtml') && appSrc.includes('function meShowAllControl') &&
     appSrc.includes('function meArchiveItemUI') && appSrc.includes('async function exportMyHumanXData'),
     'D-139B must not remove the D-137E filter/show-all controls or the D-138C archive/export controls'
+  );
+});
+
+// ── Section 67 — D-140B: Profile settings foundation ────────────────────────────
+
+test('D-140B: migration 0013 file exists', () => {
+  assert.ok(migSrc0013.length > 0, 'migrations/0013_public_profile_foundation.sql must exist');
+});
+
+test('D-140B: migration 0013 adds users.profile_public/profile_slug/profile_bio', () => {
+  assert.ok(
+    migSrc0013.includes('ALTER TABLE users ADD COLUMN profile_public INTEGER DEFAULT 0;') &&
+    migSrc0013.includes('ALTER TABLE users ADD COLUMN profile_slug TEXT;') &&
+    migSrc0013.includes('ALTER TABLE users ADD COLUMN profile_bio TEXT;'),
+    'migration 0013 must add profile_public/profile_slug/profile_bio to users'
+  );
+});
+
+test('D-140B: migration 0013 adds the partial unique index on profile_slug', () => {
+  assert.ok(
+    migSrc0013.includes('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_profile_slug') &&
+    migSrc0013.includes('ON users(profile_slug) WHERE profile_slug IS NOT NULL'),
+    'migration 0013 must create idx_users_profile_slug as a partial unique index (NULLs never collide)'
+  );
+});
+
+test('D-140B: migration 0013 adds belief_snapshots.public_summary_enabled', () => {
+  assert.ok(
+    migSrc0013.includes('ALTER TABLE belief_snapshots ADD COLUMN public_summary_enabled INTEGER DEFAULT 0;'),
+    'migration 0013 must add public_summary_enabled to belief_snapshots'
+  );
+});
+
+test('D-140B: POST /api/my-humanx/profile-settings route exists and dispatches to saveProfileSettings', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx/profile-settings' && request.method === 'POST') return await saveProfileSettings(request, env)"),
+    'worker.js must route POST /api/my-humanx/profile-settings to saveProfileSettings'
+  );
+});
+
+test('D-140B: saveProfileSettings uses requireUserId and never accepts a target user id', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+  assert.ok(
+    slice.includes('const userId = requireUserId(request);') &&
+    !slice.includes('body.userId') && !slice.includes('body.user_id') && !slice.includes('targetUser'),
+    'saveProfileSettings must derive userId only from requireUserId(request)'
+  );
+});
+
+test('D-140B: slug validation rules exist (lowercase, a-z0-9-, 3-40 chars, no leading/trailing/double hyphen)', () => {
+  const idx = workerSrc.indexOf('function validateProfileSlug');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('.toLowerCase()') &&
+    slice.includes('/^[a-z0-9-]{3,40}$/') &&
+    slice.includes("slug.startsWith('-') || slug.endsWith('-')") &&
+    slice.includes("slug.includes('--')"),
+    'validateProfileSlug must enforce lowercase, charset, length, and no leading/trailing/double hyphen'
+  );
+});
+
+test('D-140B: reserved slug list exists and blocks reserved words', () => {
+  const idx = workerSrc.indexOf('const PROFILE_SLUG_RESERVED');
+  const slice = workerSrc.slice(idx, idx + 300);
+  const required = ['admin', 'api', 'me', 'review', 'claims', 'truths', 'evidence', 'runpack', 'belief', 'login', 'logout', 'settings', 'profile'];
+  for (const word of required) {
+    assert.ok(slice.includes(`'${word}'`), `PROFILE_SLUG_RESERVED must include "${word}"`);
+  }
+  assert.ok(workerSrc.includes('PROFILE_SLUG_RESERVED.has(slug)'), 'validateProfileSlug must check the reserved list');
+});
+
+test('D-140B: profile_public=1 requires a valid slug', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+  assert.ok(
+    slice.includes('if (profilePublic) {') &&
+    slice.includes('const v = validateProfileSlug(body.profile_slug);') &&
+    slice.includes('if (v.error) return json({ error: v.error }, 400);'),
+    'saveProfileSettings must validate the slug only when profile_public is being set to 1, and 400 on any validation error'
+  );
+});
+
+test('D-140B: blank slug stores NULL when profile_public=0', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+  assert.ok(
+    slice.includes('let slug = null;') &&
+    !/slug = body\.profile_slug/.test(slice),
+    'saveProfileSettings must default slug to null and only populate it inside the profilePublic branch — never store an unvalidated slug while private'
+  );
+});
+
+test('D-140B: duplicate slug returns 409 SLUG_TAKEN', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+  assert.ok(
+    slice.includes("return json({ error: 'SLUG_TAKEN' }, 409);") &&
+    slice.includes('idx_users_profile_slug'),
+    'saveProfileSettings must catch the unique-index conflict and return 409 SLUG_TAKEN'
+  );
+});
+
+test('D-140B: bio is trimmed and capped at 240 chars', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+  assert.ok(
+    slice.includes('const bio = cleanText(body.profile_bio || \'\', 240);'),
+    'saveProfileSettings must clamp profile_bio to 240 chars via the existing cleanText helper (which also trims)'
+  );
+});
+
+test('D-140B: profile-settings response omits is_admin and admin-token material', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+  assert.ok(
+    slice.includes('return json({ ok: true, profile_public: profilePublic, profile_slug: slug, profile_bio: bio || null });') &&
+    !slice.includes('is_admin') && !slice.includes('HUMANX_ADMIN_TOKEN') && !slice.includes('email'),
+    'saveProfileSettings must only ever return {ok, profile_public, profile_slug, profile_bio} — no admin/email fields'
+  );
+});
+
+test('D-140B: myHumanX user object includes profile_public/profile_slug/profile_bio for the owner', () => {
+  const idx = workerSrc.indexOf('async function myHumanX');
+  const slice = workerSrc.slice(idx, idx + 2500);
+  assert.ok(
+    slice.includes('profile_public, profile_slug, profile_bio FROM users WHERE id=?'),
+    'myHumanX must widen its users SELECT to include the new profile fields for the owner'
+  );
+});
+
+test('D-140B: no GET /api/u or GET /api/profile public read route added', () => {
+  assert.ok(
+    !workerSrc.includes("'/api/u/") && !workerSrc.includes("'/api/u'") &&
+    !workerSrc.includes("'/api/profile/") && !workerSrc.includes("'/api/profile'"),
+    'D-140B is settings-only — no public profile read route should exist yet'
+  );
+});
+
+test('D-140B: no other public read route was added for profiles', () => {
+  const routeLines = workerSrc.match(/url\.pathname === '\/api\/[^']+' && request\.method === 'GET'/g) || [];
+  const newProfileReadRoute = routeLines.some(r => /profile|\/u\//.test(r));
+  assert.ok(!newProfileReadRoute, 'no GET route path should reference profile or /u/ yet — public read is explicitly deferred');
+});
+
+test('D-140B: frontend Profile Settings panel exists in Me, near the account card', () => {
+  const idx = appSrc.indexOf('function renderMeHtml');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    appSrc.includes('function meProfileSettingsHtml') &&
+    slice.includes('${meAccountCardHtml(u)}${meProfileSettingsHtml(data)}'),
+    'renderMeHtml must render meProfileSettingsHtml(data) immediately after the account card'
+  );
+});
+
+test('D-140B: public-off disclaimer exists', () => {
+  const idx = appSrc.indexOf('function meProfileSettingsHtml');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('Off by default. Nothing about your account is public until you turn this on and save.'),
+    'meProfileSettingsHtml must render the required off-by-default disclaimer'
+  );
+});
+
+test('D-140B: preview panel exists and is wired to live input changes', () => {
+  const idx = appSrc.indexOf('function meProfileSettingsHtml');
+  const slice = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    slice.includes('This is what others would see if you publish.') &&
+    slice.includes('id="meProfilePreviewBody"') &&
+    slice.includes('oninput="meUpdateProfilePreview()"'),
+    'meProfileSettingsHtml must render a live preview panel updated on input'
+  );
+});
+
+test('D-140B: preview omits email and user id', () => {
+  const idx = appSrc.indexOf('function meProfilePreviewBodyHtml');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    !slice.includes('.email') && !slice.includes('.id') && !slice.includes('u.id'),
+    'meProfilePreviewBodyHtml must never reference email or user id — only slug, bio, and public counts'
+  );
+});
+
+test('D-140B: save calls POST /api/my-humanx/profile-settings', () => {
+  const idx = appSrc.indexOf('async function saveProfileSettingsUI');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes("await api('/api/my-humanx/profile-settings',{method:'POST',body:JSON.stringify({profile_public:isPublic,profile_slug:slug,profile_bio:bio})})"),
+    'saveProfileSettingsUI must POST to /api/my-humanx/profile-settings with profile_public/profile_slug/profile_bio'
+  );
+});
+
+test('D-140B: copy share link uses a hash route only, never a real path fetch', () => {
+  const idx = appSrc.indexOf('function meCopyProfileLink');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('`${location.origin}/#/u/${encodeURIComponent(u.profile_slug)}`') &&
+    !slice.includes('fetch(') && !slice.includes('await api('),
+    'meCopyProfileLink must build a hash-route URL only — no public route exists yet to fetch'
+  );
+});
+
+test('D-140B: copy share link button is disabled/hidden unless the profile is public with a saved slug', () => {
+  const idx = appSrc.indexOf('function meProfileSettingsHtml');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes('const canCopy=isPublic&&!!slug') &&
+    slice.includes("${canCopy?'':'disabled'}") &&
+    slice.includes("${canCopy?'':'display:none'}"),
+    'the Copy share link button must be both disabled and hidden unless the saved profile is public with a slug'
+  );
+});
+
+test('D-140B: no comments/share-feed/social UI added', () => {
+  const idx = appSrc.indexOf('function meProfileSettingsHtml');
+  const slice = appSrc.slice(idx, idx + 1500).toLowerCase();
+  assert.ok(
+    !slice.includes('comment') && !slice.includes('feed') && !slice.includes('follow') && !slice.includes('like button'),
+    'the Profile Settings panel must not introduce comments, a feed, follows, or any other social-layer UI'
+  );
+});
+
+test('D-140B: existing Me dashboard, Belief Mirror, export, archive, filters/show-all, and account panel are preserved', () => {
+  assert.ok(
+    appSrc.includes('function meMirrorHtml') &&
+    appSrc.includes('async function exportMyHumanXData') &&
+    appSrc.includes('function meArchiveItemUI') &&
+    appSrc.includes('function meFilterBarHtml') && appSrc.includes('function meShowAllControl') &&
+    appSrc.includes('function accountPanelHtml'),
+    'D-140B must not remove the Belief Mirror, export/archive controls, filters/show-all, or the D-136C account panel'
   );
 });
 
