@@ -676,3 +676,11 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .pp-slug{margin:0;color:var(--blue)}
 .pp-bio{margin:4px 0 0}
 .pp-disclaimer{margin:8px 0 0;font-style:italic}
+.pp-card{background:linear-gradient(180deg,rgba(21,26,39,.95),rgba(10,13,20,.95));border:1px solid var(--line);box-shadow:0 8px 22px #0005;border-radius:14px}
+.pp-counts-card h3{margin:0 0 6px}
+.pp-counts-note{margin:6px 0 0;color:var(--muted)}
+.pp-section{border-left:2px solid var(--blue)}
+.pp-item-list{display:flex;flex-direction:column;gap:6px}
+.pp-item-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;background:#080b12;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.pp-empty{margin:4px 0;color:var(--muted);font-style:italic}
+@media (max-width:640px){.pp-header,.pp-counts-card,.pp-section{padding:8px}.pp-item-row{padding:7px 8px;gap:6px}.pp-display-name{font-size:16px}}

@@ -7410,6 +7410,148 @@ test('D-140C: existing public Claims/Truths routes are unmodified', () => {
   );
 });
 
+// ── Section 69 — D-141B: Public profile visual polish ──────────────────────────
+
+test('D-141B: no backend route changes — worker.js my-humanx/u routes are unmodified from D-140C', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)") &&
+    workerSrc.includes("url.pathname === '/api/my-humanx/profile-settings' && request.method === 'POST') return await saveProfileSettings(request, env)") &&
+    workerSrc.includes("url.pathname.match(/^\\/api\\/u\\/[^/]+$/) && request.method === 'GET') return await getPublicProfile(request, env, url.pathname.split('/').pop())"),
+    'D-141B is frontend-only — all D-137/D-138/D-140 my-humanx and public-profile routes must remain exactly as previously defined'
+  );
+});
+
+test('D-141B: no migration added', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_public_profile_polish.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_d141b.sql')),
+    'D-141B must not require a D1 migration — this is a presentation-only patch'
+  );
+});
+
+test('D-141B: GET /api/u/:slug response shape is unchanged from D-140C', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(
+    /profile:\s*\{\s*slug:\s*user\.profile_slug,\s*bio:\s*user\.profile_bio \|\| null,\s*displayName:/.test(slice) &&
+    slice.includes('counts: { claims: claimCount, truths: truthCount, evidence: evidenceCount, pressure: pressureCount }') &&
+    slice.includes('recentClaims: claimsRows.results || []') &&
+    slice.includes('recentTruths: truthsRows.results || []') &&
+    slice.includes('recentEvidence: evidenceRows.results || []') &&
+    slice.includes('recentPressure: pressureRows.results || []') &&
+    !slice.includes('belief_snapshots') && !slice.includes('raw_json') && !slice.includes('stress_points_json'),
+    'getPublicProfile must still return exactly {slug,bio,displayName,counts,recentClaims,recentTruths,recentEvidence,recentPressure} — no fields added or removed'
+  );
+});
+
+test('D-141B: public profile header has a dedicated polished card class', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('class="panel pp-header pp-card"'),
+    'the public profile header must use the pp-card polished class, not a bare panel'
+  );
+});
+
+test('D-141B: counts explanation copy exists on both the public page and the Me-side preview', () => {
+  const pageIdx = appSrc.indexOf('function renderPublicProfileHtml');
+  const pageSlice = appSrc.slice(pageIdx, pageIdx + 1300);
+  const previewIdx = appSrc.indexOf('function meProfilePreviewBodyHtml');
+  const previewSlice = appSrc.slice(previewIdx, previewIdx + 800);
+  assert.ok(
+    pageSlice.includes('Counts reflect public, non-archived activity only.') &&
+    previewSlice.includes('Counts reflect public, non-archived activity only.'),
+    'both the public profile page and the owner-side live preview must explain what the counts mean'
+  );
+});
+
+test('D-141B: public profile recent sections use a dedicated card/section class, not a bare panel', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 1800);
+  const sectionCount = (slice.match(/class="panel pp-section"/g) || []).length;
+  assert.ok(sectionCount === 4, 'all four recent-activity sections (claims/truths/evidence/pressure) must use the pp-section class');
+});
+
+test('D-141B: empty states use a dedicated styled class, not bare text', () => {
+  const fns = ['renderPublicProfileClaimsHtml', 'renderPublicProfileTruthsHtml', 'renderPublicProfileEvidenceHtml', 'renderPublicProfilePressureHtml'];
+  for (const fn of fns) {
+    const idx = appSrc.indexOf(`function ${fn}`);
+    const slice = appSrc.slice(idx, idx + 200);
+    assert.ok(slice.includes('class="small pp-empty"'), `${fn} must render its empty state with the pp-empty class`);
+  }
+});
+
+test('D-141B: Me-side preview shows sample public items drawn only from already-loaded local data', () => {
+  const idx = appSrc.indexOf('function meProfilePublicSamples');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes('meData?.claims') && slice.includes('meData?.truths') &&
+    !slice.includes('fetch(') && !slice.includes('await api('),
+    'meProfilePublicSamples must read only from meData (already-loaded /api/my-humanx data) — no new backend call'
+  );
+});
+
+test('D-141B: Me-side preview samples are filtered to public review_state only', () => {
+  const idx = appSrc.indexOf('function meProfilePublicSamples');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes("(c.review_state||'review')==='public'") &&
+    slice.includes("(t.review_state||'review')==='public'"),
+    'meProfilePublicSamples must filter both claims and truths to review_state===public before sampling'
+  );
+});
+
+test('D-141B: Me-side preview samples exclude archived-by-user items (review_state!=public covers this)', () => {
+  const idx = appSrc.indexOf('function meProfilePublicSamples');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes('.slice(0,2)') &&
+    !slice.includes('archived'),
+    'archived-by-user items are excluded automatically since archiving sets review_state to "archived", not "public" — no separate archived_by_user check is needed or present client-side'
+  );
+});
+
+test('D-141B: mobile CSS exists for the public profile under max-width 640px', () => {
+  assert.ok(
+    /@media \(max-width:640px\)\{\.pp-header,\.pp-counts-card,\.pp-section\{[^}]*\}\.pp-item-row\{[^}]*\}/.test(cssSrc),
+    'styles.css must include a max-width:640px rule tightening padding for the public profile header/counts/sections/item rows'
+  );
+});
+
+test('D-141B: public profile page still has no email/user id/export/archive/settings controls', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 1800);
+  assert.ok(
+    !slice.includes('.email') && !slice.includes('user_id') &&
+    !slice.includes('meArchiveItemUI') && !slice.includes('exportMyHumanXData') && !slice.includes('saveProfileSettingsUI'),
+    'renderPublicProfileHtml must still never render email/user id or any owner-only control after the visual polish'
+  );
+});
+
+test('D-141B: no comments/follows/likes/social feed added', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 1800).toLowerCase();
+  assert.ok(
+    !slice.includes('comment') && !slice.includes('follow') && !slice.includes('like button') && !slice.includes('social feed'),
+    'the polished public profile must still introduce no social-layer UI'
+  );
+});
+
+test('D-141B: no belief_snapshots query added to the public profile path', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(!slice.includes('belief_snapshots'), 'getPublicProfile must not query belief_snapshots — selected snapshot sharing is explicitly deferred per the D-141A audit');
+});
+
+test('D-141B: no raw_json/stress_points_json exposure anywhere in worker.js public profile path', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(!slice.includes('raw_json') && !slice.includes('stress_points_json'), 'getPublicProfile must not select or expose raw_json or stress_points_json');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
