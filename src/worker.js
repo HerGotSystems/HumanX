@@ -38,6 +38,8 @@ export default {
       if (url.pathname === '/api/session' && request.method === 'POST') return await createOrGetUser(request, env);
       if (url.pathname === '/api/me' && request.method === 'GET') return await getMe(request, env);
       if (url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env);
+      if (url.pathname === '/api/my-humanx/archive' && request.method === 'POST') return await archiveMyHumanXItem(request, env);
+      if (url.pathname === '/api/my-humanx/export' && request.method === 'GET') return await exportMyHumanX(request, env);
       if (url.pathname === '/api/auth/invite/create' && request.method === 'POST') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return await createInviteCode(request, env); }
       if (url.pathname === '/api/auth/invite/redeem' && request.method === 'POST') return await redeemInviteCode(request, env);
       if (url.pathname === '/api/claims' && request.method === 'GET') return await listClaims(request, env);
@@ -144,6 +146,113 @@ async function myHumanX(request, env) {
     evidence: evidenceRows.results || [],
     pressure: pressureRows.results || [],
     belief_snapshots: beliefRows.results || [],
+  });
+}
+
+// D-138B: user-owned archive/export foundation. No hard delete, no
+// deleted_at, no restore endpoint — review_state stays 'archived' so all
+// existing queue-exclusion queries (NOT IN ('archived',...)) keep working
+// unchanged; archived_by_user only disambiguates the source of the archive.
+const MY_HUMANX_ARCHIVE_TABLES = { claim: 'claims', truth: 'truths', evidence: 'evidence', pressure: 'pressure_points' };
+// Seed-prefix guard mirrors reviewCleanup()'s claim/truth signals. evidence/
+// pressure have no seed importer today (no evd_seed_/prs_seed_ ids exist in
+// practice) — these entries are included defensively in case that changes.
+const MY_HUMANX_SEED_PREFIXES = { claim: 'clm_seed_', truth: 'tru_seed_', evidence: 'evd_seed_', pressure: 'prs_seed_' };
+const MY_HUMANX_PROTECTED_SEEDS = new Set(['clm_seed_55e17c22e13e','clm_seed_8e095b6f6d30','clm_seed_c4e0335e7aae','clm_seed_8ad9ff121579','clm_seed_7fb1c24747c2']);
+const MY_HUMANX_DEV_HANDLES = new Set(['humanx-seed','anon-o_seed','anon-xksavy','anon-73d9y2','anon-ek3562']);
+
+async function archiveMyHumanXItem(request, env) {
+  const userId = requireUserId(request);
+  const body = await readJson(request);
+  const targetType = cleanText(body.targetType || body.target_type || '', 30).toLowerCase();
+  const targetId = cleanId(body.targetId || body.target_id || '');
+  // table is always looked up from our own fixed internal map below, never
+  // derived directly from request input — safe to interpolate into SQL.
+  const table = MY_HUMANX_ARCHIVE_TABLES[targetType];
+  if (!table) return json({ error: 'BAD_TARGET_TYPE', allowed: Object.keys(MY_HUMANX_ARCHIVE_TABLES) }, 400);
+  if (!targetId) return json({ error: 'TARGET_ID_REQUIRED' }, 400);
+
+  if (MY_HUMANX_PROTECTED_SEEDS.has(targetId)) return json({ error: 'PROTECTED' }, 403);
+  const seedPrefix = MY_HUMANX_SEED_PREFIXES[targetType];
+  if (seedPrefix && targetId.startsWith(seedPrefix)) return json({ error: 'PROTECTED' }, 403);
+
+  // ownership check — must be id=? AND user_id=?, never id=? alone.
+  const row = await env.DB.prepare(`SELECT t.*, u.handle FROM ${table} t LEFT JOIN users u ON u.id=t.user_id WHERE t.id=? AND t.user_id=?`).bind(targetId, userId).first();
+  if (!row) return json({ error: 'NOT_FOUND_OR_NOT_OWNED' }, 404);
+  if (MY_HUMANX_DEV_HANDLES.has(String(row.handle || '').toLowerCase())) return json({ error: 'PROTECTED' }, 403);
+
+  if (targetType === 'evidence') {
+    // Reference check via evidence's primary claim_id plus the
+    // evidence_claim_links bridge table (D-128 reuse/attach feature). If a
+    // *different* user's public claim still cites this evidence, block the
+    // archive rather than silently breaking that claim's evidence list.
+    if (row.claim_id) {
+      const primaryClaim = await env.DB.prepare(`SELECT id, user_id, review_state FROM claims WHERE id=?`).bind(row.claim_id).first();
+      if (primaryClaim && primaryClaim.review_state === 'public' && primaryClaim.user_id !== userId) {
+        return json({ error: 'STILL_REFERENCED', referencedBy: primaryClaim.id }, 409);
+      }
+    }
+    const linked = await env.DB.prepare(`SELECT c.id FROM evidence_claim_links l JOIN claims c ON c.id=l.claim_id WHERE l.evidence_id=? AND c.review_state='public' AND c.user_id!=? LIMIT 1`).bind(targetId, userId).first();
+    if (linked) return json({ error: 'STILL_REFERENCED', referencedBy: linked.id }, 409);
+  }
+
+  if (targetType === 'pressure' && row.claim_id) {
+    // pressure_points has no bridge/reuse table — only its own claim_id to check.
+    const parentClaim = await env.DB.prepare(`SELECT id, user_id, review_state FROM claims WHERE id=?`).bind(row.claim_id).first();
+    if (parentClaim && parentClaim.review_state === 'public' && parentClaim.user_id !== userId) {
+      return json({ error: 'STILL_REFERENCED', referencedBy: parentClaim.id }, 409);
+    }
+  }
+
+  const now = Date.now();
+  await env.DB.prepare(`UPDATE ${table} SET review_state='archived', archived_by_user=1, updated_at=? WHERE id=?`).bind(now, targetId).run();
+
+  return json({ ok: true, archived: true, targetType, targetId });
+}
+
+async function exportMyHumanX(request, env) {
+  const userId = requireUserId(request);
+  await safeRateLimit(request, env, `my-humanx-export:${userId}`, 5, 3600000);
+  await ensureUser(env, userId);
+
+  // Explicit column list on users (never SELECT *) — same admin-flag and
+  // fingerprint-hash omission as myHumanX() and getMe().
+  const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?`).bind(userId).first();
+
+  const [claimsRows, truthsRows, evidenceRows, pressureRows, beliefRows, claimVotesRows, evidenceVotesRows, truthVotesRows, homeTestsRows] = await Promise.all([
+    env.DB.prepare(`SELECT * FROM claims WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC`).bind(userId).all(),
+    env.DB.prepare(`SELECT * FROM truths WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC`).bind(userId).all(),
+    env.DB.prepare(`SELECT * FROM evidence WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC`).bind(userId).all(),
+    env.DB.prepare(`SELECT * FROM pressure_points WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC`).bind(userId).all(),
+    env.DB.prepare(`SELECT * FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC`).bind(userId).all(),
+    env.DB.prepare(`SELECT * FROM claim_votes WHERE user_id=? ORDER BY created_at DESC`).bind(userId).all(),
+    env.DB.prepare(`SELECT * FROM evidence_votes WHERE user_id=? ORDER BY created_at DESC`).bind(userId).all(),
+    env.DB.prepare(`SELECT * FROM truth_votes WHERE user_id=? ORDER BY created_at DESC`).bind(userId).all(),
+    env.DB.prepare(`SELECT * FROM home_tests WHERE user_id=? ORDER BY created_at DESC`).bind(userId).all(),
+  ]);
+
+  const payload = {
+    ok: true,
+    exported_at: Date.now(),
+    user,
+    claims: claimsRows.results || [],
+    truths: truthsRows.results || [],
+    evidence: evidenceRows.results || [],
+    pressure: pressureRows.results || [],
+    belief_snapshots: beliefRows.results || [],
+    claim_votes: claimVotesRows.results || [],
+    evidence_votes: evidenceVotesRows.results || [],
+    truth_votes: truthVotesRows.results || [],
+    home_tests: homeTestsRows.results || [],
+  };
+
+  return new Response(JSON.stringify(payload, null, 2), {
+    status: 200,
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      'content-disposition': `attachment; filename="humanx-export-${userId}.json"`,
+      ...CORS,
+    },
   });
 }
 

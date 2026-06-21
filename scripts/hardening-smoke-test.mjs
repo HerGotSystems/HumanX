@@ -775,6 +775,7 @@ test('CSS contains .study-review-state', () => {
 console.log('\n13. Known-good docs block');
 
 const readmeSrc = readFileSync(path.join(__dirname, '../docs/README.md'), 'utf8');
+const apiInventorySrc = (() => { try { return readFileSync(path.join(__dirname, '../docs/API_ENDPOINT_INVENTORY.md'), 'utf8'); } catch { return ''; } })();
 
 test('docs/README.md contains "Known-good checks" section', () => {
   assert.ok(readmeSrc.includes('Known-good checks'), 'docs/README.md must contain a "Known-good checks" section');
@@ -1401,6 +1402,7 @@ console.log('\n30. D-90B: Pressure point moderation backend');
 const migSrc0009 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0009_add_pressure_review_state.sql'), 'utf8'); } catch { return ''; } })();
 const migSrc0010 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0010_invite_auth.sql'), 'utf8'); } catch { return ''; } })();
 const migSrc0011 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0011_user_content_indexes.sql'), 'utf8'); } catch { return ''; } })();
+const migSrc0012 = (() => { try { return readFileSync(path.join(__dirname, '../migrations/0012_user_owned_archive_export.sql'), 'utf8'); } catch { return ''; } })();
 
 test('D-90B: migration 0009 file exists', () => {
   assert.ok(migSrc0009.length > 0, 'migrations/0009_add_pressure_review_state.sql must exist');
@@ -6237,9 +6239,8 @@ test('D-137D: D-137C truth claim state clarity is preserved', () => {
 
 test('D-137D: no backend route changes — worker.js route block is unmodified', () => {
   assert.ok(
-    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)") &&
-    !workerSrc.includes('/api/my-humanx/'),
-    'D-137D is frontend-only — the /api/my-humanx route must remain exactly as D-137B defined it'
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)"),
+    'D-137D is frontend-only — the /api/my-humanx GET route must remain exactly as D-137B defined it (D-138B later added sibling /api/my-humanx/* routes — see Section 64)'
   );
 });
 
@@ -6369,9 +6370,8 @@ test('D-137E: evidence/pressure titles are truncated via shortText to avoid long
 
 test('D-137E: no backend route changes — worker.js /api/my-humanx route is unmodified', () => {
   assert.ok(
-    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)") &&
-    !workerSrc.includes('/api/my-humanx/'),
-    'D-137E is frontend-only — the /api/my-humanx route must remain exactly as D-137B defined it'
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)"),
+    'D-137E is frontend-only — the /api/my-humanx GET route must remain exactly as D-137B defined it (D-138B later added sibling /api/my-humanx/* routes — see Section 64)'
   );
 });
 
@@ -6380,6 +6380,211 @@ test('D-137E: no D1 migration added for this change', () => {
     !existsSync(path.join(__dirname, '../migrations/0012_d137e.sql')) &&
     !existsSync(path.join(__dirname, '../migrations/0012_my_humanx_polish.sql')),
     'D-137E must not require a D1 migration'
+  );
+});
+
+// ── Section 64 — D-138B: User-owned archive/export backend foundation ──────────
+
+test('D-138B: migration 0012 file exists', () => {
+  assert.ok(migSrc0012.length > 0, 'migrations/0012_user_owned_archive_export.sql must exist');
+});
+
+test('D-138B: migration 0012 adds archived_by_user to claims/truths/evidence/pressure_points', () => {
+  assert.ok(
+    migSrc0012.includes('ALTER TABLE claims ADD COLUMN archived_by_user INTEGER DEFAULT 0;') &&
+    migSrc0012.includes('ALTER TABLE truths ADD COLUMN archived_by_user INTEGER DEFAULT 0;') &&
+    migSrc0012.includes('ALTER TABLE evidence ADD COLUMN archived_by_user INTEGER DEFAULT 0;') &&
+    migSrc0012.includes('ALTER TABLE pressure_points ADD COLUMN archived_by_user INTEGER DEFAULT 0;'),
+    'migration 0012 must add archived_by_user to all four moderated content tables'
+  );
+});
+
+test('D-138B: migration 0012 adds belief_snapshots.hidden_at and an index on it', () => {
+  assert.ok(
+    migSrc0012.includes('ALTER TABLE belief_snapshots ADD COLUMN hidden_at INTEGER;') &&
+    migSrc0012.includes('CREATE INDEX IF NOT EXISTS idx_belief_snapshots_hidden_at ON belief_snapshots(hidden_at);'),
+    'migration 0012 must add belief_snapshots.hidden_at plus a supporting index'
+  );
+});
+
+test('D-138B: migration 0012 adds evidence.updated_at', () => {
+  assert.ok(
+    migSrc0012.includes('ALTER TABLE evidence ADD COLUMN updated_at INTEGER;'),
+    'migration 0012 must add evidence.updated_at (evidence previously had no updated_at column)'
+  );
+});
+
+test('D-138B: migration 0012 adds no hard-delete or deleted_at columns', () => {
+  assert.ok(
+    !migSrc0012.includes('deleted_at') && !/DROP\s+TABLE/i.test(migSrc0012) && !/DELETE\s+FROM/i.test(migSrc0012),
+    'migration 0012 must be purely additive — no deleted_at, no DROP TABLE, no DELETE FROM'
+  );
+});
+
+test('D-138B: POST /api/my-humanx/archive route exists and dispatches to archiveMyHumanXItem', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx/archive' && request.method === 'POST') return await archiveMyHumanXItem(request, env)"),
+    'worker.js must route POST /api/my-humanx/archive to archiveMyHumanXItem'
+  );
+});
+
+test('D-138B: GET /api/my-humanx/export route exists and dispatches to exportMyHumanX', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx/export' && request.method === 'GET') return await exportMyHumanX(request, env)"),
+    'worker.js must route GET /api/my-humanx/export to exportMyHumanX'
+  );
+});
+
+test('D-138B: archiveMyHumanXItem uses requireUserId and never accepts a target user id', () => {
+  const idx = workerSrc.indexOf('async function archiveMyHumanXItem');
+  const endIdx = workerSrc.indexOf('\nasync function exportMyHumanX', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 4000);
+  assert.ok(
+    slice.includes('const userId = requireUserId(request);') &&
+    !slice.includes('userId=req') && !slice.includes('body.userId') && !slice.includes('body.user_id') && !slice.includes('targetUser'),
+    'archiveMyHumanXItem must derive userId only from requireUserId(request), never from request body'
+  );
+});
+
+test('D-138B: archiveMyHumanXItem ownership check uses WHERE id=? AND user_id=?', () => {
+  const idx = workerSrc.indexOf('async function archiveMyHumanXItem');
+  const endIdx = workerSrc.indexOf('\nasync function exportMyHumanX', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 4000);
+  assert.ok(
+    slice.includes('WHERE t.id=? AND t.user_id=?') &&
+    slice.includes('.bind(targetId, userId)'),
+    'archiveMyHumanXItem must scope the ownership lookup by both id and user_id, bound in that order'
+  );
+});
+
+test('D-138B: archiveMyHumanXItem returns 404 NOT_FOUND_OR_NOT_OWNED when ownership lookup misses', () => {
+  const idx = workerSrc.indexOf('async function archiveMyHumanXItem');
+  const endIdx = workerSrc.indexOf('\nasync function exportMyHumanX', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 4000);
+  assert.ok(
+    slice.includes("if (!row) return json({ error: 'NOT_FOUND_OR_NOT_OWNED' }, 404);"),
+    'archiveMyHumanXItem must 404 with NOT_FOUND_OR_NOT_OWNED rather than confirming row existence to a non-owner'
+  );
+});
+
+test('D-138B: archiveMyHumanXItem blocks protected seed ids and dev handles with 403 PROTECTED', () => {
+  const idx = workerSrc.indexOf('async function archiveMyHumanXItem');
+  const endIdx = workerSrc.indexOf('\nasync function exportMyHumanX', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 4000);
+  assert.ok(
+    slice.includes('MY_HUMANX_PROTECTED_SEEDS.has(targetId)') &&
+    slice.includes('MY_HUMANX_DEV_HANDLES.has(') &&
+    (slice.match(/error: 'PROTECTED' \}, 403\)/g) || []).length >= 2,
+    'archiveMyHumanXItem must reject protected seed ids and dev-handle-owned rows with 403 PROTECTED'
+  );
+});
+
+test('D-138B: archiveMyHumanXItem blocks evidence/pressure still referenced by another user\'s public claim with 409', () => {
+  const idx = workerSrc.indexOf('async function archiveMyHumanXItem');
+  const endIdx = workerSrc.indexOf('\nasync function exportMyHumanX', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 4000);
+  assert.ok(
+    (slice.match(/error: 'STILL_REFERENCED'/g) || []).length >= 2 &&
+    slice.includes("targetType === 'evidence'") &&
+    slice.includes("targetType === 'pressure'") &&
+    slice.includes('evidence_claim_links'),
+    'archiveMyHumanXItem must check both evidence.claim_id + evidence_claim_links and pressure.claim_id against other users\' public claims, returning 409 STILL_REFERENCED'
+  );
+});
+
+test('D-138B: archiveMyHumanXItem sets review_state=archived and archived_by_user=1', () => {
+  const idx = workerSrc.indexOf('async function archiveMyHumanXItem');
+  const endIdx = workerSrc.indexOf('\nasync function exportMyHumanX', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 4000);
+  assert.ok(
+    slice.includes("SET review_state='archived', archived_by_user=1, updated_at=? WHERE id=?"),
+    'archiveMyHumanXItem must archive via review_state=archived + archived_by_user=1, never a hard delete'
+  );
+});
+
+test('D-138B: archiveMyHumanXItem never issues a DELETE statement', () => {
+  const idx = workerSrc.indexOf('async function archiveMyHumanXItem');
+  const endIdx = workerSrc.indexOf('\nasync function exportMyHumanX', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 4000);
+  assert.ok(!/DELETE\s+FROM/i.test(slice), 'archiveMyHumanXItem must not contain any DELETE FROM statement — no hard delete in v1');
+});
+
+test('D-138B: exportMyHumanX requires x-humanx-user via requireUserId and never accepts a target user id', () => {
+  const idx = workerSrc.indexOf('async function exportMyHumanX');
+  const slice = workerSrc.slice(idx, idx + 3500);
+  assert.ok(
+    slice.includes('const userId = requireUserId(request);') &&
+    !slice.includes('body.userId') && !slice.includes('body.user_id') && !slice.includes('targetUser') && !slice.includes('searchParams.get(\'user'),
+    'exportMyHumanX must derive userId only from requireUserId(request)'
+  );
+});
+
+test('D-138B: exportMyHumanX filters every table query by user_id and has no LIMIT clause', () => {
+  const idx = workerSrc.indexOf('async function exportMyHumanX');
+  const slice = workerSrc.slice(idx, idx + 3500);
+  const tables = ['claims', 'truths', 'evidence', 'pressure_points', 'belief_snapshots', 'claim_votes', 'evidence_votes', 'truth_votes', 'home_tests'];
+  assert.ok(
+    tables.every(t => slice.includes(`FROM ${t} WHERE user_id=?`)),
+    'every export query must read FROM <table> WHERE user_id=? for all nine owned tables'
+  );
+  assert.ok(!/LIMIT\s+\d/i.test(slice), 'export queries must not be capped with LIMIT — full export, not a dashboard preview');
+});
+
+test('D-138B: exportMyHumanX omits is_admin and admin-token material from the users row', () => {
+  const idx = workerSrc.indexOf('async function exportMyHumanX');
+  const slice = workerSrc.slice(idx, idx + 3500);
+  assert.ok(
+    slice.includes('SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?') &&
+    !slice.includes('is_admin') && !slice.includes('SELECT * FROM users') && !slice.includes('HUMANX_ADMIN_TOKEN'),
+    'exportMyHumanX must use an explicit users column list that omits is_admin and never echo the admin token'
+  );
+});
+
+test('D-138B: exportMyHumanX sets Content-Disposition: attachment with a per-user filename', () => {
+  const idx = workerSrc.indexOf('async function exportMyHumanX');
+  const slice = workerSrc.slice(idx, idx + 3500);
+  assert.ok(
+    slice.includes('content-disposition') &&
+    slice.includes('attachment; filename=') &&
+    slice.includes('humanx-export-${userId}.json') &&
+    slice.includes("'content-type': 'application/json; charset=utf-8'"),
+    'exportMyHumanX must set a Content-Disposition attachment header and application/json content type'
+  );
+});
+
+test('D-138B: exportMyHumanX is rate-limited via safeRateLimit', () => {
+  const idx = workerSrc.indexOf('async function exportMyHumanX');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(
+    /safeRateLimit\(request, env, `my-humanx-export:\$\{userId\}`, 5, 3600000\)/.test(slice),
+    'exportMyHumanX must rate-limit via the existing safeRateLimit helper, scoped per user'
+  );
+});
+
+test('D-138B: GET /api/my-humanx dashboard, /api/me, /api/session, invite auth, and admin review cleanup routes are preserved', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)") &&
+    workerSrc.includes("url.pathname === '/api/me' && request.method === 'GET') return await getMe(request, env)") &&
+    workerSrc.includes("url.pathname === '/api/session' && request.method === 'POST') return await createOrGetUser(request, env)") &&
+    workerSrc.includes("url.pathname === '/api/auth/invite/create' && request.method === 'POST'") &&
+    workerSrc.includes("url.pathname === '/api/auth/invite/redeem' && request.method === 'POST') return await redeemInviteCode(request, env)") &&
+    workerSrc.includes("url.pathname === '/api/review/cleanup' && request.method === 'POST') return await reviewCleanup(request, env)"),
+    'D-138B must not modify the existing dashboard, account, session, invite, or admin cleanup routes'
+  );
+});
+
+test('D-138B: no frontend action menu added yet — public/app-v10.js has no archive/export UI wiring', () => {
+  assert.ok(
+    !appSrc.includes('/api/my-humanx/archive') && !appSrc.includes('/api/my-humanx/export') &&
+    !appSrc.includes('archiveMyHumanXItem') && !appSrc.includes('meArchiveItem') && !appSrc.includes('meExportData'),
+    'D-138B is backend-only — public/app-v10.js must not reference the new archive/export endpoints yet'
+  );
+});
+
+test('D-138B: docs/API_ENDPOINT_INVENTORY.md documents the new archive/export routes', () => {
+  assert.ok(
+    apiInventorySrc.includes('/api/my-humanx/archive') && apiInventorySrc.includes('/api/my-humanx/export'),
+    'docs/API_ENDPOINT_INVENTORY.md must document POST /api/my-humanx/archive and GET /api/my-humanx/export'
   );
 });
 
