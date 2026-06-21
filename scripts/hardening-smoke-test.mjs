@@ -6573,11 +6573,10 @@ test('D-138B: GET /api/my-humanx dashboard, /api/me, /api/session, invite auth, 
   );
 });
 
-test('D-138B: no frontend action menu added yet — public/app-v10.js has no archive/export UI wiring', () => {
+test('D-138B: backend foundation shipped without requiring frontend wiring in the same patch (D-138C added the UI later)', () => {
   assert.ok(
-    !appSrc.includes('/api/my-humanx/archive') && !appSrc.includes('/api/my-humanx/export') &&
-    !appSrc.includes('archiveMyHumanXItem') && !appSrc.includes('meArchiveItem') && !appSrc.includes('meExportData'),
-    'D-138B is backend-only — public/app-v10.js must not reference the new archive/export endpoints yet'
+    workerSrc.includes('async function archiveMyHumanXItem') && workerSrc.includes('async function exportMyHumanX'),
+    'D-138B backend functions must exist independently of whether the frontend has wired them up yet'
   );
 });
 
@@ -6585,6 +6584,179 @@ test('D-138B: docs/API_ENDPOINT_INVENTORY.md documents the new archive/export ro
   assert.ok(
     apiInventorySrc.includes('/api/my-humanx/archive') && apiInventorySrc.includes('/api/my-humanx/export'),
     'docs/API_ENDPOINT_INVENTORY.md must document POST /api/my-humanx/archive and GET /api/my-humanx/export'
+  );
+});
+
+// ── Section 65 — D-138C: My HumanX archive/export frontend controls ────────────
+
+test('D-138C: Export button exists in the My HumanX account card', () => {
+  const idx = appSrc.indexOf('function meAccountCardHtml');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('me-account-actions') && slice.includes('onclick="exportMyHumanXData()"') && slice.includes('Export my data'),
+    'meAccountCardHtml must render an Export button calling exportMyHumanXData()'
+  );
+});
+
+test('D-138C: exportMyHumanXData calls GET /api/my-humanx/export via the shared api() helper', () => {
+  const idx = appSrc.indexOf('async function exportMyHumanXData');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes("await api('/api/my-humanx/export')"),
+    'exportMyHumanXData must call api(\'/api/my-humanx/export\') — no separate fetch() with custom headers'
+  );
+});
+
+test('D-138C: exportMyHumanXData uses the current x-humanx-user via the shared headers()/api() pattern, never an admin header', () => {
+  const idx = appSrc.indexOf('async function exportMyHumanXData');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes("await api('/api/my-humanx/export')") &&
+    !slice.includes('adminHeaders') && !slice.includes('x-humanx-admin') && !slice.includes('adminToken'),
+    'exportMyHumanXData must rely on api()\'s default headers() (which sets x-humanx-user) and never send admin credentials'
+  );
+});
+
+test('D-138C: exportMyHumanXData triggers a browser download and shows a toast, never logs the admin token', () => {
+  const idx = appSrc.indexOf('async function exportMyHumanXData');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('new Blob(') && slice.includes('URL.createObjectURL') && slice.includes('a.click()') &&
+    slice.includes("toast('Export downloaded.')") && slice.includes("catch(e){toast(e.message||'Export failed.')}"),
+    'exportMyHumanXData must build a downloadable Blob, click a hidden anchor, and toast on both success and failure'
+  );
+});
+
+test('D-138C: archive action appears on non-archived own claim/truth/evidence/pressure rows', () => {
+  assert.ok(
+    appSrc.includes("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('claim','${esc(c.id)}')\">Archive</button>`:''") &&
+    appSrc.includes("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('truth','${esc(t.id)}')\">Archive</button>`:''") &&
+    appSrc.includes("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('evidence','${esc(e.id)}')\">Archive</button>`:''") &&
+    appSrc.includes("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('pressure','${esc(p.id)}')\">Archive</button>`:''"),
+    'each of the four item-row renderers must render an Archive button only when !isArchived'
+  );
+});
+
+test('D-138C: archive action is hidden for already-archived rows (isArchived gates the button, not just disables it)', () => {
+  const fns = ['meRecentClaimsHtml', 'meRecentTruthsHtml', 'meRecentEvidenceHtml', 'meRecentPressureHtml'];
+  for (const fn of fns) {
+    const idx = appSrc.indexOf(`function ${fn}`);
+    const slice = appSrc.slice(idx, idx + 900);
+    assert.ok(
+      slice.includes("const isArchived=state==='archived'") && slice.includes('!isArchived?`<button'),
+      `${fn} must compute isArchived from review_state and gate the Archive button behind !isArchived`
+    );
+  }
+});
+
+test('D-138C: meArchiveItemUI posts to /api/my-humanx/archive with targetType and targetId in the body', () => {
+  const idx = appSrc.indexOf('function meArchiveItemUI');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes("await api('/api/my-humanx/archive',{method:'POST',body:JSON.stringify({targetType,targetId})})"),
+    'meArchiveItemUI must POST /api/my-humanx/archive with a JSON body of {targetType,targetId}'
+  );
+});
+
+test('D-138C: meArchiveItemUI shows a confirmation modal before archiving', () => {
+  const idx = appSrc.indexOf('function meArchiveItemUI');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('hxModal({title:\'Archive item\'') &&
+    slice.includes("confirmLabel:'Archive'") &&
+    slice.includes("cancelLabel:'Cancel'") &&
+    slice.includes('onConfirm:async(close)=>{close();try{await api('),
+    'meArchiveItemUI must confirm via hxModal before issuing the archive POST — the POST must live inside onConfirm, not fire immediately'
+  );
+});
+
+test('D-138C: archive success reloads the dashboard via renderMe() (re-fetches /api/my-humanx)', () => {
+  const idx = appSrc.indexOf('function meArchiveItemUI');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes("toast('Archived.');await renderMe()"),
+    'meArchiveItemUI must call renderMe() on success, which re-fetches GET /api/my-humanx — not just meRerender() against stale cached data'
+  );
+});
+
+test('D-138C: 409/403/404 archive errors map to clear, distinct user-facing messages', () => {
+  const idx = appSrc.indexOf('function meArchiveErrorMessage');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes("code==='STILL_REFERENCED'") && slice.includes('still used by another public claim') &&
+    slice.includes("code==='PROTECTED'") && slice.includes('protected') &&
+    slice.includes("code==='NOT_FOUND_OR_NOT_OWNED'") && slice.includes('not found or not owned'),
+    'meArchiveErrorMessage must translate STILL_REFERENCED/PROTECTED/NOT_FOUND_OR_NOT_OWNED into distinct, human-readable messages'
+  );
+});
+
+test('D-138C: archive error messages are wired into the catch path via toast', () => {
+  const idx = appSrc.indexOf('function meArchiveItemUI');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('catch(e){toast(meArchiveErrorMessage(e.message))}'),
+    'meArchiveItemUI must route caught errors through meArchiveErrorMessage before toasting'
+  );
+});
+
+test('D-138C: no hard-delete action in the archive/export controls — no Delete button, no DELETE call', () => {
+  const archiveIdx = appSrc.indexOf('function meArchiveItemUI');
+  const exportIdx = appSrc.indexOf('async function exportMyHumanXData');
+  const slice = appSrc.slice(Math.min(archiveIdx, exportIdx), Math.max(archiveIdx, exportIdx) + 700);
+  assert.ok(
+    !/>Delete</i.test(slice) && !/confirmLabel:'Delete'/i.test(slice) && !/method:'DELETE'/.test(slice) &&
+    slice.includes('does not delete it'),
+    'archive/export UI must offer no Delete-labeled button or DELETE method call — only the explicit "does not delete it" reassurance copy'
+  );
+});
+
+test('D-138C: belief snapshots deferred — no archive action added to meBeliefSnapshotsHtml (no backend endpoint yet)', () => {
+  const idx = appSrc.indexOf('function meBeliefSnapshotsHtml');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    !slice.includes('meArchiveItemUI') && !slice.includes('Archive'),
+    'meBeliefSnapshotsHtml must not render an Archive action — belief-snapshot archive has no backend endpoint yet'
+  );
+});
+
+test('D-138C: no public profile/share/comments UI added', () => {
+  const archiveIdx = appSrc.indexOf('function meArchiveItemUI');
+  const exportIdx = appSrc.indexOf('async function exportMyHumanXData');
+  const slice = appSrc.slice(Math.min(archiveIdx, exportIdx), Math.max(archiveIdx, exportIdx) + 700).toLowerCase();
+  assert.ok(
+    !slice.includes('share') && !slice.includes('public profile') && !slice.includes('comment'),
+    'D-138C archive/export controls must not introduce share buttons, a public profile, or comments'
+  );
+});
+
+test('D-138C: no action menu wiring added outside My HumanX (review queue cleanup/mark-duplicate UI untouched)', () => {
+  assert.ok(
+    appSrc.includes('function reviewCleanupUI') && appSrc.includes('function markDuplicateUI'),
+    'D-138C must leave the existing admin Review Queue cleanup/mark-duplicate functions in place'
+  );
+  assert.ok(
+    !/function\s+reviewCleanupUI[\s\S]{0,400}meArchiveItemUI/.test(appSrc) &&
+    !/function\s+renderReviewList[\s\S]{0,2000}meArchiveItemUI/.test(appSrc),
+    'meArchiveItemUI must not be called from reviewCleanupUI or the Review Queue list renderer — archive stays scoped to My HumanX'
+  );
+});
+
+test('D-138C: no backend route changes — worker.js my-humanx routes are unmodified from D-138B', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)") &&
+    workerSrc.includes("url.pathname === '/api/my-humanx/archive' && request.method === 'POST') return await archiveMyHumanXItem(request, env)") &&
+    workerSrc.includes("url.pathname === '/api/my-humanx/export' && request.method === 'GET') return await exportMyHumanX(request, env)"),
+    'D-138C is frontend-only — all three /api/my-humanx* routes must remain exactly as D-137B/D-138B defined them'
+  );
+});
+
+test('D-138C: Me dashboard filters/show-all/show-less, public Study opening, and account panel are preserved', () => {
+  assert.ok(
+    appSrc.includes('function meFilterBarHtml') && appSrc.includes('function meShowAllControl') &&
+    appSrc.includes("const isPublic=state==='public'") &&
+    appSrc.includes('function accountPanelHtml') &&
+    appSrc.includes('function truthClaimStateMeta'),
+    'D-138C must not remove D-137E filters/show-all, D-137D public-study gating, D-136C account panel, or D-137C truth claimed-state clarity'
   );
 });
 

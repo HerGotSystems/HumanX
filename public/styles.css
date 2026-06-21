@@ -653,3 +653,5 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .me-filter-btn:hover{color:var(--text)}
 .me-filter-btn.active{background:var(--blue);border-color:var(--blue);color:#07080d}
 .me-toggle{margin-top:6px}
+.me-account-actions{margin-top:8px}
+.me-item-row button.danger{margin-left:auto}
