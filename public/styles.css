@@ -671,3 +671,8 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .me-profile-preview{background:#080b12;border:1px solid var(--line);border-radius:10px;padding:9px;margin-top:8px}
 .me-profile-preview-slug{margin:2px 0;font-size:12px;font-weight:700;color:var(--blue)}
 .me-profile-actions{display:flex;gap:8px;margin-top:10px}
+.pp-header{display:flex;flex-direction:column;gap:2px}
+.pp-display-name{margin:0;font-size:18px;font-weight:700;color:var(--text)}
+.pp-slug{margin:0;color:var(--blue)}
+.pp-bio{margin:4px 0 0}
+.pp-disclaimer{margin:8px 0 0;font-style:italic}

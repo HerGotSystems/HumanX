@@ -41,6 +41,7 @@ export default {
       if (url.pathname === '/api/my-humanx/archive' && request.method === 'POST') return await archiveMyHumanXItem(request, env);
       if (url.pathname === '/api/my-humanx/export' && request.method === 'GET') return await exportMyHumanX(request, env);
       if (url.pathname === '/api/my-humanx/profile-settings' && request.method === 'POST') return await saveProfileSettings(request, env);
+      if (url.pathname.match(/^\/api\/u\/[^/]+$/) && request.method === 'GET') return await getPublicProfile(request, env, url.pathname.split('/').pop());
       if (url.pathname === '/api/auth/invite/create' && request.method === 'POST') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return await createInviteCode(request, env); }
       if (url.pathname === '/api/auth/invite/redeem' && request.method === 'POST') return await redeemInviteCode(request, env);
       if (url.pathname === '/api/claims' && request.method === 'GET') return await listClaims(request, env);
@@ -306,6 +307,64 @@ async function saveProfileSettings(request, env) {
   }
 
   return json({ ok: true, profile_public: profilePublic, profile_slug: slug, profile_bio: bio || null });
+}
+
+// D-140C: public, no-auth read of an opted-in profile. table is always one
+// of our own fixed internal constants below, never derived from request
+// input — safe to interpolate. Every query filters both review_state and
+// archived_by_user so a user's own archive action also removes content
+// from their public profile.
+const PUBLIC_PROFILE_TABLES = { claims: 'claims', truths: 'truths', evidence: 'evidence', pressure: 'pressure_points' };
+
+async function publicContentCount(env, table, userId) {
+  const row = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM ${table} WHERE user_id=? AND COALESCE(review_state,'public')='public' AND COALESCE(archived_by_user,0)=0`
+  ).bind(userId).first();
+  return row?.n || 0;
+}
+
+async function getPublicProfile(request, env, rawSlug) {
+  const v = validateProfileSlug(rawSlug);
+  if (v.error) return json({ error: 'PROFILE_NOT_FOUND' }, 404);
+  const slug = v.slug;
+
+  // id is selected only to scope the content queries below — it is never
+  // included in the response payload.
+  const user = await env.DB.prepare(`SELECT id, handle, display_name, profile_slug, profile_bio FROM users WHERE profile_slug=? AND profile_public=1`).bind(slug).first();
+  // Same 404 for a missing slug and a slug that exists but isn't public —
+  // never distinguish "private" from "not found".
+  if (!user) return json({ error: 'PROFILE_NOT_FOUND' }, 404);
+  const userId = user.id;
+
+  const [claimCount, truthCount, evidenceCount, pressureCount] = await Promise.all([
+    publicContentCount(env, PUBLIC_PROFILE_TABLES.claims, userId),
+    publicContentCount(env, PUBLIC_PROFILE_TABLES.truths, userId),
+    publicContentCount(env, PUBLIC_PROFILE_TABLES.evidence, userId),
+    publicContentCount(env, PUBLIC_PROFILE_TABLES.pressure, userId),
+  ]);
+
+  const [claimsRows, truthsRows, evidenceRows, pressureRows] = await Promise.all([
+    env.DB.prepare(`SELECT id, claim, category, type, status, evidence_score, survivability, testability, created_at, updated_at FROM claims WHERE user_id=? AND COALESCE(review_state,'public')='public' AND COALESCE(archived_by_user,0)=0 ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 10`).bind(userId).all(),
+    env.DB.prepare(`SELECT id, statement, category, origin, truth_type, confidence_label, pressure_score, created_at, updated_at FROM truths WHERE user_id=? AND COALESCE(review_state,'public')='public' AND COALESCE(archived_by_user,0)=0 ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 10`).bind(userId).all(),
+    // v1 public profile deliberately omits evidence.body/source_url.
+    env.DB.prepare(`SELECT id, title, stance, quality, media_type, created_at FROM evidence WHERE user_id=? AND COALESCE(review_state,'public')='public' AND COALESCE(archived_by_user,0)=0 ORDER BY created_at DESC LIMIT 10`).bind(userId).all(),
+    // v1 public profile deliberately omits pressure_points.body.
+    env.DB.prepare(`SELECT id, title, severity, created_at FROM pressure_points WHERE user_id=? AND COALESCE(review_state,'public')='public' AND COALESCE(archived_by_user,0)=0 ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 10`).bind(userId).all(),
+  ]);
+
+  return json({
+    ok: true,
+    profile: {
+      slug: user.profile_slug,
+      bio: user.profile_bio || null,
+      displayName: user.display_name || user.handle || 'anon',
+      counts: { claims: claimCount, truths: truthCount, evidence: evidenceCount, pressure: pressureCount },
+      recentClaims: claimsRows.results || [],
+      recentTruths: truthsRows.results || [],
+      recentEvidence: evidenceRows.results || [],
+      recentPressure: pressureRows.results || [],
+    },
+  });
 }
 
 async function createInviteCode(request, env) {

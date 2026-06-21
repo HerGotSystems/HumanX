@@ -5578,7 +5578,7 @@ test('D-136C: account panel does not expose the admin token', () => {
 
 test('D-136C: no forced-login gate added — boot() still proceeds without verification', () => {
   const idx = appSrc.indexOf('async function boot()');
-  const slice = appSrc.slice(idx, idx + 600);
+  const slice = appSrc.slice(idx, idx + 800);
   assert.ok(
     slice.includes('loadMe().catch(()=>{})') && slice.includes('await Promise.all([loadGraphStatus(),loadClaims(false)])'),
     'boot() must call loadMe() non-blockingly and continue the normal anonymous boot sequence regardless of its outcome'
@@ -7164,13 +7164,13 @@ test('D-140B: save calls POST /api/my-humanx/profile-settings', () => {
   );
 });
 
-test('D-140B: copy share link uses a hash route only, never a real path fetch', () => {
+test('D-140B/D-140C: copy share link uses a hash route only, never a real path fetch', () => {
   const idx = appSrc.indexOf('function meCopyProfileLink');
   const slice = appSrc.slice(idx, idx + 400);
   assert.ok(
-    slice.includes('`${location.origin}/#/u/${encodeURIComponent(u.profile_slug)}`') &&
+    slice.includes('`${location.origin}/#/u/${encodeURIComponent(slug)}`') &&
     !slice.includes('fetch(') && !slice.includes('await api('),
-    'meCopyProfileLink must build a hash-route URL only — no public route exists yet to fetch'
+    'meCopyProfileLink must build a hash-route URL only — no fetch to the now-existing public route from the copy action itself'
   );
 });
 
@@ -7202,6 +7202,211 @@ test('D-140B: existing Me dashboard, Belief Mirror, export, archive, filters/sho
     appSrc.includes('function meFilterBarHtml') && appSrc.includes('function meShowAllControl') &&
     appSrc.includes('function accountPanelHtml'),
     'D-140B must not remove the Belief Mirror, export/archive controls, filters/show-all, or the D-136C account panel'
+  );
+});
+
+// ── Section 68 — D-140C: Public profile read-only route + hash view ────────────
+
+test('D-140C: GET /api/u/:slug route exists and dispatches to getPublicProfile', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname.match(/^\\/api\\/u\\/[^/]+$/) && request.method === 'GET') return await getPublicProfile(request, env, url.pathname.split('/').pop())"),
+    'worker.js must route GET /api/u/:slug to getPublicProfile'
+  );
+});
+
+test('D-140C: getPublicProfile is public read-only and does not call requireUserId', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(
+    !slice.includes('requireUserId(request)') && !slice.includes('requireUser(request') && !slice.includes("request.headers.get('x-humanx-user')"),
+    'getPublicProfile must never require or read x-humanx-user — it is a fully public, unauthenticated read'
+  );
+});
+
+test('D-140C: getPublicProfile validates the slug using the same rules as profile settings', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('const v = validateProfileSlug(rawSlug);') &&
+    slice.includes("if (v.error) return json({ error: 'PROFILE_NOT_FOUND' }, 404);"),
+    'getPublicProfile must reuse validateProfileSlug() and 404 on any invalid slug'
+  );
+});
+
+test('D-140C: private and not-found slugs both return the same 404 PROFILE_NOT_FOUND', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  const notFoundCount = (slice.match(/error: 'PROFILE_NOT_FOUND' \}, 404\)/g) || []).length;
+  assert.ok(
+    notFoundCount >= 2,
+    'getPublicProfile must return the identical PROFILE_NOT_FOUND 404 for both an invalid/missing slug and a private (non-public) profile, never a distinguishing error'
+  );
+});
+
+test('D-140C: profile lookup requires profile_public=1', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const slice = workerSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('WHERE profile_slug=? AND profile_public=1'),
+    'getPublicProfile must only ever match rows with profile_public=1'
+  );
+});
+
+test('D-140C: response omits email/user id/verified/is_admin/admin-token material', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(
+    !slice.includes('email') && !slice.includes('verified') && !slice.includes('is_admin') &&
+    !slice.includes('HUMANX_ADMIN_TOKEN') && !slice.includes('trust_score') && !slice.includes('strike_count') &&
+    !slice.includes('is_shadow_banned') && !slice.includes('fingerprint_hash'),
+    'getPublicProfile must never select or return email/verified/trust_score/strike_count/is_shadow_banned/is_admin/fingerprint_hash/admin-token material'
+  );
+  assert.ok(
+    /profile:\s*\{\s*slug:\s*user\.profile_slug,\s*bio:\s*user\.profile_bio \|\| null,\s*displayName:/.test(slice),
+    'the response profile object must be limited to slug/bio/displayName/counts/recent lists'
+  );
+});
+
+test('D-140C: query filters all content to public review_state and excludes archived_by_user rows', () => {
+  const idx = workerSrc.indexOf('async function publicContentCount');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
+  const expectedFilter = "COALESCE(review_state,'public')='public' AND COALESCE(archived_by_user,0)=0";
+  const occurrences = slice.split(expectedFilter).length - 1;
+  assert.ok(occurrences >= 5, 'every content query (count helper + 4 recent-list queries) must filter on both public review_state and archived_by_user=0');
+});
+
+test('D-140C: public lists are capped at 10 rows', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const slice = workerSrc.slice(idx, idx + 3000);
+  const limitCount = (slice.match(/LIMIT 10/g) || []).length;
+  assert.ok(limitCount >= 4, 'all four recent-content queries (claims/truths/evidence/pressure) must be capped at LIMIT 10');
+});
+
+test('D-140C: public-profile evidence rows omit body and source_url', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const slice = workerSrc.slice(idx, idx + 3000);
+  const evIdx = slice.indexOf('FROM evidence WHERE user_id=?');
+  const evQueryStart = slice.lastIndexOf('SELECT', evIdx);
+  const evQuery = slice.slice(evQueryStart, evIdx);
+  assert.ok(
+    !evQuery.includes('body') && !evQuery.includes('source_url'),
+    'the public-profile evidence query must not select body or source_url'
+  );
+});
+
+test('D-140C: public-profile pressure rows omit body', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const slice = workerSrc.slice(idx, idx + 3000);
+  const prIdx = slice.indexOf('FROM pressure_points WHERE user_id=?');
+  const prQueryStart = slice.lastIndexOf('SELECT', prIdx);
+  const prQuery = slice.slice(prQueryStart, prIdx);
+  assert.ok(
+    !prQuery.includes('body'),
+    'the public-profile pressure_points query must not select body'
+  );
+});
+
+test('D-140C: no raw_json/stress_points_json/export data exposed via the public route', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(
+    !slice.includes('raw_json') && !slice.includes('stress_points_json') && !slice.includes('belief_snapshots') && !slice.includes('exported_at'),
+    'getPublicProfile must not touch belief_snapshots, raw_json, stress_points_json, or any export-shaped payload'
+  );
+});
+
+test('D-140C: hash route #/u/:slug exists and is checked on boot and hashchange', () => {
+  assert.ok(
+    appSrc.includes("function parsePublicProfileHash(){const m=String(location.hash||'').match(/^#\\/u\\/([^/?#]+)/);return m?decodeURIComponent(m[1]):null}") &&
+    appSrc.includes("window.addEventListener('hashchange',applyHashRoute)") &&
+    appSrc.includes('const initialSlug=parsePublicProfileHash();'),
+    'app-v10.js must parse #/u/:slug on boot and react to hashchange'
+  );
+});
+
+test('D-140C: render() dispatches publicProfile mode to renderPublicProfile', () => {
+  assert.ok(
+    appSrc.includes("if(mode==='publicProfile')return renderPublicProfile();"),
+    'render() must dispatch to renderPublicProfile() when mode is publicProfile'
+  );
+});
+
+test('D-140C: public profile view calls GET /api/u/:slug', () => {
+  const idx = appSrc.indexOf('async function renderPublicProfile()');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes('await api(`/api/u/${encodeURIComponent(publicProfileSlug||\'\')}`)'),
+    'renderPublicProfile must call GET /api/u/:slug via the shared api() helper'
+  );
+});
+
+test('D-140C: public profile view has the required disclaimer', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes('Public profile shows selected public HumanX activity only. It is not a truth ruling or personality diagnosis.'),
+    'renderPublicProfileHtml must render the required disclaimer'
+  );
+});
+
+test('D-140C: public profile view has a friendly 404 message and no auth requirement', () => {
+  const idx = appSrc.indexOf('async function renderPublicProfile()');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('Profile not found or not public.'),
+    'renderPublicProfile must show a friendly not-found message on any error, never the raw PROFILE_NOT_FOUND code'
+  );
+});
+
+test('D-140C: public profile view has no edit/archive/export controls and no owner-only Me data', () => {
+  const htmlIdx = appSrc.indexOf('function renderPublicProfileHtml');
+  const htmlSlice = appSrc.slice(htmlIdx, htmlIdx + 1800);
+  assert.ok(
+    !htmlSlice.includes('meArchiveItemUI') && !htmlSlice.includes('exportMyHumanXData') &&
+    !htmlSlice.includes('saveProfileSettingsUI') && !htmlSlice.includes('meFilterBarHtml') &&
+    !htmlSlice.includes('.email') && !htmlSlice.includes('user_id'),
+    'renderPublicProfileHtml must not render archive/export/settings controls or any owner-only field'
+  );
+});
+
+test('D-140C: profile settings copy-link button is hidden/disabled unless live form state is public with a slug', () => {
+  const idx = appSrc.indexOf('function meUpdateProfilePreview');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('const canCopy=isPublic&&!!slug;') &&
+    slice.includes('copyBtn.disabled=!canCopy') &&
+    slice.includes("copyBtn.style.display=canCopy?'':'none'"),
+    'meUpdateProfilePreview must keep the copy-link button in sync with the live (not just saved) public+slug state — fixes the observed bug where the button stayed visible after unchecking public'
+  );
+});
+
+test('D-140C: no comments/social-feed UI added to the public profile view', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 1800).toLowerCase();
+  assert.ok(
+    !slice.includes('comment') && !slice.includes('feed') && !slice.includes('follow') && !slice.includes('like button'),
+    'the public profile view must not introduce comments, a feed, follows, or any other social-layer UI'
+  );
+});
+
+test('D-140C: no migration added — reuses migrations/0013 columns only', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_public_profile_route.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_d140c.sql')),
+    'D-140C must not require a new D1 migration — it only reads columns already added by migration 0013'
+  );
+});
+
+test('D-140C: existing public Claims/Truths routes are unmodified', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/claims' && request.method === 'GET') return await listClaims(request, env)") &&
+    workerSrc.includes("url.pathname === '/api/truths' && request.method === 'GET') return await listTruths(request, env, { json })"),
+    'D-140C must not modify the existing public claims/truths list routes'
   );
 });
 
