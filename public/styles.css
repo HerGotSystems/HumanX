@@ -648,3 +648,8 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .me-item-parent{font-size:9px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:6px;padding:2px 5px}
 .me-item-meta{color:var(--muted)}
 .me-empty{margin:4px 0}
+.me-filter-bar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.me-filter-btn{background:#080b12;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:11px;padding:5px 11px;cursor:pointer}
+.me-filter-btn:hover{color:var(--text)}
+.me-filter-btn.active{background:var(--blue);border-color:var(--blue);color:#07080d}
+.me-toggle{margin-top:6px}

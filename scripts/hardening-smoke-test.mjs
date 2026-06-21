@@ -6104,7 +6104,7 @@ test('D-137D: account card shows display name/email/handle/user id', () => {
 
 test('D-137D: counts render for claims, truths, evidence, and pressure', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 500);
+  const slice = appSrc.slice(idx, idx + 700);
   assert.ok(
     slice.includes("meCountsRow('Claims',counts.claims)") &&
     slice.includes("meCountsRow('Truths',counts.truths)") &&
@@ -6121,21 +6121,21 @@ test('D-137D: counts row renders all five review states', () => {
   );
 });
 
-test('D-137D: recent claims, truths, evidence, and pressure sections render', () => {
+test('D-137D/E: recent claims, truths, evidence, and pressure sections render', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 900);
+  const slice = appSrc.slice(idx, idx + 1700);
   assert.ok(
     slice.includes('Recent Claims') && slice.includes('Recent Truths') && slice.includes('Recent Evidence') && slice.includes('Recent Pressure'),
     'renderMeHtml must render Recent Claims/Truths/Evidence/Pressure sections'
   );
 });
 
-test('D-137D: belief snapshots section renders', () => {
+test('D-137D/E: belief snapshots section renders', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 900);
+  const slice = appSrc.slice(idx, idx + 1700);
   assert.ok(
-    slice.includes('Belief Snapshots') && slice.includes('meBeliefSnapshotsHtml(data.belief_snapshots)'),
-    'renderMeHtml must render a Belief Snapshots section from data.belief_snapshots'
+    slice.includes('Belief Snapshots') && slice.includes("meBeliefSnapshotsHtml(meVisibleSlice('snapshots',snapshots))"),
+    'renderMeHtml must render a Belief Snapshots section sourced from data.belief_snapshots'
   );
 });
 
@@ -6154,9 +6154,9 @@ test('D-137D: only public claim rows render an open-study button; non-public row
 
 test('D-137D: evidence and pressure rows show parent claim id as plain text, never as a clickable open action', () => {
   const evIdx = appSrc.indexOf('function meRecentEvidenceHtml');
-  const evSlice = appSrc.slice(evIdx, evIdx + 500);
+  const evSlice = appSrc.slice(evIdx, evIdx + 800);
   const prIdx = appSrc.indexOf('function meRecentPressureHtml');
-  const prSlice = appSrc.slice(prIdx, prIdx + 500);
+  const prSlice = appSrc.slice(prIdx, prIdx + 800);
   assert.ok(
     evSlice.includes('<code class="me-item-parent"') && !evSlice.includes('onclick="openMyClaimStudy') && !evSlice.includes('onclick="selectClaim'),
     'evidence rows must show claim_id as plain <code>, never as a clickable claim-open action'
@@ -6169,7 +6169,7 @@ test('D-137D: evidence and pressure rows show parent claim id as plain text, nev
 
 test('D-137D: truth rows only offer navigation for public truths', () => {
   const idx = appSrc.indexOf('function meRecentTruthsHtml');
-  const slice = appSrc.slice(idx, idx + 600);
+  const slice = appSrc.slice(idx, idx + 800);
   assert.ok(
     slice.includes('const isPublic=state===\'public\'') &&
     slice.includes("${isPublic?`<button class=\"btn-mini\" onclick=\"setMode('truths')\">"),
@@ -6248,6 +6248,138 @@ test('D-137D: no D1 migration added for this change', () => {
     !existsSync(path.join(__dirname, '../migrations/0012_d137d.sql')) &&
     !existsSync(path.join(__dirname, '../migrations/0012_my_humanx_ui.sql')),
     'D-137D must not require a D1 migration'
+  );
+});
+
+// ── Section 63 — D-137E: My HumanX dashboard scan density polish ───────────────
+
+test('D-137E: default visible item cap is 5', () => {
+  assert.ok(
+    appSrc.includes('const ME_VISIBLE_CAP=5;'),
+    'ME_VISIBLE_CAP must default to 5'
+  );
+});
+
+test('D-137E: meVisibleSlice and meShowAllControl implement show-all/show-less logic', () => {
+  assert.ok(
+    appSrc.includes("function meVisibleSlice(key,rows){return meExpanded[key]?rows:rows.slice(0,ME_VISIBLE_CAP)}") &&
+    appSrc.includes('function meShowAllControl(key,total)') &&
+    appSrc.includes("function meToggleExpand(key){meExpanded[key]=!meExpanded[key];meRerender()}"),
+    'Me dashboard must implement per-section show-all/show-less state via meExpanded/meToggleExpand'
+  );
+});
+
+test('D-137E: show-all control only appears when a section exceeds the cap, and toggles its own label', () => {
+  const idx = appSrc.indexOf('function meShowAllControl');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('if(total<=ME_VISIBLE_CAP)return\'\'') &&
+    slice.includes("exp?'Show less':'Show all (") ,
+    'meShowAllControl must hide itself under the cap and flip between Show all / Show less'
+  );
+});
+
+test('D-137E: state filter exists with all/public/review/rejected/archived/duplicate', () => {
+  assert.ok(
+    appSrc.includes("const ME_FILTER_STATES=['all','public','review','rejected','archived','duplicate'];") &&
+    appSrc.includes('function meFilterBarHtml()'),
+    'Me dashboard must expose a state filter bar covering all six states'
+  );
+});
+
+test('D-137E: state filter applies to claims/truths/evidence/pressure lists, not counts or snapshots', () => {
+  const idx = appSrc.indexOf('function renderMeHtml');
+  const slice = appSrc.slice(idx, idx + 1700);
+  assert.ok(
+    slice.includes('const claims=meFilterRows(data.claims)') &&
+    slice.includes('const truths=meFilterRows(data.truths)') &&
+    slice.includes('const evidence=meFilterRows(data.evidence)') &&
+    slice.includes('const pressure=meFilterRows(data.pressure)') &&
+    slice.includes('const snapshots=data.belief_snapshots||[]') &&
+    !slice.includes('meFilterRows(data.belief_snapshots)'),
+    'renderMeHtml must filter claims/truths/evidence/pressure by state but leave belief_snapshots and counts untouched'
+  );
+});
+
+test('D-137E: counts remain full totals regardless of the active state filter', () => {
+  const idx = appSrc.indexOf('function renderMeHtml');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('const counts=data.counts||{}') &&
+    slice.includes("meCountsRow('Claims',counts.claims)") &&
+    !slice.includes('meFilterRows(counts'),
+    'counts row must always read from data.counts (server-side full totals), never from the filtered/sliced lists'
+  );
+});
+
+test('D-137E: section order puts Belief Snapshots before Recent Truths/Evidence/Pressure', () => {
+  const idx = appSrc.indexOf('function renderMeHtml');
+  const slice = appSrc.slice(idx, idx + 1700);
+  const claimsAt = slice.indexOf('Recent Claims');
+  const snapshotsAt = slice.indexOf('Belief Snapshots');
+  const truthsAt = slice.indexOf('Recent Truths');
+  const evidenceAt = slice.indexOf('Recent Evidence');
+  const pressureAt = slice.indexOf('Recent Pressure');
+  assert.ok(
+    claimsAt !== -1 && snapshotsAt !== -1 && truthsAt !== -1 && evidenceAt !== -1 && pressureAt !== -1 &&
+    claimsAt < snapshotsAt && snapshotsAt < truthsAt && truthsAt < evidenceAt && evidenceAt < pressureAt,
+    'renderMeHtml must order sections: Account, Counts, Recent Claims, Belief Snapshots, Recent Truths, Recent Evidence, Recent Pressure'
+  );
+});
+
+test('D-137E: public claim open behavior preserved after scan-density polish', () => {
+  const idx = appSrc.indexOf('function meRecentClaimsHtml');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes("const isPublic=state==='public'") &&
+    slice.includes('${isPublic?`<button class="btn-mini" onclick="openMyClaimStudy('),
+    'meRecentClaimsHtml must still gate Open Study behind isPublic after the D-137E rewrite'
+  );
+});
+
+test('D-137E: non-public claim no-open behavior preserved after scan-density polish', () => {
+  const idx = appSrc.indexOf('function meRecentClaimsHtml');
+  const slice = appSrc.slice(idx, idx + 800);
+  const unconditionalSelectClaim = /<button[^>]*onclick="openMyClaimStudy\('\$\{esc\(c\.id\)\}'\)"[^>]*>Open Study/.test(slice) && !slice.includes('isPublic?');
+  assert.ok(!unconditionalSelectClaim, 'Open Study must remain gated behind isPublic, never unconditional, after the D-137E rewrite');
+});
+
+test('D-137E: item rows show state badge first, then text, then date/updated meta', () => {
+  const idx = appSrc.indexOf('function meRecentClaimsHtml');
+  const slice = appSrc.slice(idx, idx + 800);
+  const badgeAt = slice.indexOf('<span class="badge ${clr}">');
+  const textAt = slice.indexOf('<span class="me-item-text">');
+  const metaAt = slice.indexOf('<span class="small me-item-meta">');
+  assert.ok(
+    badgeAt !== -1 && textAt !== -1 && metaAt !== -1 && badgeAt < textAt && textAt < metaAt,
+    'meRecentClaimsHtml row markup must order badge, then item text, then date/updated meta'
+  );
+});
+
+test('D-137E: evidence/pressure titles are truncated via shortText to avoid long-body overflow', () => {
+  const evIdx = appSrc.indexOf('function meRecentEvidenceHtml');
+  const evSlice = appSrc.slice(evIdx, evIdx + 800);
+  const prIdx = appSrc.indexOf('function meRecentPressureHtml');
+  const prSlice = appSrc.slice(prIdx, prIdx + 800);
+  assert.ok(
+    evSlice.includes('shortText(e.title') && prSlice.includes('shortText(p.title'),
+    'evidence and pressure rows must truncate long titles via shortText'
+  );
+});
+
+test('D-137E: no backend route changes — worker.js /api/my-humanx route is unmodified', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx' && request.method === 'GET') return await myHumanX(request, env)") &&
+    !workerSrc.includes('/api/my-humanx/'),
+    'D-137E is frontend-only — the /api/my-humanx route must remain exactly as D-137B defined it'
+  );
+});
+
+test('D-137E: no D1 migration added for this change', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0012_d137e.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0012_my_humanx_polish.sql')),
+    'D-137E must not require a D1 migration'
   );
 });
 
