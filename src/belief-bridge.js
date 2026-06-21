@@ -1,8 +1,9 @@
 import { meaningKey } from './meaning-key.js';
 
 export async function promoteBeliefSnapshot(request, env, helpers) {
-  const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
+  const { readJson, cleanId, cleanText, json, requireUser, makeId, ownerTokenStatus } = helpers;
   const userId = await requireUser(request);
+  if (ownerTokenStatus) await ownerTokenStatus(request, userId); // D-145B: advisory only, result unused
   await safeRateLimit(request, env, `belief-promote:${ip(request)}`, 10, 3600000);
   const body = await readJson(request);
   const snapshotId = cleanId(body.snapshotId || body.snapshot_id || '');

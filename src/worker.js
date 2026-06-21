@@ -58,9 +58,12 @@ export default {
       if (url.pathname === '/api/evidence-attach' && request.method === 'POST') return await attachEvidenceToClaim(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId });
       if (url.pathname === '/api/graph-status' && request.method === 'GET') return await graphStatus(request, env, { json });
       if (url.pathname === '/api/analysis' && request.method === 'POST') return await addAnalysisResult(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId });
-      if (url.pathname === '/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId });
-      if (url.pathname === '/api/belief-snapshots' && request.method === 'POST') return await saveBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId });
-      if (url.pathname === '/api/belief-promote' && request.method === 'POST') return await promoteBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId });
+      // D-89D: deliberately requireUserId (not requireUser) — shadow-banned
+      // users must still be able to read their own snapshots; only writes
+      // (POST below) are blocked for them. D-145B leaves this choice intact.
+      if (url.pathname === '/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid) });
+      if (url.pathname === '/api/belief-snapshots' && request.method === 'POST') return await saveBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid) });
+      if (url.pathname === '/api/belief-promote' && request.method === 'POST') return await promoteBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid) });
       if (url.pathname.match(/^\/api\/claims\/[^/]+$/) && request.method === 'GET') return await getClaim(request, env, url.pathname.split('/').pop());
       if (url.pathname === '/api/evidence' && request.method === 'POST') return await addEvidence(request, env);
       if (url.pathname === '/api/pressure' && request.method === 'POST') return await addPressure(request, env);
@@ -87,7 +90,29 @@ export default {
 
 async function debugState(request, env) { const tables = ['users','claims','evidence','pressure_points','reports','aip_packets','rate_limits','analysis_results','belief_snapshots','truths','truth_claim_links','evidence_claim_links','claim_votes','evidence_votes','truth_votes','home_tests','duplicate_signatures']; const counts = {}; for (const table of tables) { try { const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first(); counts[table] = row?.n ?? 0; } catch (err) { counts[table] = `ERROR: ${err.message}`; } } const latest = await env.DB.prepare(`SELECT id, claim, status, review_state, created_at FROM claims ORDER BY created_at DESC LIMIT 5`).all().catch(err => ({ error: err.message, results: [] })); return json({ ok: true, counts, latest: latest.results || [], latest_error: latest.error || null }); }
 async function seedDemoClaims(request, env) { await ensureUser(env, 'usr_demo_seed'); const existing = await env.DB.prepare(`SELECT COUNT(*) AS n FROM claims`).first(); if ((existing?.n || 0) > 0) return json({ ok: true, message: 'Database already has claims. Seed not needed.', count: existing.n }); const now = Date.now(); for (const c of demoClaims()) await env.DB.prepare(`INSERT OR IGNORE INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(c.id,'usr_demo_seed',c.claim,c.category,c.type,c.status,c.evidenceScore,c.survivability,c.testability,c.contradictions,now,now,'public').run(); return json({ ok: true, seeded: demoClaims().length }); }
-async function createOrGetUser(request, env) { const body = await readJson(request); const now = Date.now(); const userId = cleanId(body.id) || makeId('usr'); const handle = cleanHandle(body.handle) || `anon-${userId.slice(-6)}`; const fingerprint = String(body.fingerprintHash || '').slice(0,128); await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, fingerprint_hash, created_at) VALUES (?, ?, ?, ?)`).bind(userId,handle,fingerprint,now).run(); let user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned, is_admin FROM users WHERE id=?`).bind(userId).first(); if (!user) { await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`).bind(userId,`anon-${userId.slice(-6)}`,now).run(); user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned, is_admin FROM users WHERE id=?`).bind(userId).first(); } return json({ user }); }
+async function createOrGetUser(request, env) {
+  const body = await readJson(request);
+  const now = Date.now();
+  const userId = cleanId(body.id) || makeId('usr');
+  const handle = cleanHandle(body.handle) || `anon-${userId.slice(-6)}`;
+  const fingerprint = String(body.fingerprintHash || '').slice(0,128);
+  await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, fingerprint_hash, created_at) VALUES (?, ?, ?, ?)`).bind(userId,handle,fingerprint,now).run();
+  // D-145B: the admin-status column is intentionally omitted from this
+  // SELECT — it was previously leaked verbatim to every caller of this
+  // endpoint (every page load, via boot()'s POST /api/session call). Same
+  // discipline as getMe()/myHumanX()/exportMyHumanX(), which already
+  // correctly omit it.
+  let user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned FROM users WHERE id=?`).bind(userId).first();
+  if (!user) {
+    await env.DB.prepare(`INSERT OR IGNORE INTO users (id, handle, created_at) VALUES (?, ?, ?)`).bind(userId,`anon-${userId.slice(-6)}`,now).run();
+    user = await env.DB.prepare(`SELECT id, handle, trust_score, strike_count, is_shadow_banned FROM users WHERE id=?`).bind(userId).first();
+  }
+  // D-145B: advisory-mode owner token, minted whenever a user row resolves
+  // and HUMANX_OWNER_SECRET is configured. null (not an error) when the
+  // secret hasn't been set yet — every existing flow keeps working either way.
+  const owner_token = await signOwnerToken(env, userId);
+  return json({ user, owner_token });
+}
 
 // D-136B: invite-code auth foundation.
 // Identity is still the unsigned x-humanx-user header (known limitation —
@@ -95,7 +120,8 @@ async function createOrGetUser(request, env) { const body = await readJson(reque
 // row in place; it never mints a new user id and never touches is_admin.
 
 async function getMe(request, env) {
-  const userId = requireUserId(request);
+  const userId = await requireUser(request, env);
+  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
   await ensureUser(env, userId);
   // is_admin and any admin-token material are intentionally omitted from this response.
   const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?`).bind(userId).first();
@@ -123,7 +149,8 @@ async function userContentCounts(env, table, userIdColumn, userId) {
 }
 
 async function myHumanX(request, env) {
-  const userId = requireUserId(request);
+  const userId = await requireUser(request, env);
+  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
   await ensureUser(env, userId);
 
   // D-140B: widened for the Profile Settings panel — profile_public/profile_slug/
@@ -182,7 +209,8 @@ const MY_HUMANX_PROTECTED_SEEDS = new Set(['clm_seed_55e17c22e13e','clm_seed_8e0
 const MY_HUMANX_DEV_HANDLES = new Set(['humanx-seed','anon-o_seed','anon-xksavy','anon-73d9y2','anon-ek3562']);
 
 async function archiveMyHumanXItem(request, env) {
-  const userId = requireUserId(request);
+  const userId = await requireUser(request, env);
+  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
   const body = await readJson(request);
   const targetType = cleanText(body.targetType || body.target_type || '', 30).toLowerCase();
   const targetId = cleanId(body.targetId || body.target_id || '');
@@ -231,7 +259,8 @@ async function archiveMyHumanXItem(request, env) {
 }
 
 async function exportMyHumanX(request, env) {
-  const userId = requireUserId(request);
+  const userId = await requireUser(request, env);
+  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
   await safeRateLimit(request, env, `my-humanx-export:${userId}`, 5, 3600000);
   await ensureUser(env, userId);
 
@@ -293,7 +322,8 @@ function validateProfileSlug(raw) {
 }
 
 async function saveProfileSettings(request, env) {
-  const userId = requireUserId(request);
+  const userId = await requireUser(request, env);
+  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
   await ensureUser(env, userId);
   const body = await readJson(request);
   const profilePublic = (body.profile_public === true || body.profile_public === 1 || body.profile_public === '1' || body.profile_public === 'true') ? 1 : 0;
@@ -681,6 +711,73 @@ function requireUserId(request) { const userId=cleanId(request.headers.get('x-hu
 async function requireUser(request, env) { const userId=requireUserId(request); if (env?.DB) { const row=await env.DB.prepare(`SELECT is_shadow_banned FROM users WHERE id=?`).bind(userId).first(); if (Number(row?.is_shadow_banned||0)===1) throw new Error('USER_SHADOW_BANNED'); } return userId; }
 function safeEqual(a, b) { const x=String(a==null?'':a); const y=String(b==null?'':b); if (!x.length || !y.length) return false; const n=Math.max(x.length, y.length); let diff=x.length ^ y.length; for (let i=0;i<n;i++){ diff |= (x.charCodeAt(i)||0) ^ (y.charCodeAt(i)||0); } return diff === 0; }
 function requireAdmin(request, env) { const admin=request.headers.get('x-humanx-admin') || ''; const expected=env.HUMANX_ADMIN_TOKEN || ''; if (!expected || !safeEqual(admin, expected)) return json({ error:'ADMIN_REQUIRED' },403); return null; }
+
+// D-145B: advisory-mode owner token foundation. Stateless HMAC-signed proof
+// that the caller previously received this exact token from POST /api/session
+// for this exact x-humanx-user id — closes the "anyone can type any usr_*
+// id" spoofing gap without requiring a full login system. Advisory only in
+// this patch: no endpoint rejects a missing/invalid token yet — see the
+// D-145A audit. Secret is read only from env.HUMANX_OWNER_SECRET (a Worker
+// secret, never present in wrangler.toml, never hard-coded). All flows must
+// keep working unchanged if the secret hasn't been set yet.
+const OWNER_TOKEN_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+
+function base64UrlEncode(bytes) {
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function base64UrlDecode(str) {
+  const padded = str.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (str.length % 4)) % 4);
+  const bin = atob(padded);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+async function hmacSha256(secret, message) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
+  return base64UrlEncode(new Uint8Array(sig));
+}
+
+async function signOwnerToken(env, userId) {
+  const secret = env?.HUMANX_OWNER_SECRET || '';
+  if (!secret || !userId) return null;
+  const now = Date.now();
+  const payload = { uid: userId, iat: now, exp: now + OWNER_TOKEN_TTL_MS };
+  const payloadB64 = base64UrlEncode(new TextEncoder().encode(JSON.stringify(payload)));
+  const sig = await hmacSha256(secret, payloadB64);
+  return `${payloadB64}.${sig}`;
+}
+
+async function verifyOwnerToken(env, token, expectedUserId) {
+  const secret = env?.HUMANX_OWNER_SECRET || '';
+  if (!token || !secret || !expectedUserId) return false;
+  const parts = String(token).split('.');
+  if (parts.length !== 2) return false;
+  const [payloadB64, sig] = parts;
+  let expectedSig;
+  try { expectedSig = await hmacSha256(secret, payloadB64); } catch { return false; }
+  if (!sig || !safeEqual(sig, expectedSig)) return false;
+  let payload;
+  try { payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadB64))); } catch { return false; }
+  if (!payload || typeof payload !== 'object') return false;
+  if (!Number.isFinite(Number(payload.exp)) || Number(payload.exp) < Date.now()) return false;
+  if (payload.uid !== expectedUserId) return false;
+  return true;
+}
+
+// Advisory-only: never throws, never blocks the request, just reports
+// whether a valid owner token was presented — 'missing' | 'valid' | 'invalid'.
+// Callers in this patch call this for observability/future-enforcement
+// purposes only and never branch request handling on the result.
+async function ownerTokenStatus(request, env, userId) {
+  const token = request.headers.get('x-humanx-owner-token') || '';
+  if (!token) return 'missing';
+  const ok = await verifyOwnerToken(env, token, userId);
+  return ok ? 'valid' : 'invalid';
+}
+
 function makeId(prefix) { return `${prefix}_${crypto.randomUUID().replaceAll('-', '').slice(0,18)}`; }
 function cleanId(v) { return String(v || '').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,80); }
 function cleanText(v,max) { return String(v || '').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max); }

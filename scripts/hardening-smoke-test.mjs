@@ -671,6 +671,8 @@ test('frontend does NOT render archived filter chip', () => {
 console.log('\n11. belief-bridge promoteToTruth FK safety');
 
 const bridgeSrc = readFileSync(path.join(__dirname, '../src/belief-bridge.js'), 'utf8');
+const beliefSnapshotsSrc = readFileSync(path.join(__dirname, '../src/belief-snapshots.js'), 'utf8');
+const humanxBridgeSrc = readFileSync(path.join(__dirname, '../public/apps/humanx-belief-engine/humanx-bridge.js'), 'utf8');
 
 // Extract promoteToTruth body for targeted assertions.
 const promoteToTruthMatch = bridgeSrc.match(/async function promoteToTruth[\s\S]*?\n(?=async function )/);
@@ -1366,10 +1368,10 @@ test('D-89D: requireUser delegates header check to requireUserId (D-89D)', () =>
   );
 });
 
-test('D-89D: GET /api/belief-snapshots passes requireUserId (identity-only, read) (D-89D)', () => {
+test('D-89D/D-145B: GET /api/belief-snapshots passes requireUserId (identity-only, read) (D-89D)', () => {
   assert.ok(
-    workerSrc.includes("'/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId })"),
-    "GET /api/belief-snapshots must pass requireUserId so shadow-banned users can still read their snapshots"
+    workerSrc.includes("'/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId, ownerTokenStatus:"),
+    "GET /api/belief-snapshots must keep passing requireUserId so shadow-banned users can still read their snapshots — D-145B only adds an advisory ownerTokenStatus helper alongside it"
   );
 });
 
@@ -5438,10 +5440,17 @@ test('D-136B: existing /api/session route still present and unmodified in routin
   );
 });
 
-test('D-136B: existing createOrGetUser function body is unchanged', () => {
+test('D-136B/D-145B: createOrGetUser id-resolution logic is unchanged for backward compatibility', () => {
+  // D-145B intentionally modified this function (omits is_admin, mints an
+  // owner_token) but the id-creation/lookup logic that existing usr_* ids
+  // depend on for backward compatibility must still be exactly this.
+  const idx = workerSrc.indexOf('async function createOrGetUser');
+  const slice = workerSrc.slice(idx, idx + 500);
   assert.ok(
-    workerSrc.includes("async function createOrGetUser(request, env) { const body = await readJson(request); const now = Date.now(); const userId = cleanId(body.id) || makeId('usr');"),
-    'createOrGetUser must remain unmodified for backward compatibility'
+    slice.includes("const userId = cleanId(body.id) || makeId('usr');") &&
+    slice.includes("const handle = cleanHandle(body.handle) || `anon-${userId.slice(-6)}`;") &&
+    slice.includes('INSERT OR IGNORE INTO users (id, handle, fingerprint_hash, created_at)'),
+    'createOrGetUser must keep resolving/creating ids exactly as before — never mint a new id for an existing usr_* value'
   );
 });
 
@@ -5482,11 +5491,11 @@ test('D-136C: loadMe calls GET /api/me with the current x-humanx-user identity',
   );
 });
 
-test('D-136C: api() helper always attaches x-humanx-user (loadMe inherits it, no separate header logic)', () => {
+test('D-136C/D-145B: api() helper always attaches x-humanx-user (loadMe inherits it, no separate header logic)', () => {
   assert.ok(
-    appSrc.includes("function headers(){return{'content-type':'application/json','x-humanx-user':user?.id||''}}") &&
+    appSrc.includes("function headers(){return{'content-type':'application/json','x-humanx-user':user?.id||'','x-humanx-owner-token':user?.ownerToken||''}}") &&
     appSrc.includes("async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{...headers(),...(opts.headers||{})}})"),
-    'api() must merge in headers() (which sets x-humanx-user) for every call, including /api/me'
+    'api() must merge in headers() (which sets x-humanx-user and, since D-145B, x-humanx-owner-token) for every call, including /api/me'
   );
 });
 
@@ -5718,11 +5727,13 @@ test('D-136D: account panel (D-136C) is unmodified by this patch', () => {
   );
 });
 
-test('D-136D: anonymous flow (localUser, /api/session) is unmodified by this patch', () => {
+test('D-136D/D-145B: anonymous flow (localUser id-generation, /api/session id-resolution) is unmodified by this patch', () => {
+  const idx = workerSrc.indexOf('async function createOrGetUser');
+  const slice = workerSrc.slice(idx, idx + 500);
   assert.ok(
     appSrc.includes("function localUser(){let u=JSON.parse(localStorage.getItem(LS_USER)||'null');if(!u){u={id:'usr_'+crypto.randomUUID().replaceAll('-','').slice(0,18),handle:'anon-'+Math.random().toString(36).slice(2,8)};localStorage.setItem(LS_USER,JSON.stringify(u))}return u}") &&
-    workerSrc.includes("async function createOrGetUser(request, env) { const body = await readJson(request); const now = Date.now(); const userId = cleanId(body.id) || makeId('usr');"),
-    'localUser() and /api/session backend must remain unmodified'
+    slice.includes("const userId = cleanId(body.id) || makeId('usr');"),
+    'localUser() and /api/session id-resolution logic must remain unmodified — D-145B only adds owner_token minting and is_admin omission'
   );
 });
 
@@ -5771,14 +5782,16 @@ test('D-137B: GET /api/my-humanx route exists and dispatches to myHumanX', () =>
   );
 });
 
-test('D-137B: myHumanX requires/uses x-humanx-user via requireUserId', () => {
+test('D-137B/D-145B: myHumanX requires/uses x-humanx-user via requireUser (which itself calls requireUserId)', () => {
   const idx = workerSrc.indexOf('async function myHumanX');
   assert.ok(idx !== -1, 'myHumanX function must exist');
   const slice = workerSrc.slice(idx, idx + 300);
   assert.ok(
-    slice.includes('requireUserId(request)'),
-    'myHumanX must resolve the requester via requireUserId(request)'
+    slice.includes('await requireUser(request, env)'),
+    'myHumanX must resolve the requester via requireUser(request, env) — D-145B switched this from requireUserId to also apply the shadow-ban check; requireUser still reads x-humanx-user internally via requireUserId'
   );
+  const ruIdx = workerSrc.indexOf('async function requireUser(request, env)');
+  assert.ok(workerSrc.slice(ruIdx, ruIdx + 200).includes('requireUserId(request)'), 'requireUser must still derive identity from requireUserId(request) — i.e. from the x-humanx-user header');
 });
 
 test('D-137B: myHumanX does not accept a caller-supplied target user id', () => {
@@ -5866,14 +5879,14 @@ test('D-137B: myHumanX omits is_admin and admin token material', () => {
   );
 });
 
-test('D-137B: GET /api/me remains unchanged', () => {
+test('D-137B/D-145B: GET /api/me route and core behavior remain in place', () => {
   const idx = workerSrc.indexOf('async function getMe');
-  const slice = workerSrc.slice(idx, idx + 200);
+  const slice = workerSrc.slice(idx, idx + 300);
   assert.ok(
     workerSrc.includes("url.pathname === '/api/me' && request.method === 'GET') return await getMe(request, env)") &&
-    slice.includes('const userId = requireUserId(request);') &&
+    slice.includes('const userId = await requireUser(request, env);') &&
     slice.includes('await ensureUser(env, userId);'),
-    '/api/me route and getMe implementation must remain unchanged'
+    '/api/me route must still exist and getMe must still resolve userId (now via requireUser, applying the shadow-ban check) then ensureUser'
   );
 });
 
@@ -6436,14 +6449,14 @@ test('D-138B: GET /api/my-humanx/export route exists and dispatches to exportMyH
   );
 });
 
-test('D-138B: archiveMyHumanXItem uses requireUserId and never accepts a target user id', () => {
+test('D-138B/D-145B: archiveMyHumanXItem uses requireUser (header-derived) and never accepts a target user id', () => {
   const idx = workerSrc.indexOf('async function archiveMyHumanXItem');
   const endIdx = workerSrc.indexOf('\nasync function exportMyHumanX', idx);
   const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 4000);
   assert.ok(
-    slice.includes('const userId = requireUserId(request);') &&
+    slice.includes('const userId = await requireUser(request, env);') &&
     !slice.includes('userId=req') && !slice.includes('body.userId') && !slice.includes('body.user_id') && !slice.includes('targetUser'),
-    'archiveMyHumanXItem must derive userId only from requireUserId(request), never from request body'
+    'archiveMyHumanXItem must derive userId only from requireUser(request, env) (x-humanx-user header, now with the shadow-ban check), never from request body'
   );
 });
 
@@ -6510,13 +6523,13 @@ test('D-138B: archiveMyHumanXItem never issues a DELETE statement', () => {
   assert.ok(!/DELETE\s+FROM/i.test(slice), 'archiveMyHumanXItem must not contain any DELETE FROM statement — no hard delete in v1');
 });
 
-test('D-138B: exportMyHumanX requires x-humanx-user via requireUserId and never accepts a target user id', () => {
+test('D-138B/D-145B: exportMyHumanX requires x-humanx-user via requireUser and never accepts a target user id', () => {
   const idx = workerSrc.indexOf('async function exportMyHumanX');
   const slice = workerSrc.slice(idx, idx + 3500);
   assert.ok(
-    slice.includes('const userId = requireUserId(request);') &&
+    slice.includes('const userId = await requireUser(request, env);') &&
     !slice.includes('body.userId') && !slice.includes('body.user_id') && !slice.includes('targetUser') && !slice.includes('searchParams.get(\'user'),
-    'exportMyHumanX must derive userId only from requireUserId(request)'
+    'exportMyHumanX must derive userId only from requireUser(request, env) — D-145B switched this from requireUserId to also apply the shadow-ban check'
   );
 });
 
@@ -6791,13 +6804,13 @@ test('D-139B: myHumanX still does not include raw_json or stress_points_json', (
   );
 });
 
-test('D-139B: myHumanX still has no target-user parameter and export route is unchanged', () => {
+test('D-139B/D-145B: myHumanX still has no target-user parameter and export route is unchanged', () => {
   const myHumanXIdx = workerSrc.indexOf('async function myHumanX');
   const mySlice = workerSrc.slice(myHumanXIdx, myHumanXIdx + 2500);
   assert.ok(
-    mySlice.includes('const userId = requireUserId(request);') &&
+    mySlice.includes('const userId = await requireUser(request, env);') &&
     !mySlice.includes('body.userId') && !mySlice.includes('body.user_id') && !mySlice.includes('targetUser'),
-    'myHumanX must still derive userId only from requireUserId(request)'
+    'myHumanX must still derive userId only from requireUser(request, env) — D-145B switched this from requireUserId'
   );
   assert.ok(
     workerSrc.includes("url.pathname === '/api/my-humanx/export' && request.method === 'GET') return await exportMyHumanX(request, env)"),
@@ -7005,14 +7018,14 @@ test('D-140B: POST /api/my-humanx/profile-settings route exists and dispatches t
   );
 });
 
-test('D-140B: saveProfileSettings uses requireUserId and never accepts a target user id', () => {
+test('D-140B/D-145B: saveProfileSettings uses requireUser and never accepts a target user id', () => {
   const idx = workerSrc.indexOf('async function saveProfileSettings');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
-  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2200);
   assert.ok(
-    slice.includes('const userId = requireUserId(request);') &&
+    slice.includes('const userId = await requireUser(request, env);') &&
     !slice.includes('body.userId') && !slice.includes('body.user_id') && !slice.includes('targetUser'),
-    'saveProfileSettings must derive userId only from requireUserId(request)'
+    'saveProfileSettings must derive userId only from requireUser(request, env) — D-145B switched this from requireUserId'
   );
 });
 
@@ -8363,6 +8376,236 @@ test('D-144B: no sitemap route added to the Worker', () => {
   assert.ok(
     !workerSrc.includes('/sitemap.xml') && !workerSrc.includes('sitemap.xml'),
     'no GET /sitemap.xml (or any sitemap) route should exist in src/worker.js yet'
+  );
+});
+
+// ── Section 75 — D-145B: Owner token foundation (advisory mode only) ───────────
+
+test('D-145B: HUMANX_OWNER_SECRET is referenced only via env, never hard-coded or in wrangler.toml', () => {
+  assert.ok(
+    workerSrc.includes('env?.HUMANX_OWNER_SECRET') || workerSrc.includes('env.HUMANX_OWNER_SECRET'),
+    'src/worker.js must read the secret from env.HUMANX_OWNER_SECRET'
+  );
+  const secretRefCount = (workerSrc.match(/HUMANX_OWNER_SECRET/g) || []).length;
+  assert.ok(secretRefCount >= 2, 'HUMANX_OWNER_SECRET should be referenced by both signOwnerToken and verifyOwnerToken');
+  const wranglerSrc = readFileSync(path.join(__dirname, '../wrangler.toml'), 'utf8');
+  assert.ok(!wranglerSrc.includes('HUMANX_OWNER_SECRET'), 'wrangler.toml must never contain HUMANX_OWNER_SECRET — it is a Worker secret, set via `wrangler secret put`, not a plaintext config value');
+});
+
+test('D-145B: signOwnerToken and verifyOwnerToken exist', () => {
+  assert.ok(workerSrc.includes('async function signOwnerToken(env, userId)'), 'signOwnerToken must exist');
+  assert.ok(workerSrc.includes('async function verifyOwnerToken(env, token, expectedUserId)'), 'verifyOwnerToken must exist');
+});
+
+test('D-145B: token signing uses HMAC-SHA256 via crypto.subtle', () => {
+  const idx = workerSrc.indexOf('async function hmacSha256');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes("crypto.subtle.importKey('raw'") &&
+    slice.includes("{ name: 'HMAC', hash: 'SHA-256' }") &&
+    slice.includes("crypto.subtle.sign('HMAC', key"),
+    'hmacSha256 must use crypto.subtle with HMAC/SHA-256 — no third-party crypto library'
+  );
+});
+
+test('D-145B: token payload includes uid/iat/exp', () => {
+  const idx = workerSrc.indexOf('async function signOwnerToken');
+  const slice = workerSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes('const payload = { uid: userId, iat: now, exp: now + OWNER_TOKEN_TTL_MS };'),
+    'signOwnerToken must build a payload of exactly {uid, iat, exp}'
+  );
+});
+
+test('D-145B: token expiry is approximately 90 days', () => {
+  assert.ok(
+    workerSrc.includes('const OWNER_TOKEN_TTL_MS = 90 * 24 * 60 * 60 * 1000;'),
+    'OWNER_TOKEN_TTL_MS must be defined as 90 days in milliseconds'
+  );
+});
+
+test('D-145B: verifyOwnerToken checks expiry', () => {
+  const idx = workerSrc.indexOf('async function verifyOwnerToken');
+  const slice = workerSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('Number(payload.exp) < Date.now()'),
+    'verifyOwnerToken must reject a token whose exp has passed'
+  );
+});
+
+test('D-145B: verifyOwnerToken checks uid matches expectedUserId', () => {
+  const idx = workerSrc.indexOf('async function verifyOwnerToken');
+  const slice = workerSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('payload.uid !== expectedUserId'),
+    'verifyOwnerToken must reject a token whose uid does not match the caller\'s x-humanx-user id — a token for user A must not validate for user B'
+  );
+});
+
+test('D-145B: verifyOwnerToken rejects missing token, missing secret, and signature mismatch', () => {
+  const idx = workerSrc.indexOf('async function verifyOwnerToken');
+  const slice = workerSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('if (!token || !secret || !expectedUserId) return false;') &&
+    slice.includes('if (!sig || !safeEqual(sig, expectedSig)) return false;'),
+    'verifyOwnerToken must reject when the token, secret, or expectedUserId is missing, and when the signature does not match (tampered payload)'
+  );
+});
+
+test('D-145B: advisory mode does not enforce rejection — ownerTokenStatus never throws or blocks', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenStatus');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    !slice.includes('throw') && !slice.includes('return json('),
+    'ownerTokenStatus must only ever return a status string (missing/valid/invalid), never throw or return an HTTP error response'
+  );
+});
+
+test('D-145B: POST /api/session returns owner_token', () => {
+  const idx = workerSrc.indexOf('async function createOrGetUser');
+  const slice = workerSrc.slice(idx, idx + 1700);
+  assert.ok(
+    slice.includes('const owner_token = await signOwnerToken(env, userId);') &&
+    slice.includes('return json({ user, owner_token });'),
+    'createOrGetUser (POST /api/session) must mint and return owner_token alongside user'
+  );
+});
+
+test('D-145B: createOrGetUser/session no longer SELECTs or returns is_admin', () => {
+  const idx = workerSrc.indexOf('async function createOrGetUser');
+  const endIdx = workerSrc.indexOf('\n// D-136B', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 1500);
+  assert.ok(!slice.includes('is_admin'), 'createOrGetUser must never select or return is_admin — it was previously leaked to every caller of POST /api/session');
+});
+
+test('D-145B: public/app-v10.js stores owner_token from the session response', () => {
+  const idx = appSrc.indexOf('async function boot()');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes("if(s.owner_token){user.ownerToken=s.owner_token}") &&
+    slice.includes('localStorage.setItem(LS_USER,JSON.stringify(user))'),
+    'boot() must store owner_token (as user.ownerToken) into the persisted localStorage user object'
+  );
+});
+
+test('D-145B: public/app-v10.js sends x-humanx-owner-token header', () => {
+  assert.ok(
+    appSrc.includes("'x-humanx-owner-token':user?.ownerToken||''"),
+    'headers() must send x-humanx-owner-token alongside x-humanx-user on every api() call'
+  );
+});
+
+test('D-145B: old localStorage user without owner_token does not break (safe optional-chaining fallback)', () => {
+  assert.ok(
+    appSrc.includes("user?.ownerToken||''"),
+    'headers() must use optional chaining + empty-string fallback so a stored user object with no ownerToken field never throws'
+  );
+});
+
+test('D-145B: Belief Engine bridge preserves owner_token — never rewrites an existing stored user object', () => {
+  const idx = humanxBridgeSrc.indexOf('function getOrCreateHumanXUser');
+  const slice = humanxBridgeSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('if (existing && existing.id) return existing;'),
+    'getOrCreateHumanXUser must return an existing stored user object as-is (never reconstruct/strip fields like ownerToken) — it only writes localStorage for brand-new users'
+  );
+  assert.ok(
+    humanxBridgeSrc.includes("'x-humanx-owner-token': user.ownerToken || ''"),
+    'the bridge\'s /api/belief-snapshots POST must also send x-humanx-owner-token when present'
+  );
+});
+
+test('D-145B: owner endpoints call the advisory ownerTokenStatus helper', () => {
+  const fns = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings'];
+  for (const fn of fns) {
+    const idx = workerSrc.indexOf(`async function ${fn}(request, env)`);
+    const slice = workerSrc.slice(idx, idx + 300);
+    assert.ok(slice.includes('await ownerTokenStatus(request, env, userId);'), `${fn} must call the advisory ownerTokenStatus helper`);
+  }
+});
+
+test('D-145B: owner endpoints switched from requireUserId to requireUser where safe', () => {
+  const fns = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings'];
+  for (const fn of fns) {
+    const idx = workerSrc.indexOf(`async function ${fn}(request, env)`);
+    const slice = workerSrc.slice(idx, idx + 200);
+    assert.ok(slice.includes('const userId = await requireUser(request, env);'), `${fn} must use requireUser(request, env), applying the shadow-ban check`);
+  }
+});
+
+test('D-145B: GET /api/belief-snapshots deliberately keeps requireUserId (shadow-banned users can still read)', () => {
+  assert.ok(
+    workerSrc.includes("requireUser: requireUserId, ownerTokenStatus:"),
+    'GET /api/belief-snapshots must keep the D-89D requireUserId behavior — only the advisory ownerTokenStatus helper was added'
+  );
+});
+
+test('D-145B: POST /api/belief-snapshots and POST /api/belief-promote call the advisory helper when provided', () => {
+  assert.ok(
+    beliefSnapshotsSrc.includes('if (ownerTokenStatus) await ownerTokenStatus(request, userId);'),
+    'saveBeliefSnapshot must call the advisory ownerTokenStatus helper when present'
+  );
+  assert.ok(
+    bridgeSrc.includes('if (ownerTokenStatus) await ownerTokenStatus(request, userId);'),
+    'promoteBeliefSnapshot must call the advisory ownerTokenStatus helper when present'
+  );
+});
+
+test('D-145B: public GET /api/u/:slug is unchanged — no owner token required', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const slice = workerSrc.slice(idx, idx + 500);
+  assert.ok(
+    !slice.includes('ownerTokenStatus') && !slice.includes('requireUser') && !slice.includes('x-humanx-owner-token'),
+    'getPublicProfile must remain fully public — no owner identity check of any kind'
+  );
+});
+
+test('D-145B: GET /u/:slug shell route is unchanged — no owner token required', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 2700);
+  assert.ok(
+    !slice.includes('ownerTokenStatus') && !slice.includes('requireUser') && !slice.includes('x-humanx-owner-token'),
+    'renderPublicProfileShell must remain fully public — no owner identity check of any kind'
+  );
+});
+
+test('D-145B: admin token path is completely unchanged', () => {
+  assert.ok(
+    workerSrc.includes("function requireAdmin(request, env) { const admin=request.headers.get('x-humanx-admin') || ''; const expected=env.HUMANX_ADMIN_TOKEN || ''; if (!expected || !safeEqual(admin, expected)) return json({ error:'ADMIN_REQUIRED' },403); return null; }"),
+    'requireAdmin must be byte-for-byte unchanged — owner token and admin token are separate, non-overlapping systems'
+  );
+});
+
+test('D-145B: no migration added', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_owner_token.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_d145b.sql')),
+    'D-145B must not require a D1 migration — the token is stateless (signature + expiry only), no new column needed'
+  );
+});
+
+test('D-145B: no wrangler.toml secret literal added', () => {
+  const wranglerSrc = readFileSync(path.join(__dirname, '../wrangler.toml'), 'utf8');
+  assert.ok(
+    !wranglerSrc.includes('OWNER_SECRET') && !wranglerSrc.includes('[vars]'),
+    'wrangler.toml must not gain any plaintext secret value — HUMANX_OWNER_SECRET is set via `wrangler secret put`, outside version control'
+  );
+});
+
+test('D-145B: no cookie auth, OAuth, email, or magic-link code added', () => {
+  assert.ok(
+    !workerSrc.includes('set-cookie') && !workerSrc.includes('Set-Cookie') &&
+    !workerSrc.includes('oauth') && !workerSrc.includes('OAuth') &&
+    !workerSrc.includes('magic-link') && !workerSrc.includes('magicLink') &&
+    !workerSrc.includes('sendEmail') && !workerSrc.includes('SENDGRID') && !workerSrc.includes('MAILGUN'),
+    'D-145B must stay within the audited advisory-token scope — no cookie/OAuth/email/magic-link infrastructure'
+  );
+});
+
+test('D-145B: no token ever appears in a URL/query string', () => {
+  assert.ok(
+    !workerSrc.includes('searchParams.get(\'owner_token\'') && !workerSrc.includes('searchParams.get(\'token\''),
+    'the owner token must only ever travel via the x-humanx-owner-token header — never as a URL/query parameter'
   );
 });
 

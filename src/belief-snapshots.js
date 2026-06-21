@@ -1,6 +1,7 @@
 export async function saveBeliefSnapshot(request, env, helpers) {
-  const { readJson, cleanId, cleanText, json, requireUser, makeId } = helpers;
+  const { readJson, cleanId, cleanText, json, requireUser, makeId, ownerTokenStatus } = helpers;
   const userId = await requireUser(request);
+  if (ownerTokenStatus) await ownerTokenStatus(request, userId); // D-145B: advisory only, result unused
   await safeRateLimit(request, env, `belief-snapshot:${ip(request)}`, 20, 3600000);
   const body = await readJson(request);
   const raw = body.snapshot || body.result || body.raw || body;
@@ -64,8 +65,9 @@ export async function saveBeliefSnapshot(request, env, helpers) {
 }
 
 export async function listBeliefSnapshots(request, env, helpers) {
-  const { json, requireUser } = helpers;
+  const { json, requireUser, ownerTokenStatus } = helpers;
   const userId = await requireUser(request);
+  if (ownerTokenStatus) await ownerTokenStatus(request, userId); // D-145B: advisory only, result unused
   const url = new URL(request.url);
   const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit') || 30)));
   const rows = await env.DB.prepare(`

@@ -45,7 +45,11 @@ function esc(s) {
 }
 function toast(t) { const e=document.createElement('div'); e.className='toast'; e.textContent=t; document.body.appendChild(e); setTimeout(()=>e.remove(),1800); }
 function hxModal({title,body,confirmLabel='Submit',cancelLabel='Cancel',onConfirm,onCancel}={}) {document.getElementById('hx-modal')?.remove();const el=document.createElement('div');el.id='hx-modal';el.className='hx-modal-overlay';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.innerHTML=`<div class="hx-modal-panel">${title?`<h3 class="hx-modal-title">${esc(title)}</h3>`:''}<div class="hx-modal-body">${body||''}</div><div class="hx-modal-actions"><button class="primary hx-modal-confirm">${esc(confirmLabel)}</button><button class="hx-modal-cancel">${esc(cancelLabel)}</button></div></div>`;document.body.appendChild(el);const close=()=>{el.remove();document.removeEventListener('keydown',onKey);};const onKey=e=>{if(e.key==='Escape'){close();if(onCancel)onCancel();}};document.addEventListener('keydown',onKey);el.querySelector('.hx-modal-confirm').onclick=()=>{if(onConfirm)onConfirm(close);};el.querySelector('.hx-modal-cancel').onclick=()=>{close();if(onCancel)onCancel();};el.addEventListener('click',e=>{if(e.target===el){close();if(onCancel)onCancel();}});setTimeout(()=>el.querySelector('textarea,input')?.focus(),50);return close;}
-function headers(){return{'content-type':'application/json','x-humanx-user':user?.id||''}}
+// D-145B: advisory-mode owner token, sent alongside x-humanx-user wherever it
+// is already sent. Empty string when absent (old stored users, or the
+// backend secret not configured yet) — no endpoint rejects on this being
+// missing/empty in this patch.
+function headers(){return{'content-type':'application/json','x-humanx-user':user?.id||'','x-humanx-owner-token':user?.ownerToken||''}}
 function adminToken(){return localStorage.getItem(LS_ADMIN)||''}
 function adminHeaders(){return {...headers(),'x-humanx-admin':adminToken()}}
 async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{...headers(),...(opts.headers||{})}});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.message||data.error||'Request failed');return data}
@@ -72,7 +76,7 @@ function parsePublicProfilePath(){const m=String(location.pathname||'').match(/^
 function resolvePublicProfileSlug(){return parsePublicProfileHash()||parsePublicProfilePath()}
 function applyHashRoute(){const slug=parsePublicProfileHash();if(slug){publicProfileSlug=slug;mode='publicProfile';render()}else if(mode==='publicProfile'){mode='home';render()}}
 window.addEventListener('hashchange',applyHashRoute);
-async function boot(){user=localUser();document.getElementById('who').textContent=user.handle;const initialSlug=resolvePublicProfileSlug();if(initialSlug){publicProfileSlug=initialSlug;mode='publicProfile'}try{const h=await api('/api/health');live=h.mode==='d1-live';setStatus(live?'D1 live':'Demo fallback',live);try{const s=await api('/api/session',{method:'POST',body:JSON.stringify(user)});if(s.user){user={...user,...s.user};document.getElementById('who').textContent=user.handle;localStorage.setItem(LS_USER,JSON.stringify(user))}}catch{}loadMe().catch(()=>{});await Promise.all([loadGraphStatus(),loadClaims(false)]);render()}catch(e){setStatus('Backend unreachable',false,true);renderError(e)}}
+async function boot(){user=localUser();document.getElementById('who').textContent=user.handle;const initialSlug=resolvePublicProfileSlug();if(initialSlug){publicProfileSlug=initialSlug;mode='publicProfile'}try{const h=await api('/api/health');live=h.mode==='d1-live';setStatus(live?'D1 live':'Demo fallback',live);try{const s=await api('/api/session',{method:'POST',body:JSON.stringify(user)});if(s.user){user={...user,...s.user};document.getElementById('who').textContent=user.handle}if(s.owner_token){user.ownerToken=s.owner_token}localStorage.setItem(LS_USER,JSON.stringify(user))}catch{}loadMe().catch(()=>{});await Promise.all([loadGraphStatus(),loadClaims(false)]);render()}catch(e){setStatus('Backend unreachable',false,true);renderError(e)}}
 
 // D-136C: account panel (anonymous/verified state + invite-code redeem).
 // Reuses the existing x-humanx-user identity — never mints a new user id,

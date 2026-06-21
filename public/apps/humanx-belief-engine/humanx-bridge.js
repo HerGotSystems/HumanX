@@ -100,7 +100,14 @@
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          'x-humanx-user': user.id
+          'x-humanx-user': user.id,
+          // D-145B: advisory-mode owner token, sent whenever it's already
+          // present in the shared humanx_public_user_v1 localStorage object
+          // (minted by the main app's POST /api/session call). Empty when
+          // absent — getOrCreateHumanXUser() never strips this field since
+          // it only writes localStorage for brand-new users, never rewrites
+          // an existing stored user object.
+          'x-humanx-owner-token': user.ownerToken || ''
         },
         body: JSON.stringify({
           snapshot,
