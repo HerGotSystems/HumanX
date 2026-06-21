@@ -28,6 +28,11 @@ export default {
     try {
       if (url.pathname === '/api/health') return json({ ok: true, service: 'humanx', mode: env.DB ? 'd1-live' : 'demo-fallback', ai: 'runpack-first-no-public-inference', legacy_ai: 'aip-first-no-public-inference' });
       if (url.pathname === '/api/ai/analyse') return json({ error: 'RUNPACK_MODE', legacy_error: 'AIP_MODE', message: 'HumanX is RunPack-first. Public users copy a task packet and run it with their own AI. Owner API credits are not used for public analysis.' }, 402);
+      // D-143B: intercept /u/:slug before the static-asset fallback so a
+      // shared profile link gets server-rendered OG meta tags. Targeted to
+      // this one path pattern only — no global not_found_handling/SPA
+      // fallback change in wrangler.toml.
+      if (url.pathname.match(/^\/u\/[^/]+$/) && request.method === 'GET') return await renderPublicProfileShell(request, env, url.pathname.split('/').pop());
       if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
       if (!env.DB) return fallbackApi(request, url);
       if (url.pathname === '/api/debug' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return debugState(request, env); }
@@ -357,17 +362,19 @@ async function publicContentCount(env, table, userId) {
   return row?.n || 0;
 }
 
-async function getPublicProfile(request, env, rawSlug) {
+// D-143B: shared by both GET /api/u/:slug (full JSON) and the GET /u/:slug
+// HTML-shell OG route, so the lookup/privacy filter is defined exactly once.
+// Returns null for a missing/invalid/non-public slug — same 404-equivalent
+// treatment both callers already use, never a distinguishing signal.
+// `userId` is included for getPublicProfile()'s own downstream queries —
+// callers must never serialize it directly into a response.
+async function loadPublicProfileSummary(env, rawSlug) {
   const v = validateProfileSlug(rawSlug);
-  if (v.error) return json({ error: 'PROFILE_NOT_FOUND' }, 404);
+  if (v.error) return null;
   const slug = v.slug;
 
-  // id is selected only to scope the content queries below — it is never
-  // included in the response payload.
   const user = await env.DB.prepare(`SELECT id, handle, display_name, profile_slug, profile_bio FROM users WHERE profile_slug=? AND profile_public=1`).bind(slug).first();
-  // Same 404 for a missing slug and a slug that exists but isn't public —
-  // never distinguish "private" from "not found".
-  if (!user) return json({ error: 'PROFILE_NOT_FOUND' }, 404);
+  if (!user) return null;
   const userId = user.id;
 
   const [claimCount, truthCount, evidenceCount, pressureCount] = await Promise.all([
@@ -376,6 +383,51 @@ async function getPublicProfile(request, env, rawSlug) {
     publicContentCount(env, PUBLIC_PROFILE_TABLES.evidence, userId),
     publicContentCount(env, PUBLIC_PROFILE_TABLES.pressure, userId),
   ]);
+
+  return {
+    userId,
+    slug: user.profile_slug,
+    bio: user.profile_bio || null,
+    displayName: user.display_name || user.handle || 'anon',
+    counts: { claims: claimCount, truths: truthCount, evidence: evidenceCount, pressure: pressureCount },
+  };
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+}
+
+// D-143B: server-rendered OG meta tags for /u/:slug. Always returns the
+// unmodified index.html (same response everyone else gets — no user-agent
+// sniffing, no cloaking) for any missing/invalid/private slug; only injects
+// profile-specific tags when the slug resolves to a public profile. No
+// mutating behavior, no new fields beyond the existing public summary.
+async function renderPublicProfileShell(request, env, rawSlug) {
+  const url = new URL(request.url);
+  const indexRequest = new Request(new URL('/index.html', url.origin), request);
+  const indexResponse = await env.ASSETS.fetch(indexRequest);
+  if (!env.DB) return indexResponse;
+
+  const summary = await loadPublicProfileSummary(env, rawSlug);
+  if (!summary) return indexResponse;
+
+  const html = await indexResponse.text();
+  const title = `${escHtml(summary.displayName)} on HumanX`;
+  const rawBio = summary.bio ? String(summary.bio).trim() : '';
+  const description = escHtml(rawBio ? (rawBio.length > 160 ? rawBio.slice(0, 157) + '...' : rawBio) : 'A HumanX public profile.');
+  const profileUrl = escHtml(`${url.origin}/u/${encodeURIComponent(summary.slug)}`);
+  const metaBlock = `<title>${title}</title>\n<meta property="og:title" content="${title}">\n<meta property="og:description" content="${description}">\n<meta property="og:type" content="profile">\n<meta property="og:url" content="${profileUrl}">\n<meta name="twitter:card" content="summary">`;
+  const injected = html.replace('<title>HumanX — Belief → Truth → Claim → Evidence</title>', metaBlock);
+
+  return new Response(injected, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } });
+}
+
+async function getPublicProfile(request, env, rawSlug) {
+  const summary = await loadPublicProfileSummary(env, rawSlug);
+  // Same 404 for a missing slug, an invalid slug, and a slug that exists but
+  // isn't public — never distinguish "private" from "not found".
+  if (!summary) return json({ error: 'PROFILE_NOT_FOUND' }, 404);
+  const userId = summary.userId;
 
   const [claimsRows, truthsRows, evidenceRows, pressureRows] = await Promise.all([
     env.DB.prepare(`SELECT id, claim, category, type, status, evidence_score, survivability, testability, created_at, updated_at FROM claims WHERE user_id=? AND COALESCE(review_state,'public')='public' AND COALESCE(archived_by_user,0)=0 ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 10`).bind(userId).all(),
@@ -414,10 +466,10 @@ async function getPublicProfile(request, env, rawSlug) {
   return json({
     ok: true,
     profile: {
-      slug: user.profile_slug,
-      bio: user.profile_bio || null,
-      displayName: user.display_name || user.handle || 'anon',
-      counts: { claims: claimCount, truths: truthCount, evidence: evidenceCount, pressure: pressureCount },
+      slug: summary.slug,
+      bio: summary.bio,
+      displayName: summary.displayName,
+      counts: summary.counts,
       recentClaims: claimsRows.results || [],
       recentTruths: truthsRows.results || [],
       recentEvidence: evidenceRows.results || [],

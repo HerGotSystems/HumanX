@@ -7164,13 +7164,14 @@ test('D-140B: save calls POST /api/my-humanx/profile-settings', () => {
   );
 });
 
-test('D-140B/D-140C: copy share link uses a hash route only, never a real path fetch', () => {
+test('D-140B/D-143B: copy share link now uses the real /u/:slug path, not the #/u/:slug hash', () => {
   const idx = appSrc.indexOf('function meCopyProfileLink');
   const slice = appSrc.slice(idx, idx + 400);
   assert.ok(
-    slice.includes('`${location.origin}/#/u/${encodeURIComponent(slug)}`') &&
+    slice.includes('`${location.origin}/u/${encodeURIComponent(slug)}`') &&
+    !slice.includes('/#/u/') &&
     !slice.includes('fetch(') && !slice.includes('await api('),
-    'meCopyProfileLink must build a hash-route URL only — no fetch to the now-existing public route from the copy action itself'
+    'meCopyProfileLink must build the server-rendered /u/:slug URL (now that it has OG meta tags) — no fetch from the copy action itself'
   );
 });
 
@@ -7224,49 +7225,61 @@ test('D-140C: getPublicProfile is public read-only and does not call requireUser
   );
 });
 
-test('D-140C: getPublicProfile validates the slug using the same rules as profile settings', () => {
-  const idx = workerSrc.indexOf('async function getPublicProfile');
+test('D-140C/D-143B: getPublicProfile (via loadPublicProfileSummary) validates the slug using the same rules as profile settings', () => {
+  const idx = workerSrc.indexOf('async function loadPublicProfileSummary');
   const slice = workerSrc.slice(idx, idx + 400);
   assert.ok(
     slice.includes('const v = validateProfileSlug(rawSlug);') &&
-    slice.includes("if (v.error) return json({ error: 'PROFILE_NOT_FOUND' }, 404);"),
-    'getPublicProfile must reuse validateProfileSlug() and 404 on any invalid slug'
+    slice.includes('if (v.error) return null;'),
+    'loadPublicProfileSummary must reuse validateProfileSlug() and return null on any invalid slug'
   );
-});
-
-test('D-140C: private and not-found slugs both return the same 404 PROFILE_NOT_FOUND', () => {
-  const idx = workerSrc.indexOf('async function getPublicProfile');
-  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
-  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
-  const notFoundCount = (slice.match(/error: 'PROFILE_NOT_FOUND' \}, 404\)/g) || []).length;
+  const gpIdx = workerSrc.indexOf('async function getPublicProfile');
+  const gpSlice = workerSrc.slice(gpIdx, gpIdx + 400);
   assert.ok(
-    notFoundCount >= 2,
-    'getPublicProfile must return the identical PROFILE_NOT_FOUND 404 for both an invalid/missing slug and a private (non-public) profile, never a distinguishing error'
+    gpSlice.includes('const summary = await loadPublicProfileSummary(env, rawSlug);') &&
+    gpSlice.includes("if (!summary) return json({ error: 'PROFILE_NOT_FOUND' }, 404);"),
+    'getPublicProfile must delegate the lookup to loadPublicProfileSummary and 404 when it returns null'
   );
 });
 
-test('D-140C: profile lookup requires profile_public=1', () => {
-  const idx = workerSrc.indexOf('async function getPublicProfile');
+test('D-140C/D-143B: private and not-found slugs both return the same 404 PROFILE_NOT_FOUND via the single shared helper', () => {
+  const idx = workerSrc.indexOf('async function loadPublicProfileSummary');
+  const endIdx = workerSrc.indexOf('\nfunction escHtml', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 1200);
+  const nullReturnCount = (slice.match(/return null;/g) || []).length;
+  assert.ok(
+    nullReturnCount >= 2,
+    'loadPublicProfileSummary must return null for both an invalid/missing slug and a private (non-public) profile — getPublicProfile then maps both to the identical PROFILE_NOT_FOUND 404, never a distinguishing error'
+  );
+});
+
+test('D-140C/D-143B: profile lookup requires profile_public=1', () => {
+  const idx = workerSrc.indexOf('async function loadPublicProfileSummary');
   const slice = workerSrc.slice(idx, idx + 700);
   assert.ok(
     slice.includes('WHERE profile_slug=? AND profile_public=1'),
-    'getPublicProfile must only ever match rows with profile_public=1'
+    'loadPublicProfileSummary must only ever match rows with profile_public=1'
   );
 });
 
-test('D-140C: response omits email/user id/verified/is_admin/admin-token material', () => {
-  const idx = workerSrc.indexOf('async function getPublicProfile');
-  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
-  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+test('D-140C/D-143B: response omits email/user id/verified/is_admin/admin-token material', () => {
+  const summaryIdx = workerSrc.indexOf('async function loadPublicProfileSummary');
+  const summaryEndIdx = workerSrc.indexOf('\nfunction escHtml', summaryIdx);
+  const summarySlice = workerSrc.slice(summaryIdx, summaryEndIdx > -1 ? summaryEndIdx : summaryIdx + 1200);
+  const gpIdx = workerSrc.indexOf('async function getPublicProfile');
+  const gpEndIdx = workerSrc.indexOf('\nasync function createInviteCode', gpIdx);
+  const gpSlice = workerSrc.slice(gpIdx, gpEndIdx > -1 ? gpEndIdx : gpIdx + 3000);
+  for (const slice of [summarySlice, gpSlice]) {
+    assert.ok(
+      !slice.includes('email') && !slice.includes('verified') && !slice.includes('is_admin') &&
+      !slice.includes('HUMANX_ADMIN_TOKEN') && !slice.includes('trust_score') && !slice.includes('strike_count') &&
+      !slice.includes('is_shadow_banned') && !slice.includes('fingerprint_hash'),
+      'neither loadPublicProfileSummary nor getPublicProfile may select or return email/verified/trust_score/strike_count/is_shadow_banned/is_admin/fingerprint_hash/admin-token material'
+    );
+  }
   assert.ok(
-    !slice.includes('email') && !slice.includes('verified') && !slice.includes('is_admin') &&
-    !slice.includes('HUMANX_ADMIN_TOKEN') && !slice.includes('trust_score') && !slice.includes('strike_count') &&
-    !slice.includes('is_shadow_banned') && !slice.includes('fingerprint_hash'),
-    'getPublicProfile must never select or return email/verified/trust_score/strike_count/is_shadow_banned/is_admin/fingerprint_hash/admin-token material'
-  );
-  assert.ok(
-    /profile:\s*\{\s*slug:\s*user\.profile_slug,\s*bio:\s*user\.profile_bio \|\| null,\s*displayName:/.test(slice),
-    'the response profile object must be limited to slug/bio/displayName/counts/recent lists'
+    /profile:\s*\{\s*slug:\s*summary\.slug,\s*bio:\s*summary\.bio,\s*displayName:\s*summary\.displayName,/.test(gpSlice),
+    'the response profile object must be built from the narrow summary object (slug/bio/displayName/counts/recent lists), never the raw user row'
   );
 });
 
@@ -7320,12 +7333,13 @@ test('D-140C/D-142B: no raw_json/stress_points_json/export data exposed via the 
   );
 });
 
-test('D-140C: hash route #/u/:slug exists and is checked on boot and hashchange', () => {
+test('D-140C/D-143B: hash route #/u/:slug still exists and is checked on boot (now via resolvePublicProfileSlug) and hashchange', () => {
   assert.ok(
     appSrc.includes("function parsePublicProfileHash(){const m=String(location.hash||'').match(/^#\\/u\\/([^/?#]+)/);return m?decodeURIComponent(m[1]):null}") &&
     appSrc.includes("window.addEventListener('hashchange',applyHashRoute)") &&
-    appSrc.includes('const initialSlug=parsePublicProfileHash();'),
-    'app-v10.js must parse #/u/:slug on boot and react to hashchange'
+    appSrc.includes('const initialSlug=resolvePublicProfileSlug();') &&
+    appSrc.includes('function resolvePublicProfileSlug(){return parsePublicProfileHash()||parsePublicProfilePath()}'),
+    'app-v10.js must still parse #/u/:slug on boot (hash takes priority via resolvePublicProfileSlug) and react to hashchange'
   );
 });
 
@@ -7429,20 +7443,20 @@ test('D-141B: no migration added', () => {
   );
 });
 
-test('D-141B/D-142B: GET /api/u/:slug response core fields are preserved, plus the new optional sharedSnapshot', () => {
+test('D-141B/D-142B/D-143B: GET /api/u/:slug response core fields are preserved, plus the new optional sharedSnapshot', () => {
   const idx = workerSrc.indexOf('async function getPublicProfile');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
   const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
   assert.ok(
-    /profile:\s*\{\s*slug:\s*user\.profile_slug,\s*bio:\s*user\.profile_bio \|\| null,\s*displayName:/.test(slice) &&
-    slice.includes('counts: { claims: claimCount, truths: truthCount, evidence: evidenceCount, pressure: pressureCount }') &&
+    /profile:\s*\{\s*slug:\s*summary\.slug,\s*bio:\s*summary\.bio,\s*displayName:\s*summary\.displayName,/.test(slice) &&
+    slice.includes('counts: summary.counts,') &&
     slice.includes('recentClaims: claimsRows.results || []') &&
     slice.includes('recentTruths: truthsRows.results || []') &&
     slice.includes('recentEvidence: evidenceRows.results || []') &&
     slice.includes('recentPressure: pressureRows.results || []') &&
     slice.includes('sharedSnapshot,') &&
     !slice.includes('raw_json') && !slice.includes('stress_points_json'),
-    'getPublicProfile must keep all D-140C core fields and add only the narrow, optional sharedSnapshot field — never raw_json/stress_points_json'
+    'getPublicProfile must keep all D-140C core fields (now sourced from the shared summary helper) and the D-142B sharedSnapshot field — never raw_json/stress_points_json'
   );
 });
 
@@ -7982,6 +7996,146 @@ test('D-142C: forbidden wording absent outside the approved guardrail disclaimer
       assert.ok(!lower.includes(phrase), `${fn} must not contain forbidden phrase "${phrase}" outside the approved disclaimer`);
     }
   }
+});
+
+// ── Section 72 — D-143B: Server-rendered OG meta tags for /u/:slug ─────────────
+
+test('D-143B: GET /u/:slug route exists and is matched before the static-asset fallback', () => {
+  const routeIdx = workerSrc.indexOf("url.pathname.match(/^\\/u\\/[^/]+$/) && request.method === 'GET') return await renderPublicProfileShell(request, env, url.pathname.split('/').pop());");
+  const fallbackIdx = workerSrc.indexOf("if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);");
+  assert.ok(routeIdx !== -1 && fallbackIdx !== -1 && routeIdx < fallbackIdx, 'the /u/:slug route must be matched before the static-asset fallback line so it can intercept and inject OG tags');
+});
+
+test('D-143B: no wrangler.toml not_found_handling / global SPA fallback change', () => {
+  const wranglerSrc = readFileSync(path.join(__dirname, '../wrangler.toml'), 'utf8');
+  assert.ok(
+    !wranglerSrc.includes('not_found_handling') && !wranglerSrc.includes('single-page-application'),
+    'wrangler.toml must not gain a global not_found_handling/SPA-fallback setting — the /u/:slug interception must stay targeted at the Worker route level'
+  );
+});
+
+test('D-143B: renderPublicProfileShell fetches index.html from env.ASSETS', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes("new Request(new URL('/index.html', url.origin), request)") &&
+    slice.includes('await env.ASSETS.fetch(indexRequest)'),
+    'renderPublicProfileShell must fetch /index.html via env.ASSETS.fetch'
+  );
+});
+
+test('D-143B: private/not-found/invalid slug returns the unmodified shell — no profile meta, no distinguishing status', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('if (!env.DB) return indexResponse;') &&
+    slice.includes('if (!summary) return indexResponse;'),
+    'renderPublicProfileShell must return the untouched indexResponse for the no-DB case and for any missing/invalid/private slug'
+  );
+});
+
+test('D-143B: public slug injects title + og:title + og:description + og:type + og:url + twitter:card', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes('<title>${title}</title>') &&
+    slice.includes('<meta property="og:title" content="${title}">') &&
+    slice.includes('<meta property="og:description" content="${description}">') &&
+    slice.includes('<meta property="og:type" content="profile">') &&
+    slice.includes('<meta property="og:url" content="${profileUrl}">') &&
+    slice.includes('<meta name="twitter:card" content="summary">'),
+    'renderPublicProfileShell must inject all six required meta tags for a public profile'
+  );
+});
+
+test('D-143B: meta content is HTML-escaped', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes('const title = `${escHtml(summary.displayName)} on HumanX`;') &&
+    slice.includes('const description = escHtml(') &&
+    slice.includes('const profileUrl = escHtml('),
+    'title/description/url must all be passed through escHtml before being interpolated into the HTML response'
+  );
+  const escIdx = workerSrc.indexOf('function escHtml');
+  const escSlice = workerSrc.slice(escIdx, escIdx + 250);
+  assert.ok(escSlice.includes('&amp;') && escSlice.includes('&lt;') && escSlice.includes('&quot;'), 'escHtml must escape &, <, >, ", \' the same way the frontend esc() helper does');
+});
+
+test('D-143B: OG description uses the bio fallback and 160-char truncation', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes("rawBio.length > 160 ? rawBio.slice(0, 157) + '...' : rawBio) : 'A HumanX public profile.'"),
+    'the description must truncate long bios to ~160 chars and fall back to a generic sentence when no bio is set'
+  );
+});
+
+test('D-143B: OG route never includes email/user id/admin fields', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 1500);
+  assert.ok(
+    !slice.includes('email') && !slice.includes('is_admin') && !slice.includes('userId') && !slice.includes('summary.userId') && !slice.includes('HUMANX_ADMIN_TOKEN'),
+    'renderPublicProfileShell must never reference email/userId/is_admin/admin-token material — it only ever reads displayName/bio/slug from the summary'
+  );
+});
+
+test('D-143B: OG route never includes sharedSnapshot/dominantPattern/raw_json/stress_points_json/dimensions_json/contradictions_json', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 1500);
+  assert.ok(
+    !slice.includes('sharedSnapshot') && !slice.includes('dominantPattern') && !slice.includes('raw_json') &&
+    !slice.includes('stress_points_json') && !slice.includes('dimensions_json') && !slice.includes('contradictions_json') &&
+    !slice.includes('belief_snapshots'),
+    'renderPublicProfileShell must never touch belief/snapshot data — OG meta is profile-summary only'
+  );
+});
+
+test('D-143B: no OG image endpoint added', () => {
+  assert.ok(!workerSrc.includes('og-image'), 'no GET .../og-image route should exist yet — deferred per the D-143A audit');
+  assert.ok(!workerSrc.includes('og:image'), 'no og:image meta tag should be injected in this patch');
+});
+
+test('D-143B: no mutating endpoint added (renderPublicProfileShell/loadPublicProfileSummary are GET-only reads)', () => {
+  const idx = workerSrc.indexOf('async function loadPublicProfileSummary');
+  const endIdx = workerSrc.indexOf('\nasync function getPublicProfile', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2500);
+  assert.ok(
+    !slice.includes('.run()') && !slice.includes('UPDATE ') && !slice.includes('INSERT ') && !slice.includes('DELETE '),
+    'loadPublicProfileSummary and renderPublicProfileShell must contain no write/mutating SQL'
+  );
+});
+
+test('D-143B: /api/u/:slug JSON route still exists unchanged', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname.match(/^\\/api\\/u\\/[^/]+$/) && request.method === 'GET') return await getPublicProfile(request, env, url.pathname.split('/').pop())"),
+    'the existing GET /api/u/:slug JSON API route must be untouched'
+  );
+});
+
+test('D-143B: direct /u/:slug frontend path fallback exists', () => {
+  assert.ok(
+    appSrc.includes("function parsePublicProfilePath(){const m=String(location.pathname||'').match(/^\\/u\\/([^/?#]+)\\/?$/);return m?decodeURIComponent(m[1]):null}") &&
+    appSrc.includes('function resolvePublicProfileSlug(){return parsePublicProfileHash()||parsePublicProfilePath()}'),
+    'app-v10.js must recognize a direct /u/:slug path (hash still takes priority) so a real-path visit renders the same public profile view'
+  );
+});
+
+test('D-143B: direct path uses the same GET /api/u/:slug call as the hash route', () => {
+  const idx = appSrc.indexOf('async function renderPublicProfile()');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes('await api(`/api/u/${encodeURIComponent(publicProfileSlug||\'\')}`)'),
+    'renderPublicProfile must call GET /api/u/:slug regardless of whether publicProfileSlug came from the hash or the path'
+  );
+});
+
+test('D-143B: no migration added', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_og_meta.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_d143b.sql')),
+    'D-143B must not require a D1 migration'
+  );
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
