@@ -404,7 +404,14 @@ function escHtml(s) {
 // mutating behavior, no new fields beyond the existing public summary.
 async function renderPublicProfileShell(request, env, rawSlug) {
   const url = new URL(request.url);
-  const indexRequest = new Request(new URL('/index.html', url.origin), request);
+  // D-143B hotfix: must request '/', not '/index.html'. Cloudflare's default
+  // static-asset html_handling ("auto-trailing-slash") 308-redirects a direct
+  // /index.html request to '/' — env.ASSETS.fetch() doesn't follow redirects
+  // for us, so requesting /index.html returned an empty-bodied redirect
+  // response, which we then served verbatim as a 200 with no HTML at all
+  // (the white-screen bug). '/' resolves straight to the real index.html
+  // content with no redirect involved.
+  const indexRequest = new Request(new URL('/', url.origin), request);
   const indexResponse = await env.ASSETS.fetch(indexRequest);
   if (!env.DB) return indexResponse;
 

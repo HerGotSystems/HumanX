@@ -8014,13 +8014,14 @@ test('D-143B: no wrangler.toml not_found_handling / global SPA fallback change',
   );
 });
 
-test('D-143B: renderPublicProfileShell fetches index.html from env.ASSETS', () => {
+test('D-143B hotfix: renderPublicProfileShell fetches "/" (not /index.html) from env.ASSETS to avoid the auto-trailing-slash redirect white screen', () => {
   const idx = workerSrc.indexOf('async function renderPublicProfileShell');
-  const slice = workerSrc.slice(idx, idx + 700);
+  const slice = workerSrc.slice(idx, idx + 1100);
   assert.ok(
-    slice.includes("new Request(new URL('/index.html', url.origin), request)") &&
-    slice.includes('await env.ASSETS.fetch(indexRequest)'),
-    'renderPublicProfileShell must fetch /index.html via env.ASSETS.fetch'
+    slice.includes("new Request(new URL('/', url.origin), request)") &&
+    slice.includes('await env.ASSETS.fetch(indexRequest)') &&
+    !slice.includes("new URL('/index.html', url.origin)"),
+    'renderPublicProfileShell must request "/" — requesting "/index.html" directly hits Cloudflare\'s default html_handling redirect and returns an empty body, which was the white-screen bug'
   );
 });
 
@@ -8036,7 +8037,7 @@ test('D-143B: private/not-found/invalid slug returns the unmodified shell — no
 
 test('D-143B: public slug injects title + og:title + og:description + og:type + og:url + twitter:card', () => {
   const idx = workerSrc.indexOf('async function renderPublicProfileShell');
-  const slice = workerSrc.slice(idx, idx + 1500);
+  const slice = workerSrc.slice(idx, idx + 2000);
   assert.ok(
     slice.includes('<title>${title}</title>') &&
     slice.includes('<meta property="og:title" content="${title}">') &&
@@ -8135,6 +8136,82 @@ test('D-143B: no migration added', () => {
     !existsSync(path.join(__dirname, '../migrations/0014_og_meta.sql')) &&
     !existsSync(path.join(__dirname, '../migrations/0014_d143b.sql')),
     'D-143B must not require a D1 migration'
+  );
+});
+
+// ── Section 73 — D-143B HOTFIX: direct /u/:slug white screen ───────────────────
+
+const indexHtmlSrc = readFileSync(path.join(__dirname, '../public/index.html'), 'utf8');
+
+test('D-143B hotfix: public/index.html app shell asset references are root-relative', () => {
+  assert.ok(
+    indexHtmlSrc.includes('href="/styles.css') && indexHtmlSrc.includes('src="/app-v10.js'),
+    'styles.css and app-v10.js must be referenced with a leading slash (root-relative), so they resolve correctly regardless of the request path depth'
+  );
+  assert.ok(
+    !/href="(?!\/|https?:|#)[^"]*\.css/.test(indexHtmlSrc) && !/src="(?!\/|https?:)[^"]*app-v10\.js/.test(indexHtmlSrc),
+    'no relative (non-root, non-absolute) stylesheet/app-script reference should exist — confirms no /u/app-v10.js or /u/styles.css resolution risk'
+  );
+});
+
+test('D-143B hotfix: /u/:slug route still injects OG tags after the asset-fetch fix', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 2000);
+  assert.ok(
+    slice.includes('<meta property="og:title" content="${title}">') &&
+    slice.includes('<meta property="og:description" content="${description}">'),
+    'OG tag injection must still work after switching the asset fetch target'
+  );
+});
+
+test('D-143B hotfix: /u/:slug route still fetches the app shell through env.ASSETS', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 900);
+  assert.ok(slice.includes('await env.ASSETS.fetch(indexRequest)'), 'the shell must still come from env.ASSETS, not a hardcoded string');
+});
+
+test('D-143B hotfix: #/u/:slug hash route is still supported', () => {
+  assert.ok(
+    appSrc.includes("function parsePublicProfileHash(){const m=String(location.hash||'').match(/^#\\/u\\/([^/?#]+)/);return m?decodeURIComponent(m[1]):null}"),
+    'the hash route parser must remain unchanged by this hotfix'
+  );
+});
+
+test('D-143B hotfix: direct /u/:slug path route is still supported', () => {
+  assert.ok(
+    appSrc.includes("function parsePublicProfilePath(){const m=String(location.pathname||'').match(/^\\/u\\/([^/?#]+)\\/?$/);return m?decodeURIComponent(m[1]):null}"),
+    'the path route parser must remain unchanged by this hotfix'
+  );
+});
+
+test('D-143B hotfix: copy share link still uses the real /u/:slug path', () => {
+  const idx = appSrc.indexOf('function meCopyProfileLink');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(slice.includes('`${location.origin}/u/${encodeURIComponent(slug)}`'), 'meCopyProfileLink must still copy the /u/:slug path, unaffected by this backend-only hotfix');
+});
+
+test('D-143B hotfix: no wrangler.toml not_found_handling change introduced by the fix', () => {
+  const wranglerSrc = readFileSync(path.join(__dirname, '../wrangler.toml'), 'utf8');
+  assert.ok(
+    !wranglerSrc.includes('not_found_handling') && !wranglerSrc.includes('single-page-application'),
+    'the hotfix must stay Worker-route-level — no global SPA-fallback config added'
+  );
+});
+
+test('D-143B hotfix: no migration added', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_hotfix.sql')),
+    'this hotfix must not require a D1 migration'
+  );
+});
+
+test('D-143B hotfix: no new mutating endpoint added', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const endIdx = workerSrc.indexOf('\nasync function getPublicProfile', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+  assert.ok(
+    !slice.includes('.run()') && !slice.includes('UPDATE ') && !slice.includes('INSERT ') && !slice.includes('DELETE '),
+    'renderPublicProfileShell must remain a read-only response transform — no write SQL introduced by the hotfix'
   );
 });
 
