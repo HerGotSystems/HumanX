@@ -413,18 +413,32 @@ async function renderPublicProfileShell(request, env, rawSlug) {
   // content with no redirect involved.
   const indexRequest = new Request(new URL('/', url.origin), request);
   const indexResponse = await env.ASSETS.fetch(indexRequest);
-  if (!env.DB) return indexResponse;
 
-  const summary = await loadPublicProfileSummary(env, rawSlug);
-  if (!summary) return indexResponse;
-
+  // D-144B: per the D-144A discoverability audit, public profiles stay
+  // share-only (reachable by direct link) but not search-indexed in v1 —
+  // profile_public has only ever meant "share link," never "searchable."
+  // noindex is unconditional: it applies to the no-DB demo-fallback case and
+  // to any private/not-found/invalid slug, not just resolved public profiles.
+  const noindexTag = '<meta name="robots" content="noindex">';
   const html = await indexResponse.text();
-  const title = `${escHtml(summary.displayName)} on HumanX`;
-  const rawBio = summary.bio ? String(summary.bio).trim() : '';
-  const description = escHtml(rawBio ? (rawBio.length > 160 ? rawBio.slice(0, 157) + '...' : rawBio) : 'A HumanX public profile.');
-  const profileUrl = escHtml(`${url.origin}/u/${encodeURIComponent(summary.slug)}`);
-  const metaBlock = `<title>${title}</title>\n<meta property="og:title" content="${title}">\n<meta property="og:description" content="${description}">\n<meta property="og:type" content="profile">\n<meta property="og:url" content="${profileUrl}">\n<meta name="twitter:card" content="summary">`;
-  const injected = html.replace('<title>HumanX — Belief → Truth → Claim → Evidence</title>', metaBlock);
+  const summary = env.DB ? await loadPublicProfileSummary(env, rawSlug) : null;
+
+  let injected;
+  if (!summary) {
+    injected = html.replace(
+      '<title>HumanX — Belief → Truth → Claim → Evidence</title>',
+      `<title>HumanX — Belief → Truth → Claim → Evidence</title>\n${noindexTag}`
+    );
+  } else {
+    const title = `${escHtml(summary.displayName)} on HumanX`;
+    const rawBio = summary.bio ? String(summary.bio).trim() : '';
+    const description = escHtml(rawBio ? (rawBio.length > 160 ? rawBio.slice(0, 157) + '...' : rawBio) : 'A HumanX public profile.');
+    const profileUrl = escHtml(`${url.origin}/u/${encodeURIComponent(summary.slug)}`);
+    // canonical only ever appears here, for a resolved public profile — never
+    // for the generic/private/not-found branch above.
+    const metaBlock = `<title>${title}</title>\n${noindexTag}\n<link rel="canonical" href="${profileUrl}">\n<meta property="og:title" content="${title}">\n<meta property="og:description" content="${description}">\n<meta property="og:type" content="profile">\n<meta property="og:url" content="${profileUrl}">\n<meta name="twitter:card" content="summary">`;
+    injected = html.replace('<title>HumanX — Belief → Truth → Claim → Evidence</title>', metaBlock);
+  }
 
   return new Response(injected, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } });
 }

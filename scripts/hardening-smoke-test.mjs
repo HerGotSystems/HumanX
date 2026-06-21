@@ -8025,19 +8025,24 @@ test('D-143B hotfix: renderPublicProfileShell fetches "/" (not /index.html) from
   );
 });
 
-test('D-143B: private/not-found/invalid slug returns the unmodified shell — no profile meta, no distinguishing status', () => {
+test('D-143B/D-144B: private/not-found/invalid slug returns the generic shell with only noindex added — no profile meta, no distinguishing status', () => {
+  // D-144B changed this from "byte-identical indexResponse" to "generic shell
+  // + unconditional noindex" — the no-distinguishing-status guarantee is
+  // unchanged (still always 200, still no profile meta), just the literal
+  // pass-through was replaced so noindex could be injected here too.
   const idx = workerSrc.indexOf('async function renderPublicProfileShell');
-  const slice = workerSrc.slice(idx, idx + 900);
+  const slice = workerSrc.slice(idx, idx + 1700);
   assert.ok(
-    slice.includes('if (!env.DB) return indexResponse;') &&
-    slice.includes('if (!summary) return indexResponse;'),
-    'renderPublicProfileShell must return the untouched indexResponse for the no-DB case and for any missing/invalid/private slug'
+    slice.includes('const summary = env.DB ? await loadPublicProfileSummary(env, rawSlug) : null;') &&
+    slice.includes('if (!summary) {') &&
+    slice.includes('`<title>HumanX — Belief → Truth → Claim → Evidence</title>\\n${noindexTag}`'),
+    'renderPublicProfileShell must inject only the noindex tag (no og:*/canonical/title change) for the no-DB/no-DB-summary/private/not-found/invalid-slug branch'
   );
 });
 
 test('D-143B: public slug injects title + og:title + og:description + og:type + og:url + twitter:card', () => {
   const idx = workerSrc.indexOf('async function renderPublicProfileShell');
-  const slice = workerSrc.slice(idx, idx + 2000);
+  const slice = workerSrc.slice(idx, idx + 2600);
   assert.ok(
     slice.includes('<title>${title}</title>') &&
     slice.includes('<meta property="og:title" content="${title}">') &&
@@ -8051,7 +8056,7 @@ test('D-143B: public slug injects title + og:title + og:description + og:type + 
 
 test('D-143B: meta content is HTML-escaped', () => {
   const idx = workerSrc.indexOf('async function renderPublicProfileShell');
-  const slice = workerSrc.slice(idx, idx + 1500);
+  const slice = workerSrc.slice(idx, idx + 2000);
   assert.ok(
     slice.includes('const title = `${escHtml(summary.displayName)} on HumanX`;') &&
     slice.includes('const description = escHtml(') &&
@@ -8065,7 +8070,7 @@ test('D-143B: meta content is HTML-escaped', () => {
 
 test('D-143B: OG description uses the bio fallback and 160-char truncation', () => {
   const idx = workerSrc.indexOf('async function renderPublicProfileShell');
-  const slice = workerSrc.slice(idx, idx + 1500);
+  const slice = workerSrc.slice(idx, idx + 2000);
   assert.ok(
     slice.includes("rawBio.length > 160 ? rawBio.slice(0, 157) + '...' : rawBio) : 'A HumanX public profile.'"),
     'the description must truncate long bios to ~160 chars and fall back to a generic sentence when no bio is set'
@@ -8156,7 +8161,7 @@ test('D-143B hotfix: public/index.html app shell asset references are root-relat
 
 test('D-143B hotfix: /u/:slug route still injects OG tags after the asset-fetch fix', () => {
   const idx = workerSrc.indexOf('async function renderPublicProfileShell');
-  const slice = workerSrc.slice(idx, idx + 2000);
+  const slice = workerSrc.slice(idx, idx + 2700);
   assert.ok(
     slice.includes('<meta property="og:title" content="${title}">') &&
     slice.includes('<meta property="og:description" content="${description}">'),
@@ -8212,6 +8217,152 @@ test('D-143B hotfix: no new mutating endpoint added', () => {
   assert.ok(
     !slice.includes('.run()') && !slice.includes('UPDATE ') && !slice.includes('INSERT ') && !slice.includes('DELETE '),
     'renderPublicProfileShell must remain a read-only response transform — no write SQL introduced by the hotfix'
+  );
+});
+
+// ── Section 74 — D-144B: noindex + robots.txt for public profiles ──────────────
+
+const robotsTxtPath = path.join(__dirname, '../public/robots.txt');
+const robotsTxtSrc = (() => { try { return readFileSync(robotsTxtPath, 'utf8'); } catch { return ''; } })();
+
+test('D-144B: public/robots.txt exists', () => {
+  assert.ok(robotsTxtSrc.length > 0, 'public/robots.txt must exist');
+});
+
+test('D-144B: robots.txt contains User-agent: *', () => {
+  assert.ok(robotsTxtSrc.includes('User-agent: *'), 'robots.txt must declare a User-agent: * block');
+});
+
+test('D-144B: robots.txt contains Disallow: /u/', () => {
+  assert.ok(robotsTxtSrc.includes('Disallow: /u/'), 'robots.txt must disallow crawling of /u/ (public profiles)');
+});
+
+test('D-144B: robots.txt does not disallow the whole site', () => {
+  assert.ok(
+    !/Disallow:\s*\/\s*$/m.test(robotsTxtSrc) && !robotsTxtSrc.includes('Disallow: /\n') && robotsTxtSrc.trim() !== 'User-agent: *\nDisallow: /',
+    'robots.txt must not contain a bare "Disallow: /" — only /u/ is restricted, the rest of the site\'s crawl behavior is unchanged'
+  );
+});
+
+test('D-144B: robots.txt does not mention a sitemap', () => {
+  assert.ok(
+    !/sitemap/i.test(robotsTxtSrc),
+    'robots.txt must not reference a sitemap — sitemap.xml is explicitly deferred per the D-144A audit (profiles are not indexed in v1)'
+  );
+});
+
+test('D-144B: no sitemap.xml file exists', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../public/sitemap.xml')),
+    'no sitemap.xml should exist yet — deferred per the D-144A audit'
+  );
+});
+
+test('D-144B: renderPublicProfileShell injects <meta name="robots" content="noindex"> via a single shared noindexTag constant', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 1300);
+  assert.ok(
+    slice.includes("const noindexTag = '<meta name=\"robots\" content=\"noindex\">';"),
+    'renderPublicProfileShell must define the noindex tag once and reuse it in both branches'
+  );
+});
+
+test('D-144B: noindex is injected unconditionally — present in both the generic/private/not-found branch and the resolved-profile branch', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 2700);
+  const noindexUsageCount = (slice.match(/\$\{noindexTag\}/g) || []).length;
+  assert.ok(noindexUsageCount >= 2, 'noindexTag must be interpolated into both the !summary branch and the resolved-summary branch — unconditional across every /u/:slug response');
+});
+
+test('D-144B: resolved public profile shell injects a canonical link to the real /u/:slug path', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 2700);
+  assert.ok(
+    slice.includes('<link rel="canonical" href="${profileUrl}">') &&
+    slice.includes("const profileUrl = escHtml(`${url.origin}/u/${encodeURIComponent(summary.slug)}`);"),
+    'the resolved-profile branch must inject a canonical link built from the real /u/:slug path, escaped via escHtml'
+  );
+});
+
+test('D-144B: canonical does not use the #/u/ hash route', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 2700);
+  assert.ok(!slice.includes('#/u/'), 'renderPublicProfileShell must never build a canonical (or any) URL using the hash route');
+});
+
+test('D-144B: private/not-found/invalid-slug branch never injects a canonical link', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const ifNotSummaryIdx = workerSrc.indexOf('if (!summary) {', idx);
+  const elseIdx = workerSrc.indexOf('} else {', ifNotSummaryIdx);
+  const notFoundBranch = workerSrc.slice(ifNotSummaryIdx, elseIdx);
+  assert.ok(!notFoundBranch.includes('canonical'), 'the !summary branch must not contain any canonical link injection');
+});
+
+test('D-144B: existing OG tags remain intact alongside the new noindex/canonical tags', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 2700);
+  assert.ok(
+    slice.includes('<meta property="og:title" content="${title}">') &&
+    slice.includes('<meta property="og:description" content="${description}">') &&
+    slice.includes('<meta property="og:type" content="profile">') &&
+    slice.includes('<meta property="og:url" content="${profileUrl}">') &&
+    slice.includes('<meta name="twitter:card" content="summary">'),
+    'all five D-143B OG/Twitter tags must still be injected for resolved public profiles'
+  );
+});
+
+test('D-144B: renderPublicProfileShell still fetches "/" — fetch target unchanged by this patch', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes("new Request(new URL('/', url.origin), request)") &&
+    !slice.includes("new URL('/index.html', url.origin)"),
+    'the D-143B hotfix fetch target ("/" not "/index.html") must remain unchanged'
+  );
+});
+
+test('D-144B: no wrangler.toml not_found_handling change', () => {
+  const wranglerSrc = readFileSync(path.join(__dirname, '../wrangler.toml'), 'utf8');
+  assert.ok(
+    !wranglerSrc.includes('not_found_handling') && !wranglerSrc.includes('single-page-application'),
+    'wrangler.toml must not gain a global not_found_handling/SPA-fallback setting'
+  );
+});
+
+test('D-144B: no migration added', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_noindex.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_d144b.sql')),
+    'D-144B must not require a D1 migration — no new schema needed for a static robots.txt and meta-tag injection'
+  );
+});
+
+test('D-144B: no new mutating endpoint added', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const endIdx = workerSrc.indexOf('\nasync function getPublicProfile', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2700);
+  assert.ok(
+    !slice.includes('.run()') && !slice.includes('UPDATE ') && !slice.includes('INSERT ') && !slice.includes('DELETE '),
+    'renderPublicProfileShell must remain a read-only response transform — no write SQL introduced by this patch'
+  );
+});
+
+test('D-144B: GET /api/u/:slug response shape unchanged', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
+  assert.ok(
+    /profile:\s*\{\s*slug:\s*summary\.slug,\s*bio:\s*summary\.bio,\s*displayName:\s*summary\.displayName,/.test(slice) &&
+    slice.includes('sharedSnapshot,') &&
+    !slice.includes('noindex') && !slice.includes('canonical'),
+    'GET /api/u/:slug must remain pure JSON, untouched by the HTML-only noindex/canonical work — no robots/canonical fields leak into the JSON response'
+  );
+});
+
+test('D-144B: no sitemap route added to the Worker', () => {
+  assert.ok(
+    !workerSrc.includes('/sitemap.xml') && !workerSrc.includes('sitemap.xml'),
+    'no GET /sitemap.xml (or any sitemap) route should exist in src/worker.js yet'
   );
 });
 
