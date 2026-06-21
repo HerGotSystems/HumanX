@@ -6774,7 +6774,7 @@ test('D-138C: Me dashboard filters/show-all/show-less, public Study opening, and
 
 test('D-139B: myHumanX belief_snapshots select includes dimensions_json/top_beliefs_json/contradictions_json', () => {
   const idx = workerSrc.indexOf('async function myHumanX');
-  const slice = workerSrc.slice(idx, idx + 2500);
+  const slice = workerSrc.slice(idx, idx + 3200);
   assert.ok(
     slice.includes('dimensions_json, top_beliefs_json, contradictions_json') &&
     slice.includes('FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC LIMIT 10'),
@@ -7082,14 +7082,14 @@ test('D-140B: bio is trimmed and capped at 240 chars', () => {
   );
 });
 
-test('D-140B: profile-settings response omits is_admin and admin-token material', () => {
+test('D-140B/D-142B: profile-settings response omits is_admin and admin-token material', () => {
   const idx = workerSrc.indexOf('async function saveProfileSettings');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
-  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2500);
   assert.ok(
-    slice.includes('return json({ ok: true, profile_public: profilePublic, profile_slug: slug, profile_bio: bio || null });') &&
+    slice.includes('return json({ ok: true, profile_public: profilePublic, profile_slug: slug, profile_bio: bio || null, shared_snapshot_id: hasSharedSnapshotField ? sharedSnapshotId : undefined });') &&
     !slice.includes('is_admin') && !slice.includes('HUMANX_ADMIN_TOKEN') && !slice.includes('email'),
-    'saveProfileSettings must only ever return {ok, profile_public, profile_slug, profile_bio} — no admin/email fields'
+    'saveProfileSettings must only ever return {ok, profile_public, profile_slug, profile_bio, shared_snapshot_id} — no admin/email fields'
   );
 });
 
@@ -7310,13 +7310,13 @@ test('D-140C: public-profile pressure rows omit body', () => {
   );
 });
 
-test('D-140C: no raw_json/stress_points_json/export data exposed via the public route', () => {
+test('D-140C/D-142B: no raw_json/stress_points_json/export data exposed via the public route', () => {
   const idx = workerSrc.indexOf('async function getPublicProfile');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
-  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
   assert.ok(
-    !slice.includes('raw_json') && !slice.includes('stress_points_json') && !slice.includes('belief_snapshots') && !slice.includes('exported_at'),
-    'getPublicProfile must not touch belief_snapshots, raw_json, stress_points_json, or any export-shaped payload'
+    !slice.includes('raw_json') && !slice.includes('stress_points_json') && !slice.includes('exported_at'),
+    'getPublicProfile must never select or return raw_json, stress_points_json, or any export-shaped payload (D-142B is allowed to query belief_snapshots narrowly — see dedicated sharedSnapshot tests)'
   );
 });
 
@@ -7429,10 +7429,10 @@ test('D-141B: no migration added', () => {
   );
 });
 
-test('D-141B: GET /api/u/:slug response shape is unchanged from D-140C', () => {
+test('D-141B/D-142B: GET /api/u/:slug response core fields are preserved, plus the new optional sharedSnapshot', () => {
   const idx = workerSrc.indexOf('async function getPublicProfile');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
-  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
   assert.ok(
     /profile:\s*\{\s*slug:\s*user\.profile_slug,\s*bio:\s*user\.profile_bio \|\| null,\s*displayName:/.test(slice) &&
     slice.includes('counts: { claims: claimCount, truths: truthCount, evidence: evidenceCount, pressure: pressureCount }') &&
@@ -7440,8 +7440,9 @@ test('D-141B: GET /api/u/:slug response shape is unchanged from D-140C', () => {
     slice.includes('recentTruths: truthsRows.results || []') &&
     slice.includes('recentEvidence: evidenceRows.results || []') &&
     slice.includes('recentPressure: pressureRows.results || []') &&
-    !slice.includes('belief_snapshots') && !slice.includes('raw_json') && !slice.includes('stress_points_json'),
-    'getPublicProfile must still return exactly {slug,bio,displayName,counts,recentClaims,recentTruths,recentEvidence,recentPressure} — no fields added or removed'
+    slice.includes('sharedSnapshot,') &&
+    !slice.includes('raw_json') && !slice.includes('stress_points_json'),
+    'getPublicProfile must keep all D-140C core fields and add only the narrow, optional sharedSnapshot field — never raw_json/stress_points_json'
   );
 });
 
@@ -7538,11 +7539,14 @@ test('D-141B: no comments/follows/likes/social feed added', () => {
   );
 });
 
-test('D-141B: no belief_snapshots query added to the public profile path', () => {
+test('D-142B: getPublicProfile queries belief_snapshots only through the narrow, gated sharedSnapshot lookup', () => {
+  // D-141B deferred this; D-142B is the explicit patch that adds it back,
+  // narrowly and gated, per the D-142A audit recommendation.
   const idx = workerSrc.indexOf('async function getPublicProfile');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
-  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
-  assert.ok(!slice.includes('belief_snapshots'), 'getPublicProfile must not query belief_snapshots — selected snapshot sharing is explicitly deferred per the D-141A audit');
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
+  const belief_snapshotsCount = (slice.match(/belief_snapshots/g) || []).length;
+  assert.ok(belief_snapshotsCount === 1, 'getPublicProfile must touch belief_snapshots exactly once, via the single gated sharedSnapshotRow query');
 });
 
 test('D-141B: no raw_json/stress_points_json exposure anywhere in worker.js public profile path', () => {
@@ -7550,6 +7554,243 @@ test('D-141B: no raw_json/stress_points_json exposure anywhere in worker.js publ
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
   const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
   assert.ok(!slice.includes('raw_json') && !slice.includes('stress_points_json'), 'getPublicProfile must not select or expose raw_json or stress_points_json');
+});
+
+// ── Section 70 — D-142B: Selected snapshot sharing foundation ──────────────────
+
+test('D-142B: no migration added', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_selected_snapshot_sharing.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_d142b.sql')),
+    'D-142B must not require a D1 migration — public_summary_enabled and hidden_at already exist from migration 0013'
+  );
+});
+
+test('D-142B: no new route added — still exactly /api/my-humanx/profile-settings and /api/u/:slug', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx/profile-settings' && request.method === 'POST') return await saveProfileSettings(request, env)") &&
+    workerSrc.includes("url.pathname.match(/^\\/api\\/u\\/[^/]+$/) && request.method === 'GET') return await getPublicProfile(request, env, url.pathname.split('/').pop())") &&
+    !workerSrc.includes('/api/my-humanx/share-snapshot'),
+    'D-142B must extend the existing routes, not add a new one'
+  );
+});
+
+test('D-142B: saveProfileSettings accepts an optional shared_snapshot_id field', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function getPublicProfile', idx) > -1 ? workerSrc.indexOf('\nasync function getPublicProfile', idx) : workerSrc.indexOf('\n// D-140C', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(
+    slice.includes("const hasSharedSnapshotField = Object.prototype.hasOwnProperty.call(body, 'shared_snapshot_id');"),
+    'saveProfileSettings must detect whether shared_snapshot_id was present in the request body at all'
+  );
+});
+
+test('D-142B: omitted shared_snapshot_id leaves the existing sharing selection unchanged', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function getPublicProfile', idx) > -1 ? workerSrc.indexOf('\nasync function getPublicProfile', idx) : workerSrc.indexOf('\n// D-140C', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(
+    /if \(hasSharedSnapshotField\) \{\s*\/\/ Always clear first/.test(slice),
+    'the belief_snapshots UPDATE statements must only run when hasSharedSnapshotField is true — an omitted field must not touch sharing state at all'
+  );
+});
+
+test('D-142B: null/empty shared_snapshot_id clears sharing (sharedSnapshotId stays null)', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function getPublicProfile', idx) > -1 ? workerSrc.indexOf('\nasync function getPublicProfile', idx) : workerSrc.indexOf('\n// D-140C', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(
+    slice.includes("if (rawSnapshotId != null && String(rawSnapshotId).trim() !== '') {") &&
+    slice.includes('// else: explicit clear (null or empty string) — sharedSnapshotId stays null.'),
+    'a null or empty-string shared_snapshot_id must leave sharedSnapshotId as null, which clears sharing below'
+  );
+});
+
+test('D-142B: non-empty shared_snapshot_id ownership check uses id + user_id + hidden_at IS NULL', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function getPublicProfile', idx) > -1 ? workerSrc.indexOf('\nasync function getPublicProfile', idx) : workerSrc.indexOf('\n// D-140C', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  assert.ok(
+    slice.includes('SELECT id FROM belief_snapshots WHERE id=? AND user_id=? AND hidden_at IS NULL') &&
+    slice.includes("if (!snapshot) return json({ error: 'SNAPSHOT_NOT_FOUND_OR_NOT_OWNED' }, 404);"),
+    'a non-empty shared_snapshot_id must be verified against id+user_id+hidden_at IS NULL, returning 404 SNAPSHOT_NOT_FOUND_OR_NOT_OWNED otherwise'
+  );
+});
+
+test('D-142B: server clears previous snapshot selections before setting the new one, enforcing at most one shared snapshot', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function getPublicProfile', idx) > -1 ? workerSrc.indexOf('\nasync function getPublicProfile', idx) : workerSrc.indexOf('\n// D-140C', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3000);
+  const clearIdx = slice.indexOf('UPDATE belief_snapshots SET public_summary_enabled=0 WHERE user_id=?');
+  const setIdx = slice.indexOf('UPDATE belief_snapshots SET public_summary_enabled=1 WHERE id=? AND user_id=?');
+  assert.ok(
+    clearIdx !== -1 && setIdx !== -1 && clearIdx < setIdx,
+    'saveProfileSettings must run the clear-all UPDATE before the set-one UPDATE, enforcing at most one public_summary_enabled=1 row per user'
+  );
+});
+
+test('D-142B: myHumanX belief_snapshots select includes public_summary_enabled', () => {
+  const idx = workerSrc.indexOf('async function myHumanX');
+  const slice = workerSrc.slice(idx, idx + 3200);
+  assert.ok(
+    slice.includes('public_summary_enabled, created_at FROM belief_snapshots'),
+    'myHumanX must widen the belief_snapshots SELECT to include public_summary_enabled so the Me-side share control can show current selection'
+  );
+});
+
+test('D-142B: GET /api/u/:slug response includes the optional sharedSnapshot field', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
+  assert.ok(
+    slice.includes('let sharedSnapshot = null;') && slice.includes('sharedSnapshot,'),
+    'getPublicProfile must include an optional sharedSnapshot field in the profile response, defaulting to null'
+  );
+});
+
+test('D-142B: sharedSnapshot query requires public_summary_enabled=1 and hidden_at IS NULL, scoped to the profile owner', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
+  assert.ok(
+    slice.includes('WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1'),
+    'the sharedSnapshot lookup must filter on user_id, public_summary_enabled=1, and hidden_at IS NULL, and select at most one row'
+  );
+});
+
+test('D-142B: public sharedSnapshot response exposes only the safe field set', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
+  assert.ok(
+    /sharedSnapshot = \{\s*label: sharedSnapshotRow\.label \|\| null,\s*dominantPattern: sharedSnapshotRow\.dominant_pattern \|\| null,\s*stabilityScore: sharedSnapshotRow\.stability_score \|\| 0,\s*opennessScore: sharedSnapshotRow\.openness_score \|\| 0,\s*pressureScore: sharedSnapshotRow\.pressure_score \|\| 0,\s*topAlignmentName,\s*contradictionCount: sharedSnapshotRow\.contradiction_count \|\| 0,\s*createdAt: sharedSnapshotRow\.created_at,\s*\};/.test(slice),
+    'the public sharedSnapshot object must be exactly {label,dominantPattern,stabilityScore,opennessScore,pressureScore,topAlignmentName,contradictionCount,createdAt} — no more, no less'
+  );
+});
+
+test('D-142B: public response never exposes raw_json/stress_points_json/dimensions_json/contradictions_json/top_beliefs_json/user_id/email for the shared snapshot', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
+  assert.ok(
+    !slice.includes('raw_json') && !slice.includes('stress_points_json') && !slice.includes('dimensions_json') &&
+    !slice.includes('contradictions_json,') && !slice.includes('.email') &&
+    !slice.includes('sharedSnapshotRow.user_id'),
+    'getPublicProfile must not select raw_json/stress_points_json/dimensions_json/full contradictions_json, nor expose user_id/email on the shared snapshot'
+  );
+});
+
+test('D-142B: topAlignmentName is extracted server-side from the first top_beliefs_json entry, never the full array', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const slice = workerSrc.slice(idx, idx + 4200);
+  assert.ok(
+    slice.includes("const topBeliefs = JSON.parse(sharedSnapshotRow.top_beliefs_json || '[]');") &&
+    slice.includes('topBeliefs[0] && topBeliefs[0].name') &&
+    !slice.includes('topBeliefs,') && !slice.includes('topBeliefs:'),
+    'getPublicProfile must parse top_beliefs_json only to extract the first entry\'s name, never pass the array through to the response'
+  );
+});
+
+test('D-142B: contradictionCount only — no contradiction text reaches the public response', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const slice = workerSrc.slice(idx, idx + 4200);
+  assert.ok(
+    slice.includes('contradictionCount: sharedSnapshotRow.contradiction_count || 0,') &&
+    !slice.includes('contradictions_json'),
+    'getPublicProfile must use the integer contradiction_count column, never parse or expose contradictions_json text'
+  );
+});
+
+test('D-142B: Me snapshot rows show a share control, exclusive across rows, plus a "do not share" option', () => {
+  const idx = appSrc.indexOf('function meBeliefSnapshotsHtml');
+  const slice = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    slice.includes('name="meSharedSnapshot"') &&
+    slice.includes("onclick=\"meShareSnapshotUI('${esc(s.id)}')\"") &&
+    slice.includes('onclick="meShareSnapshotUI(null)"') &&
+    slice.includes('Do not share a snapshot'),
+    'meBeliefSnapshotsHtml must render one radio per snapshot (same name= group for exclusivity) plus a "do not share" option'
+  );
+});
+
+test('D-142B: Me share control calls POST /api/my-humanx/profile-settings with the saved profile fields plus shared_snapshot_id', () => {
+  const idx = appSrc.indexOf('async function meShareSnapshotUI');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes("await api('/api/my-humanx/profile-settings',{method:'POST',body:JSON.stringify({profile_public:!!u.profile_public,profile_slug:u.profile_slug||'',profile_bio:u.profile_bio||'',shared_snapshot_id:snapshotId})})"),
+    'meShareSnapshotUI must POST to the existing profile-settings endpoint, reusing the saved profile_public/slug/bio so sharing a snapshot never changes those fields'
+  );
+});
+
+test('D-142B: Me preview shows the selected snapshot using only safe summary fields', () => {
+  const idx = appSrc.indexOf('function meSharedSnapshotSummary');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes("rows.find(s=>!!s.public_summary_enabled)") &&
+    slice.includes('topAlignmentName') &&
+    !slice.includes('dimensions_json') && !slice.includes('raw_json') && !slice.includes('stress_points_json'),
+    'meSharedSnapshotSummary must find the shared snapshot and extract only the safe summary fields, never raw/dimension/stress data'
+  );
+});
+
+test('D-142B: Me preview required wording exists ("one snapshot, shared by choice" + guardrail disclaimer)', () => {
+  const idx = appSrc.indexOf('function meSharedSnapshotCardHtml');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('One snapshot, shared by choice — not your complete profile.') &&
+    slice.includes('Pattern observations from your own answers, not a diagnosis or personality test.'),
+    'meSharedSnapshotCardHtml must render both required disclaimer lines exactly'
+  );
+});
+
+test('D-142B: public profile snapshot card uses third-person wording and the same field set', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes('not their complete profile') &&
+    slice.includes('from their own answers, not a diagnosis or personality test') &&
+    slice.includes('s.dominantPattern') && slice.includes('s.stabilityScore') && slice.includes('s.topAlignmentName') && slice.includes('s.contradictionCount'),
+    'renderPublicProfileSnapshotHtml must use third-person disclaimer wording and only the safe field set'
+  );
+});
+
+test('D-142B: public profile snapshot card is placed after Public Activity and before recent sections', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 1500);
+  const countsAt = slice.indexOf('pp-counts-card');
+  const snapshotAt = slice.indexOf('renderPublicProfileSnapshotHtml(p.sharedSnapshot)');
+  const claimsAt = slice.indexOf('Recent Public Claims');
+  assert.ok(
+    countsAt !== -1 && snapshotAt !== -1 && claimsAt !== -1 && countsAt < snapshotAt && snapshotAt < claimsAt,
+    'the shared-snapshot card must render between the Public Activity counts card and the Recent Public Claims section'
+  );
+});
+
+test('D-142B: no comments/likes/follows/social UI added anywhere in the sharing feature', () => {
+  const fns = ['meShareSnapshotUI', 'meBeliefSnapshotsHtml', 'meSharedSnapshotCardHtml', 'renderPublicProfileSnapshotHtml'];
+  for (const fn of fns) {
+    const idx = appSrc.indexOf(`function ${fn}`) > -1 ? appSrc.indexOf(`function ${fn}`) : appSrc.indexOf(`async function ${fn}`);
+    const slice = appSrc.slice(idx, idx + 900).toLowerCase();
+    assert.ok(
+      !slice.includes('comment') && !slice.includes('follow') && !slice.includes('like button'),
+      `${fn} must not introduce comments, follows, or likes`
+    );
+  }
+});
+
+test('D-142B: no AI provider/API call added anywhere in the sharing feature', () => {
+  const idx = workerSrc.indexOf('async function saveProfileSettings');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
+  const backendSlice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 6000);
+  const frontStartIdx = appSrc.indexOf('async function meShareSnapshotUI');
+  const frontEndIdx = appSrc.indexOf('function renderPublicProfileHtml');
+  const frontSlice = appSrc.slice(frontStartIdx, frontEndIdx);
+  assert.ok(
+    !backendSlice.includes('api.anthropic.com') && !backendSlice.includes('api.openai.com') &&
+    !frontSlice.includes('api.anthropic.com') && !frontSlice.includes('api.openai.com') &&
+    !/await api\(['"`]\/api\/(?!my-humanx)/.test(frontSlice),
+    'no AI provider call or unrelated API call should exist in the snapshot-sharing backend or frontend code'
+  );
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────

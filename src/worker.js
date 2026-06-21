@@ -142,7 +142,14 @@ async function myHumanX(request, env) {
     // D-139B: widened for the Belief Mirror panel with three extra columns only.
     // The full answer-payload blob and the scenario-response blob are deliberately
     // excluded — too large/granular for a dashboard summary, see docs/D139A audit.
-    env.DB.prepare(`SELECT id, label, stability_score, openness_score, pressure_score, dimensions_json, top_beliefs_json, contradictions_json, created_at FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC LIMIT 10`).bind(userId).all(),
+    // D-142B: also widened with public_summary_enabled (so the Me-side share
+    // control can show which snapshot is currently selected) and
+    // dominant_pattern/contradiction_count, needed for the owner-side shared-
+    // snapshot preview to match the public-safe fields exactly. dominant_pattern
+    // was missing from this SELECT since D-139B — meMirrorLatestCardHtml has
+    // always referenced latest.dominant_pattern, so this also fixes that
+    // pre-existing "Pattern not labeled" fallback bug in the private Mirror.
+    env.DB.prepare(`SELECT id, label, dominant_pattern, stability_score, openness_score, pressure_score, dimensions_json, top_beliefs_json, contradictions_json, contradiction_count, public_summary_enabled, created_at FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC LIMIT 10`).bind(userId).all(),
   ]);
 
   return json({
@@ -298,6 +305,24 @@ async function saveProfileSettings(request, env) {
   // isn't attached to a public profile shouldn't stay reserved against the
   // unique index, and there is nothing for it to label while private.
 
+  // D-142B: shared_snapshot_id is optional and independent of profile_public/
+  // slug/bio. Omitted entirely from the body -> leave the current sharing
+  // selection unchanged (this is the common case: saving the profile toggle/
+  // slug/bio should never silently unshare a snapshot the owner picked
+  // earlier). null or '' -> explicitly clear sharing. A non-empty id ->
+  // verify it belongs to this user and isn't hidden before sharing it.
+  const hasSharedSnapshotField = Object.prototype.hasOwnProperty.call(body, 'shared_snapshot_id');
+  let sharedSnapshotId = null;
+  if (hasSharedSnapshotField) {
+    const rawSnapshotId = body.shared_snapshot_id;
+    if (rawSnapshotId != null && String(rawSnapshotId).trim() !== '') {
+      sharedSnapshotId = cleanId(rawSnapshotId);
+      const snapshot = await env.DB.prepare(`SELECT id FROM belief_snapshots WHERE id=? AND user_id=? AND hidden_at IS NULL`).bind(sharedSnapshotId, userId).first();
+      if (!snapshot) return json({ error: 'SNAPSHOT_NOT_FOUND_OR_NOT_OWNED' }, 404);
+    }
+    // else: explicit clear (null or empty string) — sharedSnapshotId stays null.
+  }
+
   try {
     await env.DB.prepare(`UPDATE users SET profile_public=?, profile_slug=?, profile_bio=? WHERE id=?`).bind(profilePublic, slug, bio || null, userId).run();
   } catch (err) {
@@ -306,7 +331,16 @@ async function saveProfileSettings(request, env) {
     throw err;
   }
 
-  return json({ ok: true, profile_public: profilePublic, profile_slug: slug, profile_bio: bio || null });
+  if (hasSharedSnapshotField) {
+    // Always clear first, then set the chosen one (if any) — enforces at
+    // most one public_summary_enabled=1 row per user, server-side.
+    await env.DB.prepare(`UPDATE belief_snapshots SET public_summary_enabled=0 WHERE user_id=?`).bind(userId).run();
+    if (sharedSnapshotId) {
+      await env.DB.prepare(`UPDATE belief_snapshots SET public_summary_enabled=1 WHERE id=? AND user_id=?`).bind(sharedSnapshotId, userId).run();
+    }
+  }
+
+  return json({ ok: true, profile_public: profilePublic, profile_slug: slug, profile_bio: bio || null, shared_snapshot_id: hasSharedSnapshotField ? sharedSnapshotId : undefined });
 }
 
 // D-140C: public, no-auth read of an opted-in profile. table is always one
@@ -352,6 +386,31 @@ async function getPublicProfile(request, env, rawSlug) {
     env.DB.prepare(`SELECT id, title, severity, created_at FROM pressure_points WHERE user_id=? AND COALESCE(review_state,'public')='public' AND COALESCE(archived_by_user,0)=0 ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 10`).bind(userId).all(),
   ]);
 
+  // D-142B: optional, narrow, public-safe belief snapshot summary. Only the
+  // single snapshot the owner explicitly marked public_summary_enabled=1
+  // (and that isn't hidden) is ever considered — never a list, never the
+  // raw answer payload, and never the full contradiction-text blob or the
+  // full alignment-array blob (only a single extracted name, below).
+  const sharedSnapshotRow = await env.DB.prepare(`SELECT label, dominant_pattern, stability_score, openness_score, pressure_score, top_beliefs_json, contradiction_count, created_at FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
+  let sharedSnapshot = null;
+  if (sharedSnapshotRow) {
+    let topAlignmentName = null;
+    try {
+      const topBeliefs = JSON.parse(sharedSnapshotRow.top_beliefs_json || '[]');
+      if (Array.isArray(topBeliefs) && topBeliefs[0] && topBeliefs[0].name) topAlignmentName = String(topBeliefs[0].name);
+    } catch {}
+    sharedSnapshot = {
+      label: sharedSnapshotRow.label || null,
+      dominantPattern: sharedSnapshotRow.dominant_pattern || null,
+      stabilityScore: sharedSnapshotRow.stability_score || 0,
+      opennessScore: sharedSnapshotRow.openness_score || 0,
+      pressureScore: sharedSnapshotRow.pressure_score || 0,
+      topAlignmentName,
+      contradictionCount: sharedSnapshotRow.contradiction_count || 0,
+      createdAt: sharedSnapshotRow.created_at,
+    };
+  }
+
   return json({
     ok: true,
     profile: {
@@ -363,6 +422,7 @@ async function getPublicProfile(request, env, rawSlug) {
       recentTruths: truthsRows.results || [],
       recentEvidence: evidenceRows.results || [],
       recentPressure: pressureRows.results || [],
+      sharedSnapshot,
     },
   });
 }
