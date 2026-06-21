@@ -7743,14 +7743,14 @@ test('D-142B: Me preview required wording exists ("one snapshot, shared by choic
   );
 });
 
-test('D-142B: public profile snapshot card uses third-person wording and the same field set', () => {
+test('D-142B/D-142C: public profile snapshot card uses third-person wording and the same field set', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 800);
+  const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
     slice.includes('not their complete profile') &&
-    slice.includes('from their own answers, not a diagnosis or personality test') &&
+    slice.includes('from their own self-submitted answers, not a diagnosis or personality test') &&
     slice.includes('s.dominantPattern') && slice.includes('s.stabilityScore') && slice.includes('s.topAlignmentName') && slice.includes('s.contradictionCount'),
-    'renderPublicProfileSnapshotHtml must use third-person disclaimer wording and only the safe field set'
+    'renderPublicProfileSnapshotHtml must use third-person disclaimer wording (D-142C exact copy) and only the safe field set'
   );
 });
 
@@ -7791,6 +7791,197 @@ test('D-142B: no AI provider/API call added anywhere in the sharing feature', ()
     !/await api\(['"`]\/api\/(?!my-humanx)/.test(frontSlice),
     'no AI provider call or unrelated API call should exist in the snapshot-sharing backend or frontend code'
   );
+});
+
+// ── Section 71 — D-142C: Selected snapshot presentation polish ─────────────────
+
+test('D-142C: no backend route changes', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx/profile-settings' && request.method === 'POST') return await saveProfileSettings(request, env)") &&
+    workerSrc.includes("url.pathname.match(/^\\/api\\/u\\/[^/]+$/) && request.method === 'GET') return await getPublicProfile(request, env, url.pathname.split('/').pop())"),
+    'D-142C is frontend-only — the profile-settings and public-profile routes must remain exactly as D-140B/D-140C/D-142B defined them'
+  );
+});
+
+test('D-142C: no migration added', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_snapshot_polish.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_d142c.sql')),
+    'D-142C must not require a D1 migration — presentation-only patch'
+  );
+});
+
+test('D-142C: owner-side helper line exists in the Belief Snapshots section', () => {
+  const idx = appSrc.indexOf('function meBeliefSnapshotsHtml');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('Choose one snapshot to show on your public profile. You can also share none.'),
+    'meBeliefSnapshotsHtml must render the required helper line'
+  );
+});
+
+test('D-142C: selected snapshot row gets a visible selected class', () => {
+  const idx = appSrc.indexOf('function meBeliefSnapshotsHtml');
+  const slice = appSrc.slice(idx, idx + 1300);
+  assert.ok(
+    slice.includes("`<div class=\"me-item-row${isShared?' me-item-row-selected':''}\">"),
+    'each snapshot row must add me-item-row-selected when it is the currently shared snapshot'
+  );
+});
+
+test('D-142C: "Do not share a snapshot" row has distinct styling and its own selected state', () => {
+  const idx = appSrc.indexOf('function meBeliefSnapshotsHtml');
+  const slice = appSrc.slice(idx, idx + 1300);
+  assert.ok(
+    slice.includes("me-item-row me-snapshot-share-none${!anyShared?' me-item-row-selected':''}"),
+    'the "do not share" row must keep its own distinct me-snapshot-share-none class and also get me-item-row-selected when it is the active choice'
+  );
+  assert.ok(
+    cssSrc.includes('.me-snapshot-share-none{border-style:dashed'),
+    'styles.css must visually distinguish the "do not share" row (dashed border) from normal snapshot rows'
+  );
+});
+
+test('D-142C: radio semantics preserved — exactly one shared name= group, no duplicate toggles', () => {
+  const idx = appSrc.indexOf('function meBeliefSnapshotsHtml');
+  const slice = appSrc.slice(idx, idx + 1300);
+  const radioGroupCount = (slice.match(/name="meSharedSnapshot"/g) || []).length;
+  assert.ok(radioGroupCount >= 2, 'there must be at least one per-snapshot radio plus the "do not share" radio, all sharing name="meSharedSnapshot"');
+  assert.ok(!/name="meSharedSnapshot\d/.test(slice), 'no per-row-unique radio group names should exist — that would break mutual exclusivity');
+});
+
+test('D-142C: Profile Settings preview shows the selected snapshot summary when one is selected', () => {
+  const idx = appSrc.indexOf('function meSharedSnapshotPreviewBlockHtml');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('const s=meSharedSnapshotSummary();') &&
+    slice.includes('meSharedSnapshotCardHtml(s)'),
+    'meSharedSnapshotPreviewBlockHtml must render meSharedSnapshotCardHtml(s) when a snapshot is selected'
+  );
+});
+
+test('D-142C: Profile Settings preview shows "No belief snapshot will appear publicly." when none is selected', () => {
+  const idx = appSrc.indexOf('function meSharedSnapshotPreviewBlockHtml');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('No belief snapshot will appear publicly.') &&
+    slice.includes('if(!s)return'),
+    'meSharedSnapshotPreviewBlockHtml must show the required empty-selection message when meSharedSnapshotSummary() returns null'
+  );
+});
+
+test('D-142C: Profile Settings preview makes sharing optional/separate from the public profile toggle explicit', () => {
+  const idx = appSrc.indexOf('function meSharedSnapshotPreviewBlockHtml');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('Belief snapshot sharing is optional and separate from your public profile toggle.'),
+    'meSharedSnapshotPreviewBlockHtml must clarify sharing is optional and independent of the public profile toggle'
+  );
+});
+
+test('D-142C: public shared snapshot card title is "Shared Belief Snapshot"', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+  const slice = appSrc.slice(idx, idx + 300);
+  assert.ok(slice.includes('<h3>Shared Belief Snapshot</h3>'), 'renderPublicProfileSnapshotHtml must title the card "Shared Belief Snapshot"');
+});
+
+test('D-142C: public card disclaimer uses the exact required wording', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('A snapshot this person chose to share — pattern observations from their own self-submitted answers, not a diagnosis or personality test.'),
+    'renderPublicProfileSnapshotHtml must render the exact required disclaimer'
+  );
+});
+
+test('D-142C: public card contains "One snapshot, shared by choice"', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(slice.includes('One snapshot, shared by choice — not their complete profile.'), 'renderPublicProfileSnapshotHtml must render the required "one snapshot" wording');
+});
+
+test('D-142C: public card frames dominantPattern as a self-reported pattern, not a bare label', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+  const slice = appSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('Self-reported dominant pattern') &&
+    slice.includes('${esc(s.dominantPattern||\'Pattern not labeled\')}'),
+    'renderPublicProfileSnapshotHtml must prefix the dominant pattern with "Self-reported dominant pattern" framing copy'
+  );
+});
+
+test('D-142C: public card shows scores and createdAt but never raw fields', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+  const slice = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    slice.includes("meter('Stability',s.stabilityScore)") &&
+    slice.includes("meter('Openness',s.opennessScore)") &&
+    slice.includes("meter('Pressure',s.pressureScore)") &&
+    slice.includes('s.createdAt') &&
+    !slice.includes('dimensions') && !slice.includes('raw_json') && !slice.includes('stress_points') && !slice.includes('top_beliefs_json') && !slice.includes('contradictions_json'),
+    'renderPublicProfileSnapshotHtml must show only stability/openness/pressure/createdAt — never raw/dimension/stress/full-array fields'
+  );
+});
+
+test('D-142C: public card renders nothing when no sharedSnapshot exists', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+  const slice = appSrc.slice(idx, idx + 100);
+  assert.ok(slice.includes("if(!s)return''"), 'renderPublicProfileSnapshotHtml must return an empty string (no placeholder) when s is falsy');
+});
+
+test('D-142C: no raw_json/stress_points_json/dimensions_json/contradictions_json exposure anywhere in the snapshot UI', () => {
+  const fns = ['meSharedSnapshotSummary', 'meSharedSnapshotCardHtml', 'meSharedSnapshotPreviewBlockHtml', 'renderPublicProfileSnapshotHtml'];
+  for (const fn of fns) {
+    const idx = appSrc.indexOf(`function ${fn}`);
+    const slice = appSrc.slice(idx, idx + 1200);
+    assert.ok(
+      !slice.includes('raw_json') && !slice.includes('stress_points_json') && !slice.includes('dimensions_json') && !slice.includes('contradictions_json'),
+      `${fn} must not expose raw_json/stress_points_json/dimensions_json/contradictions_json`
+    );
+  }
+});
+
+test('D-142C: only meSharedSnapshotSummary reads top_beliefs_json, and only to extract a single name — the other UI functions never reference it', () => {
+  const summaryIdx = appSrc.indexOf('function meSharedSnapshotSummary');
+  const summarySlice = appSrc.slice(summaryIdx, summaryIdx + 700);
+  assert.ok(
+    summarySlice.includes('shared.top_beliefs_json') &&
+    summarySlice.includes('topBeliefs[0]&&topBeliefs[0].name') &&
+    !summarySlice.includes('topBeliefs,') && !summarySlice.includes('topBeliefs:'),
+    'meSharedSnapshotSummary must parse top_beliefs_json only to extract the first entry\'s name, never pass the array through'
+  );
+  for (const fn of ['meSharedSnapshotCardHtml', 'meSharedSnapshotPreviewBlockHtml', 'renderPublicProfileSnapshotHtml']) {
+    const idx = appSrc.indexOf(`function ${fn}`);
+    const slice = appSrc.slice(idx, idx + 1200);
+    assert.ok(!slice.includes('top_beliefs_json'), `${fn} must never reference top_beliefs_json directly — it only receives the already-extracted topAlignmentName`);
+  }
+});
+
+test('D-142C: no comments/likes/follows/social UI added', () => {
+  const fns = ['meBeliefSnapshotsHtml', 'meSharedSnapshotCardHtml', 'meSharedSnapshotPreviewBlockHtml', 'renderPublicProfileSnapshotHtml'];
+  for (const fn of fns) {
+    const idx = appSrc.indexOf(`function ${fn}`);
+    const slice = appSrc.slice(idx, idx + 1300).toLowerCase();
+    assert.ok(!slice.includes('comment') && !slice.includes('follow') && !slice.includes('like button'), `${fn} must not introduce comments, follows, or likes`);
+  }
+});
+
+test('D-142C: forbidden wording absent outside the approved guardrail disclaimers (diagnosis/personality type/you are/proven/good belief/bad belief/complete profile claim)', () => {
+  const fns = ['meSharedSnapshotCardHtml', 'renderPublicProfileSnapshotHtml'];
+  const approved = [
+    'Pattern observations from your own answers, not a diagnosis or personality test.',
+    'A snapshot this person chose to share — pattern observations from their own self-submitted answers, not a diagnosis or personality test.',
+  ];
+  for (const fn of fns) {
+    const idx = appSrc.indexOf(`function ${fn}`);
+    let slice = appSrc.slice(idx, idx + 1200);
+    for (const phrase of approved) slice = slice.split(phrase).join('');
+    const lower = slice.toLowerCase();
+    const forbidden = ['diagnosis', 'personality type', 'you are', 'proven', 'good belief', 'bad belief'];
+    for (const phrase of forbidden) {
+      assert.ok(!lower.includes(phrase), `${fn} must not contain forbidden phrase "${phrase}" outside the approved disclaimer`);
+    }
+  }
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────

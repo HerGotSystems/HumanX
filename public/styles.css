@@ -688,3 +688,10 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .me-snapshot-share input{width:auto}
 .me-snapshot-share-none{justify-content:flex-end}
 .pp-snapshot-card{padding:12px}
+.me-snapshot-helper{margin:0 0 8px;color:var(--muted)}
+.me-item-row.me-item-row-selected{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset}
+.me-snapshot-share-none{border-style:dashed;opacity:.85}
+.me-snapshot-share-none.me-item-row-selected{opacity:1}
+.pp-snapshot-label{margin:2px 0;font-weight:700;color:var(--text)}
+.pp-snapshot-pattern-label{margin:8px 0 2px;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.04em}
+.pp-snapshot-date{margin:8px 0 0;color:var(--muted)}
