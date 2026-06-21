@@ -134,7 +134,10 @@ async function myHumanX(request, env) {
     // evidence has no updated_at column — sort by created_at only.
     env.DB.prepare(`SELECT id, claim_id, title, quality AS type, source_url, review_state, created_at FROM evidence WHERE user_id=? ORDER BY created_at DESC LIMIT 20`).bind(userId).all(),
     env.DB.prepare(`SELECT id, claim_id, title, body, severity, review_state, created_at, updated_at FROM pressure_points WHERE user_id=? ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 20`).bind(userId).all(),
-    env.DB.prepare(`SELECT id, label, stability_score, openness_score, pressure_score, created_at FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC LIMIT 10`).bind(userId).all(),
+    // D-139B: widened for the Belief Mirror panel with three extra columns only.
+    // The full answer-payload blob and the scenario-response blob are deliberately
+    // excluded — too large/granular for a dashboard summary, see docs/D139A audit.
+    env.DB.prepare(`SELECT id, label, stability_score, openness_score, pressure_score, dimensions_json, top_beliefs_json, contradictions_json, created_at FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC LIMIT 10`).bind(userId).all(),
   ]);
 
   return json({

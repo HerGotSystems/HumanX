@@ -6760,6 +6760,204 @@ test('D-138C: Me dashboard filters/show-all/show-less, public Study opening, and
   );
 });
 
+// ── Section 66 — D-139B: Belief Mirror panel v1 ─────────────────────────────────
+
+test('D-139B: myHumanX belief_snapshots select includes dimensions_json/top_beliefs_json/contradictions_json', () => {
+  const idx = workerSrc.indexOf('async function myHumanX');
+  const slice = workerSrc.slice(idx, idx + 2500);
+  assert.ok(
+    slice.includes('dimensions_json, top_beliefs_json, contradictions_json') &&
+    slice.includes('FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC LIMIT 10'),
+    'myHumanX must widen the belief_snapshots SELECT to include dimensions_json/top_beliefs_json/contradictions_json while keeping the same LIMIT 10 and user_id filter'
+  );
+});
+
+test('D-139B: myHumanX still does not include raw_json or stress_points_json', () => {
+  const idx = workerSrc.indexOf('async function myHumanX');
+  const slice = workerSrc.slice(idx, idx + 2500);
+  assert.ok(
+    !slice.includes('raw_json') && !slice.includes('stress_points_json'),
+    'myHumanX must not select raw_json (full 77-answer payload) or stress_points_json (scenario-response data) — too large/granular for a dashboard summary'
+  );
+});
+
+test('D-139B: myHumanX still has no target-user parameter and export route is unchanged', () => {
+  const myHumanXIdx = workerSrc.indexOf('async function myHumanX');
+  const mySlice = workerSrc.slice(myHumanXIdx, myHumanXIdx + 2500);
+  assert.ok(
+    mySlice.includes('const userId = requireUserId(request);') &&
+    !mySlice.includes('body.userId') && !mySlice.includes('body.user_id') && !mySlice.includes('targetUser'),
+    'myHumanX must still derive userId only from requireUserId(request)'
+  );
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/my-humanx/export' && request.method === 'GET') return await exportMyHumanX(request, env)"),
+    'D-139B must not touch the export route'
+  );
+});
+
+test('D-139B: no new /api/my-humanx/mirror route added', () => {
+  assert.ok(
+    !workerSrc.includes('/api/my-humanx/mirror'),
+    'D-139A recommended client-side synthesis over a new endpoint — no /api/my-humanx/mirror route should exist'
+  );
+});
+
+test('D-139B: Belief Mirror panel exists in the Me render path', () => {
+  assert.ok(
+    appSrc.includes('function meMirrorHtml') &&
+    appSrc.includes('${meMirrorHtml(data)}'),
+    'renderMeHtml must render the Belief Mirror panel via meMirrorHtml(data)'
+  );
+});
+
+test('D-139B: Mirror is placed after Belief Snapshots and before Recent Truths', () => {
+  const idx = appSrc.indexOf('function renderMeHtml');
+  const slice = appSrc.slice(idx, idx + 2000);
+  const snapshotsAt = slice.indexOf('Belief Snapshots');
+  const mirrorAt = slice.indexOf('meMirrorHtml(data)');
+  const truthsAt = slice.indexOf('Recent Truths');
+  assert.ok(
+    snapshotsAt !== -1 && mirrorAt !== -1 && truthsAt !== -1 &&
+    snapshotsAt < mirrorAt && mirrorAt < truthsAt,
+    'renderMeHtml must place the Belief Mirror panel between Belief Snapshots and Recent Truths'
+  );
+});
+
+test('D-139B: guardrail copy exists', () => {
+  const idx = appSrc.indexOf('function meMirrorGuardrailHtml');
+  const slice = appSrc.slice(idx, idx + 300);
+  assert.ok(
+    slice.includes('Pattern observations from your own answers and submissions — not a diagnosis or personality test.'),
+    'meMirrorGuardrailHtml must render the exact required guardrail copy'
+  );
+});
+
+test('D-139B: latest snapshot card renders dominant_pattern and the three meter scores', () => {
+  const idx = appSrc.indexOf('function meMirrorLatestCardHtml');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('latest.dominant_pattern') &&
+    slice.includes("meter('Stability',latest.stability_score)") &&
+    slice.includes("meter('Openness',latest.openness_score)") &&
+    slice.includes("meter('Pressure',latest.pressure_score)"),
+    'meMirrorLatestCardHtml must show dominant_pattern and reuse meter() for stability/openness/pressure'
+  );
+});
+
+test('D-139B: drift card compares latest and previous snapshots with point deltas, no good/bad/improving/worsening language', () => {
+  const idx = appSrc.indexOf('function meMirrorDriftCardHtml');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes('if(!latest||!previous)return\'\'') &&
+    slice.includes('Since your last check-in') &&
+    !/improv|worsen|better|worse|good|bad/i.test(slice),
+    'meMirrorDriftCardHtml must require both latest and previous snapshots, use "since your last check-in" framing, and avoid value-judgment language'
+  );
+});
+
+test('D-139B: recurring category logic counts category from claims and truths only', () => {
+  const idx = appSrc.indexOf('function meMirrorTopCategories');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('add(c.category)') && slice.includes('add(t.category)') &&
+    !slice.includes('.statement') && !slice.includes('.claim)') && !slice.includes('.title'),
+    'meMirrorTopCategories must be a simple frequency count over claims[].category and truths[].category — no text mining of statement/claim/title text'
+  );
+});
+
+test('D-139B: pressure/evidence balance card uses pressure severity and evidence type/quality, reusing evidenceQualityLabel', () => {
+  const idx = appSrc.indexOf('function meMirrorBalanceCardHtml');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('Number(p.severity)') &&
+    slice.includes('evidenceQualityLabel(q)'),
+    'meMirrorBalanceCardHtml must count pressure.severity and reuse the existing evidenceQualityLabel() helper for evidence quality'
+  );
+});
+
+test('D-139B: contradictions_json is parsed safely (malformed/empty JSON does not throw)', () => {
+  const helperIdx = appSrc.indexOf('function meSafeParseJson');
+  const helperSlice = appSrc.slice(helperIdx, helperIdx + 300);
+  assert.ok(
+    helperSlice.includes('try{') && helperSlice.includes('catch') && helperSlice.includes('return fallback'),
+    'meSafeParseJson must wrap JSON.parse in try/catch and fall back safely'
+  );
+  const tensionsIdx = appSrc.indexOf('function meMirrorTensionsCardHtml');
+  const tensionsSlice = appSrc.slice(tensionsIdx, tensionsIdx + 500);
+  assert.ok(
+    tensionsSlice.includes("meSafeParseJson(latest.contradictions_json,[])") &&
+    tensionsSlice.includes('Array.isArray(list)') &&
+    tensionsSlice.includes('.slice(0,3)'),
+    'meMirrorTensionsCardHtml must parse contradictions_json via meSafeParseJson, guard with Array.isArray, and cap at 3 entries'
+  );
+});
+
+test('D-139B: tensions card uses the required non-accusatory wording', () => {
+  const idx = appSrc.indexOf('function meMirrorTensionsCardHtml');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('Patterns the engine flagged in your answers, not facts about you.'),
+    'meMirrorTensionsCardHtml must use the exact required tensions wording'
+  );
+});
+
+test('D-139B: fixed local question bank exists with no AI call', () => {
+  const idx = appSrc.indexOf('function meMirrorQuestions');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes("'What belief have I not pressure-tested yet?'") &&
+    slice.includes("'Which tension would I investigate first?'") &&
+    slice.includes("'What would change my mind?'") &&
+    slice.includes('.slice(0,3)') &&
+    !slice.includes('fetch(') && !slice.includes('api('),
+    'meMirrorQuestions must be a fixed local lookup table capped at 3 questions, with no network/API call'
+  );
+});
+
+test('D-139B: no AI provider/API call added anywhere in the Mirror panel', () => {
+  const startIdx = appSrc.indexOf('function meSafeParseJson');
+  const endIdx = appSrc.indexOf('function renderMeHtml');
+  const slice = appSrc.slice(startIdx, endIdx);
+  assert.ok(
+    !slice.includes('api.anthropic.com') && !slice.includes('api.openai.com') &&
+    !slice.includes('OPENAI_API_KEY') && !slice.includes('Bearer ') &&
+    !/await api\(['"`]\/api\/(?!my-humanx)/.test(slice),
+    'the entire Belief Mirror block must contain no AI provider call and no api() call other than the existing /api/my-humanx family'
+  );
+});
+
+test('D-139B: forbidden wording is absent from the Mirror panel outside the approved guardrail disclaimer (diagnosis/personality type/you are/proven/good belief/bad belief)', () => {
+  const startIdx = appSrc.indexOf('function meSafeParseJson');
+  const endIdx = appSrc.indexOf('function renderMeHtml');
+  // The guardrail sentence is the one approved place allowed to say "not a
+  // diagnosis or personality test" — strip it before scanning for misuse
+  // elsewhere in the panel.
+  const guardrail = 'Pattern observations from your own answers and submissions — not a diagnosis or personality test.';
+  const slice = appSrc.slice(startIdx, endIdx).replace(guardrail, '').toLowerCase();
+  const forbidden = ['diagnosis', 'personality type', 'you are', 'proven', 'good belief', 'bad belief'];
+  for (const phrase of forbidden) {
+    assert.ok(!slice.includes(phrase), `Belief Mirror copy must not contain the forbidden phrase "${phrase}" outside the approved guardrail disclaimer`);
+  }
+});
+
+test('D-139B: empty state links to the Belief Engine', () => {
+  const idx = appSrc.indexOf('function meMirrorHtml');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('Take the Belief Engine to start your Mirror.') &&
+    slice.includes("location.href='/apps/humanx-belief-engine/'"),
+    'meMirrorHtml must show the required empty-state copy and link to the Belief Engine when there are no snapshots'
+  );
+});
+
+test('D-139B: existing Me filters/show-all, archive, and export are preserved', () => {
+  assert.ok(
+    appSrc.includes('function meFilterBarHtml') && appSrc.includes('function meShowAllControl') &&
+    appSrc.includes('function meArchiveItemUI') && appSrc.includes('async function exportMyHumanXData'),
+    'D-139B must not remove the D-137E filter/show-all controls or the D-138C archive/export controls'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

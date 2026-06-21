@@ -655,3 +655,13 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .me-toggle{margin-top:6px}
 .me-account-actions{margin-top:8px}
 .me-item-row button.danger{margin-left:auto}
+.me-mirror-guardrail{margin:0 0 10px;font-style:italic}
+.me-mirror-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.me-mirror-card{background:#080b12;border:1px solid var(--line);border-radius:10px;padding:9px}
+.me-mirror-card h4{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.me-mirror-pattern{margin:0 0 6px;font-size:13px;font-weight:700;color:var(--text)}
+.me-mirror-drift-row{margin:2px 0;font-size:11px;color:var(--muted)}
+.me-mirror-chip-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.me-mirror-tension-list,.me-mirror-question-list{margin:4px 0 0;padding-left:16px;font-size:11px;color:var(--muted)}
+.me-mirror-tension-list li,.me-mirror-question-list li{margin:3px 0}
+@media (max-width:640px){.me-mirror-grid{grid-template-columns:1fr}}
