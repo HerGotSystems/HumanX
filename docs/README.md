@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `827 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `842 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `56 passed, 0 failed (56 hard checks)` |
 
@@ -51,11 +51,15 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D140D_PUBLIC_PROFILE_CHECKPOINT.md` ⭐ CURRENT — PUBLIC PROFILE DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
-D-140A audit → D-140B profile settings foundation (migration 0013, `POST /api/my-humanx/profile-settings`, Profile Settings panel in Me with live preview) → D-140C public read-only profile (`GET /api/u/:slug`, `#/u/:slug` hash view). Owner confirmed: Profile Settings panel works (off by default, slug required only when public, save works), Copy share link uses `#/u/:slug` and correctly hides/disables when not public, private profile shows a friendly not-found state, public profile loads at `#/u/calenhir` with bio/counts/recent public truths-evidence-pressure, no email/user id/admin/owner-only controls visible, Home/Me/Truths/Review still work. Explicit opt-in only — `profile_public` defaults to 0 for every user; public route returns the identical 404 for private/not-found/invalid slugs; only public, non-archived content is ever exposed; evidence/pressure are summary-level only (no body/source_url); no belief data, no comments/social feed. Known limitation carried forward: `x-humanx-user` still unsigned/spoofable for owner settings, hash route only (no pretty `/u/slug` path yet), no selected snapshot sharing yet. Baseline: 827/24/56 (1 expected parameterised-route warning). Recommended next: D-141A — public profile polish / selected snapshot sharing audit.
+### `D141C_PUBLIC_PROFILE_POLISH_CHECKPOINT.md` ⭐ CURRENT — PUBLIC PROFILE POLISH DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
+D-141A audit (public profile polish / selected snapshot sharing) → D-141B public profile visual polish (frontend/CSS only — header/counts/section cards, styled empty states, counts explanation, Me-side preview sample items, mobile pass). Owner confirmed: `#/u/calenhir` loads with cleaner header/card styling, "Counts reflect public, non-archived activity only." is visible, recent public sections look less debug/raw, empty states are styled, the public page still omits email/user id/export/archive/settings controls, the Me-side Profile Settings preview shows sample public items, and Me dashboard/Belief Mirror/Export/Archive/Review all still work. Backend was untouched — no migration, no new endpoint, no new public fields, `GET /api/u/:slug` response shape unchanged. Known limitation carried forward: hash route only (no pretty `/u/slug` path yet), selected belief snapshot sharing still deferred, no share-card image/meta tags yet, `x-humanx-user` still unsigned/spoofable for owner-side settings. Baseline: 842/24/56 (1 expected parameterised-route warning). Recommended next: D-142A — selected belief snapshot sharing audit.
 **Read when:** starting new feature work or returning after time away.
 
-### `D139C_BELIEF_MIRROR_CHECKPOINT.md` — D-139 BELIEF MIRROR (superseded by D-140D for current deploy)
+### `D140D_PUBLIC_PROFILE_CHECKPOINT.md` — D-140 PUBLIC PROFILE FOUNDATION (superseded by D-141C for current deploy)
+D-140A audit → D-140B profile settings foundation (migration 0013, `POST /api/my-humanx/profile-settings`, Profile Settings panel in Me with live preview) → D-140C public read-only profile (`GET /api/u/:slug`, `#/u/:slug` hash view). Owner confirmed: Profile Settings panel works (off by default, slug required only when public, save works), Copy share link uses `#/u/:slug` and correctly hides/disables when not public, private profile shows a friendly not-found state, public profile loads at `#/u/calenhir` with bio/counts/recent public truths-evidence-pressure, no email/user id/admin/owner-only controls visible, Home/Me/Truths/Review still work. Baseline: 827/24/56.
+**Read when:** reviewing D-140 history.
+
+### `D139C_BELIEF_MIRROR_CHECKPOINT.md` — D-139 BELIEF MIRROR (superseded by D-141C for current deploy)
 D-139A audit → D-139B Belief Mirror v1 (widened `GET /api/my-humanx` belief_snapshots select + a fully client-side Belief Mirror panel inside Me — latest snapshot, recent drift, recurring categories, pressure/evidence balance, tensions from `contradictions_json`, fixed local question bank). Owner confirmed: Belief Mirror appears in Me between Belief Snapshots and Recent Truths, guardrail wording is visible and feels safe, all six cards render, existing Me controls (filters, show-all, archive, export) still work. No AI/API call anywhere — every card is arithmetic over already-stored data. No new route, no migration. Baseline: 781/24/56.
 **Read when:** reviewing D-139 history.
 
