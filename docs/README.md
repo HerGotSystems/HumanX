@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `655 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `724 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `56 passed, 0 failed (56 hard checks)` |
 
@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D136E_INVITE_AUTH_CHECKPOINT.md` ⭐ CURRENT — INVITE AUTH DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
-D-136A audit → D-136B backend (migration 0010, `/api/me`, `/api/auth/invite/create`, `/api/auth/invite/redeem`) → D-136C public account panel + invite redeem → D-136D admin invite-code creator panel. Owner confirmed: admin creates invite code in Review, user redeems in account panel, panel shows VERIFIED with display name/email/handle, anonymous flow still works, no email sending (expected). Known limitation carried forward: `x-humanx-user` still unsigned/spoofable, no cookies, no magic links, no email sending, `handle` uniqueness not enforced. Baseline: 655/24/56. Recommended next: D-137A — My HumanX personal dashboard audit.
+### `D137F_MY_HUMANX_CHECKPOINT.md` ⭐ CURRENT — MY HUMANX DASHBOARD DEPLOYED + POLISHED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
+D-137A audit → D-137B backend (`GET /api/my-humanx`) → D-137C truth claimed-state clarity → D-137D My HumanX dashboard frontend → D-137E scan/polish pass (5-item caps with show-all/show-less, state filter, section reorder, badge-first row layout). Owner confirmed: Me tab works, verified account card visible, content counts visible, state filters work, recent claims/truths/evidence/pressure visible, belief snapshots visible, show all/show less works, public claim Study opens with correct Back-to-Me navigation, non-public items never open broken pages. Known limitation carried forward: `x-humanx-user` still unsigned/spoofable, no public profile/sharing/comments yet, no delete/export account tools yet. Baseline: 724/24/56. Recommended next: D-138A — user-owned delete/archive/export audit.
 **Read when:** starting new feature work or returning after time away.
+
+### `D136E_INVITE_AUTH_CHECKPOINT.md` — D-136 INVITE AUTH (superseded by D-137F for current deploy)
+D-136A audit → D-136B backend (migration 0010, `/api/me`, `/api/auth/invite/create`, `/api/auth/invite/redeem`) → D-136C public account panel + invite redeem → D-136D admin invite-code creator panel. Owner confirmed: admin creates invite code in Review, user redeems in account panel, panel shows VERIFIED with display name/email/handle, anonymous flow still works, no email sending (expected). Baseline: 655/24/56.
+**Read when:** reviewing D-136 history.
 
 ### `D131A_OWNER_SMOKE_POST_D130.md` — D-131 OWNER SMOKE (superseded by D-136E for current deploy)
 Owner confirmed production good after D-130 deploy. Admin Review, structured builder context, approve/keep/reject/mark-duplicate, queue anchor, public pages — all pass. Baseline: 498/24/56.
