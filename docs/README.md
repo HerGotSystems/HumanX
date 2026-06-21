@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `763 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `781 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `56 passed, 0 failed (56 hard checks)` |
 
@@ -51,11 +51,15 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D138D_USER_ARCHIVE_EXPORT_CHECKPOINT.md` ⭐ CURRENT — USER ARCHIVE/EXPORT DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
-D-138A audit → D-138B backend foundation (migration 0012, `POST /api/my-humanx/archive`, `GET /api/my-humanx/export`) → D-138C frontend archive/export controls (account-card Export button, per-row Archive action with confirmation modal). Owner confirmed: export downloads JSON, archive confirmation modal appears and clearly states the item is hidden not deleted, a protected item returns a clear protected toast, the rest of My HumanX remains usable. Soft-archive only — no `DELETE FROM`, no restore UI, belief-snapshot archive deferred (no backend endpoint yet). Known limitation carried forward: `x-humanx-user` still unsigned/spoofable — not final auth security. Baseline: 763/24/56. Recommended next: D-139A — Belief Mirror / personal profile usefulness audit.
+### `D139C_BELIEF_MIRROR_CHECKPOINT.md` ⭐ CURRENT — BELIEF MIRROR DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
+D-139A audit → D-139B Belief Mirror v1 (widened `GET /api/my-humanx` belief_snapshots select + a fully client-side Belief Mirror panel inside Me — latest snapshot, recent drift, recurring categories, pressure/evidence balance, tensions from `contradictions_json`, fixed local question bank). Owner confirmed: Belief Mirror appears in Me between Belief Snapshots and Recent Truths, guardrail wording is visible and feels safe, all six cards render, existing Me controls (filters, show-all, archive, export) still work. No AI/API call anywhere — every card is arithmetic over already-stored data. No new route, no migration. Known limitation carried forward: `x-humanx-user` still unsigned/spoofable, no public profile/sharing layer yet. Baseline: 781/24/56. Recommended next: D-140A — public profile / sharing / social layer audit.
 **Read when:** starting new feature work or returning after time away.
 
-### `D137F_MY_HUMANX_CHECKPOINT.md` — D-137 MY HUMANX DASHBOARD (superseded by D-138D for current deploy)
+### `D138D_USER_ARCHIVE_EXPORT_CHECKPOINT.md` — D-138 USER ARCHIVE/EXPORT (superseded by D-139C for current deploy)
+D-138A audit → D-138B backend foundation (migration 0012, `POST /api/my-humanx/archive`, `GET /api/my-humanx/export`) → D-138C frontend archive/export controls (account-card Export button, per-row Archive action with confirmation modal). Owner confirmed: export downloads JSON, archive confirmation modal appears and clearly states the item is hidden not deleted, a protected item returns a clear protected toast, the rest of My HumanX remains usable. Soft-archive only — no `DELETE FROM`, no restore UI, belief-snapshot archive deferred (no backend endpoint yet). Baseline: 763/24/56.
+**Read when:** reviewing D-138 history.
+
+### `D137F_MY_HUMANX_CHECKPOINT.md` — D-137 MY HUMANX DASHBOARD (superseded by D-139C for current deploy)
 D-137A audit → D-137B backend (`GET /api/my-humanx`) → D-137C truth claimed-state clarity → D-137D My HumanX dashboard frontend → D-137E scan/polish pass (5-item caps with show-all/show-less, state filter, section reorder, badge-first row layout). Owner confirmed: Me tab works, verified account card visible, content counts visible, state filters work, recent claims/truths/evidence/pressure visible, belief snapshots visible, show all/show less works, public claim Study opens with correct Back-to-Me navigation, non-public items never open broken pages. Baseline: 724/24/56.
 **Read when:** reviewing D-137 history.
 
