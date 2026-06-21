@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `842 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `883 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `56 passed, 0 failed (56 hard checks)` |
 
@@ -51,11 +51,15 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D141C_PUBLIC_PROFILE_POLISH_CHECKPOINT.md` ⭐ CURRENT — PUBLIC PROFILE POLISH DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
-D-141A audit (public profile polish / selected snapshot sharing) → D-141B public profile visual polish (frontend/CSS only — header/counts/section cards, styled empty states, counts explanation, Me-side preview sample items, mobile pass). Owner confirmed: `#/u/calenhir` loads with cleaner header/card styling, "Counts reflect public, non-archived activity only." is visible, recent public sections look less debug/raw, empty states are styled, the public page still omits email/user id/export/archive/settings controls, the Me-side Profile Settings preview shows sample public items, and Me dashboard/Belief Mirror/Export/Archive/Review all still work. Backend was untouched — no migration, no new endpoint, no new public fields, `GET /api/u/:slug` response shape unchanged. Known limitation carried forward: hash route only (no pretty `/u/slug` path yet), selected belief snapshot sharing still deferred, no share-card image/meta tags yet, `x-humanx-user` still unsigned/spoofable for owner-side settings. Baseline: 842/24/56 (1 expected parameterised-route warning). Recommended next: D-142A — selected belief snapshot sharing audit.
+### `D142D_SELECTED_SNAPSHOT_SHARING_CHECKPOINT.md` ⭐ CURRENT — SELECTED SNAPSHOT SHARING DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
+D-142A audit → D-142B selected snapshot sharing foundation (`POST /api/my-humanx/profile-settings` extended with `shared_snapshot_id`, server-enforced single shared snapshot, `GET /api/u/:slug` widened with an optional narrow `sharedSnapshot` field) → D-142C public copy/presentation polish (owner-side selected-row highlighting and "do not share" styling, Profile Settings preview summary/empty-state, public "Shared Belief Snapshot" card with required disclaimer and self-reported-pattern framing). Owner confirmed: share controls and "Do not share a snapshot" work, only one snapshot can be selected at a time, the selected row is visually obvious, the public profile shows the shared-snapshot card when one is selected and shows nothing when none is, no raw answer text or full contradiction text is ever visible, no email/user id/admin/owner-only controls leak onto the public page. No migration in either patch — reuses `public_summary_enabled`/`hidden_at` from migration 0013. One pre-existing bug fixed in passing: `myHumanX()` never selected `dominant_pattern`, so the private Belief Mirror's pattern card always fell back to "Pattern not labeled" since D-139B. Known limitation carried forward: hash route only (no pretty `/u/slug` path), only one shared snapshot (no history), no OpenGraph/share-card image yet, `x-humanx-user` still unsigned/spoofable for owner-side settings. Baseline: 883/24/56 (1 expected parameterised-route warning). Recommended next: D-143A — public profile share-card / OpenGraph / SEO audit.
 **Read when:** starting new feature work or returning after time away.
 
-### `D140D_PUBLIC_PROFILE_CHECKPOINT.md` — D-140 PUBLIC PROFILE FOUNDATION (superseded by D-141C for current deploy)
+### `D141C_PUBLIC_PROFILE_POLISH_CHECKPOINT.md` — D-141 PUBLIC PROFILE POLISH (superseded by D-142D for current deploy)
+D-141A audit (public profile polish / selected snapshot sharing) → D-141B public profile visual polish (frontend/CSS only — header/counts/section cards, styled empty states, counts explanation, Me-side preview sample items, mobile pass). Owner confirmed: `#/u/calenhir` loads with cleaner header/card styling, "Counts reflect public, non-archived activity only." is visible, recent public sections look less debug/raw, empty states are styled, the public page still omits email/user id/export/archive/settings controls, the Me-side Profile Settings preview shows sample public items, and Me dashboard/Belief Mirror/Export/Archive/Review all still work. Baseline: 842/24/56.
+**Read when:** reviewing D-141 history.
+
+### `D140D_PUBLIC_PROFILE_CHECKPOINT.md` — D-140 PUBLIC PROFILE FOUNDATION (superseded by D-142D for current deploy)
 D-140A audit → D-140B profile settings foundation (migration 0013, `POST /api/my-humanx/profile-settings`, Profile Settings panel in Me with live preview) → D-140C public read-only profile (`GET /api/u/:slug`, `#/u/:slug` hash view). Owner confirmed: Profile Settings panel works (off by default, slug required only when public, save works), Copy share link uses `#/u/:slug` and correctly hides/disables when not public, private profile shows a friendly not-found state, public profile loads at `#/u/calenhir` with bio/counts/recent public truths-evidence-pressure, no email/user id/admin/owner-only controls visible, Home/Me/Truths/Review still work. Baseline: 827/24/56.
 **Read when:** reviewing D-140 history.
 
