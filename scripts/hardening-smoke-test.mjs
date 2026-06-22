@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2168,7 +2168,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -6679,7 +6679,7 @@ test('D-138C: meArchiveItemUI shows a confirmation modal before archiving', () =
     slice.includes('hxModal({title:\'Archive item\'') &&
     slice.includes("confirmLabel:'Archive'") &&
     slice.includes("cancelLabel:'Cancel'") &&
-    slice.includes('onConfirm:async(close)=>{close();try{await api('),
+    slice.includes('onConfirm:async(close)=>{close();try{await ensureSession();await api('),
     'meArchiveItemUI must confirm via hxModal before issuing the archive POST — the POST must live inside onConfirm, not fire immediately'
   );
 });
@@ -8478,14 +8478,18 @@ test('D-145B: createOrGetUser/session no longer SELECTs or returns is_admin', ()
   assert.ok(!slice.includes('is_admin'), 'createOrGetUser must never select or return is_admin — it was previously leaked to every caller of POST /api/session');
 });
 
-test('D-145B: public/app-v10.js stores owner_token from the session response', () => {
-  const idx = appSrc.indexOf('async function boot()');
+test('D-145B/D-148A: public/app-v10.js stores owner_token from the session response', () => {
+  // D-148A moved this logic from inline in boot() into the shared,
+  // idempotent ensureSession() helper — boot() now calls that helper
+  // instead of duplicating the merge/persist logic itself.
+  const idx = appSrc.indexOf('async function ensureSession()');
   const slice = appSrc.slice(idx, idx + 700);
   assert.ok(
-    slice.includes("if(s.owner_token){user.ownerToken=s.owner_token}") &&
-    slice.includes('localStorage.setItem(LS_USER,JSON.stringify(user))'),
-    'boot() must store owner_token (as user.ownerToken) into the persisted localStorage user object'
+    slice.includes('if (s.owner_token) user.ownerToken = s.owner_token;') &&
+    slice.includes('localStorage.setItem(LS_USER, JSON.stringify(user));'),
+    'ensureSession() must store owner_token (as user.ownerToken) into the persisted localStorage user object'
   );
+  assert.ok(appSrc.includes('await ensureSession();'), 'boot() must call ensureSession() rather than duplicating the session-bootstrap logic inline');
 });
 
 test('D-145B: public/app-v10.js sends x-humanx-owner-token header', () => {
@@ -8807,12 +8811,15 @@ test('D-147B: owner_token_telemetry table only stores safe metadata columns', ()
   }
 });
 
-test('D-146B: no frontend change required or made', () => {
-  const idx = appSrc.indexOf('async function boot()');
-  const slice = appSrc.slice(idx, idx + 700);
+test('D-146B: backend log-only telemetry did not itself require a frontend change', () => {
+  // D-146B (console-only telemetry) shipped without touching the frontend.
+  // D-148A later changed the frontend for an unrelated reason (closing the
+  // client-side adoption gaps) — this test only confirms the owner_token
+  // storage behavior D-145B established is still present, not that the
+  // frontend is byte-for-byte frozen.
   assert.ok(
-    slice.includes("if(s.owner_token){user.ownerToken=s.owner_token}"),
-    'boot() must remain exactly as D-145B left it — no frontend change needed for log-only backend telemetry'
+    appSrc.includes('if (s.owner_token) user.ownerToken = s.owner_token;'),
+    'owner_token must still be merged into the stored user object somewhere in the frontend'
   );
 });
 
@@ -8945,6 +8952,90 @@ test('D-147B: no enforcement condition was added anywhere by this patch', () => 
     !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID') && !workerSrc.includes('OWNER_TOKEN_MISMATCH') &&
     !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
     'D-147B must remain telemetry-only — no new rejection logic anywhere in worker.js'
+  );
+});
+
+// ── Section 79 — D-148A: Client owner-token adoption gap hardening ─────────────
+
+test('D-148A: ensureSession() helper exists, is idempotent, and never throws to its caller', () => {
+  const idx = appSrc.indexOf('async function ensureSession()');
+  assert.ok(idx !== -1, 'ensureSession() must be defined in public/app-v10.js');
+  const slice = appSrc.slice(idx, idx + 900);
+  assert.ok(slice.includes('_sessionBootstrapPromise'), 'ensureSession() must dedupe concurrent calls behind a single in-flight promise');
+  assert.ok(slice.includes('try {') && slice.includes('} catch (_) {'), 'ensureSession() must swallow a failed /api/session call, not propagate it');
+  assert.ok(slice.includes("await api('/api/session', { method: 'POST'"), 'ensureSession() must call POST /api/session');
+});
+
+test('D-148A: ensureSession() never logs the owner token', () => {
+  const idx = appSrc.indexOf('async function ensureSession()');
+  const slice = appSrc.slice(idx, idx + 900);
+  assert.ok(!/console\.(log|warn|error|info|debug)/.test(slice), 'ensureSession() must never console-log anything, including the token');
+});
+
+test('D-148A: every owner-sensitive frontend call site awaits ensureSession() first', () => {
+  const callSites = [
+    { fn: 'loadMe', needle: "await ensureSession();try{const data=await api('/api/me')" },
+    { fn: 'loadBeliefSnapshots', needle: "await ensureSession();const data=await api('/api/belief-snapshots" },
+    { fn: 'promoteBelief', needle: "await ensureSession();const data=await api('/api/belief-promote'" },
+    { fn: 'exportMyHumanXData', needle: "await ensureSession();const data=await api('/api/my-humanx/export')" },
+    { fn: 'saveProfileSettingsUI', needle: "await ensureSession();await api('/api/my-humanx/profile-settings'" },
+    { fn: 'meArchiveItemUI', needle: "await ensureSession();await api('/api/my-humanx/archive'" },
+    { fn: 'meShareSnapshotUI', needle: "await ensureSession();await api('/api/my-humanx/profile-settings'" },
+    { fn: 'renderMe', needle: "await ensureSession();meData=await api('/api/my-humanx')" },
+  ];
+  for (const { fn, needle } of callSites) {
+    assert.ok(appSrc.includes(needle), `${fn} must call await ensureSession() immediately before its owner-sensitive api() call`);
+  }
+});
+
+test('D-148A: boot() uses the shared ensureSession() helper instead of duplicating session logic', () => {
+  const idx = appSrc.indexOf('async function boot()');
+  const slice = appSrc.slice(idx, idx + 500);
+  assert.ok(slice.includes('await ensureSession();'), 'boot() must call ensureSession()');
+  assert.ok(!slice.includes("api('/api/session'"), 'boot() must not duplicate the inline /api/session call — that logic now lives only in ensureSession()');
+});
+
+test('D-148A: headers() still sends x-humanx-owner-token only paired with x-humanx-user', () => {
+  assert.ok(
+    appSrc.includes("function headers(){return{'content-type':'application/json','x-humanx-user':user?.id||'','x-humanx-owner-token':user?.ownerToken||''}}"),
+    'headers() must remain unchanged — owner token still sent in the same single call as x-humanx-user, never independently'
+  );
+});
+
+test('D-148A: standalone Belief Engine bridge has its own session bootstrap before sending a belief snapshot', () => {
+  assert.ok(humanxBridgeSrc.includes('async function ensureHumanXSession(user)'), 'the bridge must define its own session bootstrap — it cannot reuse app-v10.js, it is a separate page');
+  const idx = humanxBridgeSrc.indexOf('async function ensureHumanXSession(user)');
+  const slice = humanxBridgeSrc.slice(idx, idx + 700);
+  assert.ok(slice.includes("fetch('/api/session'") && slice.includes("method: 'POST'"), 'ensureHumanXSession must call POST /api/session');
+  assert.ok(slice.includes('try {') && slice.includes('} catch (_) {'), 'a failed bootstrap must never block sending the belief snapshot');
+  assert.ok(!/console\.(log|warn|error|info|debug)/.test(slice), 'the bridge session bootstrap must never log anything, including the token');
+  const sendIdx = humanxBridgeSrc.indexOf('async function sendBeliefEngineToHumanX()');
+  const sendSlice = humanxBridgeSrc.slice(sendIdx, humanxBridgeSrc.indexOf("fetch('/api/belief-snapshots'", sendIdx));
+  assert.ok(sendSlice.includes('await ensureHumanXSession(user);'), 'sendBeliefEngineToHumanX must await ensureHumanXSession(user) before POSTing the snapshot');
+});
+
+test('D-148A: bridge session bootstrap is idempotent (shared in-flight promise)', () => {
+  assert.ok(humanxBridgeSrc.includes('_bridgeSessionPromise'), 'ensureHumanXSession must dedupe concurrent calls — safe to call on every send');
+});
+
+test('D-148A: owner token is never sent independently of x-humanx-user in either frontend file', () => {
+  const ownerTokenSenders = (appSrc.match(/x-humanx-owner-token/g) || []).length + (humanxBridgeSrc.match(/x-humanx-owner-token/g) || []).length;
+  assert.ok(ownerTokenSenders === 2, 'exactly two places should reference x-humanx-owner-token — app-v10.js headers() and the bridge fetch call, each always paired with x-humanx-user');
+});
+
+test('D-148A: no backend enforcement was added by this client-side patch', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID') && !workerSrc.includes('OWNER_TOKEN_MISMATCH') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'D-148A is a frontend-only patch — worker.js must show no new rejection logic'
+  );
+});
+
+test('D-148A: no D1 migration or wrangler.toml change was made by this patch', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0015_owner_token_client.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0015_d148a.sql')),
+    'D-148A is client-side hardening only — no new migration'
   );
 });
 

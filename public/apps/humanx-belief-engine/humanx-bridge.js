@@ -14,6 +14,37 @@
     return user;
   }
 
+  // D-148A: the standalone Belief Engine never visits the main app's boot()
+  // flow, so a user opening this page directly would never have an
+  // ownerToken minted no matter how long they waited — getOrCreateHumanXUser()
+  // only reads/creates the shared localStorage user, it never calls
+  // /api/session itself. This closes that gap: idempotent (one in-flight
+  // promise shared across calls), merges user/owner_token into the same
+  // shared localStorage object the main app reads, never logs the token,
+  // and swallows any failure so a broken session call never blocks sending
+  // the snapshot — advisory-only, exactly like the main app's ensureSession().
+  let _bridgeSessionPromise = null;
+  async function ensureHumanXSession(user) {
+    if (!_bridgeSessionPromise) {
+      _bridgeSessionPromise = (async () => {
+        try {
+          const res = await fetch('/api/session', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(user)
+          });
+          const data = await res.json().catch(() => ({}));
+          if (data.user) Object.assign(user, data.user);
+          if (data.owner_token) user.ownerToken = data.owner_token;
+          localStorage.setItem(HUMANX_USER_KEY, JSON.stringify(user));
+        } catch (_) {
+          // advisory-only — a failed bootstrap must never block the send
+        }
+      })();
+    }
+    return _bridgeSessionPromise;
+  }
+
   function score(obj, key, fallback = 50) {
     const n = Number(obj && obj[key]);
     return Number.isFinite(n) ? Math.max(0, Math.min(100, Math.round(n))) : fallback;
@@ -91,6 +122,7 @@
     try {
       if (!window.state || !window.state.scores) throw new Error('No completed Belief Engine result found. Finish the report first.');
       const user = getOrCreateHumanXUser();
+      await ensureHumanXSession(user);
       const snapshot = buildHumanXBeliefSnapshot();
       if (btn) {
         btn.disabled = true;
