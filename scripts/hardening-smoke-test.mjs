@@ -8791,6 +8791,61 @@ test('D-146B: no token value appears in any code string or comment', () => {
   assert.ok(!/['"`][A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}['"`]/.test(slice), 'no literal example token value (payload.signature shape) should appear anywhere');
 });
 
+// ── Section 77 — D-147A: Owner token telemetry audit (lock-in) ─────────────────
+
+test('D-147A: x-humanx-owner-token is never sent independently of x-humanx-user anywhere in public/', () => {
+  // Both known senders (the main app's shared headers() and the Belief
+  // Engine bridge's one fetch call) pair the two headers together. This
+  // locks that invariant explicitly, beyond the existing literal-string
+  // check on headers() itself.
+  const ownerTokenSenders = (appSrc.match(/x-humanx-owner-token/g) || []).length + (humanxBridgeSrc.match(/x-humanx-owner-token/g) || []).length;
+  const userIdSendersNearOwnerToken =
+    (appSrc.includes("'x-humanx-user':user?.id||'','x-humanx-owner-token':user?.ownerToken||''") ? 1 : 0) +
+    (humanxBridgeSrc.includes("'x-humanx-user': user.id,") && humanxBridgeSrc.includes("'x-humanx-owner-token': user.ownerToken || ''") ? 1 : 0);
+  assert.ok(ownerTokenSenders === 2, 'exactly two places in public/ should reference x-humanx-owner-token — app-v10.js headers() and the Belief Engine bridge fetch call');
+  assert.ok(userIdSendersNearOwnerToken === 2, 'both senders of x-humanx-owner-token must send x-humanx-user in the same request — never the owner token alone');
+});
+
+test('D-147A: ownerStatus is captured exactly once per call site and used only for telemetry, never for control flow', () => {
+  const fns = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings'];
+  for (const fn of fns) {
+    const idx = workerSrc.indexOf(`async function ${fn}(request, env)`);
+    const endIdx = workerSrc.indexOf('\nasync function', idx + 10);
+    const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+    const ownerStatusRefs = (slice.match(/ownerStatus/g) || []).length;
+    assert.ok(ownerStatusRefs === 2, `${fn} must reference ownerStatus exactly twice — once to capture it, once to log it — never to branch`);
+    assert.ok(!new RegExp(`if\\s*\\([^)]*ownerStatus`).test(slice), `${fn} must never branch on ownerStatus`);
+  }
+});
+
+test('D-147A: no OWNER_TOKEN_* error code exists anywhere in src/', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID') && !workerSrc.includes('OWNER_TOKEN_MISMATCH') &&
+    !beliefSnapshotsSrc.includes('OWNER_TOKEN') && !bridgeSrc.includes('OWNER_TOKEN'),
+    'no owner-token-specific rejection error code should exist anywhere — confirmed across worker.js, belief-snapshots.js, and belief-bridge.js'
+  );
+});
+
+test('D-147A: public GET /api/u/:slug and GET /u/:slug remain fully uninstrumented', () => {
+  const gpIdx = workerSrc.indexOf('async function getPublicProfile');
+  const gpSlice = workerSrc.slice(gpIdx, gpIdx + 500);
+  const rpIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const rpSlice = workerSrc.slice(rpIdx, rpIdx + 2700);
+  assert.ok(
+    !gpSlice.includes('ownerTokenStatus') && !gpSlice.includes('logOwnerTokenTelemetry') &&
+    !rpSlice.includes('ownerTokenStatus') && !rpSlice.includes('logOwnerTokenTelemetry'),
+    'getPublicProfile and renderPublicProfileShell must remain fully public, with zero owner-token telemetry'
+  );
+});
+
+test('D-147A: no migration added by this audit', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_owner_token_audit.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_d147a.sql')),
+    'D-147A is a docs-only audit — no D1 migration'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
