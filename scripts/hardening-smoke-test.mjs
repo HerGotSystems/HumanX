@@ -5881,7 +5881,7 @@ test('D-137B: myHumanX omits is_admin and admin token material', () => {
 
 test('D-137B/D-145B: GET /api/me route and core behavior remain in place', () => {
   const idx = workerSrc.indexOf('async function getMe');
-  const slice = workerSrc.slice(idx, idx + 300);
+  const slice = workerSrc.slice(idx, idx + 450);
   assert.ok(
     workerSrc.includes("url.pathname === '/api/me' && request.method === 'GET') return await getMe(request, env)") &&
     slice.includes('const userId = await requireUser(request, env);') &&
@@ -6787,7 +6787,7 @@ test('D-138C: Me dashboard filters/show-all/show-less, public Study opening, and
 
 test('D-139B: myHumanX belief_snapshots select includes dimensions_json/top_beliefs_json/contradictions_json', () => {
   const idx = workerSrc.indexOf('async function myHumanX');
-  const slice = workerSrc.slice(idx, idx + 3200);
+  const slice = workerSrc.slice(idx, idx + 3400);
   assert.ok(
     slice.includes('dimensions_json, top_beliefs_json, contradictions_json') &&
     slice.includes('FROM belief_snapshots WHERE user_id=? ORDER BY created_at DESC LIMIT 10'),
@@ -7658,7 +7658,7 @@ test('D-142B: server clears previous snapshot selections before setting the new 
 
 test('D-142B: myHumanX belief_snapshots select includes public_summary_enabled', () => {
   const idx = workerSrc.indexOf('async function myHumanX');
-  const slice = workerSrc.slice(idx, idx + 3200);
+  const slice = workerSrc.slice(idx, idx + 3400);
   assert.ok(
     slice.includes('public_summary_enabled, created_at FROM belief_snapshots'),
     'myHumanX must widen the belief_snapshots SELECT to include public_summary_enabled so the Me-side share control can show current selection'
@@ -8540,14 +8540,16 @@ test('D-145B: GET /api/belief-snapshots deliberately keeps requireUserId (shadow
   );
 });
 
-test('D-145B: POST /api/belief-snapshots and POST /api/belief-promote call the advisory helper when provided', () => {
+test('D-145B/D-146B: POST /api/belief-snapshots and POST /api/belief-promote call the advisory helper when provided', () => {
   assert.ok(
-    beliefSnapshotsSrc.includes('if (ownerTokenStatus) await ownerTokenStatus(request, userId);'),
-    'saveBeliefSnapshot must call the advisory ownerTokenStatus helper when present'
+    beliefSnapshotsSrc.includes('const ownerStatus = await ownerTokenStatus(request, userId);') &&
+    beliefSnapshotsSrc.includes("logOwnerTokenTelemetry('saveBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });"),
+    'saveBeliefSnapshot must call the advisory ownerTokenStatus helper and log its result via logOwnerTokenTelemetry'
   );
   assert.ok(
-    bridgeSrc.includes('if (ownerTokenStatus) await ownerTokenStatus(request, userId);'),
-    'promoteBeliefSnapshot must call the advisory ownerTokenStatus helper when present'
+    bridgeSrc.includes('const ownerStatus = await ownerTokenStatus(request, userId);') &&
+    bridgeSrc.includes("logOwnerTokenTelemetry('promoteBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });"),
+    'promoteBeliefSnapshot must call the advisory ownerTokenStatus helper and log its result via logOwnerTokenTelemetry'
   );
 });
 
@@ -8607,6 +8609,186 @@ test('D-145B: no token ever appears in a URL/query string', () => {
     !workerSrc.includes('searchParams.get(\'owner_token\'') && !workerSrc.includes('searchParams.get(\'token\''),
     'the owner token must only ever travel via the x-humanx-owner-token header — never as a URL/query parameter'
   );
+});
+
+// ── Section 76 — D-146B: Owner token adoption telemetry (log-only) ─────────────
+
+test('D-146B: logOwnerTokenTelemetry helper exists', () => {
+  assert.ok(
+    workerSrc.includes('function logOwnerTokenTelemetry(routeName, status, extra = {})'),
+    'logOwnerTokenTelemetry must be defined'
+  );
+});
+
+test('D-146B: telemetry helper uses console logging, nothing else', () => {
+  const idx = workerSrc.indexOf('function logOwnerTokenTelemetry');
+  const slice = workerSrc.slice(idx, idx + 300);
+  assert.ok(
+    slice.includes('console.log(') &&
+    !slice.includes('env.DB') && !slice.includes('.prepare(') && !slice.includes('fetch('),
+    'logOwnerTokenTelemetry must be lightweight console logging — no D1 write, no outbound network call'
+  );
+});
+
+test('D-146B: telemetry helper does not log the full token or the secret', () => {
+  // The log line uses the literal label "owner-token" (a fixed string, not a
+  // secret/token value) — that's expected and fine. What must never appear
+  // is a reference to the actual token/secret variables.
+  const idx = workerSrc.indexOf('function logOwnerTokenTelemetry');
+  const slice = workerSrc.slice(idx, idx + 300);
+  assert.ok(
+    !slice.includes('HUMANX_OWNER_SECRET') && !slice.includes('${token}') && !slice.includes('${secret}') && !/\btoken\b(?!-)/.test(slice.replace('[owner-token]', '')),
+    'logOwnerTokenTelemetry must only ever receive/log routeName, status, and an optional uidSuffix — never the token value or the secret'
+  );
+});
+
+test('D-146B: telemetry call sites never pass the raw token or secret as an argument', () => {
+  const calls = workerSrc.match(/logOwnerTokenTelemetry\('[a-zA-Z]+', ownerStatus, \{ uidSuffix: userId\.slice\(-6\) \}\)/g) || [];
+  assert.ok(calls.length >= 5, 'at least the five core owner endpoints must call logOwnerTokenTelemetry with only routeName/status/uidSuffix');
+});
+
+test('D-146B: ownerTokenStatus returns a structured status string with distinct buckets', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenStatus');
+  const slice = workerSrc.slice(idx, idx + 1100);
+  assert.ok(
+    slice.includes("return 'secret_missing';") &&
+    slice.includes("return 'missing';") &&
+    slice.includes("return 'invalid';") &&
+    slice.includes("return 'expired';") &&
+    slice.includes("return 'uid_mismatch';") &&
+    slice.includes("return 'valid';"),
+    'ownerTokenStatus must distinguish secret_missing/missing/invalid/expired/uid_mismatch/valid'
+  );
+});
+
+test('D-146B: ownerTokenStatus distinguishes secret_missing from a present-but-invalid token', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenStatus');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('if (!secret) return \'secret_missing\';') &&
+    slice.includes('if (!token) return \'missing\';'),
+    'ownerTokenStatus must check for a missing secret before a missing token, returning the more specific secret_missing bucket'
+  );
+});
+
+test('D-146B: ownerTokenStatus distinguishes expired from uid_mismatch from a structurally invalid token', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenStatus');
+  const slice = workerSrc.slice(idx, idx + 1100);
+  assert.ok(
+    slice.includes("if (Number(payload.exp) < Date.now()) return 'expired';") &&
+    slice.includes("if (payload.uid !== userId) return 'uid_mismatch';"),
+    'ownerTokenStatus must check expiry and uid match as distinct, separately-reported conditions'
+  );
+});
+
+test('D-146B: each existing advisory call site captures the ownerTokenStatus result (no longer discarded)', () => {
+  const fns = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings'];
+  for (const fn of fns) {
+    const idx = workerSrc.indexOf(`async function ${fn}(request, env)`);
+    const slice = workerSrc.slice(idx, idx + 350);
+    assert.ok(slice.includes('const ownerStatus = await ownerTokenStatus(request, env, userId);'), `${fn} must capture the ownerTokenStatus result into a variable, not discard it`);
+  }
+});
+
+test('D-146B: each target route logs telemetry with its own route name', () => {
+  const routeNames = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings'];
+  for (const name of routeNames) {
+    assert.ok(workerSrc.includes(`logOwnerTokenTelemetry('${name}', ownerStatus`), `worker.js must call logOwnerTokenTelemetry('${name}', ...) inside ${name}`);
+  }
+  assert.ok(beliefSnapshotsSrc.includes("logOwnerTokenTelemetry('saveBeliefSnapshot'"), 'saveBeliefSnapshot must log telemetry under its own route name');
+  assert.ok(beliefSnapshotsSrc.includes("logOwnerTokenTelemetry('listBeliefSnapshots'"), 'listBeliefSnapshots must log telemetry under its own route name');
+  assert.ok(bridgeSrc.includes("logOwnerTokenTelemetry('promoteBeliefSnapshot'"), 'promoteBeliefSnapshot must log telemetry under its own route name');
+});
+
+test('D-146B: no code rejects a missing or invalid owner token', () => {
+  const fns = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings'];
+  for (const fn of fns) {
+    const idx = workerSrc.indexOf(`async function ${fn}(request, env)`);
+    const endIdx = workerSrc.indexOf('\nasync function', idx + 10);
+    const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 2000);
+    assert.ok(
+      !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(slice) &&
+      !slice.includes("OWNER_TOKEN_REQUIRED") && !slice.includes("OWNER_TOKEN_INVALID"),
+      `${fn} must not branch on ownerStatus to reject the request — telemetry only, no enforcement`
+    );
+  }
+});
+
+test('D-146B: no 401/403 owner-token enforcement error codes exist anywhere', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID') && !workerSrc.includes('OWNER_TOKEN_MISMATCH'),
+    'no owner-token-specific rejection error code should exist yet — enforcement is a deliberately separate, later patch'
+  );
+});
+
+test('D-146B: archive/export/profile-settings/myHumanX/belief-snapshot endpoints are still advisory only', () => {
+  // Same structural guarantee as D-146B's "no rejection" test above, phrased
+  // per the task's explicit endpoint list.
+  const fns = ['archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings', 'myHumanX'];
+  for (const fn of fns) {
+    const idx = workerSrc.indexOf(`async function ${fn}(request, env)`);
+    const slice = workerSrc.slice(idx, idx + 400);
+    assert.ok(slice.includes('logOwnerTokenTelemetry('), `${fn} must log telemetry`);
+    assert.ok(!slice.includes("return json({ error:"), `${fn}'s first 400 chars (the identity-resolution block) must not return an error response based on owner token status`);
+  }
+});
+
+test('D-146B: public GET /api/u/:slug remains unchanged — no owner token telemetry', () => {
+  const idx = workerSrc.indexOf('async function getPublicProfile');
+  const slice = workerSrc.slice(idx, idx + 500);
+  assert.ok(
+    !slice.includes('ownerTokenStatus') && !slice.includes('logOwnerTokenTelemetry'),
+    'getPublicProfile must remain fully public — no owner token telemetry of any kind'
+  );
+});
+
+test('D-146B: public GET /u/:slug remains unchanged — no owner token telemetry', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 2700);
+  assert.ok(
+    !slice.includes('ownerTokenStatus') && !slice.includes('logOwnerTokenTelemetry'),
+    'renderPublicProfileShell must remain fully public — no owner token telemetry of any kind'
+  );
+});
+
+test('D-146B: admin requireAdmin path is completely unchanged', () => {
+  assert.ok(
+    workerSrc.includes("function requireAdmin(request, env) { const admin=request.headers.get('x-humanx-admin') || ''; const expected=env.HUMANX_ADMIN_TOKEN || ''; if (!expected || !safeEqual(admin, expected)) return json({ error:'ADMIN_REQUIRED' },403); return null; }"),
+    'requireAdmin must be byte-for-byte unchanged — telemetry work must not touch the admin-token system'
+  );
+});
+
+test('D-146B: no migration added', () => {
+  assert.ok(
+    !existsSync(path.join(__dirname, '../migrations/0014_owner_token_telemetry.sql')) &&
+    !existsSync(path.join(__dirname, '../migrations/0014_d146b.sql')),
+    'D-146B must not require a D1 migration — telemetry is console-log only'
+  );
+});
+
+test('D-146B: no D1 telemetry table added', () => {
+  assert.ok(
+    !workerSrc.includes('CREATE TABLE') || !/owner_token_(log|telemetry|events)/i.test(workerSrc),
+    'no owner_token_log/telemetry/events table should exist — D-146B is intentionally log-only, no D1 storage'
+  );
+});
+
+test('D-146B: no frontend change required or made', () => {
+  const idx = appSrc.indexOf('async function boot()');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes("if(s.owner_token){user.ownerToken=s.owner_token}"),
+    'boot() must remain exactly as D-145B left it — no frontend change needed for log-only backend telemetry'
+  );
+});
+
+test('D-146B: no token value appears in any code string or comment', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenStatus');
+  const endIdx = workerSrc.indexOf('\nfunction logOwnerTokenTelemetry', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 1500);
+  // The only place a "token" reference is the variable/parameter name itself
+  // (token, payloadB64, sig) — never a literal example token value.
+  assert.ok(!/['"`][A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}['"`]/.test(slice), 'no literal example token value (payload.signature shape) should appear anywhere');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────

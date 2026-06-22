@@ -61,9 +61,9 @@ export default {
       // D-89D: deliberately requireUserId (not requireUser) — shadow-banned
       // users must still be able to read their own snapshots; only writes
       // (POST below) are blocked for them. D-145B leaves this choice intact.
-      if (url.pathname === '/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid) });
-      if (url.pathname === '/api/belief-snapshots' && request.method === 'POST') return await saveBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid) });
-      if (url.pathname === '/api/belief-promote' && request.method === 'POST') return await promoteBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid) });
+      if (url.pathname === '/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry });
+      if (url.pathname === '/api/belief-snapshots' && request.method === 'POST') return await saveBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry });
+      if (url.pathname === '/api/belief-promote' && request.method === 'POST') return await promoteBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry });
       if (url.pathname.match(/^\/api\/claims\/[^/]+$/) && request.method === 'GET') return await getClaim(request, env, url.pathname.split('/').pop());
       if (url.pathname === '/api/evidence' && request.method === 'POST') return await addEvidence(request, env);
       if (url.pathname === '/api/pressure' && request.method === 'POST') return await addPressure(request, env);
@@ -121,7 +121,9 @@ async function createOrGetUser(request, env) {
 
 async function getMe(request, env) {
   const userId = await requireUser(request, env);
-  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
+  // D-146B: telemetry only — status is logged, never used to allow/reject.
+  const ownerStatus = await ownerTokenStatus(request, env, userId);
+  logOwnerTokenTelemetry('getMe', ownerStatus, { uidSuffix: userId.slice(-6) });
   await ensureUser(env, userId);
   // is_admin and any admin-token material are intentionally omitted from this response.
   const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?`).bind(userId).first();
@@ -150,7 +152,9 @@ async function userContentCounts(env, table, userIdColumn, userId) {
 
 async function myHumanX(request, env) {
   const userId = await requireUser(request, env);
-  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
+  // D-146B: telemetry only — status is logged, never used to allow/reject.
+  const ownerStatus = await ownerTokenStatus(request, env, userId);
+  logOwnerTokenTelemetry('myHumanX', ownerStatus, { uidSuffix: userId.slice(-6) });
   await ensureUser(env, userId);
 
   // D-140B: widened for the Profile Settings panel — profile_public/profile_slug/
@@ -210,7 +214,9 @@ const MY_HUMANX_DEV_HANDLES = new Set(['humanx-seed','anon-o_seed','anon-xksavy'
 
 async function archiveMyHumanXItem(request, env) {
   const userId = await requireUser(request, env);
-  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
+  // D-146B: telemetry only — status is logged, never used to allow/reject.
+  const ownerStatus = await ownerTokenStatus(request, env, userId);
+  logOwnerTokenTelemetry('archiveMyHumanXItem', ownerStatus, { uidSuffix: userId.slice(-6) });
   const body = await readJson(request);
   const targetType = cleanText(body.targetType || body.target_type || '', 30).toLowerCase();
   const targetId = cleanId(body.targetId || body.target_id || '');
@@ -260,7 +266,9 @@ async function archiveMyHumanXItem(request, env) {
 
 async function exportMyHumanX(request, env) {
   const userId = await requireUser(request, env);
-  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
+  // D-146B: telemetry only — status is logged, never used to allow/reject.
+  const ownerStatus = await ownerTokenStatus(request, env, userId);
+  logOwnerTokenTelemetry('exportMyHumanX', ownerStatus, { uidSuffix: userId.slice(-6) });
   await safeRateLimit(request, env, `my-humanx-export:${userId}`, 5, 3600000);
   await ensureUser(env, userId);
 
@@ -323,7 +331,9 @@ function validateProfileSlug(raw) {
 
 async function saveProfileSettings(request, env) {
   const userId = await requireUser(request, env);
-  await ownerTokenStatus(request, env, userId); // D-145B: advisory only, result unused
+  // D-146B: telemetry only — status is logged, never used to allow/reject.
+  const ownerStatus = await ownerTokenStatus(request, env, userId);
+  logOwnerTokenTelemetry('saveProfileSettings', ownerStatus, { uidSuffix: userId.slice(-6) });
   await ensureUser(env, userId);
   const body = await readJson(request);
   const profilePublic = (body.profile_public === true || body.profile_public === 1 || body.profile_public === '1' || body.profile_public === 'true') ? 1 : 0;
@@ -767,15 +777,45 @@ async function verifyOwnerToken(env, token, expectedUserId) {
   return true;
 }
 
-// Advisory-only: never throws, never blocks the request, just reports
-// whether a valid owner token was presented — 'missing' | 'valid' | 'invalid'.
-// Callers in this patch call this for observability/future-enforcement
-// purposes only and never branch request handling on the result.
+// D-146B: advisory-only, still never throws, never blocks the request — just
+// reports a more granular reason than D-145B's three-value version, for
+// telemetry. Buckets: 'secret_missing' | 'missing' | 'invalid' | 'expired' |
+// 'uid_mismatch' | 'valid'. This duplicates a little of verifyOwnerToken()'s
+// step-by-step logic on purpose, rather than refactoring verifyOwnerToken()
+// itself, so its existing boolean contract (and the tests pinned to its
+// exact body) stay untouched. Callers still never branch request handling
+// on this result — enforcement remains a deliberately separate, later patch
+// (see docs/D146A audit). When HUMANX_OWNER_SECRET is missing, this reports
+// 'secret_missing' (not 'invalid') so telemetry can tell "nobody has set up
+// the secret yet" apart from "tokens are actually failing verification" —
+// but the request still proceeds exactly as before either way.
 async function ownerTokenStatus(request, env, userId) {
+  const secret = env?.HUMANX_OWNER_SECRET || '';
   const token = request.headers.get('x-humanx-owner-token') || '';
+  if (!secret) return 'secret_missing';
   if (!token) return 'missing';
-  const ok = await verifyOwnerToken(env, token, userId);
-  return ok ? 'valid' : 'invalid';
+  const parts = String(token).split('.');
+  if (parts.length !== 2) return 'invalid';
+  const [payloadB64, sig] = parts;
+  let expectedSig;
+  try { expectedSig = await hmacSha256(secret, payloadB64); } catch { return 'invalid'; }
+  if (!sig || !safeEqual(sig, expectedSig)) return 'invalid';
+  let payload;
+  try { payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadB64))); } catch { return 'invalid'; }
+  if (!payload || typeof payload !== 'object' || !Number.isFinite(Number(payload.exp))) return 'invalid';
+  if (Number(payload.exp) < Date.now()) return 'expired';
+  if (payload.uid !== userId) return 'uid_mismatch';
+  return 'valid';
+}
+
+// D-146B: log-only telemetry — never used to decide whether a request is
+// allowed, never returns a value callers act on. Logs only the route name,
+// the status bucket, and (optionally) a short non-reversible suffix of the
+// user id for rough correlation — never the token itself, never
+// HUMANX_OWNER_SECRET, never email, never any other raw user data.
+function logOwnerTokenTelemetry(routeName, status, extra = {}) {
+  const uidPart = extra && extra.uidSuffix ? ` uid_suffix=${extra.uidSuffix}` : '';
+  console.log(`[owner-token] route=${routeName} status=${status}${uidPart}`);
 }
 
 function makeId(prefix) { return `${prefix}_${crypto.randomUUID().replaceAll('-', '').slice(0,18)}`; }
