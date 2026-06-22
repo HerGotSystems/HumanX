@@ -1,10 +1,11 @@
 export async function saveBeliefSnapshot(request, env, helpers) {
   const { readJson, cleanId, cleanText, json, requireUser, makeId, ownerTokenStatus, logOwnerTokenTelemetry } = helpers;
   const userId = await requireUser(request);
-  // D-146B: telemetry only — status is logged, never used to allow/reject.
+  // D-146B/D-147B: telemetry only — status is logged (and best-effort
+  // persisted), never used to allow/reject.
   if (ownerTokenStatus) {
     const ownerStatus = await ownerTokenStatus(request, userId);
-    if (logOwnerTokenTelemetry) logOwnerTokenTelemetry('saveBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });
+    if (logOwnerTokenTelemetry) await logOwnerTokenTelemetry(request, 'saveBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });
   }
   await safeRateLimit(request, env, `belief-snapshot:${ip(request)}`, 20, 3600000);
   const body = await readJson(request);
@@ -71,10 +72,11 @@ export async function saveBeliefSnapshot(request, env, helpers) {
 export async function listBeliefSnapshots(request, env, helpers) {
   const { json, requireUser, ownerTokenStatus, logOwnerTokenTelemetry } = helpers;
   const userId = await requireUser(request);
-  // D-146B: telemetry only — status is logged, never used to allow/reject.
+  // D-146B/D-147B: telemetry only — status is logged (and best-effort
+  // persisted), never used to allow/reject.
   if (ownerTokenStatus) {
     const ownerStatus = await ownerTokenStatus(request, userId);
-    if (logOwnerTokenTelemetry) logOwnerTokenTelemetry('listBeliefSnapshots', ownerStatus, { uidSuffix: userId.slice(-6) });
+    if (logOwnerTokenTelemetry) await logOwnerTokenTelemetry(request, 'listBeliefSnapshots', ownerStatus, { uidSuffix: userId.slice(-6) });
   }
   const url = new URL(request.url);
   const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit') || 30)));

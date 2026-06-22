@@ -157,7 +157,7 @@ const HIGH_RISK_ROUTES = [
 ];
 
 // Low-risk routes that are intentionally excluded from strict undocumented-route failures
-const LOW_RISK_UNLISTED = new Set(['/api/seed', '/api/debug']);
+const LOW_RISK_UNLISTED = new Set(['/api/seed', '/api/debug', '/api/debug/owner-token-telemetry']);
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 
@@ -366,6 +366,14 @@ async function main() {
     pass('/api/debug route requires requireAdmin before debugState');
   } else {
     fail('/api/debug must call requireAdmin before returning debugState');
+  }
+
+  // D-147B: /api/debug/owner-token-telemetry is admin-gated
+  const ownerTelemetryDebugMatch = workerSrc.match(/url\.pathname === '\/api\/debug\/owner-token-telemetry'[\s\S]{0,200}?ownerTokenTelemetryDebug\(request, env\)/);
+  if (ownerTelemetryDebugMatch && /requireAdmin\(request, env\)/.test(ownerTelemetryDebugMatch[0])) {
+    pass('/api/debug/owner-token-telemetry route requires requireAdmin before ownerTokenTelemetryDebug');
+  } else {
+    fail('/api/debug/owner-token-telemetry must call requireAdmin before returning ownerTokenTelemetryDebug');
   }
 
   // debug response shape preserved (debugState still exists and returns counts)

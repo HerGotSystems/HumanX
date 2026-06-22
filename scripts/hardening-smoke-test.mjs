@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -794,7 +794,7 @@ test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => 
 });
 
 test('docs/README.md documents worker route count: 39 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('39 passed, 0 failed') || readmeSrc.includes('48 passed, 0 failed') || readmeSrc.includes('56 passed, 0 failed'), 'docs/README.md must document worker route static check expected count of 39');
+  assert.ok(readmeSrc.includes('39 passed, 0 failed') || readmeSrc.includes('48 passed, 0 failed') || readmeSrc.includes('56 passed, 0 failed') || readmeSrc.includes('57 passed, 0 failed'), 'docs/README.md must document worker route static check expected count of 39');
 });
 
 test('docs/README.md mentions MODULE_TYPELESS_PACKAGE_JSON as non-blocking', () => {
@@ -2168,7 +2168,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -8540,16 +8540,16 @@ test('D-145B: GET /api/belief-snapshots deliberately keeps requireUserId (shadow
   );
 });
 
-test('D-145B/D-146B: POST /api/belief-snapshots and POST /api/belief-promote call the advisory helper when provided', () => {
+test('D-145B/D-146B/D-147B: POST /api/belief-snapshots and POST /api/belief-promote call the advisory helper when provided', () => {
   assert.ok(
     beliefSnapshotsSrc.includes('const ownerStatus = await ownerTokenStatus(request, userId);') &&
-    beliefSnapshotsSrc.includes("logOwnerTokenTelemetry('saveBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });"),
-    'saveBeliefSnapshot must call the advisory ownerTokenStatus helper and log its result via logOwnerTokenTelemetry'
+    beliefSnapshotsSrc.includes("await logOwnerTokenTelemetry(request, 'saveBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });"),
+    'saveBeliefSnapshot must call the advisory ownerTokenStatus helper and await logging its result via logOwnerTokenTelemetry'
   );
   assert.ok(
     bridgeSrc.includes('const ownerStatus = await ownerTokenStatus(request, userId);') &&
-    bridgeSrc.includes("logOwnerTokenTelemetry('promoteBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });"),
-    'promoteBeliefSnapshot must call the advisory ownerTokenStatus helper and log its result via logOwnerTokenTelemetry'
+    bridgeSrc.includes("await logOwnerTokenTelemetry(request, 'promoteBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });"),
+    'promoteBeliefSnapshot must call the advisory ownerTokenStatus helper and await logging its result via logOwnerTokenTelemetry'
   );
 });
 
@@ -8613,20 +8613,33 @@ test('D-145B: no token ever appears in a URL/query string', () => {
 
 // ── Section 76 — D-146B: Owner token adoption telemetry (log-only) ─────────────
 
-test('D-146B: logOwnerTokenTelemetry helper exists', () => {
+test('D-146B/D-147B: logOwnerTokenTelemetry helper exists', () => {
   assert.ok(
-    workerSrc.includes('function logOwnerTokenTelemetry(routeName, status, extra = {})'),
-    'logOwnerTokenTelemetry must be defined'
+    workerSrc.includes('async function logOwnerTokenTelemetry(env, request, routeName, status, extra = {})'),
+    'logOwnerTokenTelemetry must be defined — D-147B widened it to accept env/request for best-effort D1 persistence'
   );
 });
 
-test('D-146B: telemetry helper uses console logging, nothing else', () => {
-  const idx = workerSrc.indexOf('function logOwnerTokenTelemetry');
-  const slice = workerSrc.slice(idx, idx + 300);
+test('D-147B: telemetry helper still console-logs first, then best-effort persists to D1, never an outbound network call', () => {
+  const idx = workerSrc.indexOf('async function logOwnerTokenTelemetry');
+  const endIdx = workerSrc.indexOf('\nfunction makeId', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 900);
   assert.ok(
     slice.includes('console.log(') &&
-    !slice.includes('env.DB') && !slice.includes('.prepare(') && !slice.includes('fetch('),
-    'logOwnerTokenTelemetry must be lightweight console logging — no D1 write, no outbound network call'
+    slice.includes('if (!env?.DB) return;') &&
+    slice.includes('INSERT INTO owner_token_telemetry') &&
+    !slice.includes('fetch('),
+    'logOwnerTokenTelemetry must still console.log, then best-effort persist to D1 (no-op if DB binding absent) — no outbound network call'
+  );
+});
+
+test('D-147B: telemetry persistence is wrapped in try/catch — a failed insert never throws out of the helper', () => {
+  const idx = workerSrc.indexOf('async function logOwnerTokenTelemetry');
+  const endIdx = workerSrc.indexOf('\nfunction makeId', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 900);
+  assert.ok(
+    slice.includes('try {') && slice.includes('} catch (_err) {'),
+    'the D1 insert must be wrapped in try/catch so a failed write (e.g. migration not yet applied) never propagates'
   );
 });
 
@@ -8642,9 +8655,9 @@ test('D-146B: telemetry helper does not log the full token or the secret', () =>
   );
 });
 
-test('D-146B: telemetry call sites never pass the raw token or secret as an argument', () => {
-  const calls = workerSrc.match(/logOwnerTokenTelemetry\('[a-zA-Z]+', ownerStatus, \{ uidSuffix: userId\.slice\(-6\) \}\)/g) || [];
-  assert.ok(calls.length >= 5, 'at least the five core owner endpoints must call logOwnerTokenTelemetry with only routeName/status/uidSuffix');
+test('D-146B/D-147B: telemetry call sites never pass the raw token or secret as an argument', () => {
+  const calls = workerSrc.match(/await logOwnerTokenTelemetry\(env, request, '[a-zA-Z]+', ownerStatus, \{ uidSuffix: userId\.slice\(-6\) \}\)/g) || [];
+  assert.ok(calls.length >= 5, 'at least the five core owner endpoints must call logOwnerTokenTelemetry with only env/request/routeName/status/uidSuffix — never a token or secret value');
 });
 
 test('D-146B: ownerTokenStatus returns a structured status string with distinct buckets', () => {
@@ -8690,14 +8703,14 @@ test('D-146B: each existing advisory call site captures the ownerTokenStatus res
   }
 });
 
-test('D-146B: each target route logs telemetry with its own route name', () => {
+test('D-146B/D-147B: each target route logs telemetry with its own route name', () => {
   const routeNames = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings'];
   for (const name of routeNames) {
-    assert.ok(workerSrc.includes(`logOwnerTokenTelemetry('${name}', ownerStatus`), `worker.js must call logOwnerTokenTelemetry('${name}', ...) inside ${name}`);
+    assert.ok(workerSrc.includes(`logOwnerTokenTelemetry(env, request, '${name}', ownerStatus`), `worker.js must call logOwnerTokenTelemetry(env, request, '${name}', ...) inside ${name}`);
   }
-  assert.ok(beliefSnapshotsSrc.includes("logOwnerTokenTelemetry('saveBeliefSnapshot'"), 'saveBeliefSnapshot must log telemetry under its own route name');
-  assert.ok(beliefSnapshotsSrc.includes("logOwnerTokenTelemetry('listBeliefSnapshots'"), 'listBeliefSnapshots must log telemetry under its own route name');
-  assert.ok(bridgeSrc.includes("logOwnerTokenTelemetry('promoteBeliefSnapshot'"), 'promoteBeliefSnapshot must log telemetry under its own route name');
+  assert.ok(beliefSnapshotsSrc.includes("logOwnerTokenTelemetry(request, 'saveBeliefSnapshot'"), 'saveBeliefSnapshot must log telemetry under its own route name');
+  assert.ok(beliefSnapshotsSrc.includes("logOwnerTokenTelemetry(request, 'listBeliefSnapshots'"), 'listBeliefSnapshots must log telemetry under its own route name');
+  assert.ok(bridgeSrc.includes("logOwnerTokenTelemetry(request, 'promoteBeliefSnapshot'"), 'promoteBeliefSnapshot must log telemetry under its own route name');
 });
 
 test('D-146B: no code rejects a missing or invalid owner token', () => {
@@ -8758,19 +8771,40 @@ test('D-146B: admin requireAdmin path is completely unchanged', () => {
   );
 });
 
-test('D-146B: no migration added', () => {
+test('D-146B: no migration was needed for the original console-only patch', () => {
+  // D-146B itself shipped console-log-only telemetry with no migration.
+  // D-147B later added persistence — that migration is verified separately
+  // below. This test only confirms worker.js's logging call still does not
+  // *require* the table to exist (best-effort, see the D-147B tests).
   assert.ok(
-    !existsSync(path.join(__dirname, '../migrations/0014_owner_token_telemetry.sql')) &&
-    !existsSync(path.join(__dirname, '../migrations/0014_d146b.sql')),
-    'D-146B must not require a D1 migration — telemetry is console-log only'
+    workerSrc.includes('console.log(`[owner-token] route=${routeName} status=${status}${uidPart}`)'),
+    'console logging must remain regardless of whether D1 persistence is available'
   );
 });
 
-test('D-146B: no D1 telemetry table added', () => {
+test('D-147B: owner_token_telemetry migration exists and is additive-only', () => {
+  const migrationPath = path.join(__dirname, '../migrations/0014_owner_token_telemetry.sql');
+  assert.ok(existsSync(migrationPath), 'migrations/0014_owner_token_telemetry.sql must exist');
+  const sql = readFileSync(migrationPath, 'utf8');
+  assert.ok(sql.includes('CREATE TABLE IF NOT EXISTS owner_token_telemetry'), 'migration must create the owner_token_telemetry table');
   assert.ok(
-    !workerSrc.includes('CREATE TABLE') || !/owner_token_(log|telemetry|events)/i.test(workerSrc),
-    'no owner_token_log/telemetry/events table should exist — D-146B is intentionally log-only, no D1 storage'
+    !/ALTER TABLE\s+(users|claims|evidence|pressure_points|reports|belief_snapshots|truths|home_tests)/i.test(sql) &&
+    !/DROP TABLE/i.test(sql),
+    'migration must not alter or drop any existing table — additive only'
   );
+});
+
+test('D-147B: owner_token_telemetry table only stores safe metadata columns', () => {
+  const migrationPath = path.join(__dirname, '../migrations/0014_owner_token_telemetry.sql');
+  const sql = readFileSync(migrationPath, 'utf8');
+  const createIdx = sql.indexOf('CREATE TABLE IF NOT EXISTS owner_token_telemetry');
+  const createSlice = sql.slice(createIdx, sql.indexOf(';', createIdx));
+  for (const col of ['id', 'route', 'status', 'uid_suffix', 'user_agent_hash', 'created_at']) {
+    assert.ok(createSlice.includes(col), `owner_token_telemetry must include column ${col}`);
+  }
+  for (const forbidden of ['token', 'secret', 'user_id', 'header', 'body', 'ip']) {
+    assert.ok(!new RegExp(`\\b${forbidden}\\b`, 'i').test(createSlice), `owner_token_telemetry must not include a column resembling "${forbidden}"`);
+  }
 });
 
 test('D-146B: no frontend change required or made', () => {
@@ -8843,6 +8877,74 @@ test('D-147A: no migration added by this audit', () => {
     !existsSync(path.join(__dirname, '../migrations/0014_owner_token_audit.sql')) &&
     !existsSync(path.join(__dirname, '../migrations/0014_d147a.sql')),
     'D-147A is a docs-only audit — no D1 migration'
+  );
+});
+
+// ── Section 78 — D-147B: Persistent owner-token telemetry hardening ────────────
+
+test('D-147B: the telemetry INSERT statement never binds a raw token, the secret, or a full user id', () => {
+  const idx = workerSrc.indexOf('async function logOwnerTokenTelemetry');
+  const endIdx = workerSrc.indexOf('\nfunction makeId', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 900);
+  const insertIdx = slice.indexOf('INSERT INTO owner_token_telemetry');
+  const runIdx = slice.indexOf('.run();', insertIdx);
+  const bindSlice = slice.slice(insertIdx, runIdx + '.run();'.length);
+  assert.ok(
+    !/\btoken\b/.test(bindSlice) && !/\bsecret\b/.test(bindSlice) && !bindSlice.includes('userId)') && !bindSlice.includes(', userId,'),
+    'the INSERT/bind for owner_token_telemetry must only ever reference makeId(), routeName, status, extra.uidSuffix, uaHash, and Date.now() — never a raw token/secret/full userId'
+  );
+  assert.ok(bindSlice.includes('extra?.uidSuffix'), 'only the pre-truncated uidSuffix may be bound, never the full userId');
+});
+
+test('D-147B: GET /api/debug/owner-token-telemetry requires requireAdmin before returning data', () => {
+  const idx = workerSrc.indexOf("url.pathname === '/api/debug/owner-token-telemetry'");
+  const slice = workerSrc.slice(idx, idx + 250);
+  assert.ok(
+    slice.includes('requireAdmin(request, env)') && slice.includes('ownerTokenTelemetryDebug(request, env)'),
+    '/api/debug/owner-token-telemetry must call requireAdmin before ownerTokenTelemetryDebug, mirroring the existing /api/debug pattern'
+  );
+});
+
+test('D-147B: ownerTokenTelemetryDebug returns aggregate counts and a capped, sanitized recent list', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenTelemetryDebug');
+  const slice = workerSrc.slice(idx, idx + 1200);
+  assert.ok(slice.includes('GROUP BY status'), 'must return aggregate counts by status');
+  assert.ok(slice.includes('GROUP BY route'), 'must return aggregate counts by route');
+  assert.ok(slice.includes('LIMIT 20'), 'recent rows must be capped at 20');
+  assert.ok(
+    slice.includes('SELECT route, status, uid_suffix, user_agent_hash, created_at FROM owner_token_telemetry'),
+    'recent rows must only select the same safe columns the table stores — no raw token, no secret, no full user id'
+  );
+});
+
+test('D-147B: a failed telemetry insert does not block or change the response of any instrumented route', () => {
+  // logOwnerTokenTelemetry is awaited at each call site, but its own D1
+  // write is wrapped in try/catch with a swallowed catch body — so an
+  // insert failure (e.g. migration not yet applied) can never throw out
+  // of the await and never reaches the caller.
+  const idx = workerSrc.indexOf('async function logOwnerTokenTelemetry');
+  const endIdx = workerSrc.indexOf('\nfunction makeId', idx);
+  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 900);
+  const catchIdx = slice.indexOf('} catch (_err) {');
+  const catchBodyEnd = slice.indexOf('}', catchIdx + 20);
+  const catchBody = slice.slice(catchIdx, catchBodyEnd);
+  assert.ok(!catchBody.includes('throw'), 'the catch block must swallow the error, never re-throw');
+  assert.ok(!catchBody.includes('return json('), 'the catch block must not construct or return an error response');
+});
+
+test('D-147B: status buckets are unchanged from D-146B (secret_missing/missing/invalid/expired/uid_mismatch/valid)', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenStatus');
+  const slice = workerSrc.slice(idx, idx + 1000);
+  for (const bucket of ['secret_missing', 'missing', 'invalid', 'expired', 'uid_mismatch', 'valid']) {
+    assert.ok(slice.includes(`return '${bucket}';`), `ownerTokenStatus must still return '${bucket}'`);
+  }
+});
+
+test('D-147B: no enforcement condition was added anywhere by this patch', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID') && !workerSrc.includes('OWNER_TOKEN_MISMATCH') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'D-147B must remain telemetry-only — no new rejection logic anywhere in worker.js'
   );
 });
 

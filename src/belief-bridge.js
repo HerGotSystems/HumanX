@@ -3,10 +3,11 @@ import { meaningKey } from './meaning-key.js';
 export async function promoteBeliefSnapshot(request, env, helpers) {
   const { readJson, cleanId, cleanText, json, requireUser, makeId, ownerTokenStatus, logOwnerTokenTelemetry } = helpers;
   const userId = await requireUser(request);
-  // D-146B: telemetry only — status is logged, never used to allow/reject.
+  // D-146B/D-147B: telemetry only — status is logged (and best-effort
+  // persisted), never used to allow/reject.
   if (ownerTokenStatus) {
     const ownerStatus = await ownerTokenStatus(request, userId);
-    if (logOwnerTokenTelemetry) logOwnerTokenTelemetry('promoteBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });
+    if (logOwnerTokenTelemetry) await logOwnerTokenTelemetry(request, 'promoteBeliefSnapshot', ownerStatus, { uidSuffix: userId.slice(-6) });
   }
   await safeRateLimit(request, env, `belief-promote:${ip(request)}`, 10, 3600000);
   const body = await readJson(request);

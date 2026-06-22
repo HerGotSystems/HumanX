@@ -37,9 +37,9 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `970 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `983 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
-| `worker-route-static-check.mjs` | `56 passed, 0 failed (56 hard checks)` |
+| `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
 **Note:** A `MODULE_TYPELESS_PACKAGE_JSON` warning may appear during `hardening-smoke-test.mjs`. This is non-blocking and does not affect the pass count.
 
@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D146C_OWNER_TOKEN_TELEMETRY_LIVE_VERIFICATION_CHECKPOINT.md` ⭐ CURRENT — LIVE OWNER TOKEN ADOPTION CONFIRMED — READY FOR NEXT FEATURE
-D-146A enforcement readiness audit (verdict: not ready — secret unconfirmed live, zero telemetry) → D-146B log-only adoption telemetry (`ownerTokenStatus()` widened to six buckets including `secret_missing`; `logOwnerTokenTelemetry()` console-log only, no D1, no migration; still zero enforcement) → D-146C live verification. `HUMANX_OWNER_SECRET` was set in production outside this repo (external config only, never in `wrangler.toml`, never committed). Owner manually confirmed, sanitized: `POST /api/session` returns a non-null `owner_token` (type `string`) for the real owner (`usr_3c204c78f6fa49bfad`), `GET /api/me`/`GET /api/my-humanx`/`GET /api/belief-snapshots?limit=1` all still return 200 with zero enforcement, deployed logs (`wrangler tail`) show `status=valid` telemetry and no more `status=secret_missing`. No token or secret value was ever printed, shared, or recorded. No enforcement added, no migration. Baseline: 970/24/56 (1 expected parameterised-route warning). Recommended next: let telemetry soak before any enforcement decision.
+### `D147B_OWNER_TOKEN_TELEMETRY_PERSISTENCE_CHECKPOINT.md` ⭐ CURRENT — PERSISTENT TELEMETRY SHIPPED, MIGRATION NOT YET APPLIED — READY FOR NEXT FEATURE
+D-146A→C established and confirmed live, log-only owner-token telemetry (see superseded entry below). D-147A audit (read-only) confirmed the system was still advisory-only and not enforcement-ready, identifying "no persistent telemetry store" as the binding gap before enforcement could even be considered. D-147B closes that gap: new additive-only migration `0014_owner_token_telemetry.sql` (table `owner_token_telemetry` — route/status/uid_suffix/user_agent_hash/created_at only, never a raw token/secret/full user id/headers/body/IP); `logOwnerTokenTelemetry()` widened to best-effort-persist alongside its existing console.log (try/catch-wrapped, never blocks or fails the calling route, no-ops cleanly if the table doesn't exist yet); new admin-gated `GET /api/debug/owner-token-telemetry` returning aggregate counts plus a 20-row sanitized recent list. Status buckets, `ownerTokenStatus()`, and all enforcement-absence guarantees unchanged from D-146B. **The migration has NOT been applied to production as part of this patch** — apply via `wrangler d1 migrations apply <DATABASE_NAME> --remote` (documented separately, requires explicit approval) and live-confirm rows are being written before claiming persistence works in production. Baseline: 983/24/57 (1 expected parameterised-route warning). Recommended next: apply the migration + live-confirm persistence (a future D-147C-style checkpoint), then revisit enforcement readiness with real persisted data.
 **Read when:** starting new feature work or returning after time away.
+
+### `D146C_OWNER_TOKEN_TELEMETRY_LIVE_VERIFICATION_CHECKPOINT.md` — D-146 LOG-ONLY TELEMETRY + LIVE ADOPTION CONFIRMED (superseded by D-147B for current deploy)
+D-146A enforcement readiness audit (verdict: not ready — secret unconfirmed live, zero telemetry) → D-146B log-only adoption telemetry (`ownerTokenStatus()` widened to six buckets including `secret_missing`; `logOwnerTokenTelemetry()` console-log only, no D1, no migration; still zero enforcement) → D-146C live verification. `HUMANX_OWNER_SECRET` was set in production outside this repo (external config only, never in `wrangler.toml`, never committed). Owner manually confirmed, sanitized: `POST /api/session` returns a non-null `owner_token` (type `string`) for the real owner (`usr_3c204c78f6fa49bfad`), `GET /api/me`/`GET /api/my-humanx`/`GET /api/belief-snapshots?limit=1` all still return 200 with zero enforcement, deployed logs (`wrangler tail`) show `status=valid` telemetry and no more `status=secret_missing`. No token or secret value was ever printed, shared, or recorded. No enforcement added, no migration. Baseline: 970/24/56.
+**Read when:** reviewing D-146 history.
 
 ### `D145C_OWNER_TOKEN_FOUNDATION_CHECKPOINT.md` — D-145 ADVISORY OWNER TOKEN FOUNDATION (superseded by D-146C for current deploy)
 D-145A audit (owner identity / signed owner header) → D-145B advisory-mode owner token foundation (`signOwnerToken()`/`verifyOwnerToken()`/`ownerTokenStatus()`, HMAC-SHA256 via `crypto.subtle`, secret read only from `env.HUMANX_OWNER_SECRET`; `POST /api/session` mints `owner_token` and stops leaking `is_admin`; five owner endpoints switched `requireUserId()`→`requireUser()`; no enforcement). Owner confirmed live: `/api/session` returns `owner_token` (null until the secret is set) with `is_admin` absent, `/api/my-humanx` resolves the real owner with no token enforcement. Baseline: 951/24/56.

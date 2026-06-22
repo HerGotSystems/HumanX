@@ -36,6 +36,7 @@ export default {
       if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
       if (!env.DB) return fallbackApi(request, url);
       if (url.pathname === '/api/debug' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return debugState(request, env); }
+      if (url.pathname === '/api/debug/owner-token-telemetry' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return await ownerTokenTelemetryDebug(request, env); }
       if (url.pathname === '/api/seed' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return seedDemoClaims(request, env); }
       if (url.pathname === '/api/import-seed' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; const mode = url.searchParams.get('mode') || 'dry-run'; if (mode !== 'dry-run' && mode !== 'apply') return json({ error:'INVALID_MODE', message:"mode must be 'dry-run' or 'apply'" },400); return json(await importSeedData(env, { dryRun: mode !== 'apply' })); }
       if (url.pathname === '/api/import-truths' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; const mode = url.searchParams.get('mode') || 'dry-run'; if (mode !== 'dry-run' && mode !== 'apply') return json({ error:'INVALID_MODE', message:"mode must be 'dry-run' or 'apply'" },400); return json(await importTruthSeeds(env, { dryRun: mode !== 'apply' })); }
@@ -61,9 +62,9 @@ export default {
       // D-89D: deliberately requireUserId (not requireUser) — shadow-banned
       // users must still be able to read their own snapshots; only writes
       // (POST below) are blocked for them. D-145B leaves this choice intact.
-      if (url.pathname === '/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry });
-      if (url.pathname === '/api/belief-snapshots' && request.method === 'POST') return await saveBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry });
-      if (url.pathname === '/api/belief-promote' && request.method === 'POST') return await promoteBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry });
+      if (url.pathname === '/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry: (req, route, status, extra) => logOwnerTokenTelemetry(env, req, route, status, extra) });
+      if (url.pathname === '/api/belief-snapshots' && request.method === 'POST') return await saveBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry: (req, route, status, extra) => logOwnerTokenTelemetry(env, req, route, status, extra) });
+      if (url.pathname === '/api/belief-promote' && request.method === 'POST') return await promoteBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry: (req, route, status, extra) => logOwnerTokenTelemetry(env, req, route, status, extra) });
       if (url.pathname.match(/^\/api\/claims\/[^/]+$/) && request.method === 'GET') return await getClaim(request, env, url.pathname.split('/').pop());
       if (url.pathname === '/api/evidence' && request.method === 'POST') return await addEvidence(request, env);
       if (url.pathname === '/api/pressure' && request.method === 'POST') return await addPressure(request, env);
@@ -90,6 +91,26 @@ export default {
 
 async function debugState(request, env) { const tables = ['users','claims','evidence','pressure_points','reports','aip_packets','rate_limits','analysis_results','belief_snapshots','truths','truth_claim_links','evidence_claim_links','claim_votes','evidence_votes','truth_votes','home_tests','duplicate_signatures']; const counts = {}; for (const table of tables) { try { const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first(); counts[table] = row?.n ?? 0; } catch (err) { counts[table] = `ERROR: ${err.message}`; } } const latest = await env.DB.prepare(`SELECT id, claim, status, review_state, created_at FROM claims ORDER BY created_at DESC LIMIT 5`).all().catch(err => ({ error: err.message, results: [] })); return json({ ok: true, counts, latest: latest.results || [], latest_error: latest.error || null }); }
 async function seedDemoClaims(request, env) { await ensureUser(env, 'usr_demo_seed'); const existing = await env.DB.prepare(`SELECT COUNT(*) AS n FROM claims`).first(); if ((existing?.n || 0) > 0) return json({ ok: true, message: 'Database already has claims. Seed not needed.', count: existing.n }); const now = Date.now(); for (const c of demoClaims()) await env.DB.prepare(`INSERT OR IGNORE INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(c.id,'usr_demo_seed',c.claim,c.category,c.type,c.status,c.evidenceScore,c.survivability,c.testability,c.contradictions,now,now,'public').run(); return json({ ok: true, seeded: demoClaims().length }); }
+
+// D-147B: admin-only aggregate read of owner_token_telemetry. Admin-gated at
+// the dispatch level (same pattern as /api/debug, /api/seed) — this function
+// never re-checks admin itself. Returns aggregate counts by default; the
+// "recent" array is capped at 20 rows and only ever contains the same safe
+// columns the table stores — route/status/uid_suffix/user_agent_hash/
+// created_at — never a raw token, the secret, a full user id, or any other
+// raw request data. If the table doesn't exist yet (migration not applied),
+// every query fails closed to empty results, not an error.
+async function ownerTokenTelemetryDebug(request, env) {
+  if (!env.DB) return json({ ok: true, byStatus: {}, byRoute: {}, recent: [] });
+  const byStatusRows = await env.DB.prepare(`SELECT status, COUNT(*) AS n FROM owner_token_telemetry GROUP BY status`).all().catch(() => ({ results: [] }));
+  const byRouteRows = await env.DB.prepare(`SELECT route, COUNT(*) AS n FROM owner_token_telemetry GROUP BY route`).all().catch(() => ({ results: [] }));
+  const recentRows = await env.DB.prepare(`SELECT route, status, uid_suffix, user_agent_hash, created_at FROM owner_token_telemetry ORDER BY created_at DESC LIMIT 20`).all().catch(() => ({ results: [] }));
+  const byStatus = {};
+  for (const r of (byStatusRows.results || [])) byStatus[r.status] = r.n;
+  const byRoute = {};
+  for (const r of (byRouteRows.results || [])) byRoute[r.route] = r.n;
+  return json({ ok: true, byStatus, byRoute, recent: recentRows.results || [] });
+}
 async function createOrGetUser(request, env) {
   const body = await readJson(request);
   const now = Date.now();
@@ -123,7 +144,7 @@ async function getMe(request, env) {
   const userId = await requireUser(request, env);
   // D-146B: telemetry only — status is logged, never used to allow/reject.
   const ownerStatus = await ownerTokenStatus(request, env, userId);
-  logOwnerTokenTelemetry('getMe', ownerStatus, { uidSuffix: userId.slice(-6) });
+  await logOwnerTokenTelemetry(env, request, 'getMe', ownerStatus, { uidSuffix: userId.slice(-6) });
   await ensureUser(env, userId);
   // is_admin and any admin-token material are intentionally omitted from this response.
   const user = await env.DB.prepare(`SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?`).bind(userId).first();
@@ -154,7 +175,7 @@ async function myHumanX(request, env) {
   const userId = await requireUser(request, env);
   // D-146B: telemetry only — status is logged, never used to allow/reject.
   const ownerStatus = await ownerTokenStatus(request, env, userId);
-  logOwnerTokenTelemetry('myHumanX', ownerStatus, { uidSuffix: userId.slice(-6) });
+  await logOwnerTokenTelemetry(env, request, 'myHumanX', ownerStatus, { uidSuffix: userId.slice(-6) });
   await ensureUser(env, userId);
 
   // D-140B: widened for the Profile Settings panel — profile_public/profile_slug/
@@ -216,7 +237,7 @@ async function archiveMyHumanXItem(request, env) {
   const userId = await requireUser(request, env);
   // D-146B: telemetry only — status is logged, never used to allow/reject.
   const ownerStatus = await ownerTokenStatus(request, env, userId);
-  logOwnerTokenTelemetry('archiveMyHumanXItem', ownerStatus, { uidSuffix: userId.slice(-6) });
+  await logOwnerTokenTelemetry(env, request, 'archiveMyHumanXItem', ownerStatus, { uidSuffix: userId.slice(-6) });
   const body = await readJson(request);
   const targetType = cleanText(body.targetType || body.target_type || '', 30).toLowerCase();
   const targetId = cleanId(body.targetId || body.target_id || '');
@@ -268,7 +289,7 @@ async function exportMyHumanX(request, env) {
   const userId = await requireUser(request, env);
   // D-146B: telemetry only — status is logged, never used to allow/reject.
   const ownerStatus = await ownerTokenStatus(request, env, userId);
-  logOwnerTokenTelemetry('exportMyHumanX', ownerStatus, { uidSuffix: userId.slice(-6) });
+  await logOwnerTokenTelemetry(env, request, 'exportMyHumanX', ownerStatus, { uidSuffix: userId.slice(-6) });
   await safeRateLimit(request, env, `my-humanx-export:${userId}`, 5, 3600000);
   await ensureUser(env, userId);
 
@@ -333,7 +354,7 @@ async function saveProfileSettings(request, env) {
   const userId = await requireUser(request, env);
   // D-146B: telemetry only — status is logged, never used to allow/reject.
   const ownerStatus = await ownerTokenStatus(request, env, userId);
-  logOwnerTokenTelemetry('saveProfileSettings', ownerStatus, { uidSuffix: userId.slice(-6) });
+  await logOwnerTokenTelemetry(env, request, 'saveProfileSettings', ownerStatus, { uidSuffix: userId.slice(-6) });
   await ensureUser(env, userId);
   const body = await readJson(request);
   const profilePublic = (body.profile_public === true || body.profile_public === 1 || body.profile_public === '1' || body.profile_public === 'true') ? 1 : 0;
@@ -808,14 +829,46 @@ async function ownerTokenStatus(request, env, userId) {
   return 'valid';
 }
 
-// D-146B: log-only telemetry — never used to decide whether a request is
-// allowed, never returns a value callers act on. Logs only the route name,
-// the status bucket, and (optionally) a short non-reversible suffix of the
-// user id for rough correlation — never the token itself, never
-// HUMANX_OWNER_SECRET, never email, never any other raw user data.
-function logOwnerTokenTelemetry(routeName, status, extra = {}) {
+// D-146B/D-147B: telemetry only — never used to decide whether a request is
+// allowed, never returns a value callers act on, never throws. Logs (and,
+// since D-147B, best-effort persists) only the route name, the status
+// bucket, and two optional non-reversible fields: a short suffix of the
+// user id, and a hash of the request's User-Agent header. Never the token
+// itself, never HUMANX_OWNER_SECRET, never the full user id, never request
+// headers/body/IP beyond that one-way UA hash.
+//
+// A non-cryptographic FNV-1a hash is intentionally used here (not
+// crypto.subtle) — this is a low-stakes grouping aid for telemetry, not a
+// security boundary, and keeping it synchronous keeps the call sites simple.
+function requestFamilyHash(request) {
+  const ua = request?.headers?.get ? (request.headers.get('user-agent') || '') : '';
+  if (!ua) return null;
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < ua.length; i++) {
+    hash ^= ua.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16);
+}
+
+async function logOwnerTokenTelemetry(env, request, routeName, status, extra = {}) {
   const uidPart = extra && extra.uidSuffix ? ` uid_suffix=${extra.uidSuffix}` : '';
   console.log(`[owner-token] route=${routeName} status=${status}${uidPart}`);
+
+  // D-147B: best-effort persistence only. A missing table (migration not
+  // yet applied), a missing DB binding, or any other insert failure must
+  // never block, fail, or change the response of the calling route — the
+  // console log above has already happened regardless of what follows.
+  if (!env?.DB) return;
+  try {
+    const uaHash = requestFamilyHash(request);
+    await env.DB.prepare(
+      `INSERT INTO owner_token_telemetry (id, route, status, uid_suffix, user_agent_hash, created_at) VALUES (?, ?, ?, ?, ?, ?)`
+    ).bind(makeId('otl'), routeName, status, extra?.uidSuffix || null, uaHash, Date.now()).run();
+  } catch (_err) {
+    // Swallowed on purpose — telemetry persistence is never allowed to
+    // surface an error to the caller or change route behavior.
+  }
 }
 
 function makeId(prefix) { return `${prefix}_${crypto.randomUUID().replaceAll('-', '').slice(0,18)}`; }
