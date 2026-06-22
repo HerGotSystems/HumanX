@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `951 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `970 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `56 passed, 0 failed (56 hard checks)` |
 
@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D145C_OWNER_TOKEN_FOUNDATION_CHECKPOINT.md` ⭐ CURRENT — ADVISORY OWNER TOKEN DEPLOYED + OWNER SMOKE PASS — READY FOR NEXT FEATURE
-D-145A audit (owner identity / signed owner header) → D-145B advisory-mode owner token foundation (`signOwnerToken()`/`verifyOwnerToken()`/`ownerTokenStatus()`, HMAC-SHA256 via `crypto.subtle`, secret read only from `env.HUMANX_OWNER_SECRET`; `POST /api/session` mints `owner_token` and stops leaking `is_admin`; `x-humanx-owner-token` sent by both the main app and the Belief Engine bridge; five owner endpoints switched `requireUserId()`→`requireUser()` so the shadow-ban check applies; **no enforcement yet — advisory only, no lockout risk**). Owner confirmed live: `/api/session` returns `owner_token` (null until the secret is set) with `is_admin` absent, `/api/my-humanx` still works and resolves the real owner (`usr_3c204c78f6fa49bfad` / Calenhir / `calenhir`) with no token enforcement, `/u/calenhir` still 200s with OG title and noindex intact from D-143/D-144. A raw PowerShell `POST /api/session` with an arbitrary body created a *new* anonymous user — documented as an expected smoke nuance (identity is browser/localStorage-driven, not something a bare scripted POST replicates), not a regression. Two real bugs fixed in passing: the `is_admin` leak, and confirming (not "fixing") that `GET /api/belief-snapshots`'s `requireUserId`-only behavior was an intentional D-89D design choice. No migration, `HUMANX_OWNER_SECRET` is optional for this deploy. Baseline: 951/24/56 (1 expected parameterised-route warning). Recommended next: D-146A — owner token enforcement readiness audit.
+### `D146C_OWNER_TOKEN_TELEMETRY_LIVE_VERIFICATION_CHECKPOINT.md` ⭐ CURRENT — LIVE OWNER TOKEN ADOPTION CONFIRMED — READY FOR NEXT FEATURE
+D-146A enforcement readiness audit (verdict: not ready — secret unconfirmed live, zero telemetry) → D-146B log-only adoption telemetry (`ownerTokenStatus()` widened to six buckets including `secret_missing`; `logOwnerTokenTelemetry()` console-log only, no D1, no migration; still zero enforcement) → D-146C live verification. `HUMANX_OWNER_SECRET` was set in production outside this repo (external config only, never in `wrangler.toml`, never committed). Owner manually confirmed, sanitized: `POST /api/session` returns a non-null `owner_token` (type `string`) for the real owner (`usr_3c204c78f6fa49bfad`), `GET /api/me`/`GET /api/my-humanx`/`GET /api/belief-snapshots?limit=1` all still return 200 with zero enforcement, deployed logs (`wrangler tail`) show `status=valid` telemetry and no more `status=secret_missing`. No token or secret value was ever printed, shared, or recorded. No enforcement added, no migration. Baseline: 970/24/56 (1 expected parameterised-route warning). Recommended next: let telemetry soak before any enforcement decision.
 **Read when:** starting new feature work or returning after time away.
+
+### `D145C_OWNER_TOKEN_FOUNDATION_CHECKPOINT.md` — D-145 ADVISORY OWNER TOKEN FOUNDATION (superseded by D-146C for current deploy)
+D-145A audit (owner identity / signed owner header) → D-145B advisory-mode owner token foundation (`signOwnerToken()`/`verifyOwnerToken()`/`ownerTokenStatus()`, HMAC-SHA256 via `crypto.subtle`, secret read only from `env.HUMANX_OWNER_SECRET`; `POST /api/session` mints `owner_token` and stops leaking `is_admin`; five owner endpoints switched `requireUserId()`→`requireUser()`; no enforcement). Owner confirmed live: `/api/session` returns `owner_token` (null until the secret is set) with `is_admin` absent, `/api/my-humanx` resolves the real owner with no token enforcement. Baseline: 951/24/56.
+**Read when:** reviewing D-145 history.
 
 ### `D144C_NOINDEX_ROBOTS_CHECKPOINT.md` — D-144 NOINDEX/ROBOTS POLICY (superseded by D-145C for current deploy)
 D-144A audit (public profile discoverability / robots / sitemap) → D-144B share-only indexing policy (`public/robots.txt` disallowing only `/u/`; `renderPublicProfileShell()` injects `<meta name="robots" content="noindex">` unconditionally into every `/u/:slug` response, and `<link rel="canonical" href=".../u/:slug">` only when a public profile resolves). Owner confirmed live: `/u/calenhir` still returns 200 with noindex present, canonical present for the resolved profile, all five D-143 OG/Twitter tags still present, `/robots.txt` returns `User-agent: *` / `Disallow: /u/`, no sitemap.xml. Baseline: 925/24/56.
