@@ -92,24 +92,58 @@ export default {
 async function debugState(request, env) { const tables = ['users','claims','evidence','pressure_points','reports','aip_packets','rate_limits','analysis_results','belief_snapshots','truths','truth_claim_links','evidence_claim_links','claim_votes','evidence_votes','truth_votes','home_tests','duplicate_signatures']; const counts = {}; for (const table of tables) { try { const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first(); counts[table] = row?.n ?? 0; } catch (err) { counts[table] = `ERROR: ${err.message}`; } } const latest = await env.DB.prepare(`SELECT id, claim, status, review_state, created_at FROM claims ORDER BY created_at DESC LIMIT 5`).all().catch(err => ({ error: err.message, results: [] })); return json({ ok: true, counts, latest: latest.results || [], latest_error: latest.error || null }); }
 async function seedDemoClaims(request, env) { await ensureUser(env, 'usr_demo_seed'); const existing = await env.DB.prepare(`SELECT COUNT(*) AS n FROM claims`).first(); if ((existing?.n || 0) > 0) return json({ ok: true, message: 'Database already has claims. Seed not needed.', count: existing.n }); const now = Date.now(); for (const c of demoClaims()) await env.DB.prepare(`INSERT OR IGNORE INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(c.id,'usr_demo_seed',c.claim,c.category,c.type,c.status,c.evidenceScore,c.survivability,c.testability,c.contradictions,now,now,'public').run(); return json({ ok: true, seeded: demoClaims().length }); }
 
-// D-147B: admin-only aggregate read of owner_token_telemetry. Admin-gated at
-// the dispatch level (same pattern as /api/debug, /api/seed) — this function
-// never re-checks admin itself. Returns aggregate counts by default; the
-// "recent" array is capped at 20 rows and only ever contains the same safe
-// columns the table stores — route/status/uid_suffix/user_agent_hash/
-// created_at — never a raw token, the secret, a full user id, or any other
-// raw request data. If the table doesn't exist yet (migration not applied),
-// every query fails closed to empty results, not an error.
+// D-147B/D-148E: admin-only aggregate read of owner_token_telemetry.
+// Admin-gated at the dispatch level (same pattern as /api/debug, /api/seed)
+// — this function never re-checks admin itself.
+//
+// D-148E: the original response (byStatus/byRoute, missing buckets simply
+// absent) made D-148D's live verification fail with an ambiguous "is
+// valid_count present or not" result. The shape below is deliberately
+// explicit: all six known status buckets are always present (defaulting to
+// 0), valid_count is a top-level mirror of status_counts.valid so a caller
+// never has to reach into a nested object to get the one number that
+// matters most, and "recent" rows are built via an explicit allowlist
+// (route/status/uid_suffix/request_family_hash/created_at) rather than
+// whatever columns happen to come back from the query — so a future schema
+// change to the table can never silently leak an extra column through this
+// endpoint. Never a raw token, the secret, a full user id, request
+// headers/body, or an IP address.
+//
+// If the table is missing (migration not applied) or any query fails, the
+// counts/recent stay at their zeroed/empty defaults and a sanitized
+// query_error string (D1's own error message — never request data) is
+// included so an admin can see *that* something failed without the worker
+// crashing — this is deliberately surfaced, not swallowed, so a real bug
+// here cannot silently look identical to "no telemetry rows yet".
+const OWNER_TOKEN_STATUS_BUCKETS = ['secret_missing', 'missing', 'invalid', 'expired', 'uid_mismatch', 'valid'];
 async function ownerTokenTelemetryDebug(request, env) {
-  if (!env.DB) return json({ ok: true, byStatus: {}, byRoute: {}, recent: [] });
-  const byStatusRows = await env.DB.prepare(`SELECT status, COUNT(*) AS n FROM owner_token_telemetry GROUP BY status`).all().catch(() => ({ results: [] }));
-  const byRouteRows = await env.DB.prepare(`SELECT route, COUNT(*) AS n FROM owner_token_telemetry GROUP BY route`).all().catch(() => ({ results: [] }));
-  const recentRows = await env.DB.prepare(`SELECT route, status, uid_suffix, user_agent_hash, created_at FROM owner_token_telemetry ORDER BY created_at DESC LIMIT 20`).all().catch(() => ({ results: [] }));
-  const byStatus = {};
-  for (const r of (byStatusRows.results || [])) byStatus[r.status] = r.n;
-  const byRoute = {};
-  for (const r of (byRouteRows.results || [])) byRoute[r.route] = r.n;
-  return json({ ok: true, byStatus, byRoute, recent: recentRows.results || [] });
+  const status_counts = {};
+  for (const bucket of OWNER_TOKEN_STATUS_BUCKETS) status_counts[bucket] = 0;
+  if (!env.DB) return json({ ok: true, status_counts, valid_count: status_counts.valid, route_counts: {}, recent: [], query_error: null });
+
+  let byStatusRows = null, byRouteRows = null, recentRows = null, query_error = null;
+  try {
+    byStatusRows = await env.DB.prepare(`SELECT status, COUNT(*) AS n FROM owner_token_telemetry GROUP BY status`).all();
+    byRouteRows = await env.DB.prepare(`SELECT route, COUNT(*) AS n FROM owner_token_telemetry GROUP BY route`).all();
+    recentRows = await env.DB.prepare(`SELECT route, status, uid_suffix, user_agent_hash, created_at FROM owner_token_telemetry ORDER BY created_at DESC LIMIT 20`).all();
+  } catch (err) {
+    query_error = String(err?.message || err);
+  }
+
+  for (const r of (byStatusRows?.results || [])) {
+    if (OWNER_TOKEN_STATUS_BUCKETS.includes(r.status)) status_counts[r.status] = r.n;
+  }
+  const route_counts = {};
+  for (const r of (byRouteRows?.results || [])) route_counts[r.route] = r.n;
+  const recent = (recentRows?.results || []).map(r => ({
+    route: r.route,
+    status: r.status,
+    uid_suffix: r.uid_suffix ?? null,
+    request_family_hash: r.user_agent_hash ?? null,
+    created_at: r.created_at
+  }));
+
+  return json({ ok: true, status_counts, valid_count: status_counts.valid, route_counts, recent, query_error });
 }
 async function createOrGetUser(request, env) {
   const body = await readJson(request);

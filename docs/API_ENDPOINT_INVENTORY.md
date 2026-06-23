@@ -37,7 +37,7 @@ It does not propose changes. It does not define new endpoints.
 | GET | `/api/health` | Returns service status, mode flags, and AI mode label | Public | None | None — no DB read |
 | GET | `/api/debug` | Returns row counts for all tables and the 5 most recent claims | Internal-ish | All tables (COUNT only), `claims` | Exposes full table inventory and live data. No admin token required — relies on obscurity only |
 | GET | `/api/seed` | Seeds demo claims if `claims` table is empty | **Admin only** (D-59) | `claims`, `users` | D-59: now requires admin token (`x-humanx-admin`). Unauthenticated calls return 403. DB-empty guard preserved. Inserts as `review_state='public'` (demo fallback only — not used for launch pack) |
-| GET | `/api/debug/owner-token-telemetry` | Returns aggregate owner-token telemetry (counts by status, counts by route, last 20 sanitized rows) | **Admin only** (D-147B) | `owner_token_telemetry` (read-only) | Requires admin token (`x-humanx-admin`). Never returns a raw token, secret, or full user id — only route/status/uid_suffix/user_agent_hash/created_at |
+| GET | `/api/debug/owner-token-telemetry` | Returns `{ ok, status_counts (all 6 buckets, zero-defaulted), valid_count, route_counts, recent (≤20 sanitized rows), query_error }` (D-148E normalized shape) | **Admin only** (D-147B) | `owner_token_telemetry` (read-only) | Requires admin token (`x-humanx-admin`). Never returns a raw token, secret, or full user id — `recent` rows are an explicit allowlist of route/status/uid_suffix/request_family_hash/created_at only |
 
 ### Session / User
 

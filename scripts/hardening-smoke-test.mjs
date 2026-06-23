@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2168,7 +2168,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -8912,15 +8912,87 @@ test('D-147B: GET /api/debug/owner-token-telemetry requires requireAdmin before 
   );
 });
 
-test('D-147B: ownerTokenTelemetryDebug returns aggregate counts and a capped, sanitized recent list', () => {
+test('D-147B/D-148E: ownerTokenTelemetryDebug returns aggregate counts and a capped, sanitized recent list', () => {
   const idx = workerSrc.indexOf('async function ownerTokenTelemetryDebug');
-  const slice = workerSrc.slice(idx, idx + 1200);
+  const slice = workerSrc.slice(idx, idx + 1700);
   assert.ok(slice.includes('GROUP BY status'), 'must return aggregate counts by status');
   assert.ok(slice.includes('GROUP BY route'), 'must return aggregate counts by route');
   assert.ok(slice.includes('LIMIT 20'), 'recent rows must be capped at 20');
   assert.ok(
     slice.includes('SELECT route, status, uid_suffix, user_agent_hash, created_at FROM owner_token_telemetry'),
     'recent rows must only select the same safe columns the table stores — no raw token, no secret, no full user id'
+  );
+});
+
+// ── Section 80 — D-148E: Normalize owner telemetry debug response shape ────────
+
+test('D-148E: response includes a top-level valid_count', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenTelemetryDebug');
+  const slice = workerSrc.slice(idx, idx + 1700);
+  assert.ok(slice.includes('valid_count: status_counts.valid'), 'every return path must include a top-level valid_count mirroring status_counts.valid');
+});
+
+test('D-148E: status_counts always includes all six known buckets, defaulted to 0', () => {
+  assert.ok(
+    workerSrc.includes("const OWNER_TOKEN_STATUS_BUCKETS = ['secret_missing', 'missing', 'invalid', 'expired', 'uid_mismatch', 'valid'];"),
+    'OWNER_TOKEN_STATUS_BUCKETS must list all six buckets in the same order ownerTokenStatus() returns them'
+  );
+  const idx = workerSrc.indexOf('async function ownerTokenTelemetryDebug');
+  const slice = workerSrc.slice(idx, idx + 1700);
+  assert.ok(
+    slice.includes('for (const bucket of OWNER_TOKEN_STATUS_BUCKETS) status_counts[bucket] = 0;'),
+    'status_counts must be pre-initialized with every bucket at 0 before any query result is merged in — so a bucket with zero rows is still present, not absent'
+  );
+});
+
+test('D-148E: valid_count exactly mirrors status_counts.valid on every return path', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenTelemetryDebug');
+  const slice = workerSrc.slice(idx, idx + 1700);
+  const jsonReturns = (slice.match(/return json\(\{[\s\S]{0,30}status_counts/g) || []);
+  assert.ok(jsonReturns.length >= 1, 'ownerTokenTelemetryDebug must return status_counts');
+  const occurrences = (slice.match(/valid_count: status_counts\.valid/g) || []).length;
+  const returnCount = (slice.match(/return json\(/g) || []).length;
+  assert.equal(occurrences, returnCount, 'every return json(...) in ownerTokenTelemetryDebug must pair valid_count with status_counts.valid — no return path may omit or diverge it');
+});
+
+test('D-148E: recent rows are built via an explicit allowlist — no full uid, token, secret, header, body, or ip field', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenTelemetryDebug');
+  const slice = workerSrc.slice(idx, idx + 1700);
+  const mapIdx = slice.indexOf('.map(r => ({');
+  const mapSlice = slice.slice(mapIdx, slice.indexOf('}));', mapIdx) + 4);
+  assert.ok(
+    mapSlice.includes('route: r.route') &&
+    mapSlice.includes('status: r.status') &&
+    mapSlice.includes('uid_suffix: r.uid_suffix') &&
+    mapSlice.includes('request_family_hash: r.user_agent_hash') &&
+    mapSlice.includes('created_at: r.created_at'),
+    'recent rows must be built from an explicit field-by-field allowlist'
+  );
+  for (const forbidden of ['token', 'secret', 'header', 'body', 'ip', 'r.user_id', 'r.userId']) {
+    assert.ok(!new RegExp(`\\b${forbidden}\\b`, 'i').test(mapSlice), `recent row mapping must not reference "${forbidden}"`);
+  }
+});
+
+test('D-148E: a missing table or failed query returns sanitized query_error metadata instead of crashing', () => {
+  const idx = workerSrc.indexOf('async function ownerTokenTelemetryDebug');
+  const slice = workerSrc.slice(idx, idx + 1700);
+  assert.ok(slice.includes('try {') && slice.includes('} catch (err) {') && slice.includes('query_error = String(err?.message || err);'), 'a failed query must be caught and surfaced as a sanitized query_error string, not swallowed silently and not left to crash the worker');
+});
+
+test('D-148E: GET /api/debug/owner-token-telemetry remains requireAdmin-gated', () => {
+  const idx = workerSrc.indexOf("url.pathname === '/api/debug/owner-token-telemetry'");
+  const slice = workerSrc.slice(idx, idx + 250);
+  assert.ok(
+    slice.includes('requireAdmin(request, env)') && slice.includes('ownerTokenTelemetryDebug(request, env)'),
+    'the route must still call requireAdmin before ownerTokenTelemetryDebug after the response-shape change'
+  );
+});
+
+test('D-148E: no enforcement condition was added by this response-shape change', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID') && !workerSrc.includes('OWNER_TOKEN_MISMATCH') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'normalizing the debug response shape must not introduce any rejection logic'
   );
 });
 
