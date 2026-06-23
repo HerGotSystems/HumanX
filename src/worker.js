@@ -92,22 +92,36 @@ export default {
 async function debugState(request, env) { const tables = ['users','claims','evidence','pressure_points','reports','aip_packets','rate_limits','analysis_results','belief_snapshots','truths','truth_claim_links','evidence_claim_links','claim_votes','evidence_votes','truth_votes','home_tests','duplicate_signatures']; const counts = {}; for (const table of tables) { try { const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first(); counts[table] = row?.n ?? 0; } catch (err) { counts[table] = `ERROR: ${err.message}`; } } const latest = await env.DB.prepare(`SELECT id, claim, status, review_state, created_at FROM claims ORDER BY created_at DESC LIMIT 5`).all().catch(err => ({ error: err.message, results: [] })); return json({ ok: true, counts, latest: latest.results || [], latest_error: latest.error || null }); }
 async function seedDemoClaims(request, env) { await ensureUser(env, 'usr_demo_seed'); const existing = await env.DB.prepare(`SELECT COUNT(*) AS n FROM claims`).first(); if ((existing?.n || 0) > 0) return json({ ok: true, message: 'Database already has claims. Seed not needed.', count: existing.n }); const now = Date.now(); for (const c of demoClaims()) await env.DB.prepare(`INSERT OR IGNORE INTO claims (id,user_id,claim,category,type,status,evidence_score,survivability,testability,contradictions,created_at,updated_at,review_state) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(c.id,'usr_demo_seed',c.claim,c.category,c.type,c.status,c.evidenceScore,c.survivability,c.testability,c.contradictions,now,now,'public').run(); return json({ ok: true, seeded: demoClaims().length }); }
 
-// D-147B/D-148E: admin-only aggregate read of owner_token_telemetry.
+// D-147B/D-148E/D-149B: admin-only aggregate read of owner_token_telemetry.
 // Admin-gated at the dispatch level (same pattern as /api/debug, /api/seed)
 // — this function never re-checks admin itself.
 //
 // D-148E: the original response (byStatus/byRoute, missing buckets simply
 // absent) made D-148D's live verification fail with an ambiguous "is
-// valid_count present or not" result. The shape below is deliberately
-// explicit: all six known status buckets are always present (defaulting to
-// 0), valid_count is a top-level mirror of status_counts.valid so a caller
-// never has to reach into a nested object to get the one number that
-// matters most, and "recent" rows are built via an explicit allowlist
-// (route/status/uid_suffix/request_family_hash/created_at) rather than
-// whatever columns happen to come back from the query — so a future schema
-// change to the table can never silently leak an extra column through this
-// endpoint. Never a raw token, the secret, a full user id, request
-// headers/body, or an IP address.
+// valid_count present or not" result. The shape is deliberately explicit:
+// all six known status buckets are always present (defaulting to 0),
+// valid_count is a top-level mirror of status_counts.valid, and "recent"
+// rows are built via an explicit allowlist (route/status/uid_suffix/
+// request_family_hash/created_at) rather than whatever columns happen to
+// come back from the query — so a future schema change to the table can
+// never silently leak an extra column through this endpoint. Never a raw
+// token, the secret, a full user id, request headers/body, or an IP.
+//
+// D-149B: D-149A's review found persisted route_counts coverage was much
+// narrower than what D-148B/C had observed via wrangler tail — there was
+// no way to tell, from the response alone, which of the known
+// owner-sensitive routes had ever produced a persisted row versus which
+// hadn't been observed yet. observed_routes/unobserved_owner_routes make
+// that gap directly visible without an admin having to diff route_counts
+// against this route list by hand. route_status_counts gives the same
+// all-six-buckets-always-present treatment to every individual route, not
+// just the aggregate, so a route showing only valid:0 across the board is
+// distinguishable from a route with real missing/invalid traffic.
+// valid_ratio is total_count-safe (0 when there's no data yet, never
+// NaN/Infinity from a divide-by-zero). There is no time-window filter on
+// this table (no created_at range query) — sample_window/all_time make
+// that explicit so a future reader never assumes a window that doesn't
+// exist.
 //
 // If the table is missing (migration not applied) or any query fails, the
 // counts/recent stay at their zeroed/empty defaults and a sanitized
@@ -116,26 +130,66 @@ async function seedDemoClaims(request, env) { await ensureUser(env, 'usr_demo_se
 // crashing — this is deliberately surfaced, not swallowed, so a real bug
 // here cannot silently look identical to "no telemetry rows yet".
 const OWNER_TOKEN_STATUS_BUCKETS = ['secret_missing', 'missing', 'invalid', 'expired', 'uid_mismatch', 'valid'];
-async function ownerTokenTelemetryDebug(request, env) {
+const OWNER_SENSITIVE_ROUTES = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings', 'saveBeliefSnapshot', 'listBeliefSnapshots', 'promoteBeliefSnapshot'];
+function emptyOwnerTokenTelemetryResponse(query_error) {
   const status_counts = {};
   for (const bucket of OWNER_TOKEN_STATUS_BUCKETS) status_counts[bucket] = 0;
-  if (!env.DB) return json({ ok: true, status_counts, valid_count: status_counts.valid, route_counts: {}, recent: [], query_error: null });
+  const route_status_counts = {};
+  for (const route of OWNER_SENSITIVE_ROUTES) {
+    route_status_counts[route] = {};
+    for (const bucket of OWNER_TOKEN_STATUS_BUCKETS) route_status_counts[route][bucket] = 0;
+  }
+  return {
+    ok: true,
+    status_counts,
+    valid_count: status_counts.valid,
+    total_count: 0,
+    valid_ratio: 0,
+    route_counts: {},
+    route_status_counts,
+    observed_routes: [],
+    unobserved_owner_routes: [...OWNER_SENSITIVE_ROUTES],
+    recent: [],
+    sample_window: 'all_time',
+    all_time: true,
+    query_error
+  };
+}
+async function ownerTokenTelemetryDebug(request, env) {
+  if (!env.DB) return json(emptyOwnerTokenTelemetryResponse(null));
 
-  let byStatusRows = null, byRouteRows = null, recentRows = null, query_error = null;
+  let byRouteStatusRows = null, recentRows = null, query_error = null;
   try {
-    byStatusRows = await env.DB.prepare(`SELECT status, COUNT(*) AS n FROM owner_token_telemetry GROUP BY status`).all();
-    byRouteRows = await env.DB.prepare(`SELECT route, COUNT(*) AS n FROM owner_token_telemetry GROUP BY route`).all();
+    byRouteStatusRows = await env.DB.prepare(`SELECT route, status, COUNT(*) AS n FROM owner_token_telemetry GROUP BY route, status`).all();
     recentRows = await env.DB.prepare(`SELECT route, status, uid_suffix, user_agent_hash, created_at FROM owner_token_telemetry ORDER BY created_at DESC LIMIT 20`).all();
   } catch (err) {
     query_error = String(err?.message || err);
   }
 
-  for (const r of (byStatusRows?.results || [])) {
-    if (OWNER_TOKEN_STATUS_BUCKETS.includes(r.status)) status_counts[r.status] = r.n;
-  }
+  const result = emptyOwnerTokenTelemetryResponse(query_error);
+  const observedRouteSet = new Set();
   const route_counts = {};
-  for (const r of (byRouteRows?.results || [])) route_counts[r.route] = r.n;
-  const recent = (recentRows?.results || []).map(r => ({
+  for (const r of (byRouteStatusRows?.results || [])) {
+    if (!OWNER_TOKEN_STATUS_BUCKETS.includes(r.status)) continue;
+    result.status_counts[r.status] += r.n;
+    route_counts[r.route] = (route_counts[r.route] || 0) + r.n;
+    if (!result.route_status_counts[r.route]) {
+      // a route not in OWNER_SENSITIVE_ROUTES (e.g. a future route added to
+      // telemetry but not yet added to this list) is still surfaced rather
+      // than silently dropped
+      result.route_status_counts[r.route] = {};
+      for (const bucket of OWNER_TOKEN_STATUS_BUCKETS) result.route_status_counts[r.route][bucket] = 0;
+    }
+    result.route_status_counts[r.route][r.status] = r.n;
+    if (r.n > 0) observedRouteSet.add(r.route);
+  }
+  result.route_counts = route_counts;
+  result.valid_count = result.status_counts.valid;
+  result.total_count = OWNER_TOKEN_STATUS_BUCKETS.reduce((sum, b) => sum + result.status_counts[b], 0);
+  result.valid_ratio = result.total_count > 0 ? result.valid_count / result.total_count : 0;
+  result.observed_routes = OWNER_SENSITIVE_ROUTES.filter(r => observedRouteSet.has(r));
+  result.unobserved_owner_routes = OWNER_SENSITIVE_ROUTES.filter(r => !observedRouteSet.has(r));
+  result.recent = (recentRows?.results || []).map(r => ({
     route: r.route,
     status: r.status,
     uid_suffix: r.uid_suffix ?? null,
@@ -143,7 +197,7 @@ async function ownerTokenTelemetryDebug(request, env) {
     created_at: r.created_at
   }));
 
-  return json({ ok: true, status_counts, valid_count: status_counts.valid, route_counts, recent, query_error });
+  return json(result);
 }
 async function createOrGetUser(request, env) {
   const body = await readJson(request);
