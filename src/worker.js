@@ -118,10 +118,21 @@ async function seedDemoClaims(request, env) { await ensureUser(env, 'usr_demo_se
 // just the aggregate, so a route showing only valid:0 across the board is
 // distinguishable from a route with real missing/invalid traffic.
 // valid_ratio is total_count-safe (0 when there's no data yet, never
-// NaN/Infinity from a divide-by-zero). There is no time-window filter on
-// this table (no created_at range query) — sample_window/all_time make
-// that explicit so a future reader never assumes a window that doesn't
-// exist.
+// NaN/Infinity from a divide-by-zero).
+//
+// D-149E: D-149D proved every route is reachable, but did so with
+// deliberately-curated verification traffic that now permanently pollutes
+// the all-time aggregate — there was no way to look at only organic
+// traffic going forward without that curated sample skewing the picture
+// forever. window=all|1h|24h|7d adds an optional created_at-bounded view;
+// the default stays "all" so every existing caller's behavior (and every
+// prior D-148/D-149 checkpoint's findings) is unaffected unless a caller
+// explicitly opts into a narrower window. An unrecognized window value is
+// silently normalized to "all" rather than rejected with an error — this
+// is a read-only admin reporting endpoint, not a place where a typo should
+// produce a 400; the response's own sample_window field always tells the
+// caller which window was actually applied, so there is no silent
+// ambiguity about what was normalized.
 //
 // If the table is missing (migration not applied) or any query fails, the
 // counts/recent stay at their zeroed/empty defaults and a sanitized
@@ -131,7 +142,16 @@ async function seedDemoClaims(request, env) { await ensureUser(env, 'usr_demo_se
 // here cannot silently look identical to "no telemetry rows yet".
 const OWNER_TOKEN_STATUS_BUCKETS = ['secret_missing', 'missing', 'invalid', 'expired', 'uid_mismatch', 'valid'];
 const OWNER_SENSITIVE_ROUTES = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings', 'saveBeliefSnapshot', 'listBeliefSnapshots', 'promoteBeliefSnapshot'];
-function emptyOwnerTokenTelemetryResponse(query_error) {
+const OWNER_TOKEN_TELEMETRY_WINDOWS = { '1h': 3600000, '24h': 86400000, '7d': 604800000 };
+function resolveOwnerTokenTelemetryWindow(request) {
+  const url = new URL(request.url);
+  const raw = url.searchParams.get('window');
+  const windowMs = raw && OWNER_TOKEN_TELEMETRY_WINDOWS[raw];
+  const now = Date.now();
+  if (!windowMs) return { sample_window: 'all', all_time: true, window_started_at: null, window_ended_at: now };
+  return { sample_window: raw, all_time: false, window_started_at: now - windowMs, window_ended_at: now };
+}
+function emptyOwnerTokenTelemetryResponse(query_error, windowInfo) {
   const status_counts = {};
   for (const bucket of OWNER_TOKEN_STATUS_BUCKETS) status_counts[bucket] = 0;
   const route_status_counts = {};
@@ -141,6 +161,10 @@ function emptyOwnerTokenTelemetryResponse(query_error) {
   }
   return {
     ok: true,
+    sample_window: windowInfo.sample_window,
+    all_time: windowInfo.all_time,
+    window_started_at: windowInfo.window_started_at,
+    window_ended_at: windowInfo.window_ended_at,
     status_counts,
     valid_count: status_counts.valid,
     total_count: 0,
@@ -150,23 +174,27 @@ function emptyOwnerTokenTelemetryResponse(query_error) {
     observed_routes: [],
     unobserved_owner_routes: [...OWNER_SENSITIVE_ROUTES],
     recent: [],
-    sample_window: 'all_time',
-    all_time: true,
     query_error
   };
 }
 async function ownerTokenTelemetryDebug(request, env) {
-  if (!env.DB) return json(emptyOwnerTokenTelemetryResponse(null));
+  const windowInfo = resolveOwnerTokenTelemetryWindow(request);
+  if (!env.DB) return json(emptyOwnerTokenTelemetryResponse(null, windowInfo));
 
   let byRouteStatusRows = null, recentRows = null, query_error = null;
   try {
-    byRouteStatusRows = await env.DB.prepare(`SELECT route, status, COUNT(*) AS n FROM owner_token_telemetry GROUP BY route, status`).all();
-    recentRows = await env.DB.prepare(`SELECT route, status, uid_suffix, user_agent_hash, created_at FROM owner_token_telemetry ORDER BY created_at DESC LIMIT 20`).all();
+    if (windowInfo.all_time) {
+      byRouteStatusRows = await env.DB.prepare(`SELECT route, status, COUNT(*) AS n FROM owner_token_telemetry GROUP BY route, status`).all();
+      recentRows = await env.DB.prepare(`SELECT route, status, uid_suffix, user_agent_hash, created_at FROM owner_token_telemetry ORDER BY created_at DESC LIMIT 20`).all();
+    } else {
+      byRouteStatusRows = await env.DB.prepare(`SELECT route, status, COUNT(*) AS n FROM owner_token_telemetry WHERE created_at >= ? GROUP BY route, status`).bind(windowInfo.window_started_at).all();
+      recentRows = await env.DB.prepare(`SELECT route, status, uid_suffix, user_agent_hash, created_at FROM owner_token_telemetry WHERE created_at >= ? ORDER BY created_at DESC LIMIT 20`).bind(windowInfo.window_started_at).all();
+    }
   } catch (err) {
     query_error = String(err?.message || err);
   }
 
-  const result = emptyOwnerTokenTelemetryResponse(query_error);
+  const result = emptyOwnerTokenTelemetryResponse(query_error, windowInfo);
   const observedRouteSet = new Set();
   const route_counts = {};
   for (const r of (byRouteStatusRows?.results || [])) {
