@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D160B_INVITE_ACCESS_COPY_BRIDGE.md` ⭐ CURRENT — INVITE ACCESS COPY BRIDGE
+### `D160D_INVITE_ACCESS_COPY_BRIDGE_LIVE_VERIFY.md` ⭐ CURRENT — D-160B LIVE VERIFIED
+
+Version ID: 35ac0544-ffc2-4795-aa0d-b30148aaa01a. All 8 preflight checks passed. Badge shows ◎ Invite, no-code note visible, redeem form intact, no invite codes exposed.
+
+### `D160B_INVITE_ACCESS_COPY_BRIDGE.md` — INVITE ACCESS COPY BRIDGE
 
 Anonymous badge changed to `◎ Invite`. No-code private-preview copy added to account panel. 12 new smoke tests (1161/24/57). Frontend only — no backend changes.
 **Read before starting D-160C (bump/deploy) or any account panel / invite UX work.**
