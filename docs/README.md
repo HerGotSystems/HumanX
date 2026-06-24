@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D162D_CLAIM_STUDY_PUBLIC_READING_GUIDE_LIVE_VERIFY.md` ⭐ CURRENT — D-162B LIVE VERIFIED
+### `D163A_SUBMIT_CLAIM_FIRST_TIME_USER_AUDIT.md` ⭐ CURRENT — SUBMIT CLAIM FIRST-TIME USER AUDIT
+
+Builder flow is good. Gap: no "anyone can submit" copy (visitors assume invite required). No subtitle, no review mention in Step 1. D-163B plan: builder-intro subtitle, Step 1 footer note, Truth-vs-Claim note, success timeline hint. No backend changes.
+**Read before starting D-163B or any Submit Claim / builder flow work.**
+
+### `D162D_CLAIM_STUDY_PUBLIC_READING_GUIDE_LIVE_VERIFY.md` — D-162B LIVE VERIFIED
 
 Version ID: 82919838-3cab-420b-9c80-40ca181f986c. All 8 preflight checks passed. Orientation sentence, meter key, vote note, RunPack tooltip, renamed sections all confirmed live.
 
