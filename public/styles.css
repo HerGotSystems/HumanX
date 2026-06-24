@@ -113,6 +113,10 @@
 .searchbar select{width:auto;min-width:130px;flex-shrink:0}
 .verdict-qualifier{color:var(--muted);opacity:.7;font-size:10px;flex-shrink:1;line-height:1.2}
 .study-verdict-qualifier{color:var(--muted);opacity:.7;font-size:10px;margin:4px 0 0;line-height:1.3}
+.study-intro{margin:2px 0 6px;color:var(--muted);line-height:1.45}
+.study-meter-key{margin:3px 0 0;color:var(--muted);line-height:1.4;opacity:.85}
+.study-vote-note{color:var(--muted);font-size:10px;line-height:1.3;flex-basis:100%;margin:0}
+.study-lineage-note{margin:0 0 6px;color:var(--muted);line-height:1.4}
 .submit-trust-note{color:var(--muted);opacity:.8;font-size:11px;font-style:italic;margin:2px 0 8px}
 /* Workspace-aware chrome — hide searchbar, filter, or sidebar based on active mode */
 .mode-home .searchbar,.mode-submit .searchbar,.mode-export .searchbar,.mode-review .searchbar,.mode-drift .searchbar,.study-mode .searchbar{display:none}

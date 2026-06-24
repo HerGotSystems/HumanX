@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D162A_CLAIM_DETAIL_STUDY_FIRST_VISITOR_AUDIT.md` ⭐ CURRENT — CLAIM DETAIL/STUDY FIRST VISITOR AUDIT
+### `D162B_CLAIM_STUDY_PUBLIC_READING_GUIDE.md` ⭐ CURRENT — CLAIM STUDY PUBLIC READING GUIDE
+
+Orientation sentence, inline meter key, vote note, RunPack tooltip, "Claim Flow"→"How this claim is being tested", "Lineage"→"Origin and truth trail". 14 new smoke tests (1187/24/57).
+**Read before starting D-162C (bump/deploy) or any study view work.**
+
+### `D162A_CLAIM_DETAIL_STUDY_FIRST_VISITOR_AUDIT.md` — CLAIM DETAIL/STUDY FIRST VISITOR AUDIT
 
 Study view is public-safe and clean. "Claim Flow" label opaque, no intro sentence, meter bars unexplained, "Lineage" jargon. D-162B plan: rename Claim Flow, add intro + meter legend + vote note + RunPack tooltip. No backend changes.
 **Read before starting D-162B or any study/detail view work.**

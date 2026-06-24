@@ -10596,6 +10596,131 @@ test('D-161B: no admin route changed', () => {
   assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-161B (found ${count})`);
 });
 
+// ── Section 95 — D-162B: Claim study public reading guide ─────────────────────
+
+test('D-162B: "How this claim is being tested" heading exists in sectionArgumentFlow', () => {
+  const idx = appV10Src.indexOf('function sectionArgumentFlow');
+  const slice = appV10Src.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('How this claim is being tested'),
+    'sectionArgumentFlow must use "How this claim is being tested" as the section heading'
+  );
+});
+
+test('D-162B: old "Claim Flow" label removed from sectionArgumentFlow', () => {
+  const idx = appV10Src.indexOf('function sectionArgumentFlow');
+  const slice = appV10Src.slice(idx, idx + 400);
+  assert.ok(
+    !slice.includes('>Claim Flow<'),
+    'sectionArgumentFlow must not use the old "Claim Flow" heading'
+  );
+});
+
+test('D-162B: orientation sentence exists near claim title in renderStudy', () => {
+  const idx = appV10Src.indexOf('function renderStudy');
+  const slice = appV10Src.slice(idx, idx + 1200);
+  assert.ok(
+    slice.includes('study-intro') && slice.includes('evidence, pressure, votes'),
+    'renderStudy must include .study-intro orientation sentence for first-time visitors'
+  );
+});
+
+test('D-162B: meter key copy exists in renderStudy', () => {
+  const idx = appV10Src.indexOf('function renderStudy');
+  const slice = appV10Src.slice(idx, idx + 1800);
+  assert.ok(
+    slice.includes('study-meter-key') && slice.includes('Testability shows'),
+    'renderStudy must include .study-meter-key inline explanation of what the three meters measure'
+  );
+});
+
+test('D-162B: "Origin and truth trail" heading exists in sectionLineage', () => {
+  const idx = appV10Src.indexOf('function sectionLineage');
+  const slice = appV10Src.slice(idx, idx + 350);
+  assert.ok(
+    slice.includes('Origin and truth trail'),
+    'sectionLineage must use "Origin and truth trail" as the section heading'
+  );
+});
+
+test('D-162B: old "Lineage" heading removed from sectionLineage', () => {
+  const idx = appV10Src.indexOf('function sectionLineage');
+  const slice = appV10Src.slice(idx, idx + 350);
+  assert.ok(
+    !slice.includes('>Lineage<'),
+    'sectionLineage must not use the old "Lineage" heading'
+  );
+});
+
+test('D-162B: vote note exists in renderStudy', () => {
+  const idx = appV10Src.indexOf('function renderStudy');
+  const slice = appV10Src.slice(idx, idx + 2800);
+  assert.ok(
+    slice.includes('study-vote-note') && slice.includes('do not directly decide the verdict'),
+    'renderStudy must include .study-vote-note explaining that votes do not directly decide the verdict'
+  );
+});
+
+test('D-162B: RunPack button has title tooltip', () => {
+  const idx = appV10Src.indexOf('function renderStudy');
+  const slice = appV10Src.slice(idx, idx + 2800);
+  assert.ok(
+    slice.includes('Build RunPack') && slice.includes('portable investigation packet'),
+    'renderStudy Build RunPack button must have a title/tooltip explaining what RunPack does'
+  );
+});
+
+test('D-162B: D-161B "Investigate →" CTA still present in card()', () => {
+  const idx = appV10Src.indexOf('function card(');
+  const slice = appV10Src.slice(idx, idx + 1200);
+  assert.ok(
+    slice.includes('Investigate →'),
+    '"Investigate →" CTA from D-161B must remain in card() — D-162B must not revert it'
+  );
+});
+
+test('D-162B: CSS classes for study reading guide exist in styles.css', () => {
+  assert.ok(
+    cssSrc.includes('.study-intro') &&
+    cssSrc.includes('.study-meter-key') &&
+    cssSrc.includes('.study-vote-note') &&
+    cssSrc.includes('.study-lineage-note'),
+    'styles.css must define .study-intro, .study-meter-key, .study-vote-note, and .study-lineage-note'
+  );
+});
+
+test('D-162B: GET /api/claims/:id remains public-scoped to review_state=public', () => {
+  assert.ok(
+    workerSrc.includes("COALESCE(c.review_state,'public')='public'") ||
+    workerSrc.includes("COALESCE(e.review_state,'public')='public'"),
+    '/api/claims/:id must remain scoped to review_state=public — no widening of exposure'
+  );
+});
+
+test('D-162B: no sensitive fields rendered in study render functions', () => {
+  const studyFns = ['renderStudy', 'sectionEvidence', 'sectionPressure', 'sectionLineage', 'sectionArgumentFlow'];
+  for (const fn of studyFns) {
+    const idx = appV10Src.indexOf(`function ${fn}`);
+    const slice = appV10Src.slice(idx, idx + 2500);
+    assert.ok(
+      !slice.includes('c.email') && !slice.includes('c.is_admin') && !slice.includes('owner_token'),
+      `${fn} must not render email, is_admin, or owner_token`
+    );
+  }
+});
+
+test('D-162B: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-162B must not resume owner-token enforcement'
+  );
+});
+
+test('D-162B: no admin route changed', () => {
+  const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-162B (found ${count})`);
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
