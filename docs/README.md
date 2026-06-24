@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D163D_SUBMIT_CLAIM_CLARITY_LAYER_LIVE_VERIFY.md` ⭐ CURRENT — D-163B LIVE VERIFIED
+### `D164A_REVIEW_ADMIN_MODERATION_WORKFLOW_AUDIT.md` ⭐ CURRENT — REVIEW/ADMIN MODERATION WORKFLOW AUDIT
+
+All five review routes admin-gated. Main gaps: inspect-panel Approve is one-click (no confirm), keyboard `A` approves immediately, admin token shown as plaintext. D-164B: add two-step confirm to inspect-panel Approve (required); `type="password"` token input (optional); keyboard guard (optional).
+**Read before starting D-164B or any review/admin flow work.**
+
+### `D163D_SUBMIT_CLAIM_CLARITY_LAYER_LIVE_VERIFY.md` — D-163B LIVE VERIFIED
 
 Version ID: b6d46668-5048-46e5-809c-f082e672eb46. All preflight checks passed. All visual checks passed. Baseline: 1198/24/57.
 
