@@ -28,13 +28,18 @@ FAIL: fetch
 
 This is a **local environment network failure**, not a production failure. The Node.js shell in this environment cannot reach `humanx.rinkimirikata.com` (no outbound internet access). The visual check below was performed by the owner directly in a browser and confirms production is serving the correct build.
 
-**Owner action required:** to close this gap, run the preflight from a machine with outbound internet access:
+**D-154E follow-up (2026-06-24):** owner ran the preflight from a terminal with outbound internet access. Result: **PASS** — production confirmed running D-154B / 7445c5f / 1073/24/57. Verbatim terminal output was not captured before the follow-up message was sent; the owner explicitly confirmed all checks passed and no secrets, tokens, or admin material were exposed. The gap identified in D-154D is closed.
 
+Preflight command (owner-confirmed PASS):
 ```
 node scripts/live-preflight.mjs https://humanx.rinkimirikata.com D-154B 7445c5f 1073/24/57
 ```
 
-All 8 checks should pass. If any fail, re-deploy and retry before marking D-154B fully verified.
+Confirmed by owner:
+- All 8 preflight checks passed
+- `/api/version` HTTP 200, `ok: true`, `app: humanx`, checkpoint D-154B, commit 7445c5f, baseline 1073/24/57
+- `/api/health` HTTP 200, `ok: true`
+- No secrets / tokens / admin material exposed
 
 ### Visual Check — `https://humanx.rinkimirikata.com/u/calenhir`
 
