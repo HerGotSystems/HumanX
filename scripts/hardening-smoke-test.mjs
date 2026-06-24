@@ -9500,6 +9500,113 @@ test('D-151A: no owner-token enforcement work was resumed by this patch', () => 
   );
 });
 
+// ── Section 86 — D-152A: Live deployment preflight script ────────────────────
+
+const preflightSrc = readFileSync(path.join(__dirname, 'live-preflight.mjs'), 'utf8');
+
+test('D-152A: scripts/live-preflight.mjs exists and is readable', () => {
+  assert.ok(preflightSrc.length > 0, 'live-preflight.mjs must exist and be non-empty');
+});
+
+test('D-152A: preflight fetches /api/version', () => {
+  assert.ok(preflightSrc.includes('/api/version'), 'live-preflight.mjs must fetch /api/version');
+});
+
+test('D-152A: preflight fetches /api/health', () => {
+  assert.ok(preflightSrc.includes('/api/health'), 'live-preflight.mjs must fetch /api/health');
+});
+
+test('D-152A: preflight checks checkpoint against expected arg', () => {
+  assert.ok(
+    preflightSrc.includes('checkpoint') && preflightSrc.includes('checkpoint matches'),
+    'live-preflight.mjs must verify checkpoint matches the expected arg'
+  );
+});
+
+test('D-152A: preflight checks commit against expected arg', () => {
+  assert.ok(
+    preflightSrc.includes('commit') && preflightSrc.includes('commit matches'),
+    'live-preflight.mjs must verify commit matches the expected arg'
+  );
+});
+
+test('D-152A: preflight checks baseline against expected arg', () => {
+  assert.ok(
+    preflightSrc.includes('baseline') && preflightSrc.includes('baseline matches'),
+    'live-preflight.mjs must verify baseline matches the expected arg'
+  );
+});
+
+test('D-152A: preflight exits non-zero on mismatch', () => {
+  assert.ok(
+    preflightSrc.includes('process.exit(1)'),
+    'live-preflight.mjs must call process.exit(1) when any check fails'
+  );
+});
+
+test('D-152A: preflight supports --json flag for machine-readable output', () => {
+  assert.ok(
+    preflightSrc.includes('--json') && preflightSrc.includes('JSON.stringify'),
+    'live-preflight.mjs must support --json flag producing machine-readable output'
+  );
+});
+
+test('D-152A: preflight contains no secret, token, or admin-token strings', () => {
+  assert.ok(
+    !preflightSrc.includes('HUMANX_OWNER_SECRET') &&
+    !preflightSrc.includes('HUMANX_ADMIN_TOKEN') &&
+    !preflightSrc.includes('owner_token') &&
+    !preflightSrc.includes('admin_token') &&
+    !preflightSrc.includes('x-humanx-admin'),
+    'live-preflight.mjs must not reference secrets, owner tokens, or admin tokens'
+  );
+});
+
+test('D-152A: preflight does not read process.env', () => {
+  assert.ok(
+    !preflightSrc.includes('process.env'),
+    'live-preflight.mjs must not read environment variables'
+  );
+});
+
+test('D-152A: preflight does not execute wrangler or deploy', () => {
+  const execCalls = [...preflightSrc.matchAll(/execSync\s*\([^)]+\)/g)].map(m => m[0]);
+  assert.ok(
+    execCalls.length === 0,
+    'live-preflight.mjs must not call execSync — it is a read-only preflight check'
+  );
+});
+
+test('D-152A: preflight checks /api/version HTTP status is 200', () => {
+  assert.ok(
+    preflightSrc.includes('status === 200'),
+    'live-preflight.mjs must verify /api/version returns HTTP 200'
+  );
+});
+
+test('D-152A: preflight checks /api/health HTTP status is 200', () => {
+  assert.ok(
+    preflightSrc.includes('/api/health HTTP status'),
+    'live-preflight.mjs must verify /api/health returns HTTP 200'
+  );
+});
+
+test('D-152A: preflight does not require admin token (no x-humanx-admin header sent)', () => {
+  assert.ok(
+    !preflightSrc.includes('x-humanx-admin'),
+    'live-preflight.mjs must not send an admin header — it is a public-safe check'
+  );
+});
+
+test('D-152A: no owner-token enforcement work was resumed by this patch', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') &&
+    !workerSrc.includes('OWNER_TOKEN_INVALID') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'D-152A must not resume owner-token enforcement'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
