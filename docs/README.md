@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D152A_LIVE_PREFLIGHT_SCRIPT_CHECKPOINT.md` ⭐ CURRENT — LIVE PREFLIGHT SCRIPT ADDED
+### `D152B_LIVE_PREFLIGHT_LIVE_VERIFICATION_CHECKPOINT.md` ⭐ CURRENT — LIVE PREFLIGHT CONFIRMED END-TO-END
+
+`scripts/live-preflight.mjs` confirmed working against production. All 8 preflight checks passed: `/api/version` HTTP 200, `ok`, `app`, `checkpoint D-152A`, `commit c6d1437`, `baseline 1057/24/57`, `/api/health` HTTP 200 and `ok`. Full D-150/151/152 provenance workflow now verified end-to-end: bump helper writes metadata → `/api/version` returns it live → preflight script checks it programmatically. No browser console step needed for future pre-verification. Verification only — no code/migration/`wrangler.toml` change. Baseline: 1057/24/57 (1 expected parameterised-route warning), unchanged.
+**Read when:** starting new feature work or returning after time away.
+
+### `D152A_LIVE_PREFLIGHT_SCRIPT_CHECKPOINT.md` — LIVE PREFLIGHT SCRIPT ADDED (confirmed live by D-152B)
 
 Adds `scripts/live-preflight.mjs` — a direct-node script that performs the public-safe production preflight check before any live-verification session. Usage: `node scripts/live-preflight.mjs <baseUrl> <checkpoint> <commit> <baseline> [--json]`. Fetches `/api/version` and `/api/health`; verifies 8 conditions (HTTP status, ok, app, checkpoint, commit, baseline); exits non-zero on any mismatch with a `FAIL:` report showing expected vs got. No auth, no secrets, no env reads, no `wrangler`, no file writes. Supports `--json` for machine-readable output. Does not prove D1 migrations are current or that all routes work. 15 new smoke tests. Baseline: 1057/24/57 (1 expected parameterised-route warning).
 **Read when:** starting new feature work or returning after time away.
@@ -65,6 +70,8 @@ D-151A's `scripts/bump-deploy-meta.mjs` helper confirmed end-to-end in productio
 
 Adds `scripts/bump-deploy-meta.mjs` — a direct-node helper that updates `src/deploy-meta.js` before each manual deploy. Usage: `node scripts/bump-deploy-meta.mjs <checkpoint> <baseline>`. Reads the current git short SHA automatically; validates checkpoint (no whitespace) and baseline (must match `NNN/NN/NN`); writes `app/checkpoint/commit/baseline/updated_at`; never reads env, never calls `wrangler deploy`. Prints next-step instructions after writing. Fourteen new smoke tests guard: file exists, all fields written, no secrets/env/exec-deploy, writes only to `deploy-meta.js`, route still uses the module, no enforcement resumed. `deploy-meta.js` bumped to D-151A/1042/24/57. Baseline: 1042/24/57 (1 expected parameterised-route warning).
 **Read when:** reviewing D-151/D-152 history.
+
+
 
 ### `D150B_DEPLOY_PROVENANCE_LIVE_VERIFICATION_CHECKPOINT.md` — DEPLOYMENT PROVENANCE CONFIRMED LIVE (helper added in D-151A)
 
