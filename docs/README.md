@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D157A_PUBLIC_PROFILE_MOBILE_VISUAL_QA_POLISH.md` ⭐ CURRENT — D-157A MOBILE/VISUAL QA POLISH
+### `D157B_PUBLIC_PROFILE_MOBILE_VISUAL_POLISH_LIVE_VERIFY.md` ⭐ CURRENT — D-157A LIVE VERIFIED
+
+All 8 preflight checks passed. Version ID: `7a97b3d0-c581-4edd-80a5-ef38d2e16ffe`. Production running D-157A / ea2f899 / 1120/24/57. Visual/mobile checks confirmed by owner.
+**Read when:** returning after D-157A/B to plan next work.
+
+### `D157A_PUBLIC_PROFILE_MOBILE_VISUAL_QA_POLISH.md` — D-157A MOBILE/VISUAL QA POLISH (live-verified in D-157B)
 
 Mobile overflow safeguards (`min-width:0`, `overflow-wrap:anywhere` on item text, display name, bio), context block readability bump (12px), `pp-footer-actions` stacking on mobile, snapshot card blue-tinted border. Baseline: 1120/24/57. Next: D-157B bump + live verify.
 **Read when:** returning after D-157A to plan D-157B or next public profile work.
