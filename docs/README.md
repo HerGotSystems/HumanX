@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D164B_SAFER_REVIEW_APPROVAL_ACTIONS.md` ⭐ CURRENT — D-164B SAFER REVIEW APPROVAL ACTIONS
+### `D164D_SAFER_REVIEW_APPROVAL_ACTIONS_LIVE_VERIFY.md` ⭐ CURRENT — D-164B LIVE VERIFIED
+
+Version ID: 366b67a2-7386-452b-9933-f5eb38b72fb3. All preflight checks passed. All admin visual checks passed. Baseline: 1209/24/57.
+
+### `D164B_SAFER_REVIEW_APPROVAL_ACTIONS.md` — D-164B SAFER REVIEW APPROVAL ACTIONS
 
 Inspect-panel Approve now two-step (was one-click). Keyboard `A` now arms pending on first press, confirms on second. Admin token input masked with `type="password"`. No backend changes. 11 new tests, 7 pre-existing tests updated. Baseline: 1209/24/57.
 **Read before D-164C bump/deploy or any review/admin flow work.**
