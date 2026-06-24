@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D154A_PUBLIC_PROFILE_PRODUCT_AUDIT.md` ⭐ CURRENT — PUBLIC PROFILE PRODUCT AUDIT COMPLETE
+### `D154B_PUBLIC_PROFILE_CLARITY_LAYER.md` ⭐ CURRENT — PUBLIC PROFILE CLARITY LAYER DEPLOYED
+
+Context block, vocabulary guide, card reorder (snapshot before counts), consolidated snapshot disclaimers, visitor-friendly section labels, "View in HumanX →" CTA, pressure severity readable labels, evidence quality `peer_reviewed` label, visitor copy-link CTA. Frontend only. 1073/24/57. No backend, migration, or owner-token changes.
+**Read when:** editing public profile frontend or picking up D-154C/D-155A live-verify.
+
+### `D154A_PUBLIC_PROFILE_PRODUCT_AUDIT.md` — PUBLIC PROFILE PRODUCT AUDIT (implemented in D-154B)
 
 Full product audit of public profile (`/u/:slug`). Privacy verdict: clean — no `is_admin`, `email`, `owner_token`, `user.id`, evidence/pressure body, or non-public content leaks. Strengths: privacy off by default, consistent 404 treatment, OG tags, owner-recognises-own-profile. Key friction: F-1 (no HumanX context for first-time visitor), F-2 (jargon terminology opaque to outsiders), F-3 (counts-first buries snapshot), F-4 (Open Study CTA cold-drops visitor into app). Mobile: acceptable. Recommended D-154B: add context block, reorder cards (snapshot before counts), consolidate disclaimers, lightweight CTA. No code change. No owner-token work. Baseline: 1057/24/57, unchanged.
 **Read when:** starting new feature work or returning after time away.

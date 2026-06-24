@@ -7374,10 +7374,10 @@ test('D-140C: public profile view calls GET /api/u/:slug', () => {
 
 test('D-140C: public profile view has the required disclaimer', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
-  const slice = appSrc.slice(idx, idx + 800);
+  const slice = appSrc.slice(idx, idx + 1800);
   assert.ok(
     slice.includes('Public profile shows selected public HumanX activity only. It is not a truth ruling or personality diagnosis.'),
-    'renderPublicProfileHtml must render the required disclaimer'
+    'renderPublicProfileHtml must render the required disclaimer (D-154B moves it into the context block)'
   );
 });
 
@@ -7475,7 +7475,7 @@ test('D-141B/D-142B/D-143B: GET /api/u/:slug response core fields are preserved,
 
 test('D-141B: public profile header has a dedicated polished card class', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
-  const slice = appSrc.slice(idx, idx + 400);
+  const slice = appSrc.slice(idx, idx + 1300);
   assert.ok(
     slice.includes('class="panel pp-header pp-card"'),
     'the public profile header must use the pp-card polished class, not a bare panel'
@@ -7484,7 +7484,7 @@ test('D-141B: public profile header has a dedicated polished card class', () => 
 
 test('D-141B: counts explanation copy exists on both the public page and the Me-side preview', () => {
   const pageIdx = appSrc.indexOf('function renderPublicProfileHtml');
-  const pageSlice = appSrc.slice(pageIdx, pageIdx + 1300);
+  const pageSlice = appSrc.slice(pageIdx, pageIdx + 2200);
   const previewIdx = appSrc.indexOf('function meProfilePreviewBodyHtml');
   const previewSlice = appSrc.slice(previewIdx, previewIdx + 800);
   assert.ok(
@@ -7496,7 +7496,7 @@ test('D-141B: counts explanation copy exists on both the public page and the Me-
 
 test('D-141B: public profile recent sections use a dedicated card/section class, not a bare panel', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
-  const slice = appSrc.slice(idx, idx + 1800);
+  const slice = appSrc.slice(idx, idx + 3000);
   const sectionCount = (slice.match(/class="panel pp-section"/g) || []).length;
   assert.ok(sectionCount === 4, 'all four recent-activity sections (claims/truths/evidence/pressure) must use the pp-section class');
 });
@@ -7770,26 +7770,26 @@ test('D-142B: Me preview required wording exists ("one snapshot, shared by choic
   );
 });
 
-test('D-142B/D-142C: public profile snapshot card uses third-person wording and the same field set', () => {
+test('D-142B/D-142C/D-154B: public profile snapshot card uses third-person wording and the same field set', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
   const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
     slice.includes('not their complete profile') &&
     slice.includes('from their own self-submitted answers, not a diagnosis or personality test') &&
     slice.includes('s.dominantPattern') && slice.includes('s.stabilityScore') && slice.includes('s.topAlignmentName') && slice.includes('s.contradictionCount'),
-    'renderPublicProfileSnapshotHtml must use third-person disclaimer wording (D-142C exact copy) and only the safe field set'
+    'renderPublicProfileSnapshotHtml must use third-person disclaimer wording and only the safe field set'
   );
 });
 
-test('D-142B: public profile snapshot card is placed after Public Activity and before recent sections', () => {
+test('D-142B: public profile snapshot card is placed before the counts card and before recent sections (D-154B reorder)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
-  const slice = appSrc.slice(idx, idx + 1500);
+  const slice = appSrc.slice(idx, idx + 3000);
   const countsAt = slice.indexOf('pp-counts-card');
   const snapshotAt = slice.indexOf('renderPublicProfileSnapshotHtml(p.sharedSnapshot)');
-  const claimsAt = slice.indexOf('Recent Public Claims');
+  const claimsAt = slice.indexOf('<h3>Claims being tested</h3>');
   assert.ok(
-    countsAt !== -1 && snapshotAt !== -1 && claimsAt !== -1 && countsAt < snapshotAt && snapshotAt < claimsAt,
-    'the shared-snapshot card must render between the Public Activity counts card and the Recent Public Claims section'
+    countsAt !== -1 && snapshotAt !== -1 && claimsAt !== -1 && snapshotAt < countsAt && countsAt < claimsAt,
+    'D-154B reorder: the shared-snapshot card must render before the Public Activity counts card and before the content sections'
   );
 });
 
@@ -7912,19 +7912,19 @@ test('D-142C: public shared snapshot card title is "Shared Belief Snapshot"', ()
   assert.ok(slice.includes('<h3>Shared Belief Snapshot</h3>'), 'renderPublicProfileSnapshotHtml must title the card "Shared Belief Snapshot"');
 });
 
-test('D-142C: public card disclaimer uses the exact required wording', () => {
+test('D-142C/D-154B: public card disclaimer contains required wording (consolidated in D-154B)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 600);
+  const slice = appSrc.slice(idx, idx + 700);
   assert.ok(
     slice.includes('A snapshot this person chose to share — pattern observations from their own self-submitted answers, not a diagnosis or personality test.'),
-    'renderPublicProfileSnapshotHtml must render the exact required disclaimer'
+    'renderPublicProfileSnapshotHtml must retain the required disclaimer wording'
   );
 });
 
-test('D-142C: public card contains "One snapshot, shared by choice"', () => {
+test('D-142C/D-154B: public card contains "One snapshot, shared by choice" (consolidated in D-154B)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 600);
-  assert.ok(slice.includes('One snapshot, shared by choice — not their complete profile.'), 'renderPublicProfileSnapshotHtml must render the required "one snapshot" wording');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(slice.includes('One snapshot, shared by choice — not their complete profile.'), 'renderPublicProfileSnapshotHtml must retain the required "one snapshot" wording');
 });
 
 test('D-142C: public card frames dominantPattern as a self-reported pattern, not a bare label', () => {
@@ -9604,6 +9604,142 @@ test('D-152A: no owner-token enforcement work was resumed by this patch', () => 
     !workerSrc.includes('OWNER_TOKEN_INVALID') &&
     !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
     'D-152A must not resume owner-token enforcement'
+  );
+});
+
+// ── Section 87 — D-154B: Public profile clarity layer ────────────────────────
+
+const appV10Src = readFileSync(path.join(__dirname, '..', 'public', 'app-v10.js'), 'utf8');
+
+test('D-154B: HumanX context block copy is present in app-v10.js', () => {
+  assert.ok(
+    appV10Src.includes('pp-context-block') && appV10Src.includes('HumanX is a public thinking profile'),
+    'renderPublicProfileHtml must include a HumanX context block with intro copy'
+  );
+});
+
+test('D-154B: visitor-friendly section label "Claims being tested" is present', () => {
+  assert.ok(
+    appV10Src.includes('Claims being tested'),
+    'renderPublicProfileHtml must use visitor-friendly "Claims being tested" section label'
+  );
+});
+
+test('D-154B: visitor-friendly section label "Public truths" is present', () => {
+  assert.ok(
+    appV10Src.includes('Public truths'),
+    'renderPublicProfileHtml must use visitor-friendly "Public truths" section label'
+  );
+});
+
+test('D-154B: visitor-friendly section label "Questions under pressure" is present', () => {
+  assert.ok(
+    appV10Src.includes('Questions under pressure'),
+    'renderPublicProfileHtml must use visitor-friendly "Questions under pressure" section label'
+  );
+});
+
+test('D-154B: "View in HumanX" CTA replaces the old "Open Study" label in public profile', () => {
+  assert.ok(
+    appV10Src.includes('View in HumanX →'),
+    'renderPublicProfileClaimsHtml must use "View in HumanX →" CTA'
+  );
+  // Only the public-profile claims function should be checked — "Open Study →" is still valid
+  // in the owner's Me view (meRecentClaimsHtml). Extract just the public-profile function.
+  const ppClaimsFn = appV10Src.match(/function renderPublicProfileClaimsHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    !ppClaimsFn.includes('Open Study →'),
+    'renderPublicProfileClaimsHtml must not use the old "Open Study →" label (use "View in HumanX →")'
+  );
+});
+
+test('D-154B: duplicate snapshot disclaimers are consolidated to one sentence', () => {
+  const snapshotFn = appV10Src.match(/function renderPublicProfileSnapshotHtml[\s\S]*?^function /m)?.[0] || '';
+  const disclaimerCount = (snapshotFn.match(/pp-disclaimer/g)||[]).length;
+  assert.ok(
+    disclaimerCount <= 1,
+    `renderPublicProfileSnapshotHtml must have at most 1 pp-disclaimer (found ${disclaimerCount})`
+  );
+});
+
+test('D-154B: snapshot disclaimers consolidated into a single pp-disclaimer element', () => {
+  const snapshotFn = appV10Src.match(/function renderPublicProfileSnapshotHtml[\s\S]*?^function /m)?.[0] || '';
+  const disclaimerCount = (snapshotFn.match(/pp-disclaimer/g)||[]).length;
+  assert.ok(
+    disclaimerCount === 1,
+    `renderPublicProfileSnapshotHtml must have exactly 1 pp-disclaimer (found ${disclaimerCount}) — two separate disclaimer paragraphs from D-142C consolidated in D-154B`
+  );
+});
+
+test('D-154B: pressure severity uses human-readable label not raw integer', () => {
+  assert.ok(
+    appV10Src.includes('pressureSeverityLabel') && appV10Src.includes('low pressure'),
+    'renderPublicProfilePressureHtml must use pressureSeverityLabel() for human-readable severity'
+  );
+  assert.ok(
+    !appV10Src.includes('`severity ${'),
+    'renderPublicProfilePressureHtml must not render raw severity integer'
+  );
+});
+
+test('D-154B: evidenceQualityLabel maps peer_reviewed to human-readable label', () => {
+  assert.ok(
+    appV10Src.includes("peer_reviewed:'peer-reviewed'") || appV10Src.includes('peer_reviewed:"peer-reviewed"'),
+    'evidenceQualityLabel must map peer_reviewed to a human-readable string'
+  );
+});
+
+test('D-154B: visitor share CTA (copyPublicProfileLink) is present and uses location.origin', () => {
+  assert.ok(
+    appV10Src.includes('copyPublicProfileLink') && appV10Src.includes('location.origin'),
+    'copyPublicProfileLink function must exist and build URL from location.origin'
+  );
+});
+
+test('D-154B: copyPublicProfileLink has clipboard fallback for older browsers', () => {
+  assert.ok(
+    appV10Src.includes('navigator.clipboard') && appV10Src.includes('execCommand'),
+    'copyPublicProfileLink must have a navigator.clipboard fallback path'
+  );
+});
+
+test('D-154B: owner-detect behaviour is preserved (isOwner check still present)', () => {
+  assert.ok(
+    appV10Src.includes('isOwner') && appV10Src.includes('← Back to Me'),
+    'renderPublicProfileHtml must preserve owner-detection (isOwner) and "← Back to Me" label'
+  );
+});
+
+test('D-154B: no admin route was changed (requireAdmin call count unchanged)', () => {
+  const adminCallCount = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(
+    adminCallCount >= 11,
+    `worker.js must still have at least 11 requireAdmin calls (found ${adminCallCount})`
+  );
+});
+
+test('D-154B: public profile API route remains public (no requireAdmin added to /api/u/:slug)', () => {
+  const profileRouteBlock = workerSrc.match(/pathname\.startsWith\('\/api\/u\/'\)[\s\S]*?return json/)?.[0] || '';
+  assert.ok(
+    !profileRouteBlock.includes('requireAdmin'),
+    '/api/u/:slug must remain a public route — no requireAdmin guard must be present in its handler'
+  );
+});
+
+test('D-154B: no owner-token enforcement work was resumed by this patch', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') &&
+    !workerSrc.includes('OWNER_TOKEN_INVALID') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'D-154B must not resume owner-token enforcement'
+  );
+});
+
+test('D-154B: user.id, email, is_admin, owner_token not rendered by any public-profile function', () => {
+  const ppBlock = appV10Src.match(/function renderPublicProfileHtml[\s\S]*?^function copyPublicProfileLink/m)?.[0] || '';
+  assert.ok(
+    !ppBlock.includes('.email') && !ppBlock.includes('.is_admin') && !ppBlock.includes('owner_token'),
+    'Public profile render functions must not reference email, is_admin, or owner_token'
   );
 });
 
