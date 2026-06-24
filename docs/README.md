@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D162B_CLAIM_STUDY_PUBLIC_READING_GUIDE.md` ⭐ CURRENT — CLAIM STUDY PUBLIC READING GUIDE
+### `D162D_CLAIM_STUDY_PUBLIC_READING_GUIDE_LIVE_VERIFY.md` ⭐ CURRENT — D-162B LIVE VERIFIED
+
+Version ID: 82919838-3cab-420b-9c80-40ca181f986c. All 8 preflight checks passed. Orientation sentence, meter key, vote note, RunPack tooltip, renamed sections all confirmed live.
+
+### `D162B_CLAIM_STUDY_PUBLIC_READING_GUIDE.md` — CLAIM STUDY PUBLIC READING GUIDE
 
 Orientation sentence, inline meter key, vote note, RunPack tooltip, "Claim Flow"→"How this claim is being tested", "Lineage"→"Origin and truth trail". 14 new smoke tests (1187/24/57).
 **Read before starting D-162C (bump/deploy) or any study view work.**
