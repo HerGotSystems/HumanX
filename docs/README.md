@@ -51,10 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D154B_PUBLIC_PROFILE_CLARITY_LAYER.md` ⭐ CURRENT — PUBLIC PROFILE CLARITY LAYER DEPLOYED
+### `D154C_PUBLIC_PROFILE_CLARITY_LAYER_LIVE_VERIFY.md` ⭐ CURRENT — D-154B LIVE VERIFIED
 
-Context block, vocabulary guide, card reorder (snapshot before counts), consolidated snapshot disclaimers, visitor-friendly section labels, "View in HumanX →" CTA, pressure severity readable labels, evidence quality `peer_reviewed` label, visitor copy-link CTA. Frontend only. 1073/24/57. No backend, migration, or owner-token changes.
-**Read when:** editing public profile frontend or picking up D-154C/D-155A live-verify.
+Preflight passed (8/8). Visual check confirmed: context block, visitor-friendly labels, "View in HumanX →" CTA, copy-link, no private data exposure. Baseline: 1073/24/57 unchanged.
+**Read when:** returning after D-154B/C to plan next work.
+
+### `D154B_PUBLIC_PROFILE_CLARITY_LAYER.md` — PUBLIC PROFILE CLARITY LAYER (live-verified in D-154C)
 
 ### `D154A_PUBLIC_PROFILE_PRODUCT_AUDIT.md` — PUBLIC PROFILE PRODUCT AUDIT (implemented in D-154B)
 
