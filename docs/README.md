@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D159B_PUBLIC_HOME_CLARITY_BRIDGE.md` ⭐ CURRENT — PUBLIC HOME CLARITY BRIDGE
+### `D159D_PUBLIC_HOME_CLARITY_BRIDGE_LIVE_VERIFY.md` ⭐ CURRENT — D-159B LIVE VERIFIED
+
+All 8 preflight checks passed. Production running D-159B / f2ca9d8 / 1149/24/57. All home visual checks confirmed by owner.
+**Read when:** returning after D-159B/C/D to plan next work.
+
+### `D159B_PUBLIC_HOME_CLARITY_BRIDGE.md` — PUBLIC HOME CLARITY BRIDGE (live-verified in D-159D)
 
 Badge → "invite-only preview", one-sentence intro, bridge link to /u/calenhir, Browse Claims promoted to first card. Baseline: 1149/24/57. Next: D-159C bump + live verify.
 **Read before starting D-159C or any home/landing work.**
