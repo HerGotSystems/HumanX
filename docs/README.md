@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D159D_PUBLIC_HOME_CLARITY_BRIDGE_LIVE_VERIFY.md` ⭐ CURRENT — D-159B LIVE VERIFIED
+### `D160A_INVITE_ACCESS_PATH_AUDIT.md` ⭐ CURRENT — INVITE/ACCESS PATH AUDIT
+
+Invite creation correctly gated (requireAdmin + admin UI only). Redemption clean (atomic, rate-limited, no is_admin). Gap: no "don't have a code?" path. D-160B plan: add copy to account panel, optional badge label hint. No backend changes needed.
+**Read before starting D-160B or any invite/account/join flow work.**
+
+### `D159D_PUBLIC_HOME_CLARITY_BRIDGE_LIVE_VERIFY.md` — D-159B LIVE VERIFIED
 
 All 8 preflight checks passed. Production running D-159B / f2ca9d8 / 1149/24/57. All home visual checks confirmed by owner.
 **Read when:** returning after D-159B/C/D to plan next work.
