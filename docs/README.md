@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D161D_BROWSE_CLAIMS_PUBLIC_CLARITY_LIVE_VERIFY.md` ⭐ CURRENT — D-161B LIVE VERIFIED
+### `D162A_CLAIM_DETAIL_STUDY_FIRST_VISITOR_AUDIT.md` ⭐ CURRENT — CLAIM DETAIL/STUDY FIRST VISITOR AUDIT
+
+Study view is public-safe and clean. "Claim Flow" label opaque, no intro sentence, meter bars unexplained, "Lineage" jargon. D-162B plan: rename Claim Flow, add intro + meter legend + vote note + RunPack tooltip. No backend changes.
+**Read before starting D-162B or any study/detail view work.**
+
+### `D161D_BROWSE_CLAIMS_PUBLIC_CLARITY_LIVE_VERIFY.md` — D-161B LIVE VERIFIED
 
 Version ID: a33d0d09-0ad7-4d88-9d0b-1a5f25e496e1. All 8 preflight checks passed. Intro visible, stats collapsed, CTA "Investigate →", verdict copy updated, error heading visitor-safe.
 
