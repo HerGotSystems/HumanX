@@ -10008,6 +10008,108 @@ test('D-156A: no admin route changed (requireAdmin count unchanged)', () => {
   assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls (found ${count})`);
 });
 
+// ── Section 90 — D-157A: Public profile mobile / visual QA polish ─────────────
+
+test('D-157A: pp-item-row has min-width:0 to prevent flex overflow', () => {
+  assert.ok(
+    cssSrc.includes('.pp-item-row') && cssSrc.match(/\.pp-item-row\{[^}]*min-width:0/),
+    '.pp-item-row must include min-width:0 to prevent flex child overflow on narrow screens'
+  );
+});
+
+test('D-157A: pp-item-row .me-item-text has min-width:0 and overflow-wrap:anywhere', () => {
+  const rule = cssSrc.match(/\.pp-item-row \.me-item-text\{[^}]+}/)?.[0] || '';
+  assert.ok(
+    rule.includes('min-width:0') && rule.includes('overflow-wrap:anywhere'),
+    '.pp-item-row .me-item-text must have min-width:0 and overflow-wrap:anywhere to allow long titles to wrap'
+  );
+});
+
+test('D-157A: pp-display-name has overflow-wrap:anywhere', () => {
+  const rule = cssSrc.match(/\.pp-display-name\{[^}]+}/)?.[0] || '';
+  assert.ok(
+    rule.includes('overflow-wrap:anywhere'),
+    '.pp-display-name must include overflow-wrap:anywhere so long display names wrap rather than overflow'
+  );
+});
+
+test('D-157A: pp-bio has overflow-wrap:anywhere', () => {
+  const rule = cssSrc.match(/\.pp-bio\{[^}]+}/)?.[0] || '';
+  assert.ok(
+    rule.includes('overflow-wrap:anywhere'),
+    '.pp-bio must include overflow-wrap:anywhere so long bio text wraps rather than overflows'
+  );
+});
+
+test('D-157A: pp-context-block text is readable (font-size bumped above .small baseline)', () => {
+  assert.ok(
+    cssSrc.includes('.pp-context-block .small') && cssSrc.includes('font-size:12px'),
+    '.pp-context-block .small must override the base .small font-size to 12px for readability'
+  );
+});
+
+test('D-157A: pp-footer-actions wraps on small screens', () => {
+  assert.ok(
+    cssSrc.includes('.pp-footer-actions') && cssSrc.includes('flex-wrap:wrap'),
+    '.pp-footer-actions must use flex-wrap:wrap so back and copy buttons wrap instead of colliding'
+  );
+});
+
+test('D-157A: pp-footer-actions stacks vertically on mobile', () => {
+  assert.ok(
+    cssSrc.includes('pp-footer-actions') && cssSrc.includes('flex-direction:column'),
+    'styles.css must stack .pp-footer-actions buttons vertically on mobile (flex-direction:column)'
+  );
+});
+
+test('D-157A: pp-footer-actions mobile buttons go full width', () => {
+  assert.ok(
+    cssSrc.includes('pp-footer-actions button') && cssSrc.includes('width:100%'),
+    'styles.css must set .pp-footer-actions button width:100% on mobile for comfortable tap area'
+  );
+});
+
+test('D-157A: renderPublicProfileHtml uses pp-footer-actions class on action row', () => {
+  const fn = appV10Src.match(/function renderPublicProfileHtml[\s\S]*?^async function renderPublicProfile/m)?.[0] || '';
+  assert.ok(
+    fn.includes('pp-footer-actions'),
+    'renderPublicProfileHtml must apply pp-footer-actions class to the bottom action row'
+  );
+});
+
+test('D-157A: D-154B/D-155A/D-156A features all preserved', () => {
+  assert.ok(
+    appV10Src.includes('pp-context-block') &&
+    appV10Src.includes('Claims being tested') &&
+    appV10Src.includes('const BATCH=5') &&
+    appV10Src.includes('aria-expanded="false"') &&
+    appV10Src.includes("'Copied!'"),
+    'D-154B context block, D-155A BATCH=5, D-156A aria-expanded and Copied! feedback must all remain after D-157A'
+  );
+});
+
+test('D-157A: no sensitive fields rendered by any public-profile function', () => {
+  const ppBlock = appV10Src.match(/function renderPublicProfileHtml[\s\S]*?^async function renderPublicProfile/m)?.[0] || '';
+  assert.ok(
+    !ppBlock.includes('.email') && !ppBlock.includes('.is_admin') && !ppBlock.includes('owner_token'),
+    'Public profile render functions must not reference email, is_admin, or owner_token after D-157A'
+  );
+});
+
+test('D-157A: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') &&
+    !workerSrc.includes('OWNER_TOKEN_INVALID') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'D-157A must not resume owner-token enforcement'
+  );
+});
+
+test('D-157A: no admin route changed (requireAdmin count unchanged)', () => {
+  const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls (found ${count})`);
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

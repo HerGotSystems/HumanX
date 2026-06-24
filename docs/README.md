@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D156B_PUBLIC_PROFILE_INTERACTION_POLISH_LIVE_VERIFY.md` ⭐ CURRENT — D-156A LIVE VERIFIED
+### `D157A_PUBLIC_PROFILE_MOBILE_VISUAL_QA_POLISH.md` ⭐ CURRENT — D-157A MOBILE/VISUAL QA POLISH
+
+Mobile overflow safeguards (`min-width:0`, `overflow-wrap:anywhere` on item text, display name, bio), context block readability bump (12px), `pp-footer-actions` stacking on mobile, snapshot card blue-tinted border. Baseline: 1120/24/57. Next: D-157B bump + live verify.
+**Read when:** returning after D-157A to plan D-157B or next public profile work.
+
+### `D156B_PUBLIC_PROFILE_INTERACTION_POLISH_LIVE_VERIFY.md` — D-156A LIVE VERIFIED
 
 Owner confirmed preflight PASS (8/8) and all visual/interaction checks. Production running D-156A / 58e0258 / 1107/24/57. Verbatim terminal output not captured (see standing note in doc).
 **Read when:** returning after D-156A/B to plan next work.
