@@ -51,10 +51,15 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D150A_DEPLOY_PROVENANCE_GUARD_CHECKPOINT.md` ⭐ CURRENT — DEPLOYMENT PROVENANCE GUARD LIVE
+### `D150B_DEPLOY_PROVENANCE_LIVE_VERIFICATION_CHECKPOINT.md` ⭐ CURRENT — DEPLOYMENT PROVENANCE CONFIRMED LIVE
+
+D-150A's `GET /api/version` endpoint confirmed live in production. Owner-verified, sanitized: `ok: true`, `app: humanx`, `checkpoint: D-150A`, `commit: 4d79c18`, `baseline: 1028/24/57`, `updated_at: 2026-06-24T00:00:00Z`, advisory `note` present. No secrets, tokens, admin fields, or user data in the response. Endpoint is public-safe, no auth required. Provenance system is working end-to-end. Before any future live-verification pass, pull `/api/version` first to confirm production is running the expected commit. Verification only — no code/migration/`wrangler.toml` change. Baseline: 1028/24/57 (1 expected parameterised-route warning), unchanged.
+**Read when:** starting new feature work or returning after time away.
+
+### `D150A_DEPLOY_PROVENANCE_GUARD_CHECKPOINT.md` — DEPLOYMENT PROVENANCE GUARD ADDED (confirmed live by D-150B)
 
 Adds `GET /api/version` (public, no auth, no D1) returning static deployment metadata from `src/deploy-meta.js`: `app`, `checkpoint`, `commit`, `baseline`, `updated_at`, advisory `note`. Solves the D-149 live-verification confusion where production was running stale Worker code while the repo had the new endpoint. Pull `/api/version` before any live-verification pass to confirm the expected commit is actually deployed. `deploy-meta.js` must be updated and redeployed on each manual deploy. Twelve new smoke tests guard: module exists, required fields present, no secrets/tokens/user data, route registered, route is not admin-gated, no D1 query, no enforcement resumed, inventory current. API inventory updated. Baseline: 1028/24/57 (1 expected parameterised-route warning).
-**Read when:** starting new feature work or returning after time away.
+**Read when:** reviewing D-150 history.
 
 ### `D149H_PASSIVE_OWNER_TOKEN_TELEMETRY_HOLD_PROTOCOL.md` — OWNER TOKEN HOLD PROTOCOL — D-149 CHAIN CLOSED
 
