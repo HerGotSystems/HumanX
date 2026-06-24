@@ -51,10 +51,15 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D150B_DEPLOY_PROVENANCE_LIVE_VERIFICATION_CHECKPOINT.md` ⭐ CURRENT — DEPLOYMENT PROVENANCE CONFIRMED LIVE
+### `D151A_DEPLOY_META_BUMP_HELPER_CHECKPOINT.md` ⭐ CURRENT — DEPLOY METADATA BUMP HELPER ADDED
+
+Adds `scripts/bump-deploy-meta.mjs` — a direct-node helper that updates `src/deploy-meta.js` before each manual deploy. Usage: `node scripts/bump-deploy-meta.mjs <checkpoint> <baseline>`. Reads the current git short SHA automatically; validates checkpoint (no whitespace) and baseline (must match `NNN/NN/NN`); writes `app/checkpoint/commit/baseline/updated_at`; never reads env, never calls `wrangler deploy`. Prints next-step instructions after writing. Fourteen new smoke tests guard: file exists, all fields written, no secrets/env/exec-deploy, writes only to `deploy-meta.js`, route still uses the module, no enforcement resumed. `deploy-meta.js` bumped to D-151A/1042/24/57. Baseline: 1042/24/57 (1 expected parameterised-route warning).
+**Read when:** starting new feature work or returning after time away.
+
+### `D150B_DEPLOY_PROVENANCE_LIVE_VERIFICATION_CHECKPOINT.md` — DEPLOYMENT PROVENANCE CONFIRMED LIVE (helper added in D-151A)
 
 D-150A's `GET /api/version` endpoint confirmed live in production. Owner-verified, sanitized: `ok: true`, `app: humanx`, `checkpoint: D-150A`, `commit: 4d79c18`, `baseline: 1028/24/57`, `updated_at: 2026-06-24T00:00:00Z`, advisory `note` present. No secrets, tokens, admin fields, or user data in the response. Endpoint is public-safe, no auth required. Provenance system is working end-to-end. Before any future live-verification pass, pull `/api/version` first to confirm production is running the expected commit. Verification only — no code/migration/`wrangler.toml` change. Baseline: 1028/24/57 (1 expected parameterised-route warning), unchanged.
-**Read when:** starting new feature work or returning after time away.
+**Read when:** reviewing D-150 history.
 
 ### `D150A_DEPLOY_PROVENANCE_GUARD_CHECKPOINT.md` — DEPLOYMENT PROVENANCE GUARD ADDED (confirmed live by D-150B)
 

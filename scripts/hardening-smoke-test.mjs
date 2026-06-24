@@ -9387,6 +9387,119 @@ test('D-150A: docs/API_ENDPOINT_INVENTORY.md documents /api/version', () => {
   );
 });
 
+// ── Section 85 — D-151A: Deploy metadata bump helper ─────────────────────────
+
+const bumpScriptSrc = readFileSync(path.join(__dirname, 'bump-deploy-meta.mjs'), 'utf8');
+
+test('D-151A: scripts/bump-deploy-meta.mjs exists and is readable', () => {
+  assert.ok(bumpScriptSrc.length > 0, 'bump-deploy-meta.mjs must exist and be non-empty');
+});
+
+test('D-151A: bump script writes checkpoint, commit, baseline, updated_at into deploy-meta.js', () => {
+  assert.ok(
+    bumpScriptSrc.includes('checkpoint') &&
+    bumpScriptSrc.includes('commit') &&
+    bumpScriptSrc.includes('baseline') &&
+    bumpScriptSrc.includes('updated_at'),
+    'bump script must write all four provenance fields'
+  );
+});
+
+test('D-151A: bump script writes app: humanx into deploy-meta.js', () => {
+  assert.ok(bumpScriptSrc.includes("app:        'humanx'"), "bump script must always write app: 'humanx'");
+});
+
+test('D-151A: bump script reads commit from git rev-parse --short HEAD', () => {
+  assert.ok(
+    bumpScriptSrc.includes('git rev-parse --short HEAD'),
+    'bump script must read the commit SHA from git, not accept it as an argument'
+  );
+});
+
+test('D-151A: bump script validates baseline format (NNN/NN/NN)', () => {
+  assert.ok(
+    bumpScriptSrc.includes('/^\\d+\\/\\d+\\/\\d+$/'),
+    'bump script must reject baseline strings that do not match the NNN/NN/NN pattern'
+  );
+});
+
+test('D-151A: bump script exits with error when checkpoint is missing', () => {
+  assert.ok(
+    bumpScriptSrc.includes('checkpoint label is required'),
+    'bump script must print an error and exit when checkpoint argument is absent'
+  );
+});
+
+test('D-151A: bump script exits with error when baseline is missing', () => {
+  assert.ok(
+    bumpScriptSrc.includes('baseline string is required'),
+    'bump script must print an error and exit when baseline argument is absent'
+  );
+});
+
+test('D-151A: bump script does not contain secret, token, or admin-token strings', () => {
+  assert.ok(
+    !bumpScriptSrc.includes('HUMANX_OWNER_SECRET') &&
+    !bumpScriptSrc.includes('HUMANX_ADMIN_TOKEN') &&
+    !bumpScriptSrc.includes('owner_token') &&
+    !bumpScriptSrc.includes('admin_token'),
+    'bump script must never reference secrets, owner tokens, or admin tokens'
+  );
+});
+
+test('D-151A: bump script does not read process.env', () => {
+  assert.ok(
+    !bumpScriptSrc.includes('process.env'),
+    'bump script must not read environment variables — it is a pure file-write helper'
+  );
+});
+
+test('D-151A: bump script does not execute wrangler deploy (no execSync/exec of deploy)', () => {
+  // The script may print "wrangler deploy" as instructional text — that is fine.
+  // It must not actually invoke it via execSync or exec.
+  const execCalls = [...bumpScriptSrc.matchAll(/execSync\s*\([^)]+\)/g)].map(m => m[0]);
+  const deploysViaExec = execCalls.filter(c => c.includes('deploy'));
+  assert.ok(
+    deploysViaExec.length === 0,
+    'bump script must not call execSync("wrangler deploy") — deployment is a manual step'
+  );
+});
+
+test('D-151A: bump script writes to src/deploy-meta.js, not to any other file', () => {
+  assert.ok(
+    bumpScriptSrc.includes('deploy-meta.js') &&
+    !bumpScriptSrc.includes('worker.js') &&
+    !bumpScriptSrc.includes('wrangler.toml'),
+    'bump script must write only to src/deploy-meta.js'
+  );
+});
+
+test('D-151A: bump script prints next-step instructions after writing', () => {
+  assert.ok(
+    bumpScriptSrc.includes('Next steps') &&
+    bumpScriptSrc.includes('wrangler deploy') &&
+    bumpScriptSrc.includes('/api/version'),
+    'bump script must print next steps including deploy and /api/version verification'
+  );
+});
+
+test('D-151A: GET /api/version in worker.js still uses src/deploy-meta.js (not inlined)', () => {
+  assert.ok(
+    workerSrc.includes("import { DEPLOY_META } from './deploy-meta.js'") &&
+    workerSrc.includes('...DEPLOY_META'),
+    '/api/version must still read from deploy-meta.js — the bump script is only useful if the route uses the module'
+  );
+});
+
+test('D-151A: no owner-token enforcement work was resumed by this patch', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') &&
+    !workerSrc.includes('OWNER_TOKEN_INVALID') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'D-151A must not resume owner-token enforcement'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
