@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D161B_BROWSE_CLAIMS_PUBLIC_CLARITY_LAYER.md` ⭐ CURRENT — BROWSE CLAIMS PUBLIC CLARITY LAYER
+### `D161D_BROWSE_CLAIMS_PUBLIC_CLARITY_LIVE_VERIFY.md` ⭐ CURRENT — D-161B LIVE VERIFIED
+
+Version ID: a33d0d09-0ad7-4d88-9d0b-1a5f25e496e1. All 8 preflight checks passed. Intro visible, stats collapsed, CTA "Investigate →", verdict copy updated, error heading visitor-safe.
+
+### `D161B_BROWSE_CLAIMS_PUBLIC_CLARITY_LAYER.md` — BROWSE CLAIMS PUBLIC CLARITY LAYER
 
 Intro subheading added, graph stats collapsed by default, CTA renamed to "Investigate →", verdict explanation copy improved, renderError heading visitor-safe. 12 new smoke tests (1173/24/57).
 **Read before starting D-161C (bump/deploy) or any Browse Claims / arena UX work.**
