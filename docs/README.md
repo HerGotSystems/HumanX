@@ -51,10 +51,15 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D151A_DEPLOY_META_BUMP_HELPER_CHECKPOINT.md` ⭐ CURRENT — DEPLOY METADATA BUMP HELPER ADDED
+### `D151B_DEPLOY_META_BUMP_HELPER_LIVE_VERIFICATION_CHECKPOINT.md` ⭐ CURRENT — DEPLOY METADATA BUMP HELPER CONFIRMED LIVE
+
+D-151A's `scripts/bump-deploy-meta.mjs` helper confirmed end-to-end in production. Owner-verified, sanitized: `GET /api/version` returns `checkpoint: D-151A`, `commit: f77390b`, no secrets or user data. Baseline field shows `1040/24/57` (cosmetic deploy-time drift — local is `1042/24/57`; the discrepancy is informational only and does not gate anything). Helper workflow is verified: bump script → checks → commit → deploy → `/api/version` confirms. Verification only — no code/migration/`wrangler.toml` change. Baseline: 1042/24/57 (1 expected parameterised-route warning), unchanged.
+**Read when:** starting new feature work or returning after time away.
+
+### `D151A_DEPLOY_META_BUMP_HELPER_CHECKPOINT.md` — DEPLOY METADATA BUMP HELPER ADDED (confirmed live by D-151B)
 
 Adds `scripts/bump-deploy-meta.mjs` — a direct-node helper that updates `src/deploy-meta.js` before each manual deploy. Usage: `node scripts/bump-deploy-meta.mjs <checkpoint> <baseline>`. Reads the current git short SHA automatically; validates checkpoint (no whitespace) and baseline (must match `NNN/NN/NN`); writes `app/checkpoint/commit/baseline/updated_at`; never reads env, never calls `wrangler deploy`. Prints next-step instructions after writing. Fourteen new smoke tests guard: file exists, all fields written, no secrets/env/exec-deploy, writes only to `deploy-meta.js`, route still uses the module, no enforcement resumed. `deploy-meta.js` bumped to D-151A/1042/24/57. Baseline: 1042/24/57 (1 expected parameterised-route warning).
-**Read when:** starting new feature work or returning after time away.
+**Read when:** reviewing D-151 history.
 
 ### `D150B_DEPLOY_PROVENANCE_LIVE_VERIFICATION_CHECKPOINT.md` — DEPLOYMENT PROVENANCE CONFIRMED LIVE (helper added in D-151A)
 
