@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D155A_PUBLIC_PROFILE_DENSITY_READABILITY_POLISH.md` ⭐ CURRENT — PUBLIC PROFILE DENSITY POLISH
+### `D155B_PUBLIC_PROFILE_DENSITY_POLISH_LIVE_VERIFY.md` ⭐ CURRENT — D-155A LIVE VERIFIED
+
+Preflight 8/8 PASS. Production running D-155A / 122ac14 / 1091/24/57 confirmed. Deploy uploaded styles.css + app-v10.js. Version ID: 5e6530b0.
+**Read when:** returning after D-155A/B to plan next work.
+
+### `D155A_PUBLIC_PROFILE_DENSITY_READABILITY_POLISH.md` — PUBLIC PROFILE DENSITY POLISH (live-verified in D-155B)
 
 Show-more/show-less toggle for evidence (5 default) and pressure (5 default), visitor-friendly empty states, display name 22px, bio 13px/1.5 line-height, section h3 14px bold, item title 13px readable vs. muted metadata, pp-card explicit 14px padding, de-emphasised counts label. 18 new smoke tests. Baseline: 1091/24/57. Frontend/CSS only. No backend, migration, or owner-token changes.
 **Read when:** editing public profile frontend or planning D-155B live-verify.
