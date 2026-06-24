@@ -628,6 +628,7 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .account-redeem-label{margin:0 0 2px}
 .account-redeem input{font-size:11px;padding:7px 8px}
 .account-panel-close{align-self:flex-end;background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer;padding:2px 0}
+.account-nocode-note{margin:4px 0 0;color:var(--muted);font-style:italic;line-height:1.45}
 .admin-invite-panel{margin:10px 0;display:grid;gap:6px}
 .admin-invite-note{margin:0 0 2px}
 .admin-invite-result{margin-top:4px}

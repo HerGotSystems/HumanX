@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D160A_INVITE_ACCESS_PATH_AUDIT.md` ⭐ CURRENT — INVITE/ACCESS PATH AUDIT
+### `D160B_INVITE_ACCESS_COPY_BRIDGE.md` ⭐ CURRENT — INVITE ACCESS COPY BRIDGE
+
+Anonymous badge changed to `◎ Invite`. No-code private-preview copy added to account panel. 12 new smoke tests (1161/24/57). Frontend only — no backend changes.
+**Read before starting D-160C (bump/deploy) or any account panel / invite UX work.**
+
+### `D160A_INVITE_ACCESS_PATH_AUDIT.md` — INVITE/ACCESS PATH AUDIT
 
 Invite creation correctly gated (requireAdmin + admin UI only). Redemption clean (atomic, rate-limited, no is_admin). Gap: no "don't have a code?" path. D-160B plan: add copy to account panel, optional badge label hint. No backend changes needed.
 **Read before starting D-160B or any invite/account/join flow work.**

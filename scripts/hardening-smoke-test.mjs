@@ -10388,6 +10388,114 @@ test('D-159B: no admin route changed', () => {
   assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-159B (found ${count})`);
 });
 
+// ── Section 93 — D-160B: Invite access copy bridge ────────────────────────────
+
+test('D-160B: anonymous account badge shows invite signal in index.html', () => {
+  const htmlSrc = readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
+  assert.ok(
+    htmlSrc.includes('◎ Invite') && htmlSrc.includes('id="who"'),
+    'index.html who badge must show "◎ Invite" as initial text to signal the invite-only access path'
+  );
+});
+
+test('D-160B: updateWhoBadge sets anonymous badge to invite signal', () => {
+  const idx = appV10Src.indexOf('function updateWhoBadge');
+  const slice = appV10Src.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('◎ Invite') && !slice.includes("'anonymous'"),
+    'updateWhoBadge must set the badge to "◎ Invite" for anonymous users, not "anonymous"'
+  );
+});
+
+test('D-160B: no-code private-preview copy exists in accountPanelHtml', () => {
+  const idx = appV10Src.indexOf('function accountPanelHtml');
+  const slice = appV10Src.slice(idx, idx + 1600);
+  assert.ok(
+    slice.includes("Don't have a code?") && slice.includes('private preview') && slice.includes('shared directly by members'),
+    'accountPanelHtml must include the no-code explanatory copy about private preview and direct sharing'
+  );
+});
+
+test('D-160B: invite redemption form still exists and is unmodified', () => {
+  const idx = appV10Src.indexOf('function accountPanelHtml');
+  const slice = appV10Src.slice(idx, idx + 1600);
+  assert.ok(
+    slice.includes('Have an invite code?') &&
+    slice.includes('redeemInviteUI()') &&
+    slice.includes('inviteCode') &&
+    slice.includes('inviteEmail'),
+    'accountPanelHtml must retain the full invite redemption form: label, code input, email input, and Redeem button'
+  );
+});
+
+test('D-160B: no email-collection request-access form was added', () => {
+  const idx = appV10Src.indexOf('function accountPanelHtml');
+  const slice = appV10Src.slice(idx, idx + 1200);
+  assert.ok(
+    !slice.includes('request-access') && !slice.includes('requestAccess') && !slice.includes('waitlist'),
+    'D-160B must not add a request-access or waitlist form — copy only, no email collection'
+  );
+});
+
+test('D-160B: account-nocode-note CSS class exists in styles.css', () => {
+  assert.ok(
+    cssSrc.includes('.account-nocode-note') && cssSrc.includes('font-style:italic'),
+    'styles.css must define .account-nocode-note for the no-code explanatory paragraph'
+  );
+});
+
+test('D-160B: /api/auth/invite/create remains admin-gated in worker.js', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/auth/invite/create' && request.method === 'POST'") &&
+    workerSrc.includes('requireAdmin(request, env)') &&
+    workerSrc.includes('createInviteCode(request, env)'),
+    '/api/auth/invite/create must remain wrapped in requireAdmin — D-160B must not weaken this gate'
+  );
+});
+
+test('D-160B: /api/auth/invite/redeem route remains present and unchanged', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/auth/invite/redeem' && request.method === 'POST'") &&
+    workerSrc.includes('redeemInviteCode(request, env)'),
+    '/api/auth/invite/redeem must remain present and unmodified after D-160B'
+  );
+});
+
+test('D-160B: D-159B home clarity copy still present', () => {
+  const idx = appV10Src.indexOf('function renderHome');
+  const slice = appV10Src.slice(idx, idx + 1000);
+  assert.ok(
+    slice.includes('invite-only preview') &&
+    slice.includes('invite-only space') &&
+    slice.includes('href="/u/calenhir"'),
+    'D-160B must not remove D-159B home clarity changes: badge, intro, bridge link'
+  );
+});
+
+test('D-160B: no invite codes rendered in any public-facing function', () => {
+  const publicFns = ['renderPublicProfileHtml', 'renderHome', 'accountPanelHtml'];
+  for (const fn of publicFns) {
+    const idx = appV10Src.indexOf(`function ${fn}`);
+    const slice = appV10Src.slice(idx, idx + 3500);
+    assert.ok(
+      !slice.includes('invite_codes') && !slice.includes('inv_'),
+      `${fn} must not render invite codes or reference the invite_codes table`
+    );
+  }
+});
+
+test('D-160B: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-160B must not resume owner-token enforcement'
+  );
+});
+
+test('D-160B: no admin route changed', () => {
+  const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-160B (found ${count})`);
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
