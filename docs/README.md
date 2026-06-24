@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D157B_PUBLIC_PROFILE_MOBILE_VISUAL_POLISH_LIVE_VERIFY.md` ⭐ CURRENT — D-157A LIVE VERIFIED
+### `D158A_PUBLIC_PROFILE_CONTENT_HIERARCHY_AUDIT.md` ⭐ CURRENT — CONTENT HIERARCHY AUDIT
+
+Snapshot promoted before context block, counts moved to footer, empty secondary sections suppressed, optional bio fallback from snapshot. Full recommended D-158B plan inside.
+**Read before starting D-158B or any public profile content ordering work.**
+
+### `D157B_PUBLIC_PROFILE_MOBILE_VISUAL_POLISH_LIVE_VERIFY.md` — D-157A LIVE VERIFIED
 
 All 8 preflight checks passed. Version ID: `7a97b3d0-c581-4edd-80a5-ef38d2e16ffe`. Production running D-157A / ea2f899 / 1120/24/57. Visual/mobile checks confirmed by owner.
 **Read when:** returning after D-157A/B to plan next work.
