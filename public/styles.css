@@ -118,6 +118,8 @@
 .study-vote-note{color:var(--muted);font-size:10px;line-height:1.3;flex-basis:100%;margin:0}
 .study-lineage-note{margin:0 0 6px;color:var(--muted);line-height:1.4}
 .submit-trust-note{color:var(--muted);opacity:.8;font-size:11px;font-style:italic;margin:2px 0 8px}
+.builder-intro{margin:0 0 6px;color:var(--muted);line-height:1.45}
+.builder-truth-vs-claim{color:var(--muted);font-style:italic;margin:4px 0 8px;line-height:1.4}
 /* Workspace-aware chrome — hide searchbar, filter, or sidebar based on active mode */
 .mode-home .searchbar,.mode-submit .searchbar,.mode-export .searchbar,.mode-review .searchbar,.mode-drift .searchbar,.study-mode .searchbar{display:none}
 .mode-home main,.mode-submit main,.mode-export main,.mode-review main,.mode-drift main{grid-template-rows:auto 1fr}

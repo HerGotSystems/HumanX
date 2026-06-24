@@ -10721,6 +10721,106 @@ test('D-162B: no admin route changed', () => {
   assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-162B (found ${count})`);
 });
 
+// ── Section 96 — D-163B: Submit Claim first-time clarity layer ────────────────
+
+test('D-163B: builder-intro copy exists in renderBuilderStep1', () => {
+  const idx = appV10Src.indexOf('function renderBuilderStep1');
+  const slice = appV10Src.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes('builder-intro') &&
+    slice.includes('Anyone can submit') &&
+    slice.includes('pseudonymously') &&
+    slice.includes('after review'),
+    'renderBuilderStep1 must include .builder-intro with "Anyone can submit" pseudonymously and review copy'
+  );
+});
+
+test('D-163B: Step 1 footer note mentions review before public display', () => {
+  const idx = appV10Src.indexOf('function renderBuilderStep1');
+  const slice = appV10Src.slice(idx, idx + 2000);
+  assert.ok(
+    slice.includes('reviewed before it appears publicly'),
+    'renderBuilderStep1 footer note must mention that the claim is reviewed before appearing publicly'
+  );
+});
+
+test('D-163B: Truth-vs-Claim note exists in renderBuilderStep2', () => {
+  const idx = appV10Src.indexOf('function renderBuilderStep2');
+  const slice = appV10Src.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes('builder-truth-vs-claim') &&
+    slice.includes('Claims are ideas still being tested') &&
+    slice.includes('If unsure, submit as a claim'),
+    'renderBuilderStep2 must include .builder-truth-vs-claim note explaining the Truth vs Claim decision'
+  );
+});
+
+test('D-163B: success state includes review timeline expectation', () => {
+  const idx = appV10Src.indexOf('function submitBuilderClaim');
+  const slice = appV10Src.slice(idx, idx + 2000);
+  assert.ok(
+    slice.includes('Usually within a few days'),
+    'submitBuilderClaim success panel must include "Usually within a few days" review timeline note'
+  );
+});
+
+test('D-163B: claim submit route still inserts review_state=review in worker.js', () => {
+  const idx = workerSrc.indexOf('async function createClaim');
+  const slice = workerSrc.slice(idx, idx + 1400);
+  assert.ok(
+    slice.includes("'review'") && slice.includes('review_state'),
+    'createClaim must still insert review_state=review — submitted claims must not go public automatically'
+  );
+});
+
+test('D-163B: no invite-required gate added to claim submission', () => {
+  const idx = workerSrc.indexOf('async function createClaim');
+  const slice = workerSrc.slice(idx, idx + 500);
+  assert.ok(
+    !slice.includes('requireVerified') && !slice.includes('verified===1') && !slice.includes("is_verified"),
+    'createClaim must not require invite redemption or verified status — anonymous submission must remain open'
+  );
+});
+
+test('D-163B: builder-intro and builder-truth-vs-claim CSS classes defined', () => {
+  assert.ok(
+    cssSrc.includes('.builder-intro') && cssSrc.includes('.builder-truth-vs-claim'),
+    'styles.css must define .builder-intro and .builder-truth-vs-claim'
+  );
+});
+
+test('D-163B: no invite codes rendered in builder steps', () => {
+  ['renderBuilderStep1', 'renderBuilderStep2', 'renderBuilderStep3'].forEach(fn => {
+    const idx = appV10Src.indexOf(`function ${fn}`);
+    const slice = appV10Src.slice(idx, idx + 2000);
+    assert.ok(
+      !slice.includes('invite_codes') && !slice.includes('inv_'),
+      `${fn} must not render invite codes`
+    );
+  });
+});
+
+test('D-163B: no sensitive fields rendered in builder success states', () => {
+  const idx = appV10Src.indexOf('function submitBuilderClaim');
+  const slice = appV10Src.slice(idx, idx + 2500);
+  assert.ok(
+    !slice.includes('c.email') && !slice.includes('is_admin') && !slice.includes('owner_token'),
+    'submitBuilderClaim must not render email, is_admin, or owner_token'
+  );
+});
+
+test('D-163B: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-163B must not resume owner-token enforcement'
+  );
+});
+
+test('D-163B: no admin route changed', () => {
+  const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-163B (found ${count})`);
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

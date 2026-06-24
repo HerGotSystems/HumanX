@@ -51,10 +51,14 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D163A_SUBMIT_CLAIM_FIRST_TIME_USER_AUDIT.md` ⭐ CURRENT — SUBMIT CLAIM FIRST-TIME USER AUDIT
+### `D163B_SUBMIT_CLAIM_FIRST_TIME_CLARITY_LAYER.md` ⭐ CURRENT — D-163B SUBMIT CLAIM CLARITY LAYER
+
+Frontend only. Added `.builder-intro` subtitle ("Anyone can submit … pseudonymously … after review"), extended Step 1 footer to mention review, added `.builder-truth-vs-claim` note in Truth route, added "Usually within a few days" to success state. 11 new smoke tests. Baseline: 1198/24/57. No backend changes.
+**Read before D-163C bump/deploy or any builder flow changes.**
+
+### `D163A_SUBMIT_CLAIM_FIRST_TIME_USER_AUDIT.md` — SUBMIT CLAIM FIRST-TIME USER AUDIT
 
 Builder flow is good. Gap: no "anyone can submit" copy (visitors assume invite required). No subtitle, no review mention in Step 1. D-163B plan: builder-intro subtitle, Step 1 footer note, Truth-vs-Claim note, success timeline hint. No backend changes.
-**Read before starting D-163B or any Submit Claim / builder flow work.**
 
 ### `D162D_CLAIM_STUDY_PUBLIC_READING_GUIDE_LIVE_VERIFY.md` — D-162B LIVE VERIFIED
 
