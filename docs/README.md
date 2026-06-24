@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D158B_PUBLIC_PROFILE_SNAPSHOT_FIRST_HIERARCHY.md` ⭐ CURRENT — SNAPSHOT-FIRST HIERARCHY
+### `D158D_PUBLIC_PROFILE_SNAPSHOT_FIRST_LIVE_VERIFY.md` ⭐ CURRENT — D-158B LIVE VERIFIED
+
+All 8 preflight checks passed. Version ID: `1236c30c-5ed8-45ab-a050-3acaf5f59c24`. Production running D-158B / 9784116 / 1138/24/57. All visual/order checks confirmed by owner.
+**Read when:** returning after D-158B/C/D to plan next work.
+
+### `D158B_PUBLIC_PROFILE_SNAPSHOT_FIRST_HIERARCHY.md` — SNAPSHOT-FIRST HIERARCHY (live-verified in D-158D)
 
 Snapshot promoted before context block, counts moved after truths, empty truths/evidence/pressure sections suppressed, bio fallback from snapshot when bio absent. Baseline: 1138/24/57. Next: D-158C bump + live verify.
 **Read before starting D-158C or any public profile ordering work.**
