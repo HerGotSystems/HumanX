@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D160D_INVITE_ACCESS_COPY_BRIDGE_LIVE_VERIFY.md` ⭐ CURRENT — D-160B LIVE VERIFIED
+### `D161A_BROWSE_CLAIMS_FIRST_VISITOR_AUDIT.md` ⭐ CURRENT — BROWSE CLAIMS FIRST VISITOR AUDIT
+
+Claims list lacks inline "what is a claim?" copy. Graph stats box reads as admin panel. 5 friction points identified. D-161B plan: intro subheading, collapse graph box, copy improvements. No backend changes needed.
+**Read before starting D-161B or any Browse Claims / arena UX work.**
+
+### `D160D_INVITE_ACCESS_COPY_BRIDGE_LIVE_VERIFY.md` — D-160B LIVE VERIFIED
 
 Version ID: 35ac0544-ffc2-4795-aa0d-b30148aaa01a. All 8 preflight checks passed. Badge shows ◎ Invite, no-code note visible, redeem form intact, no invite codes exposed.
 
