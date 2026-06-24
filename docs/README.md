@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D156A_PUBLIC_PROFILE_INTERACTION_ACCESSIBILITY_POLISH.md` ⭐ CURRENT — PUBLIC PROFILE INTERACTION/A11Y POLISH
+### `D156B_PUBLIC_PROFILE_INTERACTION_POLISH_LIVE_VERIFY.md` ⭐ CURRENT — D-156A LIVE VERIFIED
+
+Owner confirmed preflight PASS (8/8) and all visual/interaction checks. Production running D-156A / 58e0258 / 1107/24/57. Verbatim terminal output not captured (see standing note in doc).
+**Read when:** returning after D-156A/B to plan next work.
+
+### `D156A_PUBLIC_PROFILE_INTERACTION_ACCESSIBILITY_POLISH.md` — PUBLIC PROFILE INTERACTION/A11Y POLISH (live-verified in D-156B)
 
 aria-expanded + aria-controls on show-more toggles; "Copied!" feedback + disabled state on copy-link button; .btn-secondary CSS defined; 44px mobile tap targets. 16 new smoke tests. Baseline: 1107/24/57. Frontend/CSS only.
 **Read when:** editing public profile frontend or planning D-156B live-verify.
