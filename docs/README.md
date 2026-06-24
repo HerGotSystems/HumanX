@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D153B_ADMIN_DEBUG_INVENTORY_DRIFT_FIX.md` ⭐ CURRENT — INVENTORY DOCS DRIFT FIXED
+### `D154A_PUBLIC_PROFILE_PRODUCT_AUDIT.md` ⭐ CURRENT — PUBLIC PROFILE PRODUCT AUDIT COMPLETE
+
+Full product audit of public profile (`/u/:slug`). Privacy verdict: clean — no `is_admin`, `email`, `owner_token`, `user.id`, evidence/pressure body, or non-public content leaks. Strengths: privacy off by default, consistent 404 treatment, OG tags, owner-recognises-own-profile. Key friction: F-1 (no HumanX context for first-time visitor), F-2 (jargon terminology opaque to outsiders), F-3 (counts-first buries snapshot), F-4 (Open Study CTA cold-drops visitor into app). Mobile: acceptable. Recommended D-154B: add context block, reorder cards (snapshot before counts), consolidate disclaimers, lightweight CTA. No code change. No owner-token work. Baseline: 1057/24/57, unchanged.
+**Read when:** starting new feature work or returning after time away.
+
+### `D153B_ADMIN_DEBUG_INVENTORY_DRIFT_FIX.md` — INVENTORY DOCS DRIFT FIXED (audit in D-153A)
 
 Corrects `docs/API_ENDPOINT_INVENTORY.md`: `GET /api/debug` was incorrectly described as "relies on obscurity only" — D-153A audit confirmed `requireAdmin` is in place. Visibility updated from `Internal-ish` to `Admin only (D-153B)`; risk note updated to state 403 on unauthenticated calls. Docs only. Baseline: 1057/24/57, unchanged.
 **Read when:** starting new feature work or returning after time away.
@@ -59,7 +64,7 @@ Corrects `docs/API_ENDPOINT_INVENTORY.md`: `GET /api/debug` was incorrectly desc
 ### `D153A_ADMIN_REVIEW_SURFACE_SAFETY_AUDIT.md` — ADMIN/REVIEW SURFACE AUDIT CLEAN (drift fixed by D-153B)
 
 Full audit of admin/review surface. 11 admin-gated routes found — all call `requireAdmin` as first statement before any D1 or response. `requireAdmin` is timing-safe (`safeEqual`), fail-closed when `HUMANX_ADMIN_TOKEN` unset. All 5 review routes correctly gated. `is_admin` field confirmed omitted from every user-facing response. Frontend stores admin token in `localStorage` under `humanx_admin_token_v1` only, never logs it. No ungated admin routes found. Weak spots documented (W-1: docs drift on `/api/debug` description, W-2: `exportMyHumanX` `SELECT *` on non-user tables, W-3/W-4: admin-only access to pre-approval content — all intentional). Recommended next: D-153B fix `/api/debug` inventory description. No code change. No owner-token work resumed. Baseline: 1057/24/57, unchanged.
-**Read when:** reviewing D-153 history.
+**Read when:** reviewing D-153/D-154 history.
 
 ### `D152B_LIVE_PREFLIGHT_LIVE_VERIFICATION_CHECKPOINT.md` — LIVE PREFLIGHT CONFIRMED END-TO-END (audit in D-153A)
 
