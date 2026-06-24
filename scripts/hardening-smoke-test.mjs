@@ -10496,6 +10496,106 @@ test('D-160B: no admin route changed', () => {
   assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-160B (found ${count})`);
 });
 
+// ── Section 94 — D-161B: Browse Claims public clarity layer ───────────────────
+
+test('D-161B: Browse Claims intro copy exists in renderArena', () => {
+  const idx = appV10Src.indexOf('function renderArena');
+  const slice = appV10Src.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('arena-intro') && slice.includes('Claims are public ideas being tested'),
+    'renderArena must include .arena-intro paragraph explaining what claims are'
+  );
+});
+
+test('D-161B: graph stats wrapped in arena-stats-details collapsed by default', () => {
+  const idx = appV10Src.indexOf('function renderArena');
+  const slice = appV10Src.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('arena-stats-details') && slice.includes('<details') && slice.includes('Show public network stats'),
+    'renderArena must wrap graphBox() in a <details> element with aria-closed-by-default and "Show public network stats" summary'
+  );
+});
+
+test('D-161B: graph stats content still exists inside graphBox', () => {
+  const idx = appV10Src.indexOf('function graphBox');
+  const slice = appV10Src.slice(idx, idx + 500);
+  assert.ok(
+    slice.includes("'Claims'") && slice.includes("'Evidence'") && slice.includes("'Truths'"),
+    'graphBox must still contain Claims, Evidence, Truths stats — they are moved behind a toggle, not removed'
+  );
+});
+
+test('D-161B: claim CTA changed to "Investigate →"', () => {
+  const idx = appV10Src.indexOf('function card(');
+  const slice = appV10Src.slice(idx, idx + 1200);
+  assert.ok(
+    slice.includes('Investigate →'),
+    'card() must use "Investigate →" as the claim CTA button label'
+  );
+});
+
+test('D-161B: old "Study Claim →" label is removed from card()', () => {
+  const idx = appV10Src.indexOf('function card(');
+  const slice = appV10Src.slice(idx, idx + 900);
+  assert.ok(
+    !slice.includes('Study Claim →'),
+    'card() must not contain the old "Study Claim →" label — it was replaced by "Investigate →"'
+  );
+});
+
+test('D-161B: verdict explanation copy exists in index.html filter', () => {
+  const htmlSrc = readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
+  assert.ok(
+    htmlSrc.includes('surviving evidence and pressure'),
+    'index.html verdict filter must include explanatory copy about verdicts showing claim survival under evidence and pressure'
+  );
+});
+
+test('D-161B: renderError uses visitor-friendly heading', () => {
+  const idx = appV10Src.indexOf('function renderError');
+  const slice = appV10Src.slice(idx, idx + 250);
+  assert.ok(
+    slice.includes('Something went wrong') && !slice.includes('HumanX backend notice'),
+    'renderError must use "Something went wrong" heading, not the old "HumanX backend notice" debug copy'
+  );
+});
+
+test('D-161B: arena-intro and arena-stats CSS classes defined in styles.css', () => {
+  assert.ok(
+    cssSrc.includes('.arena-intro') && cssSrc.includes('.arena-stats-details') && cssSrc.includes('.arena-stats-summary'),
+    'styles.css must define .arena-intro, .arena-stats-details, and .arena-stats-summary for the D-161B arena layout'
+  );
+});
+
+test('D-161B: /api/claims remains public and public-scoped in worker.js', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/claims' && request.method === 'GET'") &&
+    workerSrc.includes("COALESCE(c.review_state,'public')='public'"),
+    '/api/claims GET must remain public (no requireUser gate) and scoped to public review_state rows'
+  );
+});
+
+test('D-161B: mapClaim does not expose private fields', () => {
+  const idx = workerSrc.indexOf('function mapClaim');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    !slice.includes('c.email') && !slice.includes('c.is_admin') && !slice.includes('evidence.body'),
+    'mapClaim must not expose email, is_admin, or evidence.body'
+  );
+});
+
+test('D-161B: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-161B must not resume owner-token enforcement'
+  );
+});
+
+test('D-161B: no admin route changed', () => {
+  const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-161B (found ${count})`);
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

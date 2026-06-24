@@ -440,6 +440,12 @@
 .section-head h2{margin:0;font-size:18px}
 .section-head h3{margin:0;font-size:14px;font-weight:600}
 .section-head>.graph-status{flex-basis:100%;margin:4px 0 0}
+/* D-161B: Browse Claims public clarity */
+.arena-intro{margin:2px 0 0;flex-basis:100%;color:var(--muted);line-height:1.45}
+.arena-stats-details{flex-basis:100%;margin:6px 0 0}
+.arena-stats-summary{cursor:pointer;color:var(--muted);user-select:none;list-style:none;display:inline-block}
+.arena-stats-summary::-webkit-details-marker{display:none}
+.arena-stats-details[open] .arena-stats-summary{color:var(--text)}
 /* HumanX shared input form system */
 .form-panel{max-width:520px}
 .compact-form{padding:10px 14px}

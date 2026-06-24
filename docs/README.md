@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D161A_BROWSE_CLAIMS_FIRST_VISITOR_AUDIT.md` ⭐ CURRENT — BROWSE CLAIMS FIRST VISITOR AUDIT
+### `D161B_BROWSE_CLAIMS_PUBLIC_CLARITY_LAYER.md` ⭐ CURRENT — BROWSE CLAIMS PUBLIC CLARITY LAYER
+
+Intro subheading added, graph stats collapsed by default, CTA renamed to "Investigate →", verdict explanation copy improved, renderError heading visitor-safe. 12 new smoke tests (1173/24/57).
+**Read before starting D-161C (bump/deploy) or any Browse Claims / arena UX work.**
+
+### `D161A_BROWSE_CLAIMS_FIRST_VISITOR_AUDIT.md` — BROWSE CLAIMS FIRST VISITOR AUDIT
 
 Claims list lacks inline "what is a claim?" copy. Graph stats box reads as admin panel. 5 friction points identified. D-161B plan: intro subheading, collapse graph box, copy improvements. No backend changes needed.
 **Read before starting D-161B or any Browse Claims / arena UX work.**
