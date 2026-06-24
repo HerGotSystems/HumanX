@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D152B_LIVE_PREFLIGHT_LIVE_VERIFICATION_CHECKPOINT.md` ⭐ CURRENT — LIVE PREFLIGHT CONFIRMED END-TO-END
+### `D153A_ADMIN_REVIEW_SURFACE_SAFETY_AUDIT.md` ⭐ CURRENT — ADMIN/REVIEW SURFACE AUDIT CLEAN
+
+Full audit of admin/review surface. 11 admin-gated routes found — all call `requireAdmin` as first statement before any D1 or response. `requireAdmin` is timing-safe (`safeEqual`), fail-closed when `HUMANX_ADMIN_TOKEN` unset. All 5 review routes correctly gated. `is_admin` field confirmed omitted from every user-facing response. Frontend stores admin token in `localStorage` under `humanx_admin_token_v1` only, never logs it. No ungated admin routes found. Weak spots documented (W-1: docs drift on `/api/debug` description, W-2: `exportMyHumanX` `SELECT *` on non-user tables, W-3/W-4: admin-only access to pre-approval content — all intentional). Recommended next: D-153B fix `/api/debug` inventory description. No code change. No owner-token work resumed. Baseline: 1057/24/57, unchanged.
+**Read when:** starting new feature work or returning after time away.
+
+### `D152B_LIVE_PREFLIGHT_LIVE_VERIFICATION_CHECKPOINT.md` — LIVE PREFLIGHT CONFIRMED END-TO-END (audit in D-153A)
 
 `scripts/live-preflight.mjs` confirmed working against production. All 8 preflight checks passed: `/api/version` HTTP 200, `ok`, `app`, `checkpoint D-152A`, `commit c6d1437`, `baseline 1057/24/57`, `/api/health` HTTP 200 and `ok`. Full D-150/151/152 provenance workflow now verified end-to-end: bump helper writes metadata → `/api/version` returns it live → preflight script checks it programmatically. No browser console step needed for future pre-verification. Verification only — no code/migration/`wrangler.toml` change. Baseline: 1057/24/57 (1 expected parameterised-route warning), unchanged.
 **Read when:** starting new feature work or returning after time away.
