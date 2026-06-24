@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D163B_SUBMIT_CLAIM_FIRST_TIME_CLARITY_LAYER.md` ⭐ CURRENT — D-163B SUBMIT CLAIM CLARITY LAYER
+### `D163D_SUBMIT_CLAIM_CLARITY_LAYER_LIVE_VERIFY.md` ⭐ CURRENT — D-163B LIVE VERIFIED
+
+Version ID: b6d46668-5048-46e5-809c-f082e672eb46. All preflight checks passed. All visual checks passed. Baseline: 1198/24/57.
+
+### `D163B_SUBMIT_CLAIM_FIRST_TIME_CLARITY_LAYER.md` — D-163B SUBMIT CLAIM CLARITY LAYER
 
 Frontend only. Added `.builder-intro` subtitle ("Anyone can submit … pseudonymously … after review"), extended Step 1 footer to mention review, added `.builder-truth-vs-claim` note in Truth route, added "Usually within a few days" to success state. 11 new smoke tests. Baseline: 1198/24/57. No backend changes.
 **Read before D-163C bump/deploy or any builder flow changes.**
