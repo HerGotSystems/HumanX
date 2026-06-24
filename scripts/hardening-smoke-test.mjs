@@ -9282,6 +9282,111 @@ test('D-148A: no D1 migration or wrangler.toml change was made by this patch', (
   );
 });
 
+// ── Section 84 — D-150A: Deployment provenance guard ─────────────────────────
+
+const deployMetaSrc = readFileSync(path.join(__dirname, '../src/deploy-meta.js'), 'utf8');
+
+test('D-150A: src/deploy-meta.js exists and exports DEPLOY_META', () => {
+  assert.ok(deployMetaSrc.includes('export const DEPLOY_META'), 'deploy-meta.js must export DEPLOY_META');
+});
+
+test('D-150A: DEPLOY_META contains required fields: app, checkpoint, commit, baseline, updated_at', () => {
+  assert.ok(
+    deployMetaSrc.includes("app:") &&
+    deployMetaSrc.includes("checkpoint:") &&
+    deployMetaSrc.includes("commit:") &&
+    deployMetaSrc.includes("baseline:") &&
+    deployMetaSrc.includes("updated_at:"),
+    'DEPLOY_META must include app, checkpoint, commit, baseline, updated_at'
+  );
+});
+
+test('D-150A: DEPLOY_META contains no secret, token, or admin-token value', () => {
+  assert.ok(
+    !deployMetaSrc.includes('HUMANX_OWNER_SECRET') &&
+    !deployMetaSrc.includes('HUMANX_ADMIN_TOKEN') &&
+    !deployMetaSrc.includes('owner_token') &&
+    !deployMetaSrc.includes('admin_token'),
+    'deploy-meta.js must never contain secret, owner_token, or admin_token values'
+  );
+});
+
+test('D-150A: DEPLOY_META contains no user id or user data', () => {
+  assert.ok(
+    !deployMetaSrc.includes('usr_') &&
+    !deployMetaSrc.includes('user_id') &&
+    !deployMetaSrc.includes('email'),
+    'deploy-meta.js must never contain user ids or user data'
+  );
+});
+
+test('D-150A: GET /api/version route exists in worker.js', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname === '/api/version'"),
+    "worker.js must handle GET /api/version"
+  );
+});
+
+test('D-150A: GET /api/version is NOT admin-gated', () => {
+  const idx = workerSrc.indexOf("url.pathname === '/api/version'");
+  assert.ok(idx !== -1, "GET /api/version route must exist");
+  const slice = workerSrc.slice(idx, idx + 200);
+  assert.ok(
+    !slice.includes('requireAdmin'),
+    'GET /api/version must not call requireAdmin — it is a public, no-auth provenance endpoint'
+  );
+});
+
+test('D-150A: GET /api/version spreads DEPLOY_META (no manual field duplication)', () => {
+  assert.ok(
+    workerSrc.includes('...DEPLOY_META'),
+    'GET /api/version must spread DEPLOY_META rather than duplicating fields'
+  );
+});
+
+test('D-150A: worker.js imports DEPLOY_META from deploy-meta.js', () => {
+  assert.ok(
+    workerSrc.includes("import { DEPLOY_META } from './deploy-meta.js'"),
+    "worker.js must import DEPLOY_META from './deploy-meta.js'"
+  );
+});
+
+test('D-150A: GET /api/version does not reference env.DB or D1', () => {
+  const idx = workerSrc.indexOf("url.pathname === '/api/version'");
+  const slice = workerSrc.slice(idx, idx + 200);
+  assert.ok(
+    !slice.includes('env.DB') && !slice.includes('.prepare(') && !slice.includes('.first(') && !slice.includes('.all('),
+    'GET /api/version must not query D1 — response is built from the static DEPLOY_META module only'
+  );
+});
+
+test('D-150A: deploy-meta.js does not access env, request, or D1', () => {
+  assert.ok(
+    !deployMetaSrc.includes('env.') &&
+    !deployMetaSrc.includes('request.') &&
+    !deployMetaSrc.includes('.prepare(') &&
+    !deployMetaSrc.includes('.first('),
+    'deploy-meta.js must be a pure static module — no env, no request, no D1'
+  );
+});
+
+test('D-150A: no owner-token enforcement work was resumed by this patch', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') &&
+    !workerSrc.includes('OWNER_TOKEN_INVALID') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'D-150A must not resume owner-token enforcement — no new rejection logic in worker.js'
+  );
+});
+
+test('D-150A: docs/API_ENDPOINT_INVENTORY.md documents /api/version', () => {
+  const inventorySrc = readFileSync(path.join(__dirname, '../docs/API_ENDPOINT_INVENTORY.md'), 'utf8');
+  assert.ok(
+    inventorySrc.includes('/api/version'),
+    'docs/API_ENDPOINT_INVENTORY.md must document the /api/version route'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

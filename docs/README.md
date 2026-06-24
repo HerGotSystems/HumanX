@@ -51,10 +51,15 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D149H_PASSIVE_OWNER_TOKEN_TELEMETRY_HOLD_PROTOCOL.md` ⭐ CURRENT — OWNER TOKEN HOLD PROTOCOL — D-149 CHAIN CLOSED
+### `D150A_DEPLOY_PROVENANCE_GUARD_CHECKPOINT.md` ⭐ CURRENT — DEPLOYMENT PROVENANCE GUARD LIVE
+
+Adds `GET /api/version` (public, no auth, no D1) returning static deployment metadata from `src/deploy-meta.js`: `app`, `checkpoint`, `commit`, `baseline`, `updated_at`, advisory `note`. Solves the D-149 live-verification confusion where production was running stale Worker code while the repo had the new endpoint. Pull `/api/version` before any live-verification pass to confirm the expected commit is actually deployed. `deploy-meta.js` must be updated and redeployed on each manual deploy. Twelve new smoke tests guard: module exists, required fields present, no secrets/tokens/user data, route registered, route is not admin-gated, no D1 query, no enforcement resumed, inventory current. API inventory updated. Baseline: 1028/24/57 (1 expected parameterised-route warning).
+**Read when:** starting new feature work or returning after time away.
+
+### `D149H_PASSIVE_OWNER_TOKEN_TELEMETRY_HOLD_PROTOCOL.md` — OWNER TOKEN HOLD PROTOCOL — D-149 CHAIN CLOSED
 
 Freezes the enforcement decision and defines exact re-review thresholds after D-149G's first organic review (n=19/7d, valid_ratio 1.0, zero non-valid events, single user). No enforcement and no soft-warning design are allowed until one of five thresholds is met: T1 (7d total_count ≥ 50), T2 (7d total_count ≥ 100), T3 (any non-valid bucket > 0), T4 (a second real user appears), T5 (valid_ratio drops below 0.98). Includes the exact browser-console snippet for pulling the next sanitized 1h/24h/7d review, an explicit stop condition, and recommended non-token workstreams. Docs only. Baseline: 1016/24/57 (1 expected parameterised-route warning), unchanged. D-149 chain closed pending T1–T5.
-**Read when:** starting new feature work or returning after time away.
+**Read when:** reviewing D-149 history.
 
 ### `D149G_PASSIVE_OWNER_TOKEN_TELEMETRY_REVIEW_CHECKPOINT.md` — FIRST ORGANIC TELEMETRY REVIEW (hold protocol defined in D-149H)
 

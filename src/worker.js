@@ -1,3 +1,4 @@
+import { DEPLOY_META } from './deploy-meta.js';
 import { listEvidenceVault } from './evidence-vault.js';
 import { importSeedData } from './importer.js';
 import { voteClaim } from './votes.js';
@@ -27,6 +28,7 @@ export default {
 
     try {
       if (url.pathname === '/api/health') return json({ ok: true, service: 'humanx', mode: env.DB ? 'd1-live' : 'demo-fallback', ai: 'runpack-first-no-public-inference', legacy_ai: 'aip-first-no-public-inference' });
+      if (url.pathname === '/api/version' && request.method === 'GET') return json({ ok: true, ...DEPLOY_META, note: 'commit and checkpoint reflect last manual deploy — update deploy-meta.js on each deploy' });
       if (url.pathname === '/api/ai/analyse') return json({ error: 'RUNPACK_MODE', legacy_error: 'AIP_MODE', message: 'HumanX is RunPack-first. Public users copy a task packet and run it with their own AI. Owner API credits are not used for public analysis.' }, 402);
       // D-143B: intercept /u/:slug before the static-asset fallback so a
       // shared profile link gets server-rendered OG meta tags. Targeted to
