@@ -9853,9 +9853,8 @@ test('D-155A: btn-pp-show-more CSS class exists in styles.css', () => {
 
 test('D-155A: pp-more-items hidden by default via inline style in rendered HTML', () => {
   assert.ok(
-    appV10Src.includes('"pp-more-items" style="display:none"') ||
-    appV10Src.includes("'pp-more-items' style='display:none'"),
-    'pp-more-items container must be hidden by default via inline display:none'
+    appV10Src.includes('pp-more-items') && appV10Src.includes('style="display:none"'),
+    'pp-more-items container must be hidden by default via inline display:none (D-156A adds id= between class and style attributes)'
   );
 });
 
@@ -9879,6 +9878,134 @@ test('D-155A: no owner-token enforcement work resumed', () => {
 test('D-155A: no admin route changed (requireAdmin count unchanged)', () => {
   const adminCallCount = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
   assert.ok(adminCallCount >= 11, `worker.js must still have at least 11 requireAdmin calls (found ${adminCallCount})`);
+});
+
+// ── Section 89 — D-156A: Public profile interaction / accessibility polish ────
+
+test('D-156A: ppToggleShowMore sets aria-expanded on toggle', () => {
+  const fn = appV10Src.match(/function ppToggleShowMore[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('setAttribute') && fn.includes('aria-expanded'),
+    'ppToggleShowMore must call btn.setAttribute("aria-expanded", ...) on each toggle'
+  );
+});
+
+test('D-156A: ppToggleShowMore sets aria-expanded to false when collapsing', () => {
+  const fn = appV10Src.match(/function ppToggleShowMore[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes("'false'") && fn.includes("'true'"),
+    'ppToggleShowMore must set aria-expanded to "false" when collapsing and "true" when expanding'
+  );
+});
+
+test('D-156A: evidence show-more button has aria-expanded initial attribute', () => {
+  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('aria-expanded="false"'),
+    'renderPublicProfileEvidenceHtml show-more button must render with aria-expanded="false" by default'
+  );
+});
+
+test('D-156A: evidence show-more button has aria-controls pointing to pp-more-ev', () => {
+  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('aria-controls="pp-more-ev"') && fn.includes('id="pp-more-ev"'),
+    'renderPublicProfileEvidenceHtml must use aria-controls="pp-more-ev" on the button and id="pp-more-ev" on the hidden container'
+  );
+});
+
+test('D-156A: pressure show-more button has aria-expanded initial attribute', () => {
+  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('aria-expanded="false"'),
+    'renderPublicProfilePressureHtml show-more button must render with aria-expanded="false" by default'
+  );
+});
+
+test('D-156A: pressure show-more button has aria-controls pointing to pp-more-pr', () => {
+  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('aria-controls="pp-more-pr"') && fn.includes('id="pp-more-pr"'),
+    'renderPublicProfilePressureHtml must use aria-controls="pp-more-pr" on the button and id="pp-more-pr" on the hidden container'
+  );
+});
+
+test('D-156A: copyPublicProfileLink shows "Copied!" feedback on the button', () => {
+  const fn = appV10Src.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes("'Copied!'"),
+    'copyPublicProfileLink must set button text to "Copied!" on click'
+  );
+});
+
+test('D-156A: copyPublicProfileLink resets to "Copy profile link" after delay', () => {
+  const fn = appV10Src.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes("'Copy profile link'") && fn.includes('setTimeout'),
+    'copyPublicProfileLink must reset button text to "Copy profile link" via setTimeout'
+  );
+});
+
+test('D-156A: copyPublicProfileLink disables button during feedback', () => {
+  const fn = appV10Src.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('btn.disabled=true') && fn.includes('btn.disabled=false'),
+    'copyPublicProfileLink must disable the button during feedback and re-enable on reset'
+  );
+});
+
+test('D-156A: copyPublicProfileLink clipboard fallback does not call backend', () => {
+  const fn = appV10Src.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    !fn.includes('fetch(') && !fn.includes('await api(') && !fn.includes('process.env'),
+    'copyPublicProfileLink must not call fetch, api(), or process.env in any path'
+  );
+});
+
+test('D-156A: copyPublicProfileLink is called with (this, slug) from renderPublicProfileHtml', () => {
+  assert.ok(
+    appV10Src.includes("copyPublicProfileLink(this,'"),
+    'renderPublicProfileHtml must call copyPublicProfileLink(this, slug) so the button reference is passed'
+  );
+});
+
+test('D-156A: btn-secondary CSS class is defined in styles.css', () => {
+  assert.ok(
+    cssSrc.includes('.btn-secondary'),
+    'styles.css must define .btn-secondary for the Copy profile link button'
+  );
+});
+
+test('D-156A: D-154B/D-155A context block, section labels, and density behaviour preserved', () => {
+  assert.ok(
+    appV10Src.includes('pp-context-block') &&
+    appV10Src.includes('Claims being tested') &&
+    appV10Src.includes('View in HumanX →') &&
+    appV10Src.includes('const BATCH=5'),
+    'D-154B context block, visitor labels, and D-155A BATCH=5 density must all remain present after D-156A'
+  );
+});
+
+test('D-156A: no sensitive fields rendered by any public-profile function', () => {
+  const ppBlock = appV10Src.match(/function renderPublicProfileHtml[\s\S]*?^function copyPublicProfileLink/m)?.[0] || '';
+  assert.ok(
+    !ppBlock.includes('.email') && !ppBlock.includes('.is_admin') && !ppBlock.includes('owner_token'),
+    'Public profile render functions must not reference email, is_admin, or owner_token after D-156A'
+  );
+});
+
+test('D-156A: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') &&
+    !workerSrc.includes('OWNER_TOKEN_INVALID') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'D-156A must not resume owner-token enforcement'
+  );
+});
+
+test('D-156A: no admin route changed (requireAdmin count unchanged)', () => {
+  const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls (found ${count})`);
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────

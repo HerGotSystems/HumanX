@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D155B_PUBLIC_PROFILE_DENSITY_POLISH_LIVE_VERIFY.md` ⭐ CURRENT — D-155A LIVE VERIFIED
+### `D156A_PUBLIC_PROFILE_INTERACTION_ACCESSIBILITY_POLISH.md` ⭐ CURRENT — PUBLIC PROFILE INTERACTION/A11Y POLISH
+
+aria-expanded + aria-controls on show-more toggles; "Copied!" feedback + disabled state on copy-link button; .btn-secondary CSS defined; 44px mobile tap targets. 16 new smoke tests. Baseline: 1107/24/57. Frontend/CSS only.
+**Read when:** editing public profile frontend or planning D-156B live-verify.
+
+### `D155B_PUBLIC_PROFILE_DENSITY_POLISH_LIVE_VERIFY.md` — D-155A LIVE VERIFIED
 
 Preflight 8/8 PASS. Production running D-155A / 122ac14 / 1091/24/57 confirmed. Deploy uploaded styles.css + app-v10.js. Version ID: 5e6530b0.
 **Read when:** returning after D-155A/B to plan next work.
