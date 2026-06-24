@@ -2307,8 +2307,9 @@ test('D-95B: bottom-actions Approve in inspect panel has review-inspect-approve 
   const end = appSrc.indexOf('\nfunction ', start + 1);
   const body = appSrc.slice(start, end);
   const bottomIdx = body.indexOf('review-inspect-actions');
+  // D-164B: class is conditional (btn-approve-confirm or btn-approve) but always includes review-inspect-approve
   assert.ok(
-    bottomIdx !== -1 && body.slice(bottomIdx).includes('btn-approve review-inspect-approve'),
+    bottomIdx !== -1 && body.slice(bottomIdx).includes('review-inspect-approve'),
     'bottom-actions Approve button must include review-inspect-approve class in review-inspect-actions div'
   );
 });
@@ -2394,27 +2395,29 @@ test('D-96B: reviewDecisionUI clears pendingApproveReviewId on success', () => {
   );
 });
 
-test('D-96B: inspect panel action row Approve calls reviewDecisionUI directly', () => {
+test('D-96B: inspect panel action row Approve uses two-step pending flow (D-164B updated)', () => {
   const start = appSrc.indexOf('function renderReviewInspectPanel');
   const end = appSrc.indexOf('\nfunction ', start + 1);
   const body = appSrc.slice(start, end);
+  // D-164B: Approve now uses requestApproveReview on first click (two-step confirm)
   assert.ok(
-    body.includes('btn-approve review-inspect-approve') &&
-    body.includes("onclick=\"reviewDecisionUI('${esc(type)}','${esc(id)}','public')\">Approve"),
-    'inspect panel action row Approve must call reviewDecisionUI directly — deliberate review path'
+    body.includes('review-inspect-approve') &&
+    body.includes('requestApproveReview') &&
+    body.includes('Confirm approve public'),
+    'inspect panel Approve must use two-step pending flow — requestApproveReview on first click (D-164B)'
   );
 });
 
-test('D-96B: inspect panel bottom-actions Approve still calls reviewDecisionUI directly', () => {
+test('D-96B: inspect panel bottom-actions Approve is two-step (D-164B updated)', () => {
   const start = appSrc.indexOf('function renderReviewInspectPanel');
   const end = appSrc.indexOf('\nfunction ', start + 1);
   const body = appSrc.slice(start, end);
-  // bottom actions: review-inspect-actions div contains Approve
   const bottomIdx = body.indexOf('review-inspect-actions');
   assert.ok(
     bottomIdx !== -1 &&
-    body.slice(bottomIdx).includes("onclick=\"reviewDecisionUI('${esc(type)}','${esc(id)}','public')\">Approve"),
-    'inspect panel bottom-actions Approve must still call reviewDecisionUI directly'
+    body.slice(bottomIdx).includes('requestApproveReview') &&
+    body.slice(bottomIdx).includes('cancelApproveReview'),
+    'inspect panel bottom-actions Approve must use two-step pending flow (D-164B)'
   );
 });
 
@@ -3553,10 +3556,11 @@ test('D-129A: inspected card suppresses duplicate Approve/Keep/Reject — only s
 
 test('D-129A: inspect panel still has its own Approve / Keep Pending / Reject controls', () => {
   const idx = appSrc.indexOf('function renderReviewInspectPanel(');
-  const body = appSrc.slice(idx, idx + 12000);
+  const body = appSrc.slice(idx, idx + 13000);
+  // D-164B: class attribute is now conditional but always includes review-inspect-approve
   assert.ok(
     body.includes('review-inspect-actions') &&
-    body.includes('btn-approve review-inspect-approve'),
+    body.includes('review-inspect-approve'),
     'renderReviewInspectPanel must keep its bottom decision row with approve/keep/reject controls'
   );
 });
@@ -3594,13 +3598,12 @@ test('D-129B: inspect panel has exactly one review-inspect-actions row', () => {
 
 test('D-129B: bottom action row has Approve, Keep Pending, Reject, and Mark Duplicate', () => {
   const idx = appSrc.indexOf('function renderReviewInspectPanel(');
-  const body = appSrc.slice(idx, idx + 12000);
-  // The bottom row uses ${rejectSection}/${dupSection} template vars — verify those vars are defined
-  // and the action div includes approve + keep + the section vars
+  const body = appSrc.slice(idx, idx + 13000);
   const actIdx = body.indexOf('review-inspect-actions');
-  const actSection = body.slice(actIdx, actIdx + 600);
+  const actSection = body.slice(actIdx, actIdx + 700);
+  // D-164B: class is conditional but review-inspect-approve class always present
   assert.ok(
-    actSection.includes('btn-approve review-inspect-approve') &&
+    actSection.includes('review-inspect-approve') &&
     actSection.includes('btn-keep') &&
     actSection.includes('${rejectSection}') &&
     actSection.includes('${dupSection}'),
@@ -3610,9 +3613,9 @@ test('D-129B: bottom action row has Approve, Keep Pending, Reject, and Mark Dupl
 
 test('D-129B: Open Study View still present in bottom action row', () => {
   const idx = appSrc.indexOf('function renderReviewInspectPanel(');
-  const body = appSrc.slice(idx, idx + 12000);
+  const body = appSrc.slice(idx, idx + 13000);
   const actIdx = body.indexOf('review-inspect-actions');
-  const actSection = body.slice(actIdx, actIdx + 600);
+  const actSection = body.slice(actIdx, actIdx + 700);
   assert.ok(
     actSection.includes('${studyBtn}'),
     'bottom action row must still include ${studyBtn} variable for Open Study View'
@@ -3815,8 +3818,9 @@ test('D-129D: inspect actions row still has Approve/Keep/Reject buttons wired', 
   const idx = appSrc.indexOf('function renderReviewInspectPanel(');
   const end = appSrc.indexOf('\nfunction ', idx + 1);
   const body = appSrc.slice(idx, end);
+  // D-164B: Approve class is now conditional, always includes review-inspect-approve
   assert.ok(
-    body.includes('btn-approve review-inspect-approve') &&
+    body.includes('review-inspect-approve') &&
     body.includes('btn-keep') &&
     body.includes('review-inspect-reject'),
     'inspect panel action row must still contain Approve/Keep Pending/Reject controls after density pass'
@@ -10819,6 +10823,116 @@ test('D-163B: no owner-token enforcement resumed', () => {
 test('D-163B: no admin route changed', () => {
   const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
   assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-163B (found ${count})`);
+});
+
+// ── Section 97 — D-164B: Safer review approval actions ────────────────────────
+
+test('D-164B: inspect-panel Approve uses requestApproveReview not direct reviewDecisionUI', () => {
+  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
+  const end = appV10Src.indexOf('\nfunction ', idx + 1);
+  const body = appV10Src.slice(idx, end);
+  const actionsIdx = body.indexOf('review-inspect-actions');
+  const actionsBlock = body.slice(actionsIdx, actionsIdx + 700);
+  assert.ok(
+    actionsBlock.includes('requestApproveReview') &&
+    !actionsBlock.includes("onclick=\"reviewDecisionUI('${esc(type)}','${esc(id)}','public')\">Approve"),
+    'inspect-panel Approve must call requestApproveReview on first click, not reviewDecisionUI directly'
+  );
+});
+
+test('D-164B: inspect-panel Approve confirm copy "Confirm approve public" exists', () => {
+  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
+  const end = appV10Src.indexOf('\nfunction ', idx + 1);
+  const body = appV10Src.slice(idx, end);
+  assert.ok(
+    body.includes('Confirm approve public'),
+    'inspect-panel must include "Confirm approve public" confirm-state copy'
+  );
+});
+
+test('D-164B: inspect-panel Approve confirm triggers reviewDecisionUI in pending state', () => {
+  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
+  const end = appV10Src.indexOf('\nfunction ', idx + 1);
+  const body = appV10Src.slice(idx, end);
+  assert.ok(
+    body.includes('isPendingApprove'),
+    'inspect-panel must conditionally call reviewDecisionUI when isPendingApprove is true'
+  );
+});
+
+test('D-164B: inspect-panel Approve cancel button present in pending state', () => {
+  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
+  const end = appV10Src.indexOf('\nfunction ', idx + 1);
+  const body = appV10Src.slice(idx, end);
+  assert.ok(
+    body.includes('cancelApproveReview'),
+    'inspect-panel must include cancelApproveReview in the pending-approve confirm block'
+  );
+});
+
+test('D-164B: keyboard A arms pending approve on first press', () => {
+  const idx = appV10Src.indexOf('function initReviewKb');
+  const slice = appV10Src.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes('requestApproveReview(id)'),
+    'keyboard A shortcut must call requestApproveReview on first press'
+  );
+});
+
+test('D-164B: keyboard A confirms on second press when already pending', () => {
+  const idx = appV10Src.indexOf('function initReviewKb');
+  const slice = appV10Src.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes('pendingApproveReviewId===id'),
+    'keyboard A must check pendingApproveReviewId===id to distinguish arm vs. confirm'
+  );
+});
+
+test('D-164B: keyboard K and R shortcuts remain direct (unchanged)', () => {
+  const idx = appV10Src.indexOf('function initReviewKb');
+  const slice = appV10Src.slice(idx, idx + 1500);
+  assert.ok(
+    slice.includes("key==='k'?'review':'rejected'"),
+    'keyboard K and R shortcuts must still call reviewDecisionUI directly'
+  );
+});
+
+test('D-164B: admin token input uses type=password', () => {
+  const idx = appV10Src.indexOf('function renderReview');
+  const slice = appV10Src.slice(idx, idx + 1000);
+  assert.ok(
+    slice.includes('type="password"') && slice.includes('id="adminToken"'),
+    'admin token input must use type="password" to mask the token value in the browser UI'
+  );
+});
+
+test('D-164B: all five review routes retain requireAdmin', () => {
+  ['reviewDecision','reviewCleanup','markDuplicate','resolveSimilar','reviewQueue'].forEach(fn => {
+    const idx = workerSrc.indexOf(`async function ${fn}`);
+    const slice = workerSrc.slice(idx, idx + 200);
+    assert.ok(
+      slice.includes('requireAdmin'),
+      `${fn} must still call requireAdmin as the first operation`
+    );
+  });
+});
+
+test('D-164B: admin token not passed to toast or console calls', () => {
+  assert.ok(
+    !/toast\([^)]*adminToken\(\)/.test(appV10Src),
+    'admin token value must not be passed to toast()'
+  );
+  assert.ok(
+    !/console\.(log|warn|error)\([^)]*adminToken\(\)/.test(appV10Src),
+    'admin token value must not be passed to console.log/warn/error'
+  );
+});
+
+test('D-164B: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-164B must not resume owner-token enforcement'
+  );
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────

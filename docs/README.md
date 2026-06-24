@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D164A_REVIEW_ADMIN_MODERATION_WORKFLOW_AUDIT.md` ⭐ CURRENT — REVIEW/ADMIN MODERATION WORKFLOW AUDIT
+### `D164B_SAFER_REVIEW_APPROVAL_ACTIONS.md` ⭐ CURRENT — D-164B SAFER REVIEW APPROVAL ACTIONS
+
+Inspect-panel Approve now two-step (was one-click). Keyboard `A` now arms pending on first press, confirms on second. Admin token input masked with `type="password"`. No backend changes. 11 new tests, 7 pre-existing tests updated. Baseline: 1209/24/57.
+**Read before D-164C bump/deploy or any review/admin flow work.**
+
+### `D164A_REVIEW_ADMIN_MODERATION_WORKFLOW_AUDIT.md` — REVIEW/ADMIN MODERATION WORKFLOW AUDIT
 
 All five review routes admin-gated. Main gaps: inspect-panel Approve is one-click (no confirm), keyboard `A` approves immediately, admin token shown as plaintext. D-164B: add two-step confirm to inspect-panel Approve (required); `type="password"` token input (optional); keyboard guard (optional).
 **Read before starting D-164B or any review/admin flow work.**
