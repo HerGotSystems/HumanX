@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D158A_PUBLIC_PROFILE_CONTENT_HIERARCHY_AUDIT.md` ⭐ CURRENT — CONTENT HIERARCHY AUDIT
+### `D158B_PUBLIC_PROFILE_SNAPSHOT_FIRST_HIERARCHY.md` ⭐ CURRENT — SNAPSHOT-FIRST HIERARCHY
+
+Snapshot promoted before context block, counts moved after truths, empty truths/evidence/pressure sections suppressed, bio fallback from snapshot when bio absent. Baseline: 1138/24/57. Next: D-158C bump + live verify.
+**Read before starting D-158C or any public profile ordering work.**
+
+### `D158A_PUBLIC_PROFILE_CONTENT_HIERARCHY_AUDIT.md` — CONTENT HIERARCHY AUDIT (implemented in D-158B)
 
 Snapshot promoted before context block, counts moved to footer, empty secondary sections suppressed, optional bio fallback from snapshot. Full recommended D-158B plan inside.
 **Read before starting D-158B or any public profile content ordering work.**

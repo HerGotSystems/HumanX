@@ -675,6 +675,7 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .pp-display-name{margin:0;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.02em;overflow-wrap:anywhere}
 .pp-slug{margin:0;color:var(--blue);font-size:11px}
 .pp-bio{margin:6px 0 0;font-size:13px;color:var(--text);line-height:1.5;overflow-wrap:anywhere}
+.pp-bio-fallback{color:var(--muted);font-style:italic}
 .pp-disclaimer{margin:8px 0 0;font-style:italic}
 .pp-card{background:linear-gradient(180deg,rgba(21,26,39,.95),rgba(10,13,20,.95));border:1px solid var(--line);box-shadow:0 8px 22px #0005;border-radius:14px;padding:14px}
 .pp-context-block .small{font-size:12px;line-height:1.5}

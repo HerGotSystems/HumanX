@@ -7475,7 +7475,7 @@ test('D-141B/D-142B/D-143B: GET /api/u/:slug response core fields are preserved,
 
 test('D-141B: public profile header has a dedicated polished card class', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
-  const slice = appSrc.slice(idx, idx + 1300);
+  const slice = appSrc.slice(idx, idx + 2500);
   assert.ok(
     slice.includes('class="panel pp-header pp-card"'),
     'the public profile header must use the pp-card polished class, not a bare panel'
@@ -7501,12 +7501,16 @@ test('D-141B: public profile recent sections use a dedicated card/section class,
   assert.ok(sectionCount === 4, 'all four recent-activity sections (claims/truths/evidence/pressure) must use the pp-section class');
 });
 
-test('D-141B: empty states use a dedicated styled class, not bare text', () => {
-  const fns = ['renderPublicProfileClaimsHtml', 'renderPublicProfileTruthsHtml', 'renderPublicProfileEvidenceHtml', 'renderPublicProfilePressureHtml'];
-  for (const fn of fns) {
+test('D-141B/D-158B: claims empty state uses pp-empty class; secondary section functions suppress when empty (D-158B)', () => {
+  // Claims always shows its empty state (informative absence)
+  const claimsIdx = appSrc.indexOf('function renderPublicProfileClaimsHtml');
+  const claimsSlice = appSrc.slice(claimsIdx, claimsIdx + 200);
+  assert.ok(claimsSlice.includes('class="small pp-empty"'), 'renderPublicProfileClaimsHtml must render its empty state with the pp-empty class');
+  // D-158B: truths/evidence/pressure suppress the whole section when empty (return '')
+  for (const fn of ['renderPublicProfileTruthsHtml', 'renderPublicProfileEvidenceHtml', 'renderPublicProfilePressureHtml']) {
     const idx = appSrc.indexOf(`function ${fn}`);
-    const slice = appSrc.slice(idx, idx + 200);
-    assert.ok(slice.includes('class="small pp-empty"'), `${fn} must render its empty state with the pp-empty class`);
+    const slice = appSrc.slice(idx, idx + 100);
+    assert.ok(slice.includes("return''"), `${fn} must return empty string for empty rows (D-158B section suppression)`);
   }
 });
 
@@ -7781,15 +7785,16 @@ test('D-142B/D-142C/D-154B: public profile snapshot card uses third-person wordi
   );
 });
 
-test('D-142B: public profile snapshot card is placed before the counts card and before recent sections (D-154B reorder)', () => {
+test('D-142B/D-158B: public profile snapshot renders before claims; claims render before counts in return template (D-158B reorder)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
-  const slice = appSrc.slice(idx, idx + 3000);
-  const countsAt = slice.indexOf('pp-counts-card');
-  const snapshotAt = slice.indexOf('renderPublicProfileSnapshotHtml(p.sharedSnapshot)');
+  const slice = appSrc.slice(idx, idx + 3500);
+  // Use return-template interpolation references (not const definitions) for positional checks
+  const snapshotAt = slice.indexOf('renderPublicProfileSnapshotHtml(sn)');
   const claimsAt = slice.indexOf('<h3>Claims being tested</h3>');
+  const countsAt = slice.indexOf('${countsCard}');
   assert.ok(
-    countsAt !== -1 && snapshotAt !== -1 && claimsAt !== -1 && snapshotAt < countsAt && countsAt < claimsAt,
-    'D-154B reorder: the shared-snapshot card must render before the Public Activity counts card and before the content sections'
+    snapshotAt !== -1 && claimsAt !== -1 && countsAt !== -1 && snapshotAt < claimsAt && claimsAt < countsAt,
+    'D-158B reorder: snapshot renders before claims, claims before counts (countsCard reference in return template)'
   );
 });
 
@@ -9805,19 +9810,19 @@ test('D-155A: show-less label exists in ppToggleShowMore', () => {
   );
 });
 
-test('D-155A: evidence empty state uses visitor-friendly copy', () => {
+test('D-155A/D-158B: evidence function suppresses section when empty (D-158B supersedes D-155A empty-state copy)', () => {
   const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
-    fn.includes('No public supporting evidence yet.'),
-    'renderPublicProfileEvidenceHtml empty state must use visitor-friendly "No public supporting evidence yet."'
+    fn.includes("return''"),
+    'D-158B: renderPublicProfileEvidenceHtml must return empty string when rows empty (section suppressed entirely)'
   );
 });
 
-test('D-155A: pressure empty state uses visitor-friendly copy', () => {
+test('D-155A/D-158B: pressure function suppresses section when empty (D-158B supersedes D-155A empty-state copy)', () => {
   const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
-    fn.includes('No public questions under pressure yet.'),
-    'renderPublicProfilePressureHtml empty state must use visitor-friendly "No public questions under pressure yet."'
+    fn.includes("return''"),
+    'D-158B: renderPublicProfilePressureHtml must return empty string when rows empty (section suppressed entirely)'
   );
 });
 
@@ -10108,6 +10113,179 @@ test('D-157A: no owner-token enforcement resumed', () => {
 test('D-157A: no admin route changed (requireAdmin count unchanged)', () => {
   const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
   assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls (found ${count})`);
+});
+
+// ── Section 91 — D-158B: Public profile snapshot-first hierarchy ───────────────
+
+test('D-158B: snapshot renders before context block in return template of renderPublicProfileHtml', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  // Use return-template references: snapshot call appears as renderPublicProfileSnapshotHtml(sn),
+  // context block appears as ${contextBlock} (the interpolation, after the const definition)
+  const snapshotAt = slice.indexOf('renderPublicProfileSnapshotHtml(sn)');
+  const contextAt = slice.indexOf('${contextBlock}');
+  assert.ok(
+    snapshotAt !== -1 && contextAt !== -1 && snapshotAt < contextAt,
+    'D-158B: snapshot call must appear before ${contextBlock} interpolation in the return template'
+  );
+});
+
+test('D-158B: context block renders before claims section', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  const contextAt = slice.indexOf('pp-context-block');
+  const claimsAt = slice.indexOf('<h3>Claims being tested</h3>');
+  assert.ok(
+    contextAt !== -1 && claimsAt !== -1 && contextAt < claimsAt,
+    'D-158B: context block must appear before the claims section'
+  );
+});
+
+test('D-158B: claims section renders before public truths in output order', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  const claimsAt = slice.indexOf('<h3>Claims being tested</h3>');
+  const truthsAt = slice.indexOf('<h3>Public truths</h3>');
+  assert.ok(
+    claimsAt !== -1 && truthsAt !== -1 && claimsAt < truthsAt,
+    'D-158B: claims section must render before public truths'
+  );
+});
+
+test('D-158B: counts card renders after truths and before evidence in return template', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  // <h3> strings only appear in the return template; ${countsCard} is the return interpolation
+  const truthsAt = slice.indexOf('<h3>Public truths</h3>');
+  const countsAt = slice.indexOf('${countsCard}');
+  const evidenceAt = slice.indexOf('<h3>Supporting evidence</h3>');
+  assert.ok(
+    truthsAt !== -1 && countsAt !== -1 && evidenceAt !== -1 && truthsAt < countsAt && countsAt < evidenceAt,
+    'D-158B: truths section must appear before ${countsCard} interpolation, which must appear before evidence section'
+  );
+});
+
+test('D-158B: renderPublicProfileTruthsHtml returns empty string for empty rows (section suppressed)', () => {
+  const fn = appV10Src.match(/function renderPublicProfileTruthsHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes("if(!rows||!rows.length)return''"),
+    'renderPublicProfileTruthsHtml must return empty string (not an empty-state paragraph) so empty truths section is suppressed'
+  );
+});
+
+test('D-158B: renderPublicProfileEvidenceHtml returns empty string for empty rows (section suppressed)', () => {
+  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes("if(!rows||!rows.length)return''"),
+    'renderPublicProfileEvidenceHtml must return empty string for empty rows so empty evidence section is suppressed'
+  );
+});
+
+test('D-158B: renderPublicProfilePressureHtml returns empty string for empty rows (section suppressed)', () => {
+  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes("if(!rows||!rows.length)return''"),
+    'renderPublicProfilePressureHtml must return empty string for empty rows so empty pressure section is suppressed'
+  );
+});
+
+test('D-158B: renderPublicProfileClaimsHtml retains empty-state paragraph (claims always shown)', () => {
+  const fn = appV10Src.match(/function renderPublicProfileClaimsHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('pp-empty') && fn.includes('No public claims yet'),
+    'renderPublicProfileClaimsHtml must keep its empty-state paragraph — claims absence is informative'
+  );
+});
+
+test('D-158B: truths section conditionally wrapped in renderPublicProfileHtml', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  assert.ok(
+    slice.includes('truthsHtml?') && slice.includes('<h3>Public truths</h3>'),
+    'renderPublicProfileHtml must conditionally render the truths section wrapper only when truthsHtml is non-empty'
+  );
+});
+
+test('D-158B: evidence section conditionally wrapped in renderPublicProfileHtml', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  assert.ok(
+    slice.includes('evidenceHtml?') && slice.includes('<h3>Supporting evidence</h3>'),
+    'renderPublicProfileHtml must conditionally render the evidence section wrapper only when evidenceHtml is non-empty'
+  );
+});
+
+test('D-158B: pressure section conditionally wrapped in renderPublicProfileHtml', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  assert.ok(
+    slice.includes('pressureHtml?') && slice.includes('<h3>Questions under pressure</h3>'),
+    'renderPublicProfileHtml must conditionally render the pressure section wrapper only when pressureHtml is non-empty'
+  );
+});
+
+test('D-158B: bio fallback is computed from snapshot dominantPattern and topAlignmentName', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  assert.ok(
+    slice.includes('pp-bio-fallback') &&
+    slice.includes('sn.dominantPattern') &&
+    slice.includes('sn.topAlignmentName') &&
+    slice.includes('Belief pattern:') &&
+    slice.includes('Top alignment:'),
+    'renderPublicProfileHtml must compute a bio fallback line from snapshot dominantPattern and topAlignmentName'
+  );
+});
+
+test('D-158B: bio fallback only shown when bio is absent', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  assert.ok(
+    slice.includes('!p.bio') && slice.includes('bioFallback') && slice.includes('p.bio?'),
+    'renderPublicProfileHtml must guard bio fallback behind !p.bio and show real bio when present'
+  );
+});
+
+test('D-158B: pp-bio-fallback CSS class exists in styles.css', () => {
+  assert.ok(
+    cssSrc.includes('.pp-bio-fallback') && cssSrc.includes('font-style:italic'),
+    'styles.css must define .pp-bio-fallback with italic styling to visually distinguish it from a real bio'
+  );
+});
+
+test('D-158B: D-154B/D-155A/D-156A/D-157A features all preserved after reorder', () => {
+  assert.ok(
+    appV10Src.includes('pp-context-block') &&
+    appV10Src.includes('Claims being tested') &&
+    appV10Src.includes('View in HumanX →') &&
+    appV10Src.includes('const BATCH=5') &&
+    appV10Src.includes('aria-expanded="false"') &&
+    appV10Src.includes("'Copied!'") &&
+    appV10Src.includes('pp-footer-actions'),
+    'D-158B must preserve context block, section labels, View in HumanX, BATCH=5, aria-expanded, Copied!, pp-footer-actions'
+  );
+});
+
+test('D-158B: no sensitive fields in renderPublicProfileHtml after reorder', () => {
+  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
+  const slice = appV10Src.slice(idx, idx + 3500);
+  assert.ok(
+    !slice.includes('.email') && !slice.includes('.is_admin') && !slice.includes('owner_token'),
+    'renderPublicProfileHtml must not reference email, is_admin, or owner_token after D-158B'
+  );
+});
+
+test('D-158B: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') &&
+    !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-158B must not resume owner-token enforcement'
+  );
+});
+
+test('D-158B: no admin route changed', () => {
+  const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-158B (found ${count})`);
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
