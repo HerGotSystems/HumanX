@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D158D_PUBLIC_PROFILE_SNAPSHOT_FIRST_LIVE_VERIFY.md` ⭐ CURRENT — D-158B LIVE VERIFIED
+### `D159A_PUBLIC_ONBOARDING_LANDING_CLARITY_AUDIT.md` ⭐ CURRENT — ONBOARDING/LANDING CLARITY AUDIT
+
+Home page is a full app dashboard, not a landing page. No "invite-only" copy, no profile discovery path. Recommended D-159B: remove "working system" badge, add one-sentence invite/profile intro, reorder action cards. Full plan inside.
+**Read before starting D-159B or any home/landing work.**
+
+### `D158D_PUBLIC_PROFILE_SNAPSHOT_FIRST_LIVE_VERIFY.md` — D-158B LIVE VERIFIED
 
 All 8 preflight checks passed. Version ID: `1236c30c-5ed8-45ab-a050-3acaf5f59c24`. Production running D-158B / 9784116 / 1138/24/57. All visual/order checks confirmed by owner.
 **Read when:** returning after D-158B/C/D to plan next work.
