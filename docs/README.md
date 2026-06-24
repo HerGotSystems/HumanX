@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D164D_SAFER_REVIEW_APPROVAL_ACTIONS_LIVE_VERIFY.md` ⭐ CURRENT — D-164B LIVE VERIFIED
+### `D165A_REVIEW_QUEUE_ADMIN_UX_AUDIT.md` ⭐ CURRENT — REVIEW QUEUE ADMIN UX AUDIT
+
+Empty/filter/error states are clear. Three gaps: keyboard hint says "A approve" but A now requires two presses (D-164B); truth-derived filter has no help text; "Review unavailable" error has no retry/re-enter path. D-165B plan: update keyboard hint copy, add truth-derived filter help + empty state, add scroll-up note to error panel.
+**Read before starting D-165B or any review queue UX work.**
+
+### `D164D_SAFER_REVIEW_APPROVAL_ACTIONS_LIVE_VERIFY.md` — D-164B LIVE VERIFIED
 
 Version ID: 366b67a2-7386-452b-9933-f5eb38b72fb3. All preflight checks passed. All admin visual checks passed. Baseline: 1209/24/57.
 
