@@ -9743,6 +9743,144 @@ test('D-154B: user.id, email, is_admin, owner_token not rendered by any public-p
   );
 });
 
+// ── Section 88 — D-155A: Public profile density / readability polish ──────────
+
+test('D-155A: ppToggleShowMore helper function exists', () => {
+  assert.ok(
+    appV10Src.includes('function ppToggleShowMore(btn)'),
+    'ppToggleShowMore must exist as a global helper for show-more/show-less toggling'
+  );
+});
+
+test('D-155A: ppToggleShowMore toggles .pp-more-items visibility', () => {
+  assert.ok(
+    appV10Src.includes('pp-more-items') && appV10Src.includes("moreDiv.style.display=showing?'none':''"),
+    'ppToggleShowMore must toggle the .pp-more-items element display style'
+  );
+});
+
+test('D-155A: show-more toggle exists in renderPublicProfileEvidenceHtml', () => {
+  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('pp-more-items') && fn.includes('btn-pp-show-more') && fn.includes('ppToggleShowMore'),
+    'renderPublicProfileEvidenceHtml must include pp-more-items container and btn-pp-show-more toggle'
+  );
+});
+
+test('D-155A: show-more toggle exists in renderPublicProfilePressureHtml', () => {
+  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('pp-more-items') && fn.includes('btn-pp-show-more') && fn.includes('ppToggleShowMore'),
+    'renderPublicProfilePressureHtml must include pp-more-items container and btn-pp-show-more toggle'
+  );
+});
+
+test('D-155A: evidence show-more defaults to first 5 items', () => {
+  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('const BATCH=5') && fn.includes('rows.slice(0,BATCH)') && fn.includes('rows.slice(BATCH)'),
+    'renderPublicProfileEvidenceHtml must show first 5 by default via BATCH=5 slicing'
+  );
+});
+
+test('D-155A: pressure show-more defaults to first 5 items', () => {
+  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('const BATCH=5') && fn.includes('rows.slice(0,BATCH)') && fn.includes('rows.slice(BATCH)'),
+    'renderPublicProfilePressureHtml must show first 5 by default via BATCH=5 slicing'
+  );
+});
+
+test('D-155A: show-more toggle label uses "Show N more" pattern', () => {
+  assert.ok(
+    appV10Src.includes('Show ${rest.length} more') || appV10Src.includes('Show ${count} more'),
+    'show-more button must use dynamic "Show N more" label'
+  );
+});
+
+test('D-155A: show-less label exists in ppToggleShowMore', () => {
+  assert.ok(
+    appV10Src.includes("'Show less'"),
+    'ppToggleShowMore must set button text to "Show less" when expanded'
+  );
+});
+
+test('D-155A: evidence empty state uses visitor-friendly copy', () => {
+  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('No public supporting evidence yet.'),
+    'renderPublicProfileEvidenceHtml empty state must use visitor-friendly "No public supporting evidence yet."'
+  );
+});
+
+test('D-155A: pressure empty state uses visitor-friendly copy', () => {
+  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('No public questions under pressure yet.'),
+    'renderPublicProfilePressureHtml empty state must use visitor-friendly "No public questions under pressure yet."'
+  );
+});
+
+test('D-155A: D-154B HumanX context block is still present', () => {
+  assert.ok(
+    appV10Src.includes('pp-context-block') && appV10Src.includes('HumanX is a public thinking profile'),
+    'D-154B HumanX context block must still be present after D-155A changes'
+  );
+});
+
+test('D-155A: D-154B visitor-friendly section labels are still present', () => {
+  assert.ok(
+    appV10Src.includes('Claims being tested') &&
+    appV10Src.includes('Public truths') &&
+    appV10Src.includes('Questions under pressure'),
+    'D-154B visitor-friendly section labels must still be present after D-155A'
+  );
+});
+
+test('D-155A: "View in HumanX" CTA still present', () => {
+  assert.ok(
+    appV10Src.includes('View in HumanX →'),
+    '"View in HumanX →" CTA must still be present after D-155A'
+  );
+});
+
+test('D-155A: btn-pp-show-more CSS class exists in styles.css', () => {
+  assert.ok(
+    cssSrc.includes('.btn-pp-show-more'),
+    'styles.css must define .btn-pp-show-more for the show-more toggle button'
+  );
+});
+
+test('D-155A: pp-more-items hidden by default via inline style in rendered HTML', () => {
+  assert.ok(
+    appV10Src.includes('"pp-more-items" style="display:none"') ||
+    appV10Src.includes("'pp-more-items' style='display:none'"),
+    'pp-more-items container must be hidden by default via inline display:none'
+  );
+});
+
+test('D-155A: show-more toggle does not expose any new API fields', () => {
+  const toggleFn = appV10Src.match(/function ppToggleShowMore[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    !toggleFn.includes('fetch(') && !toggleFn.includes('await api(') && !toggleFn.includes('process.env'),
+    'ppToggleShowMore must be pure client-side DOM manipulation — no fetch, no api(), no env access'
+  );
+});
+
+test('D-155A: no owner-token enforcement work resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') &&
+    !workerSrc.includes('OWNER_TOKEN_INVALID') &&
+    !/if\s*\(\s*ownerStatus\s*[!=]==?\s*'valid'/.test(workerSrc),
+    'D-155A must not resume owner-token enforcement'
+  );
+});
+
+test('D-155A: no admin route changed (requireAdmin count unchanged)', () => {
+  const adminCallCount = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(adminCallCount >= 11, `worker.js must still have at least 11 requireAdmin calls (found ${adminCallCount})`);
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

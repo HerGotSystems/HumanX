@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D154C_PUBLIC_PROFILE_CLARITY_LAYER_LIVE_VERIFY.md` ⭐ CURRENT — D-154B LIVE VERIFIED
+### `D155A_PUBLIC_PROFILE_DENSITY_READABILITY_POLISH.md` ⭐ CURRENT — PUBLIC PROFILE DENSITY POLISH
+
+Show-more/show-less toggle for evidence (5 default) and pressure (5 default), visitor-friendly empty states, display name 22px, bio 13px/1.5 line-height, section h3 14px bold, item title 13px readable vs. muted metadata, pp-card explicit 14px padding, de-emphasised counts label. 18 new smoke tests. Baseline: 1091/24/57. Frontend/CSS only. No backend, migration, or owner-token changes.
+**Read when:** editing public profile frontend or planning D-155B live-verify.
+
+### `D154C_PUBLIC_PROFILE_CLARITY_LAYER_LIVE_VERIFY.md` — D-154B LIVE VERIFIED
 
 Preflight passed (8/8). Visual check confirmed: context block, visitor-friendly labels, "View in HumanX →" CTA, copy-link, no private data exposure. Baseline: 1073/24/57 unchanged.
 **Read when:** returning after D-154B/C to plan next work.
