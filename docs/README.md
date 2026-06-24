@@ -51,10 +51,15 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D149G_PASSIVE_OWNER_TOKEN_TELEMETRY_REVIEW_CHECKPOINT.md` ⭐ CURRENT — FIRST ORGANIC TELEMETRY REVIEW — PASSIVE HOLD RECOMMENDED
+### `D149H_PASSIVE_OWNER_TOKEN_TELEMETRY_HOLD_PROTOCOL.md` ⭐ CURRENT — OWNER TOKEN HOLD PROTOCOL — D-149 CHAIN CLOSED
+
+Freezes the enforcement decision and defines exact re-review thresholds after D-149G's first organic review (n=19/7d, valid_ratio 1.0, zero non-valid events, single user). No enforcement and no soft-warning design are allowed until one of five thresholds is met: T1 (7d total_count ≥ 50), T2 (7d total_count ≥ 100), T3 (any non-valid bucket > 0), T4 (a second real user appears), T5 (valid_ratio drops below 0.98). Includes the exact browser-console snippet for pulling the next sanitized 1h/24h/7d review, an explicit stop condition, and recommended non-token workstreams. Docs only. Baseline: 1016/24/57 (1 expected parameterised-route warning), unchanged. D-149 chain closed pending T1–T5.
+**Read when:** starting new feature work or returning after time away.
+
+### `D149G_PASSIVE_OWNER_TOKEN_TELEMETRY_REVIEW_CHECKPOINT.md` — FIRST ORGANIC TELEMETRY REVIEW (hold protocol defined in D-149H)
 
 First organic/passive review of owner-token telemetry using live time-windowed data (D-149E/F). Evidence: `total_count` 1/5/19 across 1h/24h/7d; `valid_ratio: 1.0` in all windows; zero non-valid events; all 8 owner routes observed across 7d with read-heavy distribution consistent with natural use. Sample is still small (n=19, single user). No non-valid events observed, so there is no empirical basis for soft-warning calibration or hard enforcement. Verdict: hard enforcement not justified; soft-warning design (D-150A) not yet justified — no trigger condition observed. Recommended next: D-149H passive hold; re-review when 7d total_count ≥ 50–100, or first non-valid event appears, or a second user begins issuing owner tokens. No code/migration/`wrangler.toml` change. Baseline: 1016/24/57 (1 expected parameterised-route warning), unchanged.
-**Read when:** starting new feature work or returning after time away.
+**Read when:** reviewing D-149 history.
 
 ### `D149F_OWNER_TOKEN_TELEMETRY_TIME_WINDOW_LIVE_VERIFICATION_CHECKPOINT.md` — TIME-WINDOWED TELEMETRY CONFIRMED LIVE (organic review done in D-149G)
 D-149E's `window=all|1h|24h|7d` query-param support was deployed and live-verified across every supported value: default and `?window=all` both return `sample_window: all, all_time: true`; `1h`/`24h`/`7d` each correctly report their own value with `all_time: false`; an invalid value (`banana`) returns 200 and silently normalizes to `all` exactly as designed, with the response itself confirming what was applied. `query_error: null` throughout. No token/secret/admin-token value recorded. Verification only — no code/migration/`wrangler.toml` change, no enforcement, no soft warning. Baseline: 1016/24/57 (1 expected parameterised-route warning), unchanged.
