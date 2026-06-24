@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D159A_PUBLIC_ONBOARDING_LANDING_CLARITY_AUDIT.md` ⭐ CURRENT — ONBOARDING/LANDING CLARITY AUDIT
+### `D159B_PUBLIC_HOME_CLARITY_BRIDGE.md` ⭐ CURRENT — PUBLIC HOME CLARITY BRIDGE
+
+Badge → "invite-only preview", one-sentence intro, bridge link to /u/calenhir, Browse Claims promoted to first card. Baseline: 1149/24/57. Next: D-159C bump + live verify.
+**Read before starting D-159C or any home/landing work.**
+
+### `D159A_PUBLIC_ONBOARDING_LANDING_CLARITY_AUDIT.md` — ONBOARDING/LANDING CLARITY AUDIT (implemented in D-159B)
 
 Home page is a full app dashboard, not a landing page. No "invite-only" copy, no profile discovery path. Recommended D-159B: remove "working system" badge, add one-sentence invite/profile intro, reorder action cards. Full plan inside.
 **Read before starting D-159B or any home/landing work.**

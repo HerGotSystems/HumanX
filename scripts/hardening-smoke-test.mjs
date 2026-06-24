@@ -10288,6 +10288,106 @@ test('D-158B: no admin route changed', () => {
   assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-158B (found ${count})`);
 });
 
+// ── Section 92 — D-159B: Public home clarity bridge ───────────────────────────
+
+test('D-159B: working-system badge replaced with invite-only-preview badge', () => {
+  const idx = appV10Src.indexOf('function renderHome');
+  const slice = appV10Src.slice(idx, idx + 500);
+  assert.ok(
+    !slice.includes('working system') && slice.includes('invite-only preview'),
+    'renderHome must not contain "working system" badge; must contain "invite-only preview" badge instead'
+  );
+});
+
+test('D-159B: home intro paragraph contains invite-only/claims/beliefs/public profiles language', () => {
+  const idx = appV10Src.indexOf('function renderHome');
+  const slice = appV10Src.slice(idx, idx + 1000);
+  assert.ok(
+    slice.includes('invite-only') && slice.includes('claims') && slice.includes('beliefs') && slice.includes('public thinking profiles'),
+    'renderHome must include a short intro paragraph covering invite-only, claims, beliefs, and public thinking profiles'
+  );
+});
+
+test('D-159B: public profile example bridge link exists and points to /u/calenhir', () => {
+  const idx = appV10Src.indexOf('function renderHome');
+  const slice = appV10Src.slice(idx, idx + 1000);
+  assert.ok(
+    slice.includes('href="/u/calenhir"') && slice.includes('View a public profile example'),
+    'renderHome must include a link to /u/calenhir with "View a public profile example" copy'
+  );
+});
+
+test('D-159B: Browse Claims card appears before Submit Claim in renderHome', () => {
+  const idx = appV10Src.indexOf('function renderHome');
+  const slice = appV10Src.slice(idx, idx + 4000);
+  const browseAt = slice.indexOf("setMode('arena')");
+  const submitAt = slice.indexOf("setMode('submit')");
+  assert.ok(
+    browseAt !== -1 && submitAt !== -1 && browseAt < submitAt,
+    'Browse Claims (setMode arena) must appear before Submit Claim (setMode submit) in renderHome card grid'
+  );
+});
+
+test('D-159B: Browse Claims card appears before Belief Engine in renderHome', () => {
+  const idx = appV10Src.indexOf('function renderHome');
+  const slice = appV10Src.slice(idx, idx + 4000);
+  const browseAt = slice.indexOf("setMode('arena')");
+  const beliefAt = slice.indexOf("humanx-belief-engine");
+  assert.ok(
+    browseAt !== -1 && beliefAt !== -1 && browseAt < beliefAt,
+    'Browse Claims must appear before Belief Engine in the home card grid'
+  );
+});
+
+test('D-159B: Browse Claims card has cc-card-primary class', () => {
+  const idx = appV10Src.indexOf('function renderHome');
+  const slice = appV10Src.slice(idx, idx + 4000);
+  const gridStart = slice.indexOf('cc-card-grid');
+  const gridSlice = slice.slice(gridStart, gridStart + 600);
+  assert.ok(
+    gridSlice.includes("setMode('arena')") && gridSlice.includes('cc-card-primary'),
+    'The first card in the home grid must be Browse Claims and must carry the cc-card-primary class'
+  );
+});
+
+test('D-159B: cc-bridge-link CSS exists in styles.css', () => {
+  assert.ok(
+    cssSrc.includes('.cc-bridge-link') && cssSrc.includes('color:var(--blue)'),
+    'styles.css must define .cc-bridge-link with blue colour for the public profile example link'
+  );
+});
+
+test('D-159B: D-158B public profile features all preserved after home changes', () => {
+  assert.ok(
+    appV10Src.includes('renderPublicProfileSnapshotHtml(sn)') &&
+    appV10Src.includes('pp-context-block') &&
+    appV10Src.includes('pp-bio-fallback') &&
+    appV10Src.includes("if(!rows||!rows.length)return''"),
+    'D-159B home changes must not affect D-158B public profile: snapshot-first, bio fallback, section suppression all intact'
+  );
+});
+
+test('D-159B: no sensitive fields in renderHome', () => {
+  const idx = appV10Src.indexOf('function renderHome');
+  const slice = appV10Src.slice(idx, idx + 5000);
+  assert.ok(
+    !slice.includes('.email') && !slice.includes('.is_admin') && !slice.includes('owner_token') && !slice.includes('admin_token'),
+    'renderHome must not reference email, is_admin, owner_token, or admin_token'
+  );
+});
+
+test('D-159B: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-159B must not resume owner-token enforcement'
+  );
+});
+
+test('D-159B: no admin route changed', () => {
+  const count = (workerSrc.match(/requireAdmin\s*\(/g)||[]).length;
+  assert.ok(count >= 11, `worker.js must still have at least 11 requireAdmin calls after D-159B (found ${count})`);
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

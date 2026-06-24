@@ -19,6 +19,10 @@
 .cc-hero-right{flex-shrink:0;min-width:220px}
 .cc-title{font-size:46px;line-height:.88;margin:6px 0 10px;letter-spacing:-.07em}
 .cc-subtitle{font-size:12px;line-height:1.55;color:#c8d0e0;margin:0 0 6px;max-width:520px}
+.cc-intro{margin-top:2px;color:var(--muted)}
+.cc-intro-bridge{margin:4px 0 0}
+.cc-bridge-link{font-size:11px;color:var(--blue);text-decoration:none;font-weight:600}
+.cc-bridge-link:hover{text-decoration:underline}
 .cc-hero-statusline{font-size:10px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:0 0 8px}
 .cc-hero-statusline span{line-height:1}
 .cc-sep{opacity:.35}
