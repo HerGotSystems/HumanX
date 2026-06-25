@@ -11930,6 +11930,89 @@ test('D-177B: no owner-token work resumed', () => {
   assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain in effect');
 });
 
+// ── D-178B: HTTP cache and nosniff headers patch ─────────────────────────────
+
+test('D-178B: CORS object includes cache-control no-store', () => {
+  assert.ok(workerSrc.includes("'cache-control': 'no-store'") || workerSrc.includes('"cache-control": "no-store"'), 'CORS object must include cache-control: no-store');
+});
+
+test('D-178B: CORS object includes x-content-type-options nosniff', () => {
+  assert.ok(workerSrc.includes("'x-content-type-options': 'nosniff'") || workerSrc.includes('"x-content-type-options": "nosniff"'), 'CORS object must include x-content-type-options: nosniff');
+});
+
+test('D-178B: json() helper spreads CORS (inherits no-store and nosniff)', () => {
+  assert.ok(workerSrc.includes('...CORS') && workerSrc.includes("function json("), 'json() must spread CORS to inherit all safe headers');
+  // confirm CORS appears in json() definition
+  const jsonFnIdx = workerSrc.indexOf('function json(');
+  const snippet = workerSrc.slice(jsonFnIdx, jsonFnIdx + 200);
+  assert.ok(snippet.includes('...CORS'), 'json() must spread CORS');
+});
+
+test('D-178B: export new Response spreads CORS (inherits no-store and nosniff)', () => {
+  // The exportMyHumanX manual new Response also spreads ...CORS
+  const exportIdx = workerSrc.indexOf('content-disposition');
+  assert.ok(exportIdx !== -1, 'export response must exist');
+  const snippet = workerSrc.slice(Math.max(0, exportIdx - 200), exportIdx + 200);
+  assert.ok(snippet.includes('...CORS'), 'export new Response must spread CORS');
+});
+
+test('D-178B: review route inherits no-store via json() helper', () => {
+  assert.ok(workerSrc.includes('reviewQueue') && workerSrc.includes('requireAdmin'), 'review route must use json() and requireAdmin');
+});
+
+test('D-178B: public profile shell has Cache-Control no-store', () => {
+  assert.ok(workerSrc.includes("'cache-control': 'no-store'") && workerSrc.includes("renderPublicProfileShell"), 'renderPublicProfileShell must exist');
+  // Find the HTML response line
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes("'cache-control': 'no-store'"), 'profile shell HTML response must include cache-control: no-store');
+});
+
+test('D-178B: public profile shell has X-Content-Type-Options nosniff', () => {
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes("'x-content-type-options': 'nosniff'"), 'profile shell HTML response must include x-content-type-options: nosniff');
+});
+
+test('D-178B: public profile shell has Referrer-Policy no-referrer', () => {
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes("'referrer-policy': 'no-referrer'"), 'profile shell HTML response must include referrer-policy: no-referrer');
+});
+
+test('D-178B: CORS remains wildcard origin with no credentials header', () => {
+  const corsIdx = workerSrc.indexOf("const CORS");
+  const corsSnippet = workerSrc.slice(corsIdx, corsIdx + 300);
+  assert.ok(corsSnippet.includes("'access-control-allow-origin': '*'"), 'CORS origin must remain wildcard');
+  assert.ok(!corsSnippet.includes('allow-credentials'), 'CORS must not add allow-credentials');
+});
+
+test('D-178B: no CSP added in this patch', () => {
+  assert.ok(!workerSrc.includes('content-security-policy'), 'no CSP header must be added in D-178B');
+});
+
+test('D-178B: review routes remain requireAdmin-gated', () => {
+  assert.ok(workerSrc.includes('requireAdmin(request,env)') || workerSrc.includes('requireAdmin(request, env)'), 'requireAdmin must still be called');
+  assert.ok(workerSrc.includes("'/api/review'") || workerSrc.includes('"/api/review"'), 'review route must still be present');
+});
+
+test('D-178B: no owner-token work resumed', () => {
+  assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain in effect');
+});
+
+test('D-178B: no frontend console logging', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  assert.ok(!frontendSrc.includes('console.'), 'frontend must not have console logging');
+});
+
+test('D-178B: admin token input remains type=password', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  assert.ok(frontendSrc.includes('type="password"'), 'admin token input must remain password type');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

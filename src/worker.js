@@ -17,7 +17,9 @@ import { cleanClaimBuilderContext, insertClaimBuilderContext, attachClaimBuilder
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET,POST,OPTIONS',
-  'access-control-allow-headers': 'content-type,x-humanx-user,x-humanx-admin'
+  'access-control-allow-headers': 'content-type,x-humanx-user,x-humanx-admin',
+  'cache-control': 'no-store',
+  'x-content-type-options': 'nosniff',
 };
 
 export default {
@@ -617,7 +619,7 @@ async function renderPublicProfileShell(request, env, rawSlug) {
     injected = html.replace('<title>HumanX — Belief → Truth → Claim → Evidence</title>', metaBlock);
   }
 
-  return new Response(injected, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } });
+  return new Response(injected, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer' } });
 }
 
 async function getPublicProfile(request, env, rawSlug) {
