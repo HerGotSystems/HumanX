@@ -51,10 +51,15 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D166B_SENSITIVE_METADATA_GUARDRAILS_PATCH.md` ⭐ CURRENT — SENSITIVE METADATA GUARDRAILS PATCH
+### `D166D_SENSITIVE_METADATA_GUARDRAILS_LIVE_VERIFY.md` ⭐ CURRENT — D-166B LIVE VERIFIED
+
+Production confirmed: health ok/d1-live, /api/review returns 403 without admin, is_shadow_banned absent from /api/me + /api/my-humanx + /api/my-humanx/export, admin token input password-masked, no console logging in production JS. Baseline: 1223/24/57 unchanged.
+**Read before starting any follow-on metadata/privacy or next-feature work.**
+
+### `D166B_SENSITIVE_METADATA_GUARDRAILS_PATCH.md` — SENSITIVE METADATA GUARDRAILS PATCH (live-verified in D-166D)
 
 reviewQueue c.* wildcard replaced with explicit column allowlist (F-01). is_shadow_banned removed from /api/me, /api/my-humanx, /api/my-humanx/export, and invite redeem responses (F-04/F-06). Shadow-ban enforcement in requireUser unchanged. 8 smoke tests added/updated. Baseline: 1223/24/57.
-**Read before starting D-166B or any metadata/privacy work.**
+**Read before starting any metadata/privacy work.**
 
 ### `D164D_SAFER_REVIEW_APPROVAL_ACTIONS_LIVE_VERIFY.md` — D-164B LIVE VERIFIED
 
