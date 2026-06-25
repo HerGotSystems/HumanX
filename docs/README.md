@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D166D_SENSITIVE_METADATA_GUARDRAILS_LIVE_VERIFY.md` ⭐ CURRENT — D-166B LIVE VERIFIED
+### `D167A_REVIEW_QUEUE_FIELD_CONTRACT_AUDIT.md` ⭐ CURRENT — REVIEW QUEUE FIELD CONTRACT AUDIT
+
+All 25 claim fields used by the Review UI confirmed present in D-166B explicit SELECT or via attachClaimBuilderContexts(). Five dropped columns (supporters, challengers, belief_yes, belief_no, uncertainty) confirmed unused by review rendering. No code changes needed. Baseline: 1223/24/57.
+**Read before any review queue backend or frontend field change.**
+
+### `D166D_SENSITIVE_METADATA_GUARDRAILS_LIVE_VERIFY.md` — D-166B LIVE VERIFIED
 
 Production confirmed: health ok/d1-live, /api/review returns 403 without admin, is_shadow_banned absent from /api/me + /api/my-humanx + /api/my-humanx/export, admin token input password-masked, no console logging in production JS. Baseline: 1223/24/57 unchanged.
 **Read before starting any follow-on metadata/privacy or next-feature work.**
