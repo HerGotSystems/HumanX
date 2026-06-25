@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D168B_PUBLIC_API_RESPONSE_ALLOWLIST_PATCH.md` ⭐ CURRENT — PUBLIC API RESPONSE ALLOWLIST PATCH
+### `D168D_PUBLIC_API_RESPONSE_ALLOWLIST_LIVE_VERIFY.md` ⭐ CURRENT — D-168B LIVE VERIFIED
 
-All D-168A gaps patched: `is_shadow_banned` removed from `/api/session`; `getClaim()` evidence/pressure/tests use explicit column SELECTs (no `user_id`/`duplicate_signature`); evidence vault drops `duplicate_signature`; graph-status reduced to 6 product-visible table counts. +17 new smoke tests. New baseline: 1240/24/57.
+Production confirmed: `is_shadow_banned`/`is_admin` absent from `/api/session`; `duplicate_signature`/`user_id`/`is_shadow_banned`/`is_admin`/`email` absent from `/api/claims/:id` and `/api/evidence-vault`; `users`/`rateLimits`/`duplicateSignatures`/`summary` absent from `/api/graph-status`; `/api/review` returns 403 without admin token. Baseline: 1240/24/57.
+
+### `D168B_PUBLIC_API_RESPONSE_ALLOWLIST_PATCH.md` — PUBLIC API RESPONSE ALLOWLIST PATCH (live-verified in D-168D)
+
+All D-168A gaps patched: `is_shadow_banned` removed from `/api/session`; `getClaim()` evidence/pressure/tests use explicit column SELECTs (no `user_id`/`duplicate_signature`); evidence vault drops `duplicate_signature`; graph-status reduced to 6 product-visible table counts. +17 new smoke tests. Baseline: 1240/24/57.
 **Read before any public route response field change.**
 
 ### `D168A_PUBLIC_API_RESPONSE_ALLOWLIST_AUDIT.md` — PUBLIC API RESPONSE ALLOWLIST AUDIT (patched in D-168B)
