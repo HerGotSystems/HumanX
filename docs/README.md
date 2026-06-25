@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D169B_FRONTEND_EXPORT_OWNER_TOKEN_LEAK_PATCH.md` ⭐ CURRENT — FRONTEND EXPORT TOKEN LEAK PATCH
+### `D169D_FRONTEND_EXPORT_OWNER_TOKEN_LEAK_LIVE_VERIFY.md` ⭐ CURRENT — D-169B LIVE VERIFIED
+
+Production confirmed: `safeExportUser()` present in JS; `downloadJSON` uses it; raw user spread absent; admin token input masked; no console logging. `/api/session` does not expose `ownerToken` (camelCase) or `is_shadow_banned`/`is_admin`; does return `owner_token` (snake_case, existing advisory behavior per D-149H). `/api/review` returns 403 without admin token. Baseline: 1249/24/57.
+
+### `D169B_FRONTEND_EXPORT_OWNER_TOKEN_LEAK_PATCH.md` — FRONTEND EXPORT TOKEN LEAK PATCH (live-verified in D-169D)
 
 `safeExportUser()` helper added; `downloadJSON()` now exports `{id, handle}` only — never `ownerToken`. +9 new smoke tests. New baseline: 1249/24/57.
 **Read before any frontend export/downloadJSON change.**
