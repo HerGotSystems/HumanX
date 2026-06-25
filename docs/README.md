@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D172D_ADMIN_REVIEW_KEYBOARD_RECOVERY_LIVE_VERIFY.md` ⭐ CURRENT — D-172B/D LIVE VERIFIED
+### `D173A_PUBLIC_MUTATION_PATH_AUDIT.md` ⭐ CURRENT — D-173A PUBLIC MUTATION AUDIT
+
+All 17 public mutation routes audited. Review-first enforced on all user content. Shadow-ban on all write routes. No admin/moderation field injection possible. F1 (low): reportTarget targetType not allowlisted. F2 (low): no per-user report dedupe — single user can stack report_count to 5. F3 (low): createTruth accepts linkedClaimId from body without validation. F4 (low-medium): convertTruthToClaim returns SELECT * claim rows. D-173B patch list provided. Baseline: 1285/24/57.
+
+### `D172D_ADMIN_REVIEW_KEYBOARD_RECOVERY_LIVE_VERIFY.md` — D-172B/D LIVE VERIFIED
 
 All D-172B frontend patches confirmed in production JS. Keyboard two-step copy, `requestRejectReview` arm flow, all three `clearAdminToken` resets, password input, no console logging — all True. `/api/review` 403 without token confirmed. Baseline: 1285/24/57.
 
