@@ -51,7 +51,8 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D176D_ERROR_RESPONSE_HYGIENE_LIVE_VERIFY.md` ⭐ CURRENT — D-176B/D LIVE VERIFIED
+### `D176D_ERROR_RESPONSE_HYGIENE_LIVE_VERIFY.md` — D-176B/D LIVE VERIFIED
+### `D177A_FRONTEND_HTML_ESCAPING_XSS_AUDIT.md` ⭐ CURRENT — D-177A FRONTEND XSS AUDIT
 
 Production preflight confirms: health ok/d1-live, /api/session clean, invalid report targetType → 400, invalid evidence claimId → 404, admin token input password, no console logging, /api/review without admin → 403. Global 500, TRUTH_LINK_FAILED, builder context, and safeAll hygiene patches are source/static-verified. Baseline: 1335/24/57.
 
