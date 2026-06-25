@@ -51,10 +51,10 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D165D_REVIEW_QUEUE_UX_COPY_POLISH_LIVE_VERIFY.md` ⭐ CURRENT — REVIEW QUEUE UX COPY POLISH LIVE VERIFY
+### `D166A_SENSITIVE_METADATA_EXPOSURE_AUDIT.md` ⭐ CURRENT — SENSITIVE METADATA EXPOSURE AUDIT
 
-Production confirmed: D-165B keyboard hint, truth-derived filter copy, and review-unavailable recovery copy are live. Health: d1-live. Old "A approve" hint absent. Admin token input masked. No backend/owner-token changes. Baseline: 1215/24/57.
-**Read before starting D-166A or any review queue work.**
+Audit only; no code changed. Public surface clean. Admin-only review panel exposes user_id + normalized_claim (intentional). c.* wildcard in reviewQueue is a structural fragility (F-01). is_shadow_banned in own /api/me responses is questionable (F-04/F-06). No token leaks in docs. Baseline: 1215/24/57.
+**Read before starting D-166B or any metadata/privacy work.**
 
 ### `D164D_SAFER_REVIEW_APPROVAL_ACTIONS_LIVE_VERIFY.md` — D-164B LIVE VERIFIED
 
