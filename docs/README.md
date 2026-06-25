@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D175D_PUBLIC_ABUSE_ORPHAN_ROW_GUARDRAILS_LIVE_VERIFY.md` ⭐ CURRENT — D-175B/D LIVE VERIFIED
+### `D176A_ERROR_RESPONSE_STATUS_HYGIENE_AUDIT.md` ⭐ CURRENT — D-176A ERROR HYGIENE AUDIT
+
+Audit-only. Three patch-recommended findings: F1 (global catch 500 exposes raw err.message), F2 (TRUTH_LINK_FAILED exposes raw linkErr.message), F3 (truths.js builder context embeds raw cbcErr). One questionable: F4 (lineage.errors carries SQL text in public claim response). All other error surfaces acceptable. Baseline: 1322/24/57.
+
+### `D175D_PUBLIC_ABUSE_ORPHAN_ROW_GUARDRAILS_LIVE_VERIFY.md` — D-175B/D LIVE VERIFIED
 
 Production preflight confirms: health ok/d1-live, /api/session clean (no is_admin/is_shadow_banned), invalid evidence claimId → 404, invalid pressure claimId → 404, admin token input password, no console logging, /api/review without admin → 403. Session rate-limit and CLAIM_NOT_FOUND token are source/static-verified. Baseline: 1322/24/57.
 
