@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D173D_PUBLIC_MUTATION_GUARDRAILS_LIVE_VERIFY.md` ⭐ CURRENT — D-173B/D LIVE VERIFIED
+### `D174A_GLOBAL_RAW_ROW_SELECT_STAR_EXPOSURE_AUDIT.md` ⭐ CURRENT — D-174A GLOBAL RAW-ROW AUDIT
+
+Full audit of all SELECT *, raw row returns, and object spreads across 17 src files. One finding (F1, low risk): addHomeTest() returns raw home_tests row to own-user — no user_id/admin fields in home_tests today but inconsistent with mapper pattern. All other surfaces clean: no public raw rows, admin raw rows gated by requireAdmin(), export SELECT * approved by D-138B. D-174B: add mapHomeTest(). Baseline: 1300/24/57.
+
+### `D173D_PUBLIC_MUTATION_GUARDRAILS_LIVE_VERIFY.md` — D-173B/D LIVE VERIFIED
 
 Production preflight from owner terminal confirms: health ok/d1-live, /api/session does not expose is_admin or is_shadow_banned, invalid report targetType returns 400, invalid linkedClaimId returns 400, /api/review without admin returns 403. Report dedupe and convertTruthToClaim sanitization are source/static verified by D-173B tests (baseline 1300). Baseline: 1300/24/57.
 
