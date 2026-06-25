@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D171E_RUNPACK_EXPORT_CLAIM_PAYLOAD_LIVE_VERIFY.md` ⭐ CURRENT — D-171B/C LIVE VERIFIED
+### `D172A_ADMIN_REVIEW_MUTATION_PATH_AUDIT.md` ⭐ CURRENT — D-172A ADMIN REVIEW MUTATION AUDIT
+
+All 5 review mutation routes confirmed `requireAdmin`-gated. Approve/reject two-step in card and inspect-panel UI. F1 (low): keyboard `R` rejects without arm step, inconsistent with card UI. F2 (very low): `clearAdminToken()` resets only `pendingRejectReviewId`, not approve/cleanup pending state. D-172B recommended: KB hint clarification and `clearAdminToken()` consistency fix. Baseline: 1274/24/57.
+
+### `D171E_RUNPACK_EXPORT_CLAIM_PAYLOAD_LIVE_VERIFY.md` — D-171B/C LIVE VERIFIED
 
 Production confirmed: `safeRunPackClaim()` present; fallback RunPack uses it; `safeExportUser()` intact; admin token masked; no console logging. Backend `/api/runpack` POST confirmed — all 14 moderation/internal fields absent from `payload.claim`. `/api/review` returns 403. `downloadJSON` probe regex too narrow (defensive `(claims||[])` wrapper) — static smoke test is authoritative. Baseline: 1274/24/57.
 
