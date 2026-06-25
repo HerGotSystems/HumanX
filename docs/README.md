@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D172B_ADMIN_REVIEW_KEYBOARD_RECOVERY_PATCH.md` ⭐ CURRENT — D-172B KEYBOARD/RECOVERY PATCH
+### `D172D_ADMIN_REVIEW_KEYBOARD_RECOVERY_LIVE_VERIFY.md` ⭐ CURRENT — D-172B/D LIVE VERIFIED
+
+All D-172B frontend patches confirmed in production JS. Keyboard two-step copy, `requestRejectReview` arm flow, all three `clearAdminToken` resets, password input, no console logging — all True. `/api/review` 403 without token confirmed. Baseline: 1285/24/57.
+
+### `D172B_ADMIN_REVIEW_KEYBOARD_RECOVERY_PATCH.md` — D-172B KEYBOARD/RECOVERY PATCH
 
 Keyboard `R` reject made two-step (arm → confirm) to match card/panel UX. `clearAdminToken()` now resets all three pending action states. D-164B smoke test updated. New baseline: 1285/24/57.
 
