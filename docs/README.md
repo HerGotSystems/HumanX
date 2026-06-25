@@ -51,10 +51,10 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D165B_REVIEW_QUEUE_ADMIN_UX_COPY_POLISH.md` ⭐ CURRENT — REVIEW QUEUE UX COPY POLISH
+### `D165D_REVIEW_QUEUE_UX_COPY_POLISH_LIVE_VERIFY.md` ⭐ CURRENT — REVIEW QUEUE UX COPY POLISH LIVE VERIFY
 
-Keyboard hint updated to reflect D-164B two-press A ("A arm · A again confirm · K keep · R reject · …"). truth-derived filter now has help text and empty state. "Review unavailable" error now includes re-enter token recovery copy. 6 new smoke tests. Baseline: 1215/24/57.
-**Read before starting D-165C or any review queue UX work.**
+Production confirmed: D-165B keyboard hint, truth-derived filter copy, and review-unavailable recovery copy are live. Health: d1-live. Old "A approve" hint absent. Admin token input masked. No backend/owner-token changes. Baseline: 1215/24/57.
+**Read before starting D-166A or any review queue work.**
 
 ### `D164D_SAFER_REVIEW_APPROVAL_ACTIONS_LIVE_VERIFY.md` — D-164B LIVE VERIFIED
 
