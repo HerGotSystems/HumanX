@@ -51,9 +51,9 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D166A_SENSITIVE_METADATA_EXPOSURE_AUDIT.md` ⭐ CURRENT — SENSITIVE METADATA EXPOSURE AUDIT
+### `D166B_SENSITIVE_METADATA_GUARDRAILS_PATCH.md` ⭐ CURRENT — SENSITIVE METADATA GUARDRAILS PATCH
 
-Audit only; no code changed. Public surface clean. Admin-only review panel exposes user_id + normalized_claim (intentional). c.* wildcard in reviewQueue is a structural fragility (F-01). is_shadow_banned in own /api/me responses is questionable (F-04/F-06). No token leaks in docs. Baseline: 1215/24/57.
+reviewQueue c.* wildcard replaced with explicit column allowlist (F-01). is_shadow_banned removed from /api/me, /api/my-humanx, /api/my-humanx/export, and invite redeem responses (F-04/F-06). Shadow-ban enforcement in requireUser unchanged. 8 smoke tests added/updated. Baseline: 1223/24/57.
 **Read before starting D-166B or any metadata/privacy work.**
 
 ### `D164D_SAFER_REVIEW_APPROVAL_ACTIONS_LIVE_VERIFY.md` — D-164B LIVE VERIFIED

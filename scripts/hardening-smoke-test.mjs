@@ -5430,10 +5430,13 @@ test('D-136B: getMe omits is_admin and any admin token material', () => {
 test('D-136B: getMe returns the documented user field set', () => {
   const idx = workerSrc.indexOf('async function getMe');
   const slice = workerSrc.slice(idx, workerSrc.indexOf('\n}', idx) + 2);
-  const fields = ['id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at'];
+  // D-166B: is_shadow_banned removed from getMe SELECT; comment mentions it as omitted — check SELECT string only.
+  const selectIdx = slice.indexOf('SELECT id, handle, email');
+  const selectStr = selectIdx >= 0 ? slice.slice(selectIdx, selectIdx + 200) : '';
   assert.ok(
-    fields.every(f => slice.includes(f)),
-    'getMe must SELECT the documented field set'
+    selectStr.includes('id, handle, email, verified, verified_at, display_name, trust_score, strike_count, created_at') &&
+    !selectStr.includes('is_shadow_banned'),
+    'getMe SELECT must include the documented field set and must not include is_shadow_banned (D-166B)'
   );
 });
 
@@ -6551,10 +6554,14 @@ test('D-138B: exportMyHumanX filters every table query by user_id and has no LIM
 test('D-138B: exportMyHumanX omits is_admin and admin-token material from the users row', () => {
   const idx = workerSrc.indexOf('async function exportMyHumanX');
   const slice = workerSrc.slice(idx, idx + 3500);
+  // D-166B: is_shadow_banned also removed from export users SELECT (comment still mentions it as omitted).
+  const selectIdx = slice.indexOf('SELECT id, handle, email, verified');
+  const selectStr = selectIdx >= 0 ? slice.slice(selectIdx, selectIdx + 200) : '';
   assert.ok(
-    slice.includes('SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, is_shadow_banned, created_at FROM users WHERE id=?') &&
-    !slice.includes('is_admin') && !slice.includes('SELECT * FROM users') && !slice.includes('HUMANX_ADMIN_TOKEN'),
-    'exportMyHumanX must use an explicit users column list that omits is_admin and never echo the admin token'
+    selectStr.includes('SELECT id, handle, email, verified, verified_at, display_name, trust_score, strike_count, created_at FROM users WHERE id=?') &&
+    !selectStr.includes('is_admin') && !selectStr.includes('is_shadow_banned') &&
+    !slice.includes('SELECT * FROM users') && !slice.includes('HUMANX_ADMIN_TOKEN'),
+    'exportMyHumanX must use an explicit users column list that omits is_admin, is_shadow_banned, and never echo the admin token'
   );
 });
 
@@ -10987,6 +10994,97 @@ test('D-165B: no owner-token work resumed', () => {
   assert.ok(
     !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
     'D-165B must not resume owner-token enforcement (D-149H hold in effect)'
+  );
+});
+
+// ── Section 99 — D-166B: Sensitive metadata exposure guardrails ───────────────
+
+test('D-166B: reviewQueue claims SELECT does not use c.* wildcard', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 6000);
+  assert.ok(
+    !slice.includes("'claim' AS target_type, c.*"),
+    'reviewQueue claims SELECT must not use c.* — use an explicit allowlist instead'
+  );
+});
+
+test('D-166B: reviewQueue claims SELECT does not include normalized_claim unless justified', () => {
+  const idx = workerSrc.indexOf('async function reviewQueue(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 6000);
+  // normalized_claim IS intentionally included for admin dedup — test confirms it is
+  // explicitly named (i.e. c.normalized_claim), not silently dragged in via c.*
+  const hasWildcard = slice.includes("'claim' AS target_type, c.*");
+  const hasExplicit = slice.includes('c.normalized_claim');
+  assert.ok(
+    !hasWildcard && hasExplicit,
+    'normalized_claim should appear explicitly as c.normalized_claim, never via c.* wildcard'
+  );
+});
+
+test('D-166B: /api/me getMe SELECT does not include is_shadow_banned', () => {
+  const idx = workerSrc.indexOf('async function getMe(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 600);
+  // The comment mentions is_shadow_banned (as omitted) — check the SELECT string directly
+  const selectIdx = slice.indexOf('SELECT id, handle, email');
+  const selectStr = slice.slice(selectIdx, selectIdx + 200);
+  assert.ok(
+    selectIdx >= 0 && !selectStr.includes('is_shadow_banned'),
+    'getMe SELECT string must not include is_shadow_banned — removed by D-166B'
+  );
+});
+
+test('D-166B: /api/my-humanx myHumanX SELECT does not include is_shadow_banned', () => {
+  const idx = workerSrc.indexOf('async function myHumanX(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 4000);
+  // The function body has a users SELECT — confirm it omits is_shadow_banned
+  const selectIdx = slice.indexOf('SELECT id, handle, email, verified');
+  const selectSlice = slice.slice(selectIdx, selectIdx + 300);
+  assert.ok(
+    !selectSlice.includes('is_shadow_banned'),
+    'myHumanX users SELECT must not include is_shadow_banned — removed by D-166B'
+  );
+});
+
+test('D-166B: /api/my-humanx/export exportMyHumanX SELECT does not include is_shadow_banned', () => {
+  const idx = workerSrc.indexOf('async function exportMyHumanX(');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 2000);
+  const selectIdx = slice.indexOf('SELECT id, handle, email, verified');
+  const selectSlice = slice.slice(selectIdx, selectIdx + 300);
+  assert.ok(
+    !selectSlice.includes('is_shadow_banned'),
+    'exportMyHumanX users SELECT must not include is_shadow_banned — removed by D-166B'
+  );
+});
+
+test('D-166B: shadow-ban enforcement code still present in requireUser', () => {
+  const idx = workerSrc.indexOf('async function requireUser(');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('is_shadow_banned') && slice.includes('USER_SHADOW_BANNED'),
+    'requireUser must still read is_shadow_banned from DB and throw USER_SHADOW_BANNED — enforcement unchanged'
+  );
+});
+
+test('D-166B: review routes remain requireAdmin-gated after D-166B', () => {
+  ['reviewDecision','reviewCleanup','markDuplicate','resolveSimilar','reviewQueue'].forEach(fn => {
+    const idx = workerSrc.indexOf(`async function ${fn}`);
+    const slice = workerSrc.slice(idx, idx + 200);
+    assert.ok(
+      slice.includes('requireAdmin'),
+      `${fn} must still call requireAdmin as its first operation after D-166B`
+    );
+  });
+});
+
+test('D-166B: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-166B must not resume owner-token enforcement (D-149H hold in effect)'
   );
 });
 
