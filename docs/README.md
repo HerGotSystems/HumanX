@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1261 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1274 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D171B_RUNPACK_EXPORT_CLAIM_PAYLOAD_PATCH.md` ⭐ CURRENT — D-171B RUNPACK/EXPORT CLAIM PAYLOAD PATCH
+### `D171C_BACKEND_RUNPACK_CLAIM_PAYLOAD_PATCH.md` ⭐ CURRENT — D-171C BACKEND RUNPACK CLAIM PAYLOAD PATCH
+
+`safeRunPackClaimBackend()` helper added to `src/worker.js`; `buildRunPack()` now applies it to `payload.claim`. Strips the same moderation/dedup/admin fields as D-171B (`nearDuplicateOf`, `duplicateOf`, `statusLocked` etc). `mapClaim()` unchanged. +13 smoke tests. New baseline: 1274/24/57.
+**Read before any backend RunPack or buildRunPack change.**
+
+### `D171B_RUNPACK_EXPORT_CLAIM_PAYLOAD_PATCH.md` — D-171B RUNPACK/EXPORT CLAIM PAYLOAD PATCH (backend completed in D-171C)
 
 `safeRunPackClaim()` helper added; fallback RunPack `payload` and `downloadJSON()` claims array now use it. Strips `nearDuplicateOf`, `duplicateOf`, `statusLocked` (and all non-allowlisted fields) from exported claim objects. Backend `mapClaim()` unchanged. +12 smoke tests. New baseline: 1261/24/57.
 **Read before any RunPack, export, or claim-payload change.**

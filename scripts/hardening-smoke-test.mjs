@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2168,7 +2168,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -11386,6 +11386,86 @@ test('D-171B: no owner-token enforcement resumed in frontend', () => {
 
 test('D-171B: no console.* calls in frontend', () => {
   assert.ok(!/console\.(log|error|warn|debug|info)\s*\(/.test(frontendSrc), 'app-v10.js must have zero console.* calls — D-171B must not add any');
+});
+
+// ── D-171C: backend RunPack claim payload sanitization ────────────────────────
+
+test('D-171C: safeRunPackClaimBackend helper exists in worker', () => {
+  assert.ok(workerSrc.includes('function safeRunPackClaimBackend('), 'safeRunPackClaimBackend must be defined in src/worker.js');
+});
+
+test('D-171C: buildRunPack uses safeRunPackClaimBackend for payload.claim', () => {
+  const idx = workerSrc.indexOf('function buildRunPack(');
+  const end = workerSrc.indexOf('\nfunction ', idx + 1);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 2000);
+  assert.ok(slice.includes('safeRunPackClaimBackend(detail.claim)'), 'buildRunPack must apply safeRunPackClaimBackend to detail.claim before putting it in payload');
+  assert.ok(!slice.includes('payload:detail') && !slice.includes('payload: detail'), 'buildRunPack must not spread raw detail as payload — must sanitize detail.claim');
+});
+
+test('D-171C: safeRunPackClaimBackend does not include nearDuplicateOf', () => {
+  const idx = workerSrc.indexOf('function safeRunPackClaimBackend(');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(!slice.includes('nearDuplicateOf') && !slice.includes('near_duplicate_of'), 'safeRunPackClaimBackend must not include nearDuplicateOf');
+});
+
+test('D-171C: safeRunPackClaimBackend does not include duplicateOf', () => {
+  const idx = workerSrc.indexOf('function safeRunPackClaimBackend(');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(!slice.includes('duplicateOf') && !slice.includes('duplicate_of'), 'safeRunPackClaimBackend must not include duplicateOf');
+});
+
+test('D-171C: safeRunPackClaimBackend does not include statusLocked', () => {
+  const idx = workerSrc.indexOf('function safeRunPackClaimBackend(');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(!slice.includes('statusLocked') && !slice.includes('status_locked'), 'safeRunPackClaimBackend must not include statusLocked');
+});
+
+test('D-171C: safeRunPackClaimBackend does not include normalizedClaim or normalized_claim', () => {
+  const idx = workerSrc.indexOf('function safeRunPackClaimBackend(');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(!slice.includes('normalizedClaim') && !slice.includes('normalized_claim'), 'safeRunPackClaimBackend must not include normalized claim field');
+});
+
+test('D-171C: safeRunPackClaimBackend does not include damage', () => {
+  const idx = workerSrc.indexOf('function safeRunPackClaimBackend(');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(!slice.includes('damage'), 'safeRunPackClaimBackend must not include damage field');
+});
+
+test('D-171C: safeRunPackClaimBackend does not include user_id, email, is_admin, is_shadow_banned', () => {
+  const idx = workerSrc.indexOf('function safeRunPackClaimBackend(');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(
+    !slice.includes('user_id') && !slice.includes('email') &&
+    !slice.includes('is_admin') && !slice.includes('is_shadow_banned'),
+    'safeRunPackClaimBackend must not include user_id, email, is_admin, is_shadow_banned'
+  );
+});
+
+test('D-171C: safeRunPackClaimBackend does not include ownerToken or owner_token', () => {
+  const idx = workerSrc.indexOf('function safeRunPackClaimBackend(');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(!slice.includes('ownerToken') && !slice.includes('owner_token'), 'safeRunPackClaimBackend must not include any owner token field');
+});
+
+test('D-171C: safeRunPackClaimBackend does not include duplicate_signature or duplicateSignature', () => {
+  const idx = workerSrc.indexOf('function safeRunPackClaimBackend(');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(!slice.includes('duplicate_signature') && !slice.includes('duplicateSignature'), 'safeRunPackClaimBackend must not include duplicate signature field');
+});
+
+test('D-171C: backend mapClaim() still includes nearDuplicateOf, duplicateOf, statusLocked (unchanged)', () => {
+  const idx = workerSrc.indexOf('function mapClaim(');
+  const slice = workerSrc.slice(idx, idx + 600);
+  assert.ok(slice.includes('nearDuplicateOf') && slice.includes('duplicateOf') && slice.includes('statusLocked'), 'mapClaim() must remain unchanged — admin/review routes still need these fields');
+});
+
+test('D-171C: frontend safeRunPackClaim still exists (D-171B intact)', () => {
+  assert.ok(frontendSrc.includes('function safeRunPackClaim('), 'D-171B frontend safeRunPackClaim must still be present');
+});
+
+test('D-171C: no owner-token enforcement resumed', () => {
+  assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold — owner-token enforcement must not be resumed');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
