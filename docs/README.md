@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D174B_HOME_TEST_RAW_ROW_RESPONSE_PATCH.md` ⭐ CURRENT — D-174B HOME TEST MAPPER PATCH
+### `D174D_HOME_TEST_RAW_ROW_RESPONSE_LIVE_VERIFY.md` ⭐ CURRENT — D-174B/D LIVE VERIFIED
+
+Production preflight confirms: health ok/d1-live, /api/session does not expose is_admin or is_shadow_banned, admin token input is type=password, no console logging, /api/review without admin returns 403. mapHomeTest() behavior is source/static-verified by D-174B tests (baseline 1308). Baseline: 1308/24/57.
+
+### `D174B_HOME_TEST_RAW_ROW_RESPONSE_PATCH.md` — D-174B HOME TEST MAPPER PATCH
 
 addHomeTest() now returns test:mapHomeTest(row) instead of raw test:row. mapHomeTest() explicit allowlist omits user_id and future columns. Frontend unaffected (discards response, reloads claim). 8 new smoke tests. Baseline: 1308/24/57.
 
