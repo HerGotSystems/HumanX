@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D171C_BACKEND_RUNPACK_CLAIM_PAYLOAD_PATCH.md` ⭐ CURRENT — D-171C BACKEND RUNPACK CLAIM PAYLOAD PATCH
+### `D171E_RUNPACK_EXPORT_CLAIM_PAYLOAD_LIVE_VERIFY.md` ⭐ CURRENT — D-171B/C LIVE VERIFIED
+
+Production confirmed: `safeRunPackClaim()` present; fallback RunPack uses it; `safeExportUser()` intact; admin token masked; no console logging. Backend `/api/runpack` POST confirmed — all 14 moderation/internal fields absent from `payload.claim`. `/api/review` returns 403. `downloadJSON` probe regex too narrow (defensive `(claims||[])` wrapper) — static smoke test is authoritative. Baseline: 1274/24/57.
+
+### `D171C_BACKEND_RUNPACK_CLAIM_PAYLOAD_PATCH.md` — D-171C BACKEND RUNPACK CLAIM PAYLOAD PATCH (live-verified in D-171E)
 
 `safeRunPackClaimBackend()` helper added to `src/worker.js`; `buildRunPack()` now applies it to `payload.claim`. Strips the same moderation/dedup/admin fields as D-171B (`nearDuplicateOf`, `duplicateOf`, `statusLocked` etc). `mapClaim()` unchanged. +13 smoke tests. New baseline: 1274/24/57.
 **Read before any backend RunPack or buildRunPack change.**
