@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2168,7 +2168,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -11086,6 +11086,164 @@ test('D-166B: no owner-token enforcement resumed', () => {
     !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
     'D-166B must not resume owner-token enforcement (D-149H hold in effect)'
   );
+});
+
+// ── Section 99 — D-168B: Public API Response Allowlist Patch ─────────────────
+
+test('D-168B: POST /api/session createOrGetUser SELECT does not include is_shadow_banned', () => {
+  const idx = workerSrc.indexOf('async function createOrGetUser');
+  const end = workerSrc.indexOf('\nasync function ', idx + 1);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 1500);
+  // Confirm is_shadow_banned does not appear in the SELECT strings
+  const selectIdx = slice.indexOf('SELECT id, handle, trust_score, strike_count');
+  assert.ok(selectIdx >= 0, 'createOrGetUser must still SELECT id/handle/trust_score/strike_count');
+  const selectStr = slice.slice(selectIdx, selectIdx + 200);
+  assert.ok(!selectStr.includes('is_shadow_banned'), 'createOrGetUser SELECT must not include is_shadow_banned — removed by D-168B (D-168A gap)');
+});
+
+test('D-168B: shadow-ban enforcement code still present in requireUser (D-168B did not remove enforcement)', () => {
+  const idx = workerSrc.indexOf('async function requireUser(');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('is_shadow_banned') && slice.includes('USER_SHADOW_BANNED'),
+    'requireUser must still read is_shadow_banned from DB and throw USER_SHADOW_BANNED — only the session response field was removed'
+  );
+});
+
+test('D-168B: getClaim() public evidence SELECT does not use SELECT e.*', () => {
+  const idx = workerSrc.indexOf('async function getClaim(request, env, claimId)');
+  const end = workerSrc.indexOf('\nasync function createClaim', idx);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 3000);
+  assert.ok(
+    !slice.includes("SELECT e.*, u.handle, 'direct'") && !slice.includes("SELECT e.*, u.handle, l.stance"),
+    'getClaim() public evidence SELECTs must not use e.* wildcard — replaced by explicit column list in D-168B'
+  );
+});
+
+test('D-168B: getClaim() public evidence SELECT does not expose user_id', () => {
+  const idx = workerSrc.indexOf('async function getClaim(request, env, claimId)');
+  const end = workerSrc.indexOf('\nasync function createClaim', idx);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 3000);
+  // Check only the column list (before FROM) — the JOIN condition may reference e.user_id
+  const sqlStrings = [...slice.matchAll(/`SELECT ([^`]+)`/g)].map(m => m[1]);
+  sqlStrings.forEach(s => {
+    const cols = s.slice(0, s.indexOf(' FROM ') > 0 ? s.indexOf(' FROM ') : s.length);
+    assert.ok(!/\be\.user_id\b/.test(cols), 'getClaim() evidence SELECT column list must not include e.user_id (JOIN condition is fine)');
+  });
+});
+
+test('D-168B: getClaim() public evidence SELECT does not expose duplicate_signature', () => {
+  const idx = workerSrc.indexOf('async function getClaim(request, env, claimId)');
+  const end = workerSrc.indexOf('\nasync function createClaim', idx);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 3000);
+  assert.ok(!slice.includes('duplicate_signature'), 'getClaim() evidence SELECT must not expose duplicate_signature — internal dedup hash removed in D-168B');
+});
+
+test('D-168B: getClaim() public pressure SELECT does not use SELECT p.*', () => {
+  const idx = workerSrc.indexOf('async function getClaim(request, env, claimId)');
+  const end = workerSrc.indexOf('\nasync function createClaim', idx);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 3000);
+  assert.ok(
+    !slice.includes('SELECT p.*, u.handle FROM pressure_points'),
+    'getClaim() public pressure SELECT must not use p.* wildcard — replaced by explicit column list in D-168B'
+  );
+});
+
+test('D-168B: getClaim() public pressure SELECT does not expose user_id', () => {
+  const idx = workerSrc.indexOf('async function getClaim(request, env, claimId)');
+  const end = workerSrc.indexOf('\nasync function createClaim', idx);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 3000);
+  const sqlStrings = [...slice.matchAll(/`SELECT ([^`]+)`/g)].map(m => m[1]);
+  sqlStrings.forEach(s => {
+    const cols = s.slice(0, s.indexOf(' FROM ') > 0 ? s.indexOf(' FROM ') : s.length);
+    assert.ok(!/\bp\.user_id\b/.test(cols), 'getClaim() pressure SELECT column list must not include p.user_id');
+  });
+});
+
+test('D-168B: getClaim() public tests SELECT does not use SELECT t.*', () => {
+  const idx = workerSrc.indexOf('async function getClaim(request, env, claimId)');
+  const end = workerSrc.indexOf('\nasync function createClaim', idx);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 3000);
+  assert.ok(
+    !slice.includes('SELECT t.*, u.handle FROM home_tests t LEFT JOIN users u ON u.id=t.user_id WHERE t.claim_id=?'),
+    'getClaim() public tests SELECT must not use t.* wildcard — replaced by explicit column list in D-168B'
+  );
+});
+
+test('D-168B: getClaim() public tests SELECT does not expose user_id', () => {
+  const idx = workerSrc.indexOf('async function getClaim(request, env, claimId)');
+  const end = workerSrc.indexOf('\nasync function createClaim', idx);
+  const slice = workerSrc.slice(idx, end > idx ? end : idx + 3000);
+  const sqlStrings = [...slice.matchAll(/`SELECT ([^`]+)`/g)].map(m => m[1]);
+  sqlStrings.forEach(s => {
+    const cols = s.slice(0, s.indexOf(' FROM ') > 0 ? s.indexOf(' FROM ') : s.length);
+    assert.ok(!/\bt\.user_id\b/.test(cols), 'getClaim() tests SELECT column list must not include t.user_id');
+  });
+});
+
+test('D-168B: public evidence vault SELECT does not expose duplicate_signature', () => {
+  const vaultSrc = readFileSync(path.join(__dirname, '../src/evidence-vault.js'), 'utf8');
+  assert.ok(!vaultSrc.includes('duplicate_signature'), 'evidence-vault.js must not expose duplicate_signature in public response — removed in D-168B');
+});
+
+test('D-168B: public evidence vault response mapper does not include user_id', () => {
+  const vaultSrc = readFileSync(path.join(__dirname, '../src/evidence-vault.js'), 'utf8');
+  // The JOIN condition may reference e.user_id — check only the response mapper object
+  assert.ok(!vaultSrc.includes('userId: row.user_id') && !vaultSrc.includes('user_id: row.user_id'), 'evidence-vault.js response mapper must not map user_id into the public response');
+});
+
+test('D-168B: public graph-status does not expose internal inventory counts (users, rateLimits, duplicateSignatures)', () => {
+  const graphSrc = readFileSync(path.join(__dirname, '../src/graph-status.js'), 'utf8');
+  assert.ok(!graphSrc.includes("'users'"), 'graph-status must not include users table count in public response');
+  assert.ok(!graphSrc.includes("'rate_limits'"), 'graph-status must not include rate_limits table count in public response');
+  assert.ok(!graphSrc.includes("'duplicate_signatures'"), 'graph-status must not include duplicate_signatures table count in public response');
+});
+
+test('D-168B: public graph-status retains product-visible counts (claims, evidence, truths, evidenceClaimLinks, claimVotes, reports)', () => {
+  const graphSrc = readFileSync(path.join(__dirname, '../src/graph-status.js'), 'utf8');
+  assert.ok(graphSrc.includes("'claims'") && graphSrc.includes("'evidence'") && graphSrc.includes("'truths'") && graphSrc.includes("'claim_votes'") && graphSrc.includes("'evidence_claim_links'") && graphSrc.includes("'reports'"), 'graph-status must still include the six product-visible table counts used by graphBox()');
+});
+
+test('D-168B: review routes remain requireAdmin-gated', () => {
+  ['reviewDecision','reviewCleanup','markDuplicate','resolveSimilar','reviewQueue'].forEach(fn => {
+    const idx = workerSrc.indexOf(`async function ${fn}`);
+    const slice = workerSrc.slice(idx, idx + 200);
+    assert.ok(slice.includes('requireAdmin'), `${fn} must still call requireAdmin as its first operation after D-168B`);
+  });
+});
+
+test('D-168B: no owner-token enforcement resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-168B must not resume owner-token enforcement (D-149H hold in effect)'
+  );
+});
+
+test('D-168B: public routes do not expose is_admin on any known own-user SELECT', () => {
+  ['async function getMe(', 'async function myHumanX(', 'async function exportMyHumanX(', 'async function redeemInviteCode(', 'async function createOrGetUser'].forEach(fn => {
+    const idx = workerSrc.indexOf(fn);
+    const end = workerSrc.indexOf('\nasync function ', idx + 1);
+    const slice = workerSrc.slice(idx, end > idx ? end : idx + 3000);
+    // Match only backtick-bounded SQL strings to avoid matching SELECT in code comments
+    const sqlStrings = [...slice.matchAll(/`SELECT ([^`]+)`/g)].map(m => m[1]);
+    sqlStrings.forEach(s => {
+      assert.ok(!s.includes('is_admin'), `${fn} SQL SELECT must not include is_admin — found in: ${s.slice(0, 80)}`);
+    });
+  });
+});
+
+test('D-168B: public routes do not expose is_shadow_banned on known own-user SELECTs', () => {
+  ['async function getMe(', 'async function myHumanX(', 'async function exportMyHumanX(', 'async function redeemInviteCode(', 'async function createOrGetUser'].forEach(fn => {
+    const idx = workerSrc.indexOf(fn);
+    const end = workerSrc.indexOf('\nasync function ', idx + 1);
+    const slice = workerSrc.slice(idx, end > idx ? end : idx + 3000);
+    // Only check the users SELECT strings, not the whole function body
+    // (getMe/myHumanX have comments mentioning is_shadow_banned as intentionally omitted)
+    const selectMatches = [...slice.matchAll(/SELECT id, handle[^`]+/g)];
+    selectMatches.forEach(m => {
+      assert.ok(!m[0].includes('is_shadow_banned'), `${fn} users SELECT must not include is_shadow_banned — found in: ${m[0].slice(0, 120)}`);
+    });
+  });
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────

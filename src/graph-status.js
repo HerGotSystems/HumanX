@@ -1,24 +1,17 @@
 export async function graphStatus(request, env, helpers) {
   const { json } = helpers;
 
+  // D-168B: reduced to only the six tables the public graphBox() UI displays.
+  // Internal inventory (users, rateLimits, duplicateSignatures, etc.) removed
+  // from the public response — aggregate counts of internal tables are not
+  // product-visible data and should not be unauthenticated signals.
   const tables = [
-    ['users', 'users'],
     ['claims', 'claims'],
     ['evidence', 'evidence'],
-    ['pressure_points', 'pressure'],
-    ['home_tests', 'tests'],
     ['truths', 'truths'],
-    ['truth_claim_links', 'truthClaimLinks'],
     ['evidence_claim_links', 'evidenceClaimLinks'],
     ['claim_votes', 'claimVotes'],
-    ['evidence_votes', 'evidenceVotes'],
-    ['truth_votes', 'truthVotes'],
     ['reports', 'reports'],
-    ['analysis_results', 'analysisResults'],
-    ['belief_snapshots', 'beliefSnapshots'],
-    ['aip_packets', 'runpacks'],
-    ['rate_limits', 'rateLimits'],
-    ['duplicate_signatures', 'duplicateSignatures']
   ];
 
   const counts = {};
@@ -34,19 +27,9 @@ export async function graphStatus(request, env, helpers) {
     }
   }
 
-  const n = key => Number(counts[key] || 0);
-
   return json({
     ok: Object.keys(errors).length === 0,
     graph: counts,
     errors,
-    summary: {
-      claimPressureObjects: n('claims') + n('pressure') + n('tests'),
-      evidenceGraphObjects: n('evidence') + n('evidenceClaimLinks') + n('evidenceVotes'),
-      beliefTruthObjects: n('truths') + n('truthClaimLinks') + n('truthVotes') + n('beliefSnapshots'),
-      reviewObjects: n('reports') + n('claimVotes'),
-      analysisObjects: n('analysisResults') + n('runpacks'),
-      systemObjects: n('users') + n('rateLimits') + n('duplicateSignatures')
-    }
   });
 }

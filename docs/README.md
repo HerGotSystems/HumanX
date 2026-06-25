@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1223 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1240 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -51,10 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D168A_PUBLIC_API_RESPONSE_ALLOWLIST_AUDIT.md` ⭐ CURRENT — PUBLIC API RESPONSE ALLOWLIST AUDIT
+### `D168B_PUBLIC_API_RESPONSE_ALLOWLIST_PATCH.md` ⭐ CURRENT — PUBLIC API RESPONSE ALLOWLIST PATCH
 
-Public/unauthenticated surface audit. Primary gap: `is_shadow_banned` still returned by `POST /api/session` (D-166B missed `createOrGetUser`). Three lower-priority findings documented (evidence/pressure/tests raw `SELECT *` exposes `user_id`; `duplicate_signature` in evidence vault; `graph-status` unauthenticated). D-168B patch list included. Baseline: 1223/24/57.
+All D-168A gaps patched: `is_shadow_banned` removed from `/api/session`; `getClaim()` evidence/pressure/tests use explicit column SELECTs (no `user_id`/`duplicate_signature`); evidence vault drops `duplicate_signature`; graph-status reduced to 6 product-visible table counts. +17 new smoke tests. New baseline: 1240/24/57.
 **Read before any public route response field change.**
+
+### `D168A_PUBLIC_API_RESPONSE_ALLOWLIST_AUDIT.md` — PUBLIC API RESPONSE ALLOWLIST AUDIT (patched in D-168B)
 
 ### `D167A_REVIEW_QUEUE_FIELD_CONTRACT_AUDIT.md` — REVIEW QUEUE FIELD CONTRACT AUDIT
 
