@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1240 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1249 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -51,9 +51,14 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D169A_FRONTEND_STORAGE_TOKEN_HANDLING_AUDIT.md` ⭐ CURRENT — FRONTEND STORAGE/TOKEN AUDIT
+### `D169B_FRONTEND_EXPORT_OWNER_TOKEN_LEAK_PATCH.md` ⭐ CURRENT — FRONTEND EXPORT TOKEN LEAK PATCH
 
-Admin token: masked input, localStorage only, never logged or rendered. Owner token: advisory-only, never rendered in UI. Two D-169B patches recommended: (1) strip ownerToken from downloadJSON() export, (2) optionally narrow user ID display in My HumanX card. Baseline: 1240/24/57.
+`safeExportUser()` helper added; `downloadJSON()` now exports `{id, handle}` only — never `ownerToken`. +9 new smoke tests. New baseline: 1249/24/57.
+**Read before any frontend export/downloadJSON change.**
+
+### `D169A_FRONTEND_STORAGE_TOKEN_HANDLING_AUDIT.md` — FRONTEND STORAGE/TOKEN AUDIT (F2 patched in D-169B)
+
+Admin token: masked input, localStorage only, never logged or rendered. Owner token: advisory-only, never rendered in UI. F2 (ownerToken in downloadJSON) patched in D-169B. F1 (user ID in Me card) accepted as-is. Baseline: 1240/24/57.
 **Read before any frontend token/storage/export change.**
 
 ### `D168D_PUBLIC_API_RESPONSE_ALLOWLIST_LIVE_VERIFY.md` — D-168B LIVE VERIFIED (patched in D-168B, verified in D-168D)

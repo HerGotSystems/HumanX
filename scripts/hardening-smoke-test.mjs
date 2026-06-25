@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2168,7 +2168,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -11244,6 +11244,65 @@ test('D-168B: public routes do not expose is_shadow_banned on known own-user SEL
       assert.ok(!m[0].includes('is_shadow_banned'), `${fn} users SELECT must not include is_shadow_banned — found in: ${m[0].slice(0, 120)}`);
     });
   });
+});
+
+// ── D-169B: Frontend export ownerToken leak patch ─────────────────────────────
+
+const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+
+test('D-169B: safeExportUser helper exists in frontend', () => {
+  assert.ok(frontendSrc.includes('function safeExportUser('), 'app-v10.js must define safeExportUser()');
+});
+
+test('D-169B: downloadJSON uses safeExportUser, not raw user object', () => {
+  const fnIdx = frontendSrc.indexOf('function downloadJSON(');
+  const fnEnd = frontendSrc.indexOf('\nfunction ', fnIdx + 1);
+  const slice = frontendSrc.slice(fnIdx, fnEnd > fnIdx ? fnEnd : fnIdx + 500);
+  assert.ok(slice.includes('safeExportUser()'), 'downloadJSON must call safeExportUser()');
+  assert.ok(!slice.includes('JSON.stringify({user,') && !slice.includes('JSON.stringify({ user,'), 'downloadJSON must not spread raw user object into export');
+});
+
+test('D-169B: safeExportUser does not include ownerToken', () => {
+  const helperIdx = frontendSrc.indexOf('function safeExportUser(');
+  const helperEnd = frontendSrc.indexOf('\nfunction ', helperIdx + 1);
+  const slice = frontendSrc.slice(helperIdx, helperEnd > helperIdx ? helperEnd : helperIdx + 300);
+  assert.ok(!slice.includes('ownerToken') && !slice.includes('owner_token'), 'safeExportUser must not include ownerToken or owner_token');
+});
+
+test('D-169B: safeExportUser does not include email, is_admin, is_shadow_banned', () => {
+  const helperIdx = frontendSrc.indexOf('function safeExportUser(');
+  const helperEnd = frontendSrc.indexOf('\nfunction ', helperIdx + 1);
+  const slice = frontendSrc.slice(helperIdx, helperEnd > helperIdx ? helperEnd : helperIdx + 300);
+  assert.ok(!slice.includes('email'), 'safeExportUser must not include email');
+  assert.ok(!slice.includes('is_admin'), 'safeExportUser must not include is_admin');
+  assert.ok(!slice.includes('is_shadow_banned'), 'safeExportUser must not include is_shadow_banned');
+});
+
+test('D-169B: admin token localStorage key not exported by safeExportUser', () => {
+  const helperIdx = frontendSrc.indexOf('function safeExportUser(');
+  const helperEnd = frontendSrc.indexOf('\nfunction ', helperIdx + 1);
+  const slice = frontendSrc.slice(helperIdx, helperEnd > helperIdx ? helperEnd : helperIdx + 300);
+  assert.ok(!slice.includes('LS_ADMIN') && !slice.includes('adminToken') && !slice.includes('humanx_admin_token'), 'safeExportUser must not reference admin token');
+});
+
+test('D-169B: admin token input remains type="password" in renderReview', () => {
+  assert.ok(frontendSrc.includes('type="password"'), 'admin token input must remain type="password"');
+});
+
+test('D-169B: no console.* calls in frontend', () => {
+  assert.ok(!/console\.(log|error|warn|debug|info)\s*\(/.test(frontendSrc), 'app-v10.js must have no console.* calls');
+});
+
+test('D-169B: no owner-token enforcement resumed in frontend', () => {
+  assert.ok(!frontendSrc.includes('OWNER_TOKEN_REQUIRED') && !frontendSrc.includes('OWNER_TOKEN_INVALID'), 'frontend must not resume owner-token enforcement');
+});
+
+test('D-169B: safeExportUser exports id and handle', () => {
+  const helperIdx = frontendSrc.indexOf('function safeExportUser(');
+  const helperEnd = frontendSrc.indexOf('\nfunction ', helperIdx + 1);
+  const slice = frontendSrc.slice(helperIdx, helperEnd > helperIdx ? helperEnd : helperIdx + 300);
+  assert.ok(slice.includes('id:') || slice.includes('id :'), 'safeExportUser must export id');
+  assert.ok(slice.includes('handle:') || slice.includes('handle :'), 'safeExportUser must export handle');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
