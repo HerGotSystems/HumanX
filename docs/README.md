@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D168D_PUBLIC_API_RESPONSE_ALLOWLIST_LIVE_VERIFY.md` ⭐ CURRENT — D-168B LIVE VERIFIED
+### `D169A_FRONTEND_STORAGE_TOKEN_HANDLING_AUDIT.md` ⭐ CURRENT — FRONTEND STORAGE/TOKEN AUDIT
+
+Admin token: masked input, localStorage only, never logged or rendered. Owner token: advisory-only, never rendered in UI. Two D-169B patches recommended: (1) strip ownerToken from downloadJSON() export, (2) optionally narrow user ID display in My HumanX card. Baseline: 1240/24/57.
+**Read before any frontend token/storage/export change.**
+
+### `D168D_PUBLIC_API_RESPONSE_ALLOWLIST_LIVE_VERIFY.md` — D-168B LIVE VERIFIED (patched in D-168B, verified in D-168D)
 
 Production confirmed: `is_shadow_banned`/`is_admin` absent from `/api/session`; `duplicate_signature`/`user_id`/`is_shadow_banned`/`is_admin`/`email` absent from `/api/claims/:id` and `/api/evidence-vault`; `users`/`rateLimits`/`duplicateSignatures`/`summary` absent from `/api/graph-status`; `/api/review` returns 403 without admin token. Baseline: 1240/24/57.
 
