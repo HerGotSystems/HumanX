@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D170A_OWNER_TOKEN_ADVISORY_CONTAINMENT_AUDIT.md` ⭐ CURRENT — D-170A OWNER-TOKEN CONTAINMENT AUDIT
+### `D171A_RUNPACK_EXPORT_PAYLOAD_ALLOWLIST_AUDIT.md` ⭐ CURRENT — D-171A RUNPACK/EXPORT PAYLOAD ALLOWLIST AUDIT
+
+All RunPack/copy/download/export payload surfaces audited. No token, email, user_id, invite code, or secret material found. F1: `mapClaim()` includes three internal dedup/admin fields (`nearDuplicateOf`, `duplicateOf`, `statusLocked`) in RunPack `payload.claim` and JSON download `claims` — not secrets, but unnecessary for AI consumers. D-171B recommended: `safeRunPackClaim()` helper. D-169B export containment confirmed intact. Baseline: 1249/24/57.
+**Read before any RunPack, export, or claim-payload change.**
+
+### `D170A_OWNER_TOKEN_ADVISORY_CONTAINMENT_AUDIT.md` — D-170A OWNER-TOKEN CONTAINMENT AUDIT (prior current)
 
 All owner-token surfaces audited: session response, localStorage, in-memory user object, request headers, backend telemetry logging, admin review UI, public UI, public APIs, export/download, docs. No leaks found. `/api/session` returning `owner_token` is confirmed intentional D-148A advisory bootstrap. Export path clean post-D-169B. D-149H hold confirmed in effect. No patches recommended. Baseline: 1249/24/57.
 
