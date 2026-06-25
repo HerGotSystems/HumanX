@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D173B_PUBLIC_MUTATION_GUARDRAILS_PATCH.md` ⭐ CURRENT — D-173B PUBLIC MUTATION GUARDRAILS PATCH
+### `D173D_PUBLIC_MUTATION_GUARDRAILS_LIVE_VERIFY.md` ⭐ CURRENT — D-173B/D LIVE VERIFIED
+
+Production preflight from owner terminal confirms: health ok/d1-live, /api/session does not expose is_admin or is_shadow_banned, invalid report targetType returns 400, invalid linkedClaimId returns 400, /api/review without admin returns 403. Report dedupe and convertTruthToClaim sanitization are source/static verified by D-173B tests (baseline 1300). Baseline: 1300/24/57.
+
+### `D173B_PUBLIC_MUTATION_GUARDRAILS_PATCH.md` — D-173B PUBLIC MUTATION GUARDRAILS PATCH
 
 All four D-173A findings patched. P1: reportTarget targetType allowlist (claim/evidence/pressure/truth). P2: per-user per-target report dedupe — duplicate returns ok:true,duplicate:true without incrementing. P3: createTruth validates linkedClaimId existence and state before insert. P4: convertTruthToClaim wraps all claim return paths through mapClaim(). 15 new smoke tests. Baseline: 1300/24/57.
 
