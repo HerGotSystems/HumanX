@@ -29,7 +29,7 @@ export async function convertTruthToClaim(request, env, helpers) {
     const linkId = await ensureTruthClaimLink(env, helpers, truthId, existing.id, userId, body.bridgeNote || 'Matched existing claim during truth conversion.', now);
     await syncTruthLinkState(env, truthId, existing.id, now);
     // Public existing claim — include claimId so frontend can open Study view
-    return json({ ok: true, existing: true, truth: { id: truth.id, statement: truth.statement }, claim: existing, bridge: { truthId, claimId: existing.id, linkId, claimState: 'public' } });
+    return json({ ok: true, existing: true, truth: { id: truth.id, statement: truth.statement }, claim: mapClaim(existing), bridge: { truthId, claimId: existing.id, linkId, claimState: 'public' } });
   }
 
   // Check for a non-public existing claim (rejected, review, archived, duplicate) so the
@@ -41,7 +41,7 @@ export async function convertTruthToClaim(request, env, helpers) {
     await syncTruthLinkState(env, truthId, nonPublic.id, now);
     const claimState = nonPublic.review_state || 'public';
     // claimId intentionally omitted — non-public claims cannot be fetched by getClaim
-    return json({ ok: true, existing: true, truth: { id: truth.id, statement: truth.statement }, claim: nonPublic, bridge: { truthId, linkId, claimState } });
+    return json({ ok: true, existing: true, truth: { id: truth.id, statement: truth.statement }, claim: mapClaim(nonPublic), bridge: { truthId, linkId, claimState } });
   }
 
   const now = Date.now();
@@ -69,7 +69,7 @@ export async function convertTruthToClaim(request, env, helpers) {
     const racedBridge = racedState === 'public'
       ? { truthId, claimId: raced.id, linkId, claimState: 'public' }
       : { truthId, linkId, claimState: racedState };
-    return json({ ok: true, existing: true, raced: true, truth: { id: truth.id, statement: truth.statement }, claim: raced, bridge: racedBridge });
+    return json({ ok: true, existing: true, raced: true, truth: { id: truth.id, statement: truth.statement }, claim: mapClaim(raced), bridge: racedBridge });
   }
 
   let linkId;
@@ -83,7 +83,7 @@ export async function convertTruthToClaim(request, env, helpers) {
 
   const claim = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(claimId).first();
 
-  return json({ ok: true, existing: false, truth: { id: truth.id, statement: truth.statement }, claim, bridge: { truthId, claimId, linkId } });
+  return json({ ok: true, existing: false, truth: { id: truth.id, statement: truth.statement }, claim: mapClaim(claim), bridge: { truthId, claimId, linkId } });
 }
 
 async function insertClaimWithNormalizedKey(env, c) {
@@ -256,4 +256,30 @@ function isUniqueConstraintError(err) {
 
 function normalizeClaim(v) {
   return meaningKey(v);
+}
+
+function mapClaim(c) {
+  if (!c) return null;
+  return {
+    id: c.id,
+    claim: c.claim,
+    category: c.category,
+    type: c.type,
+    status: c.status,
+    evidenceScore: c.evidence_score ?? c.evidenceScore ?? null,
+    survivability: c.survivability ?? null,
+    testability: c.testability ?? null,
+    contradictions: c.contradictions ?? 0,
+    reportCount: c.report_count || 0,
+    reviewState: c.review_state || 'review',
+    beliefYes: c.belief_yes || 0,
+    beliefNo: c.belief_no || 0,
+    uncertainty: c.uncertainty || 0,
+    createdAt: c.created_at,
+    updatedAt: c.updated_at,
+    handle: c.handle || 'anon',
+    nearDuplicateOf: c.near_duplicate_of || null,
+    duplicateOf: c.duplicate_of || null,
+    statusLocked: !!(c.status_locked),
+  };
 }

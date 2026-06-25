@@ -49,6 +49,15 @@ export async function createTruth(request, env, helpers) {
 
   if (existing) return repeatExistingTruth(env, json, makeId, userId, existing.id, now, body.claim_builder);
 
+  const rawLinkedClaimId = cleanId(body.linkedClaimId || body.linked_claim_id || '') || null;
+  let validLinkedClaimId = null;
+  if (rawLinkedClaimId) {
+    const linkedClaimRow = await env.DB.prepare(`SELECT id, review_state FROM claims WHERE id=?`).bind(rawLinkedClaimId).first();
+    if (!linkedClaimRow) return json({ error: 'LINKED_CLAIM_NOT_FOUND' }, 400);
+    const linkedState = (linkedClaimRow.review_state || 'public').toLowerCase();
+    if (['archived', 'rejected', 'duplicate'].includes(linkedState)) return json({ error: 'LINKED_CLAIM_NOT_ELIGIBLE', review_state: linkedState }, 400);
+    validLinkedClaimId = rawLinkedClaimId;
+  }
   const id = makeId('tru');
   try {
     await env.DB.prepare(`
@@ -68,7 +77,7 @@ export async function createTruth(request, env, helpers) {
       cleanText(body.confidenceLabel || body.confidence_label || 'claimed', 60),
       1,
       0,
-      cleanId(body.linkedClaimId || body.linked_claim_id || '') || null,
+      validLinkedClaimId,
       now,
       now,
       'review'

@@ -11547,6 +11547,93 @@ test('D-172B: no owner-token work resumed', () => {
   assert.ok(!appSrc.includes('OWNER_TOKEN_REQUIRED') && !appSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold — owner-token enforcement must not be resumed in frontend');
 });
 
+// ── D-173B: Public mutation guardrails ────────────────────────────────────────
+
+const truthBridgeSrc = readFileSync(path.join(__dirname, '../src/truth-claim-bridge.js'), 'utf8');
+// truthsSrc already declared above (line ~651)
+
+test('D-173B: reportTarget allowlist exists in worker source', () => {
+  assert.ok(workerSrc.includes("ALLOWED_REPORT_TYPES=new Set(['claim','evidence','pressure','truth'])"), 'ALLOWED_REPORT_TYPES set must be present in worker');
+});
+
+test('D-173B: invalid report target types are rejected with BAD_TARGET_TYPE', () => {
+  assert.ok(workerSrc.includes("error:'BAD_TARGET_TYPE'"), 'BAD_TARGET_TYPE error response must exist');
+  assert.ok(workerSrc.includes("ALLOWED_REPORT_TYPES.has(targetType)"), 'allowlist check must be applied to targetType');
+});
+
+test('D-173B: report duplicate detection exists in worker', () => {
+  assert.ok(workerSrc.includes("SELECT id FROM reports WHERE target_id=? AND reporter_id=? AND status='open'"), 'dedupe query must exist in reportTarget');
+  assert.ok(workerSrc.includes('dupReport'), 'dupReport variable must be used');
+});
+
+test('D-173B: duplicate report returns ok:true duplicate:true without incrementing', () => {
+  assert.ok(workerSrc.includes("if (dupReport) return json({ ok:true, duplicate:true })"), 'early return for duplicate must exist before INSERT');
+});
+
+test('D-173B: valid first report still reaches INSERT INTO reports', () => {
+  assert.ok(workerSrc.includes("INSERT INTO reports (id,target_type,target_id,reporter_id,reason,created_at,status)"), 'INSERT INTO reports must still exist for first reports');
+});
+
+test('D-173B: createTruth validates provided linkedClaimId before insert', () => {
+  assert.ok(truthsSrc.includes('rawLinkedClaimId'), 'rawLinkedClaimId extraction must exist in truths.js');
+  assert.ok(truthsSrc.includes("SELECT id, review_state FROM claims WHERE id=?"), 'linkedClaimId existence check must query claims table');
+});
+
+test('D-173B: createTruth rejects invalid linkedClaimId with LINKED_CLAIM_NOT_FOUND', () => {
+  assert.ok(truthsSrc.includes("error: 'LINKED_CLAIM_NOT_FOUND'"), 'LINKED_CLAIM_NOT_FOUND error must exist');
+});
+
+test('D-173B: createTruth rejects terminal-state linkedClaimId with LINKED_CLAIM_NOT_ELIGIBLE', () => {
+  assert.ok(truthsSrc.includes("error: 'LINKED_CLAIM_NOT_ELIGIBLE'"), 'LINKED_CLAIM_NOT_ELIGIBLE error must exist');
+  assert.ok(truthsSrc.includes("['archived', 'rejected', 'duplicate'].includes(linkedState)"), 'terminal state check must cover archived/rejected/duplicate');
+});
+
+test('D-173B: createTruth still supports no linkedClaimId (null path)', () => {
+  assert.ok(truthsSrc.includes('validLinkedClaimId = null'), 'validLinkedClaimId must default to null when not provided');
+  assert.ok(truthsSrc.includes('validLinkedClaimId,'), 'validLinkedClaimId must be used as bind param in INSERT');
+});
+
+test('D-173B: convertTruthToClaim does not return raw SELECT * claim rows', () => {
+  assert.ok(!truthBridgeSrc.includes('claim, bridge:'), 'shorthand claim shorthand in return must be replaced with mapClaim()');
+  assert.ok(!truthBridgeSrc.includes('claim: existing,'), 'raw existing claim must be replaced with mapClaim(existing)');
+  assert.ok(!truthBridgeSrc.includes('claim: nonPublic,'), 'raw nonPublic claim must be replaced with mapClaim(nonPublic)');
+  assert.ok(!truthBridgeSrc.includes('claim: raced,'), 'raw raced claim must be replaced with mapClaim(raced)');
+});
+
+test('D-173B: convertTruthToClaim uses mapClaim wrapper on all return paths', () => {
+  assert.ok(truthBridgeSrc.includes('claim: mapClaim(existing)'), 'existing path must use mapClaim');
+  assert.ok(truthBridgeSrc.includes('claim: mapClaim(nonPublic)'), 'nonPublic path must use mapClaim');
+  assert.ok(truthBridgeSrc.includes('claim: mapClaim(raced)'), 'raced path must use mapClaim');
+  assert.ok(truthBridgeSrc.includes('claim: mapClaim(claim)'), 'new claim path must use mapClaim');
+});
+
+test('D-173B: convertTruthToClaim mapClaim does not expose normalized_claim', () => {
+  const mapClaimIdx = truthBridgeSrc.indexOf('function mapClaim');
+  const mapClaimBody = truthBridgeSrc.slice(mapClaimIdx, mapClaimIdx + 1000);
+  assert.ok(!mapClaimBody.includes('normalized_claim'), 'mapClaim must not include normalized_claim');
+  assert.ok(!mapClaimBody.includes('status_locked:'), 'mapClaim must not expose raw status_locked field name');
+  assert.ok(mapClaimBody.includes('statusLocked'), 'mapClaim must expose camelCase statusLocked (server-derived boolean)');
+});
+
+test('D-173B: convertTruthToClaim mapClaim does not expose user_id or damage', () => {
+  const mapClaimIdx = truthBridgeSrc.indexOf('function mapClaim');
+  const mapClaimBody = truthBridgeSrc.slice(mapClaimIdx, mapClaimIdx + 1000);
+  assert.ok(!mapClaimBody.includes('user_id'), 'mapClaim must not expose user_id');
+  assert.ok(!mapClaimBody.includes('damage'), 'mapClaim must not expose damage field');
+});
+
+test('D-173B: review routes remain requireAdmin-gated', () => {
+  assert.ok(workerSrc.includes('requireAdmin(request,env)') || workerSrc.includes('requireAdmin(request, env)'), 'requireAdmin must remain in worker');
+  const reviewRoutes = ['/api/review/decision', '/api/review/cleanup'];
+  for (const r of reviewRoutes) {
+    assert.ok(workerSrc.includes(r), `admin review route ${r} must still exist`);
+  }
+});
+
+test('D-173B: no owner-token work resumed', () => {
+  assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
