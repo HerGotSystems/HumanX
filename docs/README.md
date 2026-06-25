@@ -51,10 +51,10 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D165A_REVIEW_QUEUE_ADMIN_UX_AUDIT.md` ⭐ CURRENT — REVIEW QUEUE ADMIN UX AUDIT
+### `D165B_REVIEW_QUEUE_ADMIN_UX_COPY_POLISH.md` ⭐ CURRENT — REVIEW QUEUE UX COPY POLISH
 
-Empty/filter/error states are clear. Three gaps: keyboard hint says "A approve" but A now requires two presses (D-164B); truth-derived filter has no help text; "Review unavailable" error has no retry/re-enter path. D-165B plan: update keyboard hint copy, add truth-derived filter help + empty state, add scroll-up note to error panel.
-**Read before starting D-165B or any review queue UX work.**
+Keyboard hint updated to reflect D-164B two-press A ("A arm · A again confirm · K keep · R reject · …"). truth-derived filter now has help text and empty state. "Review unavailable" error now includes re-enter token recovery copy. 6 new smoke tests. Baseline: 1215/24/57.
+**Read before starting D-165C or any review queue UX work.**
 
 ### `D164D_SAFER_REVIEW_APPROVAL_ACTIONS_LIVE_VERIFY.md` — D-164B LIVE VERIFIED
 

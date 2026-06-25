@@ -10935,6 +10935,61 @@ test('D-164B: no owner-token enforcement resumed', () => {
   );
 });
 
+// ── Section 98 — D-165B: Review queue admin UX copy polish ───────────────────
+
+test('D-165B: keyboard hint reflects two-press A (A arm · A again confirm)', () => {
+  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
+  const end = appV10Src.indexOf('\nfunction ', idx + 1);
+  const slice = appV10Src.slice(idx, end > idx ? end : idx + 15000);
+  assert.ok(
+    slice.includes('A arm · A again confirm'),
+    'keyboard hint must read "A arm · A again confirm" to reflect D-164B two-press approve flow'
+  );
+});
+
+test('D-165B: old one-shot "A approve" keyboard hint is gone', () => {
+  assert.ok(
+    !appV10Src.includes('A approve · K keep'),
+    'old "A approve · K keep" hint must be removed — superseded by D-165B two-press wording'
+  );
+});
+
+test('D-165B: reviewFilterHelpText contains truth-derived copy', () => {
+  const idx = appV10Src.indexOf('function reviewFilterHelpText');
+  const end = appV10Src.indexOf('\nfunction ', idx + 1);
+  const slice = appV10Src.slice(idx, end > idx ? end : idx + 800);
+  assert.ok(
+    slice.includes('Truth-derived items come from belief/truth flows'),
+    'reviewFilterHelpText must include truth-derived help copy'
+  );
+});
+
+test('D-165B: reviewEmptyText contains truth-derived empty state copy', () => {
+  const idx = appV10Src.indexOf('function reviewEmptyText');
+  const end = appV10Src.indexOf('\nfunction ', idx + 1);
+  const slice = appV10Src.slice(idx, end > idx ? end : idx + 1500);
+  assert.ok(
+    slice.includes('No truth-derived review items right now'),
+    'reviewEmptyText must include truth-derived empty state copy'
+  );
+});
+
+test('D-165B: Review unavailable error panel includes recovery copy', () => {
+  const idx = appV10Src.indexOf('async function renderReview(');
+  const slice = appV10Src.slice(idx, idx + 2000);
+  assert.ok(
+    slice.includes('Check the admin token above, re-enter it if needed'),
+    'renderReview catch block must include recovery copy for Review unavailable state'
+  );
+});
+
+test('D-165B: no owner-token work resumed', () => {
+  assert.ok(
+    !workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'),
+    'D-165B must not resume owner-token enforcement (D-149H hold in effect)'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
