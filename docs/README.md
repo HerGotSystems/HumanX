@@ -56,7 +56,8 @@ Read these first when starting a new session or returning after time away.
 ### `D177B_FRONTEND_MODAL_HTML_CONTRACT_PATCH.md` — D-177B FRONTEND MODAL CONTRACT
 ### `D177D_FRONTEND_MODAL_HTML_CONTRACT_LIVE_VERIFY.md` — D-177B/D LIVE VERIFIED
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
-### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` ⭐ CURRENT — D-178B HTTP CACHE/NOSNIFF PATCH
+### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
+### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` ⭐ CURRENT — D-178B/D LIVE VERIFIED
 
 Production preflight confirms: health ok/d1-live, /api/session clean, invalid report targetType → 400, invalid evidence claimId → 404, admin token input password, no console logging, /api/review without admin → 403. Global 500, TRUTH_LINK_FAILED, builder context, and safeAll hygiene patches are source/static-verified. Baseline: 1335/24/57.
 
