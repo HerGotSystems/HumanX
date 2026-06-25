@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1016 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1223 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -51,10 +51,14 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D167A_REVIEW_QUEUE_FIELD_CONTRACT_AUDIT.md` ⭐ CURRENT — REVIEW QUEUE FIELD CONTRACT AUDIT
+### `D168A_PUBLIC_API_RESPONSE_ALLOWLIST_AUDIT.md` ⭐ CURRENT — PUBLIC API RESPONSE ALLOWLIST AUDIT
 
-All 25 claim fields used by the Review UI confirmed present in D-166B explicit SELECT or via attachClaimBuilderContexts(). Five dropped columns (supporters, challengers, belief_yes, belief_no, uncertainty) confirmed unused by review rendering. No code changes needed. Baseline: 1223/24/57.
-**Read before any review queue backend or frontend field change.**
+Public/unauthenticated surface audit. Primary gap: `is_shadow_banned` still returned by `POST /api/session` (D-166B missed `createOrGetUser`). Three lower-priority findings documented (evidence/pressure/tests raw `SELECT *` exposes `user_id`; `duplicate_signature` in evidence vault; `graph-status` unauthenticated). D-168B patch list included. Baseline: 1223/24/57.
+**Read before any public route response field change.**
+
+### `D167A_REVIEW_QUEUE_FIELD_CONTRACT_AUDIT.md` — REVIEW QUEUE FIELD CONTRACT AUDIT
+
+All 25 claim fields used by the Review UI confirmed present in D-166B explicit SELECT or via attachClaimBuilderContexts(). Five dropped columns confirmed unused. No code changes needed. Baseline: 1223/24/57.
 
 ### `D166D_SENSITIVE_METADATA_GUARDRAILS_LIVE_VERIFY.md` — D-166B LIVE VERIFIED
 
