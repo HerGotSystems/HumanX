@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D175B_PUBLIC_ABUSE_ORPHAN_ROW_GUARDRAILS_PATCH.md` ⭐ CURRENT — D-175B ABUSE GUARDRAIL PATCH
+### `D175D_PUBLIC_ABUSE_ORPHAN_ROW_GUARDRAILS_LIVE_VERIFY.md` ⭐ CURRENT — D-175B/D LIVE VERIFIED
+
+Production preflight confirms: health ok/d1-live, /api/session clean (no is_admin/is_shadow_banned), invalid evidence claimId → 404, invalid pressure claimId → 404, admin token input password, no console logging, /api/review without admin → 403. Session rate-limit and CLAIM_NOT_FOUND token are source/static-verified. Baseline: 1322/24/57.
+
+### `D175B_PUBLIC_ABUSE_ORPHAN_ROW_GUARDRAILS_PATCH.md` — D-175B ABUSE GUARDRAIL PATCH
 
 Patches D-175A F1/F2/F3: session rate limit (30/hr/IP), claim existence check in addEvidence(), claim existence check in addPressure(). +14 smoke tests. Baseline: 1322/24/57.
 
