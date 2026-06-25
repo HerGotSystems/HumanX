@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1249 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1261 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -51,7 +51,12 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D171A_RUNPACK_EXPORT_PAYLOAD_ALLOWLIST_AUDIT.md` ⭐ CURRENT — D-171A RUNPACK/EXPORT PAYLOAD ALLOWLIST AUDIT
+### `D171B_RUNPACK_EXPORT_CLAIM_PAYLOAD_PATCH.md` ⭐ CURRENT — D-171B RUNPACK/EXPORT CLAIM PAYLOAD PATCH
+
+`safeRunPackClaim()` helper added; fallback RunPack `payload` and `downloadJSON()` claims array now use it. Strips `nearDuplicateOf`, `duplicateOf`, `statusLocked` (and all non-allowlisted fields) from exported claim objects. Backend `mapClaim()` unchanged. +12 smoke tests. New baseline: 1261/24/57.
+**Read before any RunPack, export, or claim-payload change.**
+
+### `D171A_RUNPACK_EXPORT_PAYLOAD_ALLOWLIST_AUDIT.md` — D-171A RUNPACK/EXPORT PAYLOAD ALLOWLIST AUDIT (patched in D-171B)
 
 All RunPack/copy/download/export payload surfaces audited. No token, email, user_id, invite code, or secret material found. F1: `mapClaim()` includes three internal dedup/admin fields (`nearDuplicateOf`, `duplicateOf`, `statusLocked`) in RunPack `payload.claim` and JSON download `claims` — not secrets, but unnecessary for AI consumers. D-171B recommended: `safeRunPackClaim()` helper. D-169B export containment confirmed intact. Baseline: 1249/24/57.
 **Read before any RunPack, export, or claim-payload change.**
