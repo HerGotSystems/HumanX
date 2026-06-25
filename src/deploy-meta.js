@@ -2,8 +2,8 @@
 // No secrets, no tokens, no user data, no D1 access.
 export const DEPLOY_META = {
   app:        'humanx',
-  checkpoint: 'D-169B',
-  commit:     '036c016',
-  baseline:   '1249/24/57',
-  updated_at: '2026-06-25T14:00:00Z',
+  checkpoint: 'D-171C',
+  commit:     '488d446',
+  baseline:   '1274/24/57',
+  updated_at: '2026-06-25T16:00:00Z',
 };
