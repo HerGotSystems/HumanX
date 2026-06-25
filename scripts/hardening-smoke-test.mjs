@@ -11851,6 +11851,85 @@ test('D-176B: no owner-token work resumed', () => {
   assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain in effect');
 });
 
+// ── D-177B: Frontend modal HTML safety contract ───────────────────────────────
+
+test('D-177B: hxModal has explicit raw-HTML safety contract comment', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  assert.ok(
+    frontendSrc.includes('body` is raw HTML') || frontendSrc.includes('body is raw HTML'),
+    'hxModal must have a comment marking body as raw HTML'
+  );
+  assert.ok(
+    frontendSrc.includes('esc()') && frontendSrc.indexOf('esc()') < frontendSrc.indexOf('function hxModal') + 300,
+    'hxModal comment must reference esc() requirement'
+  );
+});
+
+test('D-177B: hxModal markDuplicateUI caller escapes label before body', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  // markDuplicateUI must escape `label` with esc() before inserting into hxModal body
+  const dupUiIdx = frontendSrc.indexOf('markDuplicateUI');
+  const hxModalCallIdx = frontendSrc.indexOf('hxModal(', dupUiIdx);
+  const snippet = frontendSrc.slice(dupUiIdx, hxModalCallIdx + 400);
+  assert.ok(snippet.includes('esc(label)'), 'markDuplicateUI must use esc(label) in hxModal body');
+});
+
+test('D-177B: hxModal resolveSimilarUI caller escapes nearDup before body', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  // Use the function definition as anchor (not call sites in onclick strings)
+  const resolveIdx = frontendSrc.indexOf('async function resolveSimilarUI');
+  assert.ok(resolveIdx !== -1, 'resolveSimilarUI function must exist');
+  const hxModalCallIdx = frontendSrc.indexOf('hxModal(', resolveIdx);
+  const snippet = frontendSrc.slice(hxModalCallIdx, hxModalCallIdx + 500);
+  assert.ok(snippet.includes('esc(nearDup)'), 'resolveSimilarUI must use esc(nearDup) in hxModal body');
+});
+
+test('D-177B: no unescaped raw user text passed directly to hxModal body', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  // Find all hxModal call sites and verify none pass a bare user-data variable as body without esc()
+  // Pattern check: body containing item.claim or item.statement or item.note without esc()
+  const hxModalCalls = [...frontendSrc.matchAll(/hxModal\(\{[^}]{0,600}body:/g)];
+  for (const m of hxModalCalls) {
+    const snippet = frontendSrc.slice(m.index, m.index + 800);
+    // Must not contain raw unescaped user fields directly in body
+    assert.ok(
+      !snippet.match(/body:\s*`[^`]*\$\{(item\.(claim|statement|note|title|body)|rawText)[^}]*\}`/),
+      'hxModal body must not embed raw user fields without esc()'
+    );
+  }
+});
+
+test('D-177B: toast still uses textContent (not innerHTML)', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  assert.ok(frontendSrc.includes('e.textContent=t') || frontendSrc.includes('e.textContent = t'), 'toast must use textContent');
+  const toastFn = frontendSrc.slice(frontendSrc.indexOf('function toast'), frontendSrc.indexOf('function toast') + 200);
+  assert.ok(!toastFn.includes('innerHTML'), 'toast must not use innerHTML');
+});
+
+test('D-177B: URL rendering goes through safeHttpUrl / sourceLink', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  assert.ok(frontendSrc.includes('function safeHttpUrl'), 'safeHttpUrl must be defined');
+  assert.ok(frontendSrc.includes('function sourceLink'), 'sourceLink must be defined');
+  assert.ok(
+    frontendSrc.includes('safeHttpUrl(url)') || frontendSrc.includes('safeHttpUrl(e.source_url') || frontendSrc.includes('sourceLink('),
+    'URL rendering must use safeHttpUrl or sourceLink'
+  );
+});
+
+test('D-177B: no frontend console logging', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  assert.ok(!frontendSrc.includes('console.'), 'frontend must not have console logging');
+});
+
+test('D-177B: admin token input remains type=password', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  assert.ok(frontendSrc.includes('type="password"'), 'admin token input must remain password type');
+});
+
+test('D-177B: no owner-token work resumed', () => {
+  assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain in effect');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
