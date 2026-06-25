@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D169D_FRONTEND_EXPORT_OWNER_TOKEN_LEAK_LIVE_VERIFY.md` ⭐ CURRENT — D-169B LIVE VERIFIED
+### `D170A_OWNER_TOKEN_ADVISORY_CONTAINMENT_AUDIT.md` ⭐ CURRENT — D-170A OWNER-TOKEN CONTAINMENT AUDIT
+
+All owner-token surfaces audited: session response, localStorage, in-memory user object, request headers, backend telemetry logging, admin review UI, public UI, public APIs, export/download, docs. No leaks found. `/api/session` returning `owner_token` is confirmed intentional D-148A advisory bootstrap. Export path clean post-D-169B. D-149H hold confirmed in effect. No patches recommended. Baseline: 1249/24/57.
+
+### `D169D_FRONTEND_EXPORT_OWNER_TOKEN_LEAK_LIVE_VERIFY.md` — D-169B LIVE VERIFIED (audited in D-170A)
 
 Production confirmed: `safeExportUser()` present in JS; `downloadJSON` uses it; raw user spread absent; admin token input masked; no console logging. `/api/session` does not expose `ownerToken` (camelCase) or `is_shadow_banned`/`is_admin`; does return `owner_token` (snake_case, existing advisory behavior per D-149H). `/api/review` returns 403 without admin token. Baseline: 1249/24/57.
 
