@@ -11781,6 +11781,76 @@ test('D-175B: no owner-token work resumed', () => {
   assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain in effect');
 });
 
+// ── D-176B: Error response hygiene patch ─────────────────────────────────────
+
+test('D-176B: global catch 500 does not return raw err.message', () => {
+  // After D-176B the catch block must NOT pass the raw message variable to the 500 response
+  const catchMatch = workerSrc.match(/\} catch \(err\) \{[\s\S]*?return json\(\{ error:.*?\}, 500\)/);
+  const catchBlock = catchMatch ? catchMatch[0] : '';
+  assert.ok(!catchBlock.includes('message }, 500') && !catchBlock.includes('message,500'), 'global catch must not return raw message in 500');
+});
+
+test('D-176B: global catch 500 returns INTERNAL_ERROR with generic message', () => {
+  assert.ok(workerSrc.includes("error: 'INTERNAL_ERROR'") || workerSrc.includes('error:"INTERNAL_ERROR"'), 'global catch must use INTERNAL_ERROR code');
+  assert.ok(workerSrc.includes("'Unexpected server error.'") || workerSrc.includes('"Unexpected server error."'), 'global catch must use generic safe message');
+});
+
+test('D-176B: global catch does not expose SQL or stack text publicly', () => {
+  const catchMatch = workerSrc.match(/\} catch \(err\) \{[\s\S]*?return json\(\{ error:.*?\}, 500\)/);
+  const catchBlock = catchMatch ? catchMatch[0] : '';
+  assert.ok(!catchBlock.includes('SQLITE') && !catchBlock.includes('.stack'), 'global catch must not reference SQL or stack in public 500 response');
+});
+
+test('D-176B: deliberate validation errors remain machine-readable', () => {
+  assert.ok(workerSrc.includes("'CLAIM_NOT_FOUND'"), 'CLAIM_NOT_FOUND must still be present');
+  assert.ok(workerSrc.includes("'BAD_TARGET_TYPE'"), 'BAD_TARGET_TYPE must still be present');
+  assert.ok(workerSrc.includes("'RATE_LIMITED'"), 'RATE_LIMITED must still be present');
+  assert.ok(workerSrc.includes("'UNAUTHORIZED'"), 'UNAUTHORIZED must still be present');
+});
+
+test('D-176B: TRUTH_LINK_FAILED does not return raw linkErr.message', () => {
+  assert.ok(!truthBridgeSrc.includes('linkErr.message') && !truthBridgeSrc.includes('linkErr &&'), 'TRUTH_LINK_FAILED must not return raw linkErr message');
+});
+
+test('D-176B: TRUTH_LINK_FAILED preserves machine-readable error code', () => {
+  assert.ok(truthBridgeSrc.includes("'TRUTH_LINK_FAILED'"), 'TRUTH_LINK_FAILED code must remain');
+  assert.ok(truthBridgeSrc.includes("'Truth claim link failed.'"), 'TRUTH_LINK_FAILED must use generic safe message');
+});
+
+test('D-176B: builder context failure does not embed raw cbcErr.message', () => {
+  assert.ok(!truthsSrc.includes('cbcErr?.message') && !truthsSrc.includes('cbcErr.message'), 'builder context throw must not embed cbcErr.message');
+  assert.ok(truthsSrc.includes("SERVER_ERROR: builder context insert failed'"), 'builder context must still throw with safe fixed message');
+});
+
+test('D-176B: safeAll lineage errors do not expose raw SQL error text', () => {
+  assert.ok(!workerSrc.includes('err && err.message ? err.message : err') || workerSrc.indexOf('safeAll') > workerSrc.indexOf('err && err.message'), 'safeAll must not embed raw err.message in error field');
+  assert.ok(workerSrc.includes('return { results: [], error: label }') || workerSrc.includes("results:[],error:label"), 'safeAll must return label-only error');
+});
+
+test('D-176B: rate-limit errors remain safe and do not expose IP or key values', () => {
+  assert.ok(workerSrc.includes("error:'RATE_LIMITED', message:'Too many requests. Try again later.'"), 'rate-limit error must use safe generic message');
+  assert.ok(!workerSrc.match(/RATE_LIMITED.*ip\(request\)|ip\(request\).*RATE_LIMITED/), 'rate-limit error must not expose IP value');
+});
+
+test('D-176B: review routes remain requireAdmin-gated', () => {
+  assert.ok(workerSrc.includes('requireAdmin(request,env)') || workerSrc.includes('requireAdmin(request, env)'), 'requireAdmin must still be used');
+  assert.ok(workerSrc.includes('reviewDecision'), 'review decision route must remain');
+});
+
+test('D-176B: no frontend console logging', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  assert.ok(!frontendSrc.includes('console.'), 'frontend must not have console logging');
+});
+
+test('D-176B: admin token input remains type=password', () => {
+  const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  assert.ok(frontendSrc.includes('type="password"'), 'admin token input must remain password type');
+});
+
+test('D-176B: no owner-token work resumed', () => {
+  assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain in effect');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

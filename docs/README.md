@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D176A_ERROR_RESPONSE_STATUS_HYGIENE_AUDIT.md` ⭐ CURRENT — D-176A ERROR HYGIENE AUDIT
+### `D176B_ERROR_RESPONSE_HYGIENE_PATCH.md` ⭐ CURRENT — D-176B ERROR HYGIENE PATCH
+
+Patches D-176A F1/F2/F3/F4: global catch 500 → INTERNAL_ERROR/generic message; TRUTH_LINK_FAILED → safe message; builder context throw → safe message; safeAll lineage errors → label-only (no SQL text). +13 smoke tests. Baseline: 1335/24/57.
+
+### `D176A_ERROR_RESPONSE_STATUS_HYGIENE_AUDIT.md` — D-176A ERROR HYGIENE AUDIT
 
 Audit-only. Three patch-recommended findings: F1 (global catch 500 exposes raw err.message), F2 (TRUTH_LINK_FAILED exposes raw linkErr.message), F3 (truths.js builder context embeds raw cbcErr). One questionable: F4 (lineage.errors carries SQL text in public claim response). All other error surfaces acceptable. Baseline: 1322/24/57.
 

@@ -95,7 +95,7 @@ export async function createTruth(request, env, helpers) {
       try {
         await insertClaimBuilderContext(env, makeId, { targetType: 'truth', targetId: id, userId, context: ctx });
       } catch (cbcErr) {
-        throw new Error(`SERVER_ERROR: builder context insert failed — ${String(cbcErr?.message || cbcErr)}`);
+        throw new Error('SERVER_ERROR: builder context insert failed');
       }
     }
   }

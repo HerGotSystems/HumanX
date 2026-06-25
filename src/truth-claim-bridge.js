@@ -78,7 +78,7 @@ export async function convertTruthToClaim(request, env, helpers) {
     await syncTruthLinkState(env, truthId, claimId, now);
   } catch (linkErr) {
     await env.DB.prepare(`DELETE FROM claims WHERE id=?`).bind(claimId).run().catch(() => {});
-    return json({ error: 'TRUTH_LINK_FAILED', message: String(linkErr && linkErr.message ? linkErr.message : linkErr) }, 500);
+    return json({ error: 'TRUTH_LINK_FAILED', message: 'Truth claim link failed.' }, 500);
   }
 
   const claim = await env.DB.prepare(`SELECT * FROM claims WHERE id=?`).bind(claimId).first();
