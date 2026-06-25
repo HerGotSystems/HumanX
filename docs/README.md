@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D176B_ERROR_RESPONSE_HYGIENE_PATCH.md` ⭐ CURRENT — D-176B ERROR HYGIENE PATCH
+### `D176D_ERROR_RESPONSE_HYGIENE_LIVE_VERIFY.md` ⭐ CURRENT — D-176B/D LIVE VERIFIED
+
+Production preflight confirms: health ok/d1-live, /api/session clean, invalid report targetType → 400, invalid evidence claimId → 404, admin token input password, no console logging, /api/review without admin → 403. Global 500, TRUTH_LINK_FAILED, builder context, and safeAll hygiene patches are source/static-verified. Baseline: 1335/24/57.
+
+### `D176B_ERROR_RESPONSE_HYGIENE_PATCH.md` — D-176B ERROR HYGIENE PATCH
 
 Patches D-176A F1/F2/F3/F4: global catch 500 → INTERNAL_ERROR/generic message; TRUTH_LINK_FAILED → safe message; builder context throw → safe message; safeAll lineage errors → label-only (no SQL text). +13 smoke tests. Baseline: 1335/24/57.
 
