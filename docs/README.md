@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D174A_GLOBAL_RAW_ROW_SELECT_STAR_EXPOSURE_AUDIT.md` ⭐ CURRENT — D-174A GLOBAL RAW-ROW AUDIT
+### `D174B_HOME_TEST_RAW_ROW_RESPONSE_PATCH.md` ⭐ CURRENT — D-174B HOME TEST MAPPER PATCH
+
+addHomeTest() now returns test:mapHomeTest(row) instead of raw test:row. mapHomeTest() explicit allowlist omits user_id and future columns. Frontend unaffected (discards response, reloads claim). 8 new smoke tests. Baseline: 1308/24/57.
+
+### `D174A_GLOBAL_RAW_ROW_SELECT_STAR_EXPOSURE_AUDIT.md` — D-174A GLOBAL RAW-ROW AUDIT
 
 Full audit of all SELECT *, raw row returns, and object spreads across 17 src files. One finding (F1, low risk): addHomeTest() returns raw home_tests row to own-user — no user_id/admin fields in home_tests today but inconsistent with mapper pattern. All other surfaces clean: no public raw rows, admin raw rows gated by requireAdmin(), export SELECT * approved by D-138B. D-174B: add mapHomeTest(). Baseline: 1300/24/57.
 

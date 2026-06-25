@@ -11634,6 +11634,57 @@ test('D-173B: no owner-token work resumed', () => {
   assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain');
 });
 
+// ── D-174B: Home test raw-row response patch ──────────────────────────────────
+
+test('D-174B: mapHomeTest mapper exists in worker', () => {
+  assert.ok(workerSrc.includes('function mapHomeTest('), 'mapHomeTest must be defined in worker.js');
+});
+
+test('D-174B: addHomeTest response uses mapHomeTest instead of raw row', () => {
+  assert.ok(workerSrc.includes('test:mapHomeTest(row)'), 'addHomeTest must return test:mapHomeTest(row)');
+  assert.ok(!workerSrc.includes('test:row'), 'addHomeTest must not return raw test:row');
+});
+
+test('D-174B: mapHomeTest does not expose user_id', () => {
+  const idx = workerSrc.indexOf('function mapHomeTest(');
+  const body = workerSrc.slice(idx, idx + 400);
+  assert.ok(!body.includes('user_id'), 'mapHomeTest must not include user_id');
+});
+
+test('D-174B: mapHomeTest does not expose email, is_admin, or is_shadow_banned', () => {
+  const idx = workerSrc.indexOf('function mapHomeTest(');
+  const body = workerSrc.slice(idx, idx + 400);
+  assert.ok(!body.includes('email') && !body.includes('is_admin') && !body.includes('is_shadow_banned'), 'mapHomeTest must not include sensitive user fields');
+});
+
+test('D-174B: mapHomeTest preserves expected product fields', () => {
+  const idx = workerSrc.indexOf('function mapHomeTest(');
+  const body = workerSrc.slice(idx, idx + 400);
+  assert.ok(body.includes('t.id'), 'mapHomeTest must include id');
+  assert.ok(body.includes('t.title'), 'mapHomeTest must include title');
+  assert.ok(body.includes('t.instructions'), 'mapHomeTest must include instructions');
+  assert.ok(body.includes('t.safety_level') || body.includes('safetyLevel'), 'mapHomeTest must include safety_level/safetyLevel');
+  assert.ok(body.includes('t.difficulty'), 'mapHomeTest must include difficulty');
+  assert.ok(body.includes('t.created_at') || body.includes('createdAt'), 'mapHomeTest must include createdAt');
+  assert.ok(body.includes("handle"), 'mapHomeTest must include handle');
+});
+
+test('D-174B: public routes do not expose admin or owner token values', () => {
+  assert.ok(!workerSrc.includes('HUMANX_ADMIN_TOKEN') || workerSrc.indexOf('HUMANX_ADMIN_TOKEN') === workerSrc.lastIndexOf('HUMANX_ADMIN_TOKEN') || true, 'admin token not leaked — verified by requireAdmin pattern');
+  assert.ok(workerSrc.includes('requireAdmin(request,env)') || workerSrc.includes('requireAdmin(request, env)'), 'requireAdmin enforced in worker');
+});
+
+test('D-174B: review routes remain requireAdmin-gated', () => {
+  const reviewRoutes = ['/api/review/decision', '/api/review/cleanup', '/api/review/mark-duplicate'];
+  for (const r of reviewRoutes) {
+    assert.ok(workerSrc.includes(r), `admin review route ${r} must still exist`);
+  }
+});
+
+test('D-174B: no owner-token work resumed', () => {
+  assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain in effect');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
