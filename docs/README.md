@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D175A_PUBLIC_ABUSE_RATE_LIMIT_GUARDRAIL_AUDIT.md` ⭐ CURRENT — D-175A ABUSE GUARDRAIL AUDIT
+### `D175B_PUBLIC_ABUSE_ORPHAN_ROW_GUARDRAILS_PATCH.md` ⭐ CURRENT — D-175B ABUSE GUARDRAIL PATCH
+
+Patches D-175A F1/F2/F3: session rate limit (30/hr/IP), claim existence check in addEvidence(), claim existence check in addPressure(). +14 smoke tests. Baseline: 1322/24/57.
+
+### `D175A_PUBLIC_ABUSE_RATE_LIMIT_GUARDRAIL_AUDIT.md` — D-175A ABUSE GUARDRAIL AUDIT
 
 Audit-only. Three findings: F1 (/api/session no rate limit), F2 (addEvidence no claim existence check), F3 (addPressure no claim existence check). All review-first gating confirmed intact. Baseline: 1308/24/57.
 

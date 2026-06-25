@@ -11685,6 +11685,102 @@ test('D-174B: no owner-token work resumed', () => {
   assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain in effect');
 });
 
+// ── D-175B: Public abuse and orphan-row guardrails patch ──────────────────────
+
+test('D-175B: /api/session applies safeRateLimit before readJson', () => {
+  const fnMatch = workerSrc.match(/async function createOrGetUser[\s\S]*?^}/m);
+  const fn = fnMatch ? fnMatch[0] : workerSrc;
+  const rlIdx = fn.indexOf('safeRateLimit');
+  const rjIdx = fn.indexOf('readJson');
+  assert.ok(rlIdx !== -1, 'createOrGetUser must call safeRateLimit');
+  assert.ok(rlIdx < rjIdx, 'safeRateLimit must be called before readJson in createOrGetUser');
+});
+
+test('D-175B: session rate-limit key is IP-scoped', () => {
+  assert.ok(workerSrc.includes('`session:${ip(request)}`') || workerSrc.includes("'session:'+ip(request)"), 'session rate-limit key must be IP-scoped');
+});
+
+test('D-175B: session rate-limit is 30/hr/IP', () => {
+  assert.ok(workerSrc.includes('`session:${ip(request)}`, 30, 3600000') || workerSrc.includes("'session:'+ip(request)+',30,3600000"), 'session rate limit must be 30/hr/IP');
+});
+
+test('D-175B: session response does not expose IP or fingerprint', () => {
+  // The session SELECT only returns id, handle, trust_score, strike_count — confirm fingerprint_hash absent from the SELECT
+  assert.ok(workerSrc.includes('SELECT id, handle, trust_score, strike_count FROM users WHERE id=?'), 'session SELECT must not include fingerprint_hash');
+  // The return statement must not include ip or fingerprint field names
+  const returnMatch = workerSrc.match(/return json\(\{ user, owner_token \}\)/);
+  assert.ok(returnMatch, 'session return must be json({ user, owner_token }) only');
+});
+
+test('D-175B: addEvidence validates claimId existence before insertEvidence', () => {
+  const fnMatch = workerSrc.match(/async function addEvidence[\s\S]*?(?=\nasync function|\nfunction )/);
+  const fn = fnMatch ? fnMatch[0] : workerSrc;
+  const claimCheckIdx = fn.indexOf('SELECT id FROM claims WHERE id');
+  const insertIdx = fn.indexOf('insertEvidence');
+  assert.ok(claimCheckIdx !== -1, 'addEvidence must query claim existence');
+  assert.ok(claimCheckIdx < insertIdx, 'claim existence check must precede insertEvidence');
+});
+
+test('D-175B: addEvidence rejects missing claim with CLAIM_NOT_FOUND', () => {
+  const fnMatch = workerSrc.match(/async function addEvidence[\s\S]*?(?=\nasync function|\nfunction )/);
+  const fn = fnMatch ? fnMatch[0] : workerSrc;
+  assert.ok(fn.includes("CLAIM_NOT_FOUND"), 'addEvidence must return CLAIM_NOT_FOUND on missing claim');
+});
+
+test('D-175B: addEvidence still inserts review-first on valid claim', () => {
+  const fnMatch = workerSrc.match(/async function addEvidence[\s\S]*?(?=\nasync function|\nfunction )/);
+  const fn = fnMatch ? fnMatch[0] : workerSrc;
+  assert.ok(fn.includes('insertEvidence'), 'addEvidence must still call insertEvidence for valid path');
+  assert.ok(!fn.includes("review_state='public'"), 'addEvidence must not hardcode public review_state');
+});
+
+test('D-175B: addPressure validates claimId existence before INSERT', () => {
+  const fnMatch = workerSrc.match(/async function addPressure[\s\S]*?(?=\nasync function|\nfunction )/);
+  const fn = fnMatch ? fnMatch[0] : workerSrc;
+  const claimCheckIdx = fn.indexOf('SELECT id FROM claims WHERE id');
+  const insertIdx = fn.indexOf('INSERT INTO pressure_points');
+  assert.ok(claimCheckIdx !== -1, 'addPressure must query claim existence');
+  assert.ok(claimCheckIdx < insertIdx, 'claim existence check must precede pressure INSERT');
+});
+
+test('D-175B: addPressure rejects missing claim with CLAIM_NOT_FOUND', () => {
+  const fnMatch = workerSrc.match(/async function addPressure[\s\S]*?(?=\nasync function|\nfunction )/);
+  const fn = fnMatch ? fnMatch[0] : workerSrc;
+  assert.ok(fn.includes("CLAIM_NOT_FOUND"), 'addPressure must return CLAIM_NOT_FOUND on missing claim');
+});
+
+test('D-175B: addPressure still inserts review-first on valid claim', () => {
+  const fnMatch = workerSrc.match(/async function addPressure[\s\S]*?(?=\nasync function|\nfunction )/);
+  const fn = fnMatch ? fnMatch[0] : workerSrc;
+  assert.ok(fn.includes('INSERT INTO pressure_points'), 'addPressure must still INSERT for valid path');
+  assert.ok(fn.includes("'review'"), 'addPressure must hardcode review_state=review');
+});
+
+test('D-175B: no orphan evidence insert path before claim validation', () => {
+  const before = workerSrc.indexOf('async function addEvidence');
+  const claimCheck = workerSrc.indexOf('evidenceClaimRow', before);
+  const insert = workerSrc.indexOf('insertEvidence(env,claimId', before);
+  assert.ok(claimCheck > before, 'evidenceClaimRow check must be inside addEvidence');
+  assert.ok(insert > before, 'insertEvidence call must be inside addEvidence');
+  assert.ok(claimCheck < insert, 'claim check must precede insertEvidence call');
+});
+
+test('D-175B: no orphan pressure insert path before claim validation', () => {
+  const before = workerSrc.indexOf('async function addPressure');
+  const claimCheck = workerSrc.indexOf('pressureClaimRow');
+  const insert = workerSrc.indexOf('INSERT INTO pressure_points');
+  assert.ok(claimCheck > before && claimCheck < insert, 'claim check variable must appear before pressure INSERT');
+});
+
+test('D-175B: review routes remain requireAdmin-gated', () => {
+  assert.ok(workerSrc.includes("requireAdmin(request,env)") || workerSrc.includes("requireAdmin(request, env)"), 'requireAdmin must still exist');
+  assert.ok(workerSrc.includes('/api/review/decision') || workerSrc.includes("reviewDecision"), 'review decision route must remain');
+});
+
+test('D-175B: no owner-token work resumed', () => {
+  assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold must remain in effect');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
