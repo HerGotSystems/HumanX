@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D174D_HOME_TEST_RAW_ROW_RESPONSE_LIVE_VERIFY.md` ⭐ CURRENT — D-174B/D LIVE VERIFIED
+### `D175A_PUBLIC_ABUSE_RATE_LIMIT_GUARDRAIL_AUDIT.md` ⭐ CURRENT — D-175A ABUSE GUARDRAIL AUDIT
+
+Audit-only. Three findings: F1 (/api/session no rate limit), F2 (addEvidence no claim existence check), F3 (addPressure no claim existence check). All review-first gating confirmed intact. Baseline: 1308/24/57.
+
+### `D174D_HOME_TEST_RAW_ROW_RESPONSE_LIVE_VERIFY.md` — D-174B/D LIVE VERIFIED
 
 Production preflight confirms: health ok/d1-live, /api/session does not expose is_admin or is_shadow_banned, admin token input is type=password, no console logging, /api/review without admin returns 403. mapHomeTest() behavior is source/static-verified by D-174B tests (baseline 1308). Baseline: 1308/24/57.
 
