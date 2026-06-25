@@ -51,7 +51,11 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D172A_ADMIN_REVIEW_MUTATION_PATH_AUDIT.md` ⭐ CURRENT — D-172A ADMIN REVIEW MUTATION AUDIT
+### `D172B_ADMIN_REVIEW_KEYBOARD_RECOVERY_PATCH.md` ⭐ CURRENT — D-172B KEYBOARD/RECOVERY PATCH
+
+Keyboard `R` reject made two-step (arm → confirm) to match card/panel UX. `clearAdminToken()` now resets all three pending action states. D-164B smoke test updated. New baseline: 1285/24/57.
+
+### `D172A_ADMIN_REVIEW_MUTATION_PATH_AUDIT.md` — D-172A ADMIN REVIEW MUTATION AUDIT
 
 All 5 review mutation routes confirmed `requireAdmin`-gated. Approve/reject two-step in card and inspect-panel UI. F1 (low): keyboard `R` rejects without arm step, inconsistent with card UI. F2 (very low): `clearAdminToken()` resets only `pendingRejectReviewId`, not approve/cleanup pending state. D-172B recommended: KB hint clarification and `clearAdminToken()` consistency fix. Baseline: 1274/24/57.
 

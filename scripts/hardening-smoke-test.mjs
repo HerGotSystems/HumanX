@@ -10895,12 +10895,23 @@ test('D-164B: keyboard A confirms on second press when already pending', () => {
   );
 });
 
-test('D-164B: keyboard K and R shortcuts remain direct (unchanged)', () => {
+test('D-164B: keyboard K shortcut remains direct; keyboard R is now two-step (D-172B)', () => {
   const idx = appV10Src.indexOf('function initReviewKb');
-  const slice = appV10Src.slice(idx, idx + 1500);
+  const slice = appV10Src.slice(idx, idx + 2000);
+  // K is still direct (non-destructive keep-pending)
   assert.ok(
-    slice.includes("key==='k'?'review':'rejected'"),
-    'keyboard K and R shortcuts must still call reviewDecisionUI directly'
+    slice.includes("reviewDecisionUI(type,id,'review')"),
+    'keyboard K must still call reviewDecisionUI directly with review decision'
+  );
+  // R is now two-step (D-172B) — old single-step pattern must be gone
+  assert.ok(
+    !slice.includes("key==='k'?'review':'rejected'"),
+    'D-172B: old direct K/R shared decision pattern must be replaced'
+  );
+  // R two-step arm pattern must be present
+  assert.ok(
+    slice.includes("key==='r'){if(pendingRejectReviewId===id)"),
+    'D-172B: keyboard R must use two-step arm/confirm pattern'
   );
 });
 
@@ -11466,6 +11477,74 @@ test('D-171C: frontend safeRunPackClaim still exists (D-171B intact)', () => {
 
 test('D-171C: no owner-token enforcement resumed', () => {
   assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold — owner-token enforcement must not be resumed');
+});
+
+// ── D-172B: Admin review keyboard/recovery consistency ───────────────────────
+
+test('D-172B: keyboard R no longer fires reviewDecisionUI directly in one step', () => {
+  // Old single-step pattern: k and r shared a single decision variable: key==='k'?'review':'rejected'
+  // New pattern: key==='r' → arm first via requestRejectReview, confirm on second R
+  const oldDirectReject = `key==='k'?'review':'rejected'`;
+  assert.ok(!appSrc.includes(oldDirectReject), 'old direct k/r shared decision variable must be replaced by separate two-step R block');
+});
+
+test('D-172B: keyboard R arms pendingRejectReviewId before confirming', () => {
+  // New two-step R: first R calls requestRejectReview(id) (arm), second R confirms
+  assert.ok(appSrc.includes(`key==='r'){if(pendingRejectReviewId===id)`), 'keyboard R must check pendingRejectReviewId before confirming');
+  assert.ok(appSrc.includes(`}else{requestRejectReview(id);}return;}`), 'keyboard R must arm via requestRejectReview on first press');
+});
+
+test('D-172B: keyboard R confirms reject only when pendingRejectReviewId matches', () => {
+  // The confirm path: pendingRejectReviewId===id → reviewDecisionUI(...,'rejected')
+  const idx = appSrc.indexOf(`key==='r'){if(pendingRejectReviewId===id)`);
+  assert.ok(idx >= 0, 'keyboard R two-step block must exist');
+  const window = appSrc.slice(idx, idx + 300);
+  assert.ok(window.includes(`reviewDecisionUI(type,id,'rejected')`), 'keyboard R confirm must call reviewDecisionUI with rejected');
+});
+
+test('D-172B: keyboard hint updated to show R arm / R again reject', () => {
+  assert.ok(appSrc.includes('R arm · R again reject'), 'KB hint must read "R arm · R again reject"');
+  assert.ok(!appSrc.includes('R reject · ['), 'old KB hint "R reject ·" must be replaced');
+});
+
+test('D-172B: clearAdminToken resets pendingRejectReviewId', () => {
+  const idx = appSrc.indexOf('function clearAdminToken(');
+  assert.ok(idx >= 0, 'clearAdminToken must exist');
+  const fn = appSrc.slice(idx, idx + 300);
+  assert.ok(fn.includes('pendingRejectReviewId=null'), 'clearAdminToken must reset pendingRejectReviewId');
+});
+
+test('D-172B: clearAdminToken resets pendingApproveReviewId', () => {
+  const idx = appSrc.indexOf('function clearAdminToken(');
+  const fn = appSrc.slice(idx, idx + 300);
+  assert.ok(fn.includes('pendingApproveReviewId=null'), 'clearAdminToken must reset pendingApproveReviewId');
+});
+
+test('D-172B: clearAdminToken resets pendingCleanupReviewId', () => {
+  const idx = appSrc.indexOf('function clearAdminToken(');
+  const fn = appSrc.slice(idx, idx + 300);
+  assert.ok(fn.includes('pendingCleanupReviewId=null'), 'clearAdminToken must reset pendingCleanupReviewId');
+});
+
+test('D-172B: admin token input remains type=password', () => {
+  assert.ok(appSrc.includes('type="password"'), 'admin token input must remain type="password"');
+});
+
+test('D-172B: no console.* calls in frontend', () => {
+  assert.ok(!appSrc.includes('console.log') && !appSrc.includes('console.error') && !appSrc.includes('console.warn'), 'no console.* in frontend');
+});
+
+test('D-172B: review mutation routes remain requireAdmin-gated in worker', () => {
+  const routes = ['/api/review/decision', '/api/review/cleanup', '/api/review/mark-duplicate', '/api/review/resolve-similar'];
+  for (const r of routes) {
+    assert.ok(workerSrc.includes(r), `route ${r} must exist in worker`);
+  }
+  assert.ok(workerSrc.includes('requireAdmin(request,env)') || workerSrc.includes('requireAdmin(request, env)'), 'requireAdmin must be present in worker');
+});
+
+test('D-172B: no owner-token work resumed', () => {
+  assert.ok(!workerSrc.includes('OWNER_TOKEN_REQUIRED') && !workerSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold — owner-token enforcement must not be resumed');
+  assert.ok(!appSrc.includes('OWNER_TOKEN_REQUIRED') && !appSrc.includes('OWNER_TOKEN_INVALID'), 'D-149H hold — owner-token enforcement must not be resumed in frontend');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
