@@ -3431,10 +3431,11 @@ test('D-114B: form field IDs unchanged', () => {
 });
 
 test('D-114B: submitTruth() call and function unchanged', () => {
+  // D-181B migrated onclick="submitTruth()" to data-action="submitTruth"; function body unchanged
   assert.ok(
-    appSrc.includes('onclick="submitTruth()"') &&
+    appSrc.includes('data-action="submitTruth"') &&
     appSrc.includes("function submitTruth(){const statement=document.getElementById('truthStatement')"),
-    'submitTruth wiring and field reads must be unchanged'
+    'submitTruth wiring (data-action) and field reads must be present'
   );
 });
 
@@ -6617,9 +6618,10 @@ test('D-138B: docs/API_ENDPOINT_INVENTORY.md documents the new archive/export ro
 test('D-138C: Export button exists in the My HumanX account card', () => {
   const idx = appSrc.indexOf('function meAccountCardHtml');
   const slice = appSrc.slice(idx, idx + 700);
+  // D-181B migrated onclick="exportMyHumanXData()" to data-action="exportMyHumanXData"
   assert.ok(
-    slice.includes('me-account-actions') && slice.includes('onclick="exportMyHumanXData()"') && slice.includes('Export my data'),
-    'meAccountCardHtml must render an Export button calling exportMyHumanXData()'
+    slice.includes('me-account-actions') && slice.includes('data-action="exportMyHumanXData"') && slice.includes('Export my data'),
+    'meAccountCardHtml must render an Export button with data-action="exportMyHumanXData"'
   );
 });
 
@@ -9625,44 +9627,42 @@ test('D-152A: no owner-token enforcement work was resumed by this patch', () => 
 
 // ── Section 87 — D-154B: Public profile clarity layer ────────────────────────
 
-const appV10Src = readFileSync(path.join(__dirname, '..', 'public', 'app-v10.js'), 'utf8');
-
 test('D-154B: HumanX context block copy is present in app-v10.js', () => {
   assert.ok(
-    appV10Src.includes('pp-context-block') && appV10Src.includes('HumanX is a public thinking profile'),
+    appSrc.includes('pp-context-block') && appSrc.includes('HumanX is a public thinking profile'),
     'renderPublicProfileHtml must include a HumanX context block with intro copy'
   );
 });
 
 test('D-154B: visitor-friendly section label "Claims being tested" is present', () => {
   assert.ok(
-    appV10Src.includes('Claims being tested'),
+    appSrc.includes('Claims being tested'),
     'renderPublicProfileHtml must use visitor-friendly "Claims being tested" section label'
   );
 });
 
 test('D-154B: visitor-friendly section label "Public truths" is present', () => {
   assert.ok(
-    appV10Src.includes('Public truths'),
+    appSrc.includes('Public truths'),
     'renderPublicProfileHtml must use visitor-friendly "Public truths" section label'
   );
 });
 
 test('D-154B: visitor-friendly section label "Questions under pressure" is present', () => {
   assert.ok(
-    appV10Src.includes('Questions under pressure'),
+    appSrc.includes('Questions under pressure'),
     'renderPublicProfileHtml must use visitor-friendly "Questions under pressure" section label'
   );
 });
 
 test('D-154B: "View in HumanX" CTA replaces the old "Open Study" label in public profile', () => {
   assert.ok(
-    appV10Src.includes('View in HumanX →'),
+    appSrc.includes('View in HumanX →'),
     'renderPublicProfileClaimsHtml must use "View in HumanX →" CTA'
   );
   // Only the public-profile claims function should be checked — "Open Study →" is still valid
   // in the owner's Me view (meRecentClaimsHtml). Extract just the public-profile function.
-  const ppClaimsFn = appV10Src.match(/function renderPublicProfileClaimsHtml[\s\S]*?^function /m)?.[0] || '';
+  const ppClaimsFn = appSrc.match(/function renderPublicProfileClaimsHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     !ppClaimsFn.includes('Open Study →'),
     'renderPublicProfileClaimsHtml must not use the old "Open Study →" label (use "View in HumanX →")'
@@ -9670,7 +9670,7 @@ test('D-154B: "View in HumanX" CTA replaces the old "Open Study" label in public
 });
 
 test('D-154B: duplicate snapshot disclaimers are consolidated to one sentence', () => {
-  const snapshotFn = appV10Src.match(/function renderPublicProfileSnapshotHtml[\s\S]*?^function /m)?.[0] || '';
+  const snapshotFn = appSrc.match(/function renderPublicProfileSnapshotHtml[\s\S]*?^function /m)?.[0] || '';
   const disclaimerCount = (snapshotFn.match(/pp-disclaimer/g)||[]).length;
   assert.ok(
     disclaimerCount <= 1,
@@ -9679,7 +9679,7 @@ test('D-154B: duplicate snapshot disclaimers are consolidated to one sentence', 
 });
 
 test('D-154B: snapshot disclaimers consolidated into a single pp-disclaimer element', () => {
-  const snapshotFn = appV10Src.match(/function renderPublicProfileSnapshotHtml[\s\S]*?^function /m)?.[0] || '';
+  const snapshotFn = appSrc.match(/function renderPublicProfileSnapshotHtml[\s\S]*?^function /m)?.[0] || '';
   const disclaimerCount = (snapshotFn.match(/pp-disclaimer/g)||[]).length;
   assert.ok(
     disclaimerCount === 1,
@@ -9689,39 +9689,39 @@ test('D-154B: snapshot disclaimers consolidated into a single pp-disclaimer elem
 
 test('D-154B: pressure severity uses human-readable label not raw integer', () => {
   assert.ok(
-    appV10Src.includes('pressureSeverityLabel') && appV10Src.includes('low pressure'),
+    appSrc.includes('pressureSeverityLabel') && appSrc.includes('low pressure'),
     'renderPublicProfilePressureHtml must use pressureSeverityLabel() for human-readable severity'
   );
   assert.ok(
-    !appV10Src.includes('`severity ${'),
+    !appSrc.includes('`severity ${'),
     'renderPublicProfilePressureHtml must not render raw severity integer'
   );
 });
 
 test('D-154B: evidenceQualityLabel maps peer_reviewed to human-readable label', () => {
   assert.ok(
-    appV10Src.includes("peer_reviewed:'peer-reviewed'") || appV10Src.includes('peer_reviewed:"peer-reviewed"'),
+    appSrc.includes("peer_reviewed:'peer-reviewed'") || appSrc.includes('peer_reviewed:"peer-reviewed"'),
     'evidenceQualityLabel must map peer_reviewed to a human-readable string'
   );
 });
 
 test('D-154B: visitor share CTA (copyPublicProfileLink) is present and uses location.origin', () => {
   assert.ok(
-    appV10Src.includes('copyPublicProfileLink') && appV10Src.includes('location.origin'),
+    appSrc.includes('copyPublicProfileLink') && appSrc.includes('location.origin'),
     'copyPublicProfileLink function must exist and build URL from location.origin'
   );
 });
 
 test('D-154B: copyPublicProfileLink has clipboard fallback for older browsers', () => {
   assert.ok(
-    appV10Src.includes('navigator.clipboard') && appV10Src.includes('execCommand'),
+    appSrc.includes('navigator.clipboard') && appSrc.includes('execCommand'),
     'copyPublicProfileLink must have a navigator.clipboard fallback path'
   );
 });
 
 test('D-154B: owner-detect behaviour is preserved (isOwner check still present)', () => {
   assert.ok(
-    appV10Src.includes('isOwner') && appV10Src.includes('← Back to Me'),
+    appSrc.includes('isOwner') && appSrc.includes('← Back to Me'),
     'renderPublicProfileHtml must preserve owner-detection (isOwner) and "← Back to Me" label'
   );
 });
@@ -9752,7 +9752,7 @@ test('D-154B: no owner-token enforcement work was resumed by this patch', () => 
 });
 
 test('D-154B: user.id, email, is_admin, owner_token not rendered by any public-profile function', () => {
-  const ppBlock = appV10Src.match(/function renderPublicProfileHtml[\s\S]*?^function copyPublicProfileLink/m)?.[0] || '';
+  const ppBlock = appSrc.match(/function renderPublicProfileHtml[\s\S]*?^function copyPublicProfileLink/m)?.[0] || '';
   assert.ok(
     !ppBlock.includes('.email') && !ppBlock.includes('.is_admin') && !ppBlock.includes('owner_token'),
     'Public profile render functions must not reference email, is_admin, or owner_token'
@@ -9763,20 +9763,20 @@ test('D-154B: user.id, email, is_admin, owner_token not rendered by any public-p
 
 test('D-155A: ppToggleShowMore helper function exists', () => {
   assert.ok(
-    appV10Src.includes('function ppToggleShowMore(btn)'),
+    appSrc.includes('function ppToggleShowMore(btn)'),
     'ppToggleShowMore must exist as a global helper for show-more/show-less toggling'
   );
 });
 
 test('D-155A: ppToggleShowMore toggles .pp-more-items visibility', () => {
   assert.ok(
-    appV10Src.includes('pp-more-items') && appV10Src.includes("moreDiv.style.display=showing?'none':''"),
+    appSrc.includes('pp-more-items') && appSrc.includes("moreDiv.style.display=showing?'none':''"),
     'ppToggleShowMore must toggle the .pp-more-items element display style'
   );
 });
 
 test('D-155A: show-more toggle exists in renderPublicProfileEvidenceHtml', () => {
-  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('pp-more-items') && fn.includes('btn-pp-show-more') && fn.includes('ppToggleShowMore'),
     'renderPublicProfileEvidenceHtml must include pp-more-items container and btn-pp-show-more toggle'
@@ -9784,7 +9784,7 @@ test('D-155A: show-more toggle exists in renderPublicProfileEvidenceHtml', () =>
 });
 
 test('D-155A: show-more toggle exists in renderPublicProfilePressureHtml', () => {
-  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('pp-more-items') && fn.includes('btn-pp-show-more') && fn.includes('ppToggleShowMore'),
     'renderPublicProfilePressureHtml must include pp-more-items container and btn-pp-show-more toggle'
@@ -9792,7 +9792,7 @@ test('D-155A: show-more toggle exists in renderPublicProfilePressureHtml', () =>
 });
 
 test('D-155A: evidence show-more defaults to first 5 items', () => {
-  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('const BATCH=5') && fn.includes('rows.slice(0,BATCH)') && fn.includes('rows.slice(BATCH)'),
     'renderPublicProfileEvidenceHtml must show first 5 by default via BATCH=5 slicing'
@@ -9800,7 +9800,7 @@ test('D-155A: evidence show-more defaults to first 5 items', () => {
 });
 
 test('D-155A: pressure show-more defaults to first 5 items', () => {
-  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('const BATCH=5') && fn.includes('rows.slice(0,BATCH)') && fn.includes('rows.slice(BATCH)'),
     'renderPublicProfilePressureHtml must show first 5 by default via BATCH=5 slicing'
@@ -9809,20 +9809,20 @@ test('D-155A: pressure show-more defaults to first 5 items', () => {
 
 test('D-155A: show-more toggle label uses "Show N more" pattern', () => {
   assert.ok(
-    appV10Src.includes('Show ${rest.length} more') || appV10Src.includes('Show ${count} more'),
+    appSrc.includes('Show ${rest.length} more') || appSrc.includes('Show ${count} more'),
     'show-more button must use dynamic "Show N more" label'
   );
 });
 
 test('D-155A: show-less label exists in ppToggleShowMore', () => {
   assert.ok(
-    appV10Src.includes("'Show less'"),
+    appSrc.includes("'Show less'"),
     'ppToggleShowMore must set button text to "Show less" when expanded'
   );
 });
 
 test('D-155A/D-158B: evidence function suppresses section when empty (D-158B supersedes D-155A empty-state copy)', () => {
-  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes("return''"),
     'D-158B: renderPublicProfileEvidenceHtml must return empty string when rows empty (section suppressed entirely)'
@@ -9830,7 +9830,7 @@ test('D-155A/D-158B: evidence function suppresses section when empty (D-158B sup
 });
 
 test('D-155A/D-158B: pressure function suppresses section when empty (D-158B supersedes D-155A empty-state copy)', () => {
-  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes("return''"),
     'D-158B: renderPublicProfilePressureHtml must return empty string when rows empty (section suppressed entirely)'
@@ -9839,23 +9839,23 @@ test('D-155A/D-158B: pressure function suppresses section when empty (D-158B sup
 
 test('D-155A: D-154B HumanX context block is still present', () => {
   assert.ok(
-    appV10Src.includes('pp-context-block') && appV10Src.includes('HumanX is a public thinking profile'),
+    appSrc.includes('pp-context-block') && appSrc.includes('HumanX is a public thinking profile'),
     'D-154B HumanX context block must still be present after D-155A changes'
   );
 });
 
 test('D-155A: D-154B visitor-friendly section labels are still present', () => {
   assert.ok(
-    appV10Src.includes('Claims being tested') &&
-    appV10Src.includes('Public truths') &&
-    appV10Src.includes('Questions under pressure'),
+    appSrc.includes('Claims being tested') &&
+    appSrc.includes('Public truths') &&
+    appSrc.includes('Questions under pressure'),
     'D-154B visitor-friendly section labels must still be present after D-155A'
   );
 });
 
 test('D-155A: "View in HumanX" CTA still present', () => {
   assert.ok(
-    appV10Src.includes('View in HumanX →'),
+    appSrc.includes('View in HumanX →'),
     '"View in HumanX →" CTA must still be present after D-155A'
   );
 });
@@ -9869,13 +9869,13 @@ test('D-155A: btn-pp-show-more CSS class exists in styles.css', () => {
 
 test('D-155A: pp-more-items hidden by default via inline style in rendered HTML', () => {
   assert.ok(
-    appV10Src.includes('pp-more-items') && appV10Src.includes('style="display:none"'),
+    appSrc.includes('pp-more-items') && appSrc.includes('style="display:none"'),
     'pp-more-items container must be hidden by default via inline display:none (D-156A adds id= between class and style attributes)'
   );
 });
 
 test('D-155A: show-more toggle does not expose any new API fields', () => {
-  const toggleFn = appV10Src.match(/function ppToggleShowMore[\s\S]*?^function /m)?.[0] || '';
+  const toggleFn = appSrc.match(/function ppToggleShowMore[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     !toggleFn.includes('fetch(') && !toggleFn.includes('await api(') && !toggleFn.includes('process.env'),
     'ppToggleShowMore must be pure client-side DOM manipulation — no fetch, no api(), no env access'
@@ -9899,7 +9899,7 @@ test('D-155A: no admin route changed (requireAdmin count unchanged)', () => {
 // ── Section 89 — D-156A: Public profile interaction / accessibility polish ────
 
 test('D-156A: ppToggleShowMore sets aria-expanded on toggle', () => {
-  const fn = appV10Src.match(/function ppToggleShowMore[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function ppToggleShowMore[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('setAttribute') && fn.includes('aria-expanded'),
     'ppToggleShowMore must call btn.setAttribute("aria-expanded", ...) on each toggle'
@@ -9907,7 +9907,7 @@ test('D-156A: ppToggleShowMore sets aria-expanded on toggle', () => {
 });
 
 test('D-156A: ppToggleShowMore sets aria-expanded to false when collapsing', () => {
-  const fn = appV10Src.match(/function ppToggleShowMore[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function ppToggleShowMore[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes("'false'") && fn.includes("'true'"),
     'ppToggleShowMore must set aria-expanded to "false" when collapsing and "true" when expanding'
@@ -9915,7 +9915,7 @@ test('D-156A: ppToggleShowMore sets aria-expanded to false when collapsing', () 
 });
 
 test('D-156A: evidence show-more button has aria-expanded initial attribute', () => {
-  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('aria-expanded="false"'),
     'renderPublicProfileEvidenceHtml show-more button must render with aria-expanded="false" by default'
@@ -9923,7 +9923,7 @@ test('D-156A: evidence show-more button has aria-expanded initial attribute', ()
 });
 
 test('D-156A: evidence show-more button has aria-controls pointing to pp-more-ev', () => {
-  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('aria-controls="pp-more-ev"') && fn.includes('id="pp-more-ev"'),
     'renderPublicProfileEvidenceHtml must use aria-controls="pp-more-ev" on the button and id="pp-more-ev" on the hidden container'
@@ -9931,7 +9931,7 @@ test('D-156A: evidence show-more button has aria-controls pointing to pp-more-ev
 });
 
 test('D-156A: pressure show-more button has aria-expanded initial attribute', () => {
-  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('aria-expanded="false"'),
     'renderPublicProfilePressureHtml show-more button must render with aria-expanded="false" by default'
@@ -9939,7 +9939,7 @@ test('D-156A: pressure show-more button has aria-expanded initial attribute', ()
 });
 
 test('D-156A: pressure show-more button has aria-controls pointing to pp-more-pr', () => {
-  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('aria-controls="pp-more-pr"') && fn.includes('id="pp-more-pr"'),
     'renderPublicProfilePressureHtml must use aria-controls="pp-more-pr" on the button and id="pp-more-pr" on the hidden container'
@@ -9947,7 +9947,7 @@ test('D-156A: pressure show-more button has aria-controls pointing to pp-more-pr
 });
 
 test('D-156A: copyPublicProfileLink shows "Copied!" feedback on the button', () => {
-  const fn = appV10Src.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes("'Copied!'"),
     'copyPublicProfileLink must set button text to "Copied!" on click'
@@ -9955,7 +9955,7 @@ test('D-156A: copyPublicProfileLink shows "Copied!" feedback on the button', () 
 });
 
 test('D-156A: copyPublicProfileLink resets to "Copy profile link" after delay', () => {
-  const fn = appV10Src.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes("'Copy profile link'") && fn.includes('setTimeout'),
     'copyPublicProfileLink must reset button text to "Copy profile link" via setTimeout'
@@ -9963,7 +9963,7 @@ test('D-156A: copyPublicProfileLink resets to "Copy profile link" after delay', 
 });
 
 test('D-156A: copyPublicProfileLink disables button during feedback', () => {
-  const fn = appV10Src.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('btn.disabled=true') && fn.includes('btn.disabled=false'),
     'copyPublicProfileLink must disable the button during feedback and re-enable on reset'
@@ -9971,7 +9971,7 @@ test('D-156A: copyPublicProfileLink disables button during feedback', () => {
 });
 
 test('D-156A: copyPublicProfileLink clipboard fallback does not call backend', () => {
-  const fn = appV10Src.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     !fn.includes('fetch(') && !fn.includes('await api(') && !fn.includes('process.env'),
     'copyPublicProfileLink must not call fetch, api(), or process.env in any path'
@@ -9980,7 +9980,7 @@ test('D-156A: copyPublicProfileLink clipboard fallback does not call backend', (
 
 test('D-156A: copyPublicProfileLink is called with (this, slug) from renderPublicProfileHtml', () => {
   assert.ok(
-    appV10Src.includes("copyPublicProfileLink(this,'"),
+    appSrc.includes("copyPublicProfileLink(this,'"),
     'renderPublicProfileHtml must call copyPublicProfileLink(this, slug) so the button reference is passed'
   );
 });
@@ -9994,16 +9994,16 @@ test('D-156A: btn-secondary CSS class is defined in styles.css', () => {
 
 test('D-156A: D-154B/D-155A context block, section labels, and density behaviour preserved', () => {
   assert.ok(
-    appV10Src.includes('pp-context-block') &&
-    appV10Src.includes('Claims being tested') &&
-    appV10Src.includes('View in HumanX →') &&
-    appV10Src.includes('const BATCH=5'),
+    appSrc.includes('pp-context-block') &&
+    appSrc.includes('Claims being tested') &&
+    appSrc.includes('View in HumanX →') &&
+    appSrc.includes('const BATCH=5'),
     'D-154B context block, visitor labels, and D-155A BATCH=5 density must all remain present after D-156A'
   );
 });
 
 test('D-156A: no sensitive fields rendered by any public-profile function', () => {
-  const ppBlock = appV10Src.match(/function renderPublicProfileHtml[\s\S]*?^function copyPublicProfileLink/m)?.[0] || '';
+  const ppBlock = appSrc.match(/function renderPublicProfileHtml[\s\S]*?^function copyPublicProfileLink/m)?.[0] || '';
   assert.ok(
     !ppBlock.includes('.email') && !ppBlock.includes('.is_admin') && !ppBlock.includes('owner_token'),
     'Public profile render functions must not reference email, is_admin, or owner_token after D-156A'
@@ -10086,7 +10086,7 @@ test('D-157A: pp-footer-actions mobile buttons go full width', () => {
 });
 
 test('D-157A: renderPublicProfileHtml uses pp-footer-actions class on action row', () => {
-  const fn = appV10Src.match(/function renderPublicProfileHtml[\s\S]*?^async function renderPublicProfile/m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfileHtml[\s\S]*?^async function renderPublicProfile/m)?.[0] || '';
   assert.ok(
     fn.includes('pp-footer-actions'),
     'renderPublicProfileHtml must apply pp-footer-actions class to the bottom action row'
@@ -10095,17 +10095,17 @@ test('D-157A: renderPublicProfileHtml uses pp-footer-actions class on action row
 
 test('D-157A: D-154B/D-155A/D-156A features all preserved', () => {
   assert.ok(
-    appV10Src.includes('pp-context-block') &&
-    appV10Src.includes('Claims being tested') &&
-    appV10Src.includes('const BATCH=5') &&
-    appV10Src.includes('aria-expanded="false"') &&
-    appV10Src.includes("'Copied!'"),
+    appSrc.includes('pp-context-block') &&
+    appSrc.includes('Claims being tested') &&
+    appSrc.includes('const BATCH=5') &&
+    appSrc.includes('aria-expanded="false"') &&
+    appSrc.includes("'Copied!'"),
     'D-154B context block, D-155A BATCH=5, D-156A aria-expanded and Copied! feedback must all remain after D-157A'
   );
 });
 
 test('D-157A: no sensitive fields rendered by any public-profile function', () => {
-  const ppBlock = appV10Src.match(/function renderPublicProfileHtml[\s\S]*?^async function renderPublicProfile/m)?.[0] || '';
+  const ppBlock = appSrc.match(/function renderPublicProfileHtml[\s\S]*?^async function renderPublicProfile/m)?.[0] || '';
   assert.ok(
     !ppBlock.includes('.email') && !ppBlock.includes('.is_admin') && !ppBlock.includes('owner_token'),
     'Public profile render functions must not reference email, is_admin, or owner_token after D-157A'
@@ -10129,8 +10129,8 @@ test('D-157A: no admin route changed (requireAdmin count unchanged)', () => {
 // ── Section 91 — D-158B: Public profile snapshot-first hierarchy ───────────────
 
 test('D-158B: snapshot renders before context block in return template of renderPublicProfileHtml', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   // Use return-template references: snapshot call appears as renderPublicProfileSnapshotHtml(sn),
   // context block appears as ${contextBlock} (the interpolation, after the const definition)
   const snapshotAt = slice.indexOf('renderPublicProfileSnapshotHtml(sn)');
@@ -10142,8 +10142,8 @@ test('D-158B: snapshot renders before context block in return template of render
 });
 
 test('D-158B: context block renders before claims section', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   const contextAt = slice.indexOf('pp-context-block');
   const claimsAt = slice.indexOf('<h3>Claims being tested</h3>');
   assert.ok(
@@ -10153,8 +10153,8 @@ test('D-158B: context block renders before claims section', () => {
 });
 
 test('D-158B: claims section renders before public truths in output order', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   const claimsAt = slice.indexOf('<h3>Claims being tested</h3>');
   const truthsAt = slice.indexOf('<h3>Public truths</h3>');
   assert.ok(
@@ -10164,8 +10164,8 @@ test('D-158B: claims section renders before public truths in output order', () =
 });
 
 test('D-158B: counts card renders after truths and before evidence in return template', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   // <h3> strings only appear in the return template; ${countsCard} is the return interpolation
   const truthsAt = slice.indexOf('<h3>Public truths</h3>');
   const countsAt = slice.indexOf('${countsCard}');
@@ -10177,7 +10177,7 @@ test('D-158B: counts card renders after truths and before evidence in return tem
 });
 
 test('D-158B: renderPublicProfileTruthsHtml returns empty string for empty rows (section suppressed)', () => {
-  const fn = appV10Src.match(/function renderPublicProfileTruthsHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfileTruthsHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes("if(!rows||!rows.length)return''"),
     'renderPublicProfileTruthsHtml must return empty string (not an empty-state paragraph) so empty truths section is suppressed'
@@ -10185,7 +10185,7 @@ test('D-158B: renderPublicProfileTruthsHtml returns empty string for empty rows 
 });
 
 test('D-158B: renderPublicProfileEvidenceHtml returns empty string for empty rows (section suppressed)', () => {
-  const fn = appV10Src.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes("if(!rows||!rows.length)return''"),
     'renderPublicProfileEvidenceHtml must return empty string for empty rows so empty evidence section is suppressed'
@@ -10193,7 +10193,7 @@ test('D-158B: renderPublicProfileEvidenceHtml returns empty string for empty row
 });
 
 test('D-158B: renderPublicProfilePressureHtml returns empty string for empty rows (section suppressed)', () => {
-  const fn = appV10Src.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes("if(!rows||!rows.length)return''"),
     'renderPublicProfilePressureHtml must return empty string for empty rows so empty pressure section is suppressed'
@@ -10201,7 +10201,7 @@ test('D-158B: renderPublicProfilePressureHtml returns empty string for empty row
 });
 
 test('D-158B: renderPublicProfileClaimsHtml retains empty-state paragraph (claims always shown)', () => {
-  const fn = appV10Src.match(/function renderPublicProfileClaimsHtml[\s\S]*?^function /m)?.[0] || '';
+  const fn = appSrc.match(/function renderPublicProfileClaimsHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
     fn.includes('pp-empty') && fn.includes('No public claims yet'),
     'renderPublicProfileClaimsHtml must keep its empty-state paragraph — claims absence is informative'
@@ -10209,8 +10209,8 @@ test('D-158B: renderPublicProfileClaimsHtml retains empty-state paragraph (claim
 });
 
 test('D-158B: truths section conditionally wrapped in renderPublicProfileHtml', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   assert.ok(
     slice.includes('truthsHtml?') && slice.includes('<h3>Public truths</h3>'),
     'renderPublicProfileHtml must conditionally render the truths section wrapper only when truthsHtml is non-empty'
@@ -10218,8 +10218,8 @@ test('D-158B: truths section conditionally wrapped in renderPublicProfileHtml', 
 });
 
 test('D-158B: evidence section conditionally wrapped in renderPublicProfileHtml', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   assert.ok(
     slice.includes('evidenceHtml?') && slice.includes('<h3>Supporting evidence</h3>'),
     'renderPublicProfileHtml must conditionally render the evidence section wrapper only when evidenceHtml is non-empty'
@@ -10227,8 +10227,8 @@ test('D-158B: evidence section conditionally wrapped in renderPublicProfileHtml'
 });
 
 test('D-158B: pressure section conditionally wrapped in renderPublicProfileHtml', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   assert.ok(
     slice.includes('pressureHtml?') && slice.includes('<h3>Questions under pressure</h3>'),
     'renderPublicProfileHtml must conditionally render the pressure section wrapper only when pressureHtml is non-empty'
@@ -10236,8 +10236,8 @@ test('D-158B: pressure section conditionally wrapped in renderPublicProfileHtml'
 });
 
 test('D-158B: bio fallback is computed from snapshot dominantPattern and topAlignmentName', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   assert.ok(
     slice.includes('pp-bio-fallback') &&
     slice.includes('sn.dominantPattern') &&
@@ -10249,8 +10249,8 @@ test('D-158B: bio fallback is computed from snapshot dominantPattern and topAlig
 });
 
 test('D-158B: bio fallback only shown when bio is absent', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   assert.ok(
     slice.includes('!p.bio') && slice.includes('bioFallback') && slice.includes('p.bio?'),
     'renderPublicProfileHtml must guard bio fallback behind !p.bio and show real bio when present'
@@ -10266,20 +10266,20 @@ test('D-158B: pp-bio-fallback CSS class exists in styles.css', () => {
 
 test('D-158B: D-154B/D-155A/D-156A/D-157A features all preserved after reorder', () => {
   assert.ok(
-    appV10Src.includes('pp-context-block') &&
-    appV10Src.includes('Claims being tested') &&
-    appV10Src.includes('View in HumanX →') &&
-    appV10Src.includes('const BATCH=5') &&
-    appV10Src.includes('aria-expanded="false"') &&
-    appV10Src.includes("'Copied!'") &&
-    appV10Src.includes('pp-footer-actions'),
+    appSrc.includes('pp-context-block') &&
+    appSrc.includes('Claims being tested') &&
+    appSrc.includes('View in HumanX →') &&
+    appSrc.includes('const BATCH=5') &&
+    appSrc.includes('aria-expanded="false"') &&
+    appSrc.includes("'Copied!'") &&
+    appSrc.includes('pp-footer-actions'),
     'D-158B must preserve context block, section labels, View in HumanX, BATCH=5, aria-expanded, Copied!, pp-footer-actions'
   );
 });
 
 test('D-158B: no sensitive fields in renderPublicProfileHtml after reorder', () => {
-  const idx = appV10Src.indexOf('function renderPublicProfileHtml');
-  const slice = appV10Src.slice(idx, idx + 3500);
+  const idx = appSrc.indexOf('function renderPublicProfileHtml');
+  const slice = appSrc.slice(idx, idx + 3500);
   assert.ok(
     !slice.includes('.email') && !slice.includes('.is_admin') && !slice.includes('owner_token'),
     'renderPublicProfileHtml must not reference email, is_admin, or owner_token after D-158B'
@@ -10302,8 +10302,8 @@ test('D-158B: no admin route changed', () => {
 // ── Section 92 — D-159B: Public home clarity bridge ───────────────────────────
 
 test('D-159B: working-system badge replaced with invite-only-preview badge', () => {
-  const idx = appV10Src.indexOf('function renderHome');
-  const slice = appV10Src.slice(idx, idx + 500);
+  const idx = appSrc.indexOf('function renderHome');
+  const slice = appSrc.slice(idx, idx + 500);
   assert.ok(
     !slice.includes('working system') && slice.includes('invite-only preview'),
     'renderHome must not contain "working system" badge; must contain "invite-only preview" badge instead'
@@ -10311,8 +10311,8 @@ test('D-159B: working-system badge replaced with invite-only-preview badge', () 
 });
 
 test('D-159B: home intro paragraph contains invite-only/claims/beliefs/public profiles language', () => {
-  const idx = appV10Src.indexOf('function renderHome');
-  const slice = appV10Src.slice(idx, idx + 1000);
+  const idx = appSrc.indexOf('function renderHome');
+  const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(
     slice.includes('invite-only') && slice.includes('claims') && slice.includes('beliefs') && slice.includes('public thinking profiles'),
     'renderHome must include a short intro paragraph covering invite-only, claims, beliefs, and public thinking profiles'
@@ -10320,8 +10320,8 @@ test('D-159B: home intro paragraph contains invite-only/claims/beliefs/public pr
 });
 
 test('D-159B: public profile example bridge link exists and points to /u/calenhir', () => {
-  const idx = appV10Src.indexOf('function renderHome');
-  const slice = appV10Src.slice(idx, idx + 1000);
+  const idx = appSrc.indexOf('function renderHome');
+  const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(
     slice.includes('href="/u/calenhir"') && slice.includes('View a public profile example'),
     'renderHome must include a link to /u/calenhir with "View a public profile example" copy'
@@ -10329,8 +10329,8 @@ test('D-159B: public profile example bridge link exists and points to /u/calenhi
 });
 
 test('D-159B: Browse Claims card appears before Submit Claim in renderHome', () => {
-  const idx = appV10Src.indexOf('function renderHome');
-  const slice = appV10Src.slice(idx, idx + 4000);
+  const idx = appSrc.indexOf('function renderHome');
+  const slice = appSrc.slice(idx, idx + 4000);
   const browseAt = slice.indexOf("setMode('arena')");
   const submitAt = slice.indexOf("setMode('submit')");
   assert.ok(
@@ -10340,8 +10340,8 @@ test('D-159B: Browse Claims card appears before Submit Claim in renderHome', () 
 });
 
 test('D-159B: Browse Claims card appears before Belief Engine in renderHome', () => {
-  const idx = appV10Src.indexOf('function renderHome');
-  const slice = appV10Src.slice(idx, idx + 4000);
+  const idx = appSrc.indexOf('function renderHome');
+  const slice = appSrc.slice(idx, idx + 4000);
   const browseAt = slice.indexOf("setMode('arena')");
   const beliefAt = slice.indexOf("humanx-belief-engine");
   assert.ok(
@@ -10351,8 +10351,8 @@ test('D-159B: Browse Claims card appears before Belief Engine in renderHome', ()
 });
 
 test('D-159B: Browse Claims card has cc-card-primary class', () => {
-  const idx = appV10Src.indexOf('function renderHome');
-  const slice = appV10Src.slice(idx, idx + 4000);
+  const idx = appSrc.indexOf('function renderHome');
+  const slice = appSrc.slice(idx, idx + 4000);
   const gridStart = slice.indexOf('cc-card-grid');
   const gridSlice = slice.slice(gridStart, gridStart + 600);
   assert.ok(
@@ -10370,17 +10370,17 @@ test('D-159B: cc-bridge-link CSS exists in styles.css', () => {
 
 test('D-159B: D-158B public profile features all preserved after home changes', () => {
   assert.ok(
-    appV10Src.includes('renderPublicProfileSnapshotHtml(sn)') &&
-    appV10Src.includes('pp-context-block') &&
-    appV10Src.includes('pp-bio-fallback') &&
-    appV10Src.includes("if(!rows||!rows.length)return''"),
+    appSrc.includes('renderPublicProfileSnapshotHtml(sn)') &&
+    appSrc.includes('pp-context-block') &&
+    appSrc.includes('pp-bio-fallback') &&
+    appSrc.includes("if(!rows||!rows.length)return''"),
     'D-159B home changes must not affect D-158B public profile: snapshot-first, bio fallback, section suppression all intact'
   );
 });
 
 test('D-159B: no sensitive fields in renderHome', () => {
-  const idx = appV10Src.indexOf('function renderHome');
-  const slice = appV10Src.slice(idx, idx + 5000);
+  const idx = appSrc.indexOf('function renderHome');
+  const slice = appSrc.slice(idx, idx + 5000);
   assert.ok(
     !slice.includes('.email') && !slice.includes('.is_admin') && !slice.includes('owner_token') && !slice.includes('admin_token'),
     'renderHome must not reference email, is_admin, owner_token, or admin_token'
@@ -10410,8 +10410,8 @@ test('D-160B: anonymous account badge shows invite signal in index.html', () => 
 });
 
 test('D-160B: updateWhoBadge sets anonymous badge to invite signal', () => {
-  const idx = appV10Src.indexOf('function updateWhoBadge');
-  const slice = appV10Src.slice(idx, idx + 400);
+  const idx = appSrc.indexOf('function updateWhoBadge');
+  const slice = appSrc.slice(idx, idx + 400);
   assert.ok(
     slice.includes('◎ Invite') && !slice.includes("'anonymous'"),
     'updateWhoBadge must set the badge to "◎ Invite" for anonymous users, not "anonymous"'
@@ -10419,8 +10419,8 @@ test('D-160B: updateWhoBadge sets anonymous badge to invite signal', () => {
 });
 
 test('D-160B: no-code private-preview copy exists in accountPanelHtml', () => {
-  const idx = appV10Src.indexOf('function accountPanelHtml');
-  const slice = appV10Src.slice(idx, idx + 1600);
+  const idx = appSrc.indexOf('function accountPanelHtml');
+  const slice = appSrc.slice(idx, idx + 1600);
   assert.ok(
     slice.includes("Don't have a code?") && slice.includes('private preview') && slice.includes('shared directly by members'),
     'accountPanelHtml must include the no-code explanatory copy about private preview and direct sharing'
@@ -10428,20 +10428,21 @@ test('D-160B: no-code private-preview copy exists in accountPanelHtml', () => {
 });
 
 test('D-160B: invite redemption form still exists and is unmodified', () => {
-  const idx = appV10Src.indexOf('function accountPanelHtml');
-  const slice = appV10Src.slice(idx, idx + 1600);
+  const idx = appSrc.indexOf('function accountPanelHtml');
+  const slice = appSrc.slice(idx, idx + 1600);
+  // D-181B migrated onclick="redeemInviteUI()" to data-action="redeemInviteUI"
   assert.ok(
     slice.includes('Have an invite code?') &&
-    slice.includes('redeemInviteUI()') &&
+    slice.includes('data-action="redeemInviteUI"') &&
     slice.includes('inviteCode') &&
     slice.includes('inviteEmail'),
-    'accountPanelHtml must retain the full invite redemption form: label, code input, email input, and Redeem button'
+    'accountPanelHtml must retain the full invite redemption form: label, code input, email input, and Redeem button (data-action wired)'
   );
 });
 
 test('D-160B: no email-collection request-access form was added', () => {
-  const idx = appV10Src.indexOf('function accountPanelHtml');
-  const slice = appV10Src.slice(idx, idx + 1200);
+  const idx = appSrc.indexOf('function accountPanelHtml');
+  const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
     !slice.includes('request-access') && !slice.includes('requestAccess') && !slice.includes('waitlist'),
     'D-160B must not add a request-access or waitlist form — copy only, no email collection'
@@ -10473,8 +10474,8 @@ test('D-160B: /api/auth/invite/redeem route remains present and unchanged', () =
 });
 
 test('D-160B: D-159B home clarity copy still present', () => {
-  const idx = appV10Src.indexOf('function renderHome');
-  const slice = appV10Src.slice(idx, idx + 1000);
+  const idx = appSrc.indexOf('function renderHome');
+  const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(
     slice.includes('invite-only preview') &&
     slice.includes('invite-only space') &&
@@ -10486,8 +10487,8 @@ test('D-160B: D-159B home clarity copy still present', () => {
 test('D-160B: no invite codes rendered in any public-facing function', () => {
   const publicFns = ['renderPublicProfileHtml', 'renderHome', 'accountPanelHtml'];
   for (const fn of publicFns) {
-    const idx = appV10Src.indexOf(`function ${fn}`);
-    const slice = appV10Src.slice(idx, idx + 3500);
+    const idx = appSrc.indexOf(`function ${fn}`);
+    const slice = appSrc.slice(idx, idx + 3500);
     assert.ok(
       !slice.includes('invite_codes') && !slice.includes('inv_'),
       `${fn} must not render invite codes or reference the invite_codes table`
@@ -10510,8 +10511,8 @@ test('D-160B: no admin route changed', () => {
 // ── Section 94 — D-161B: Browse Claims public clarity layer ───────────────────
 
 test('D-161B: Browse Claims intro copy exists in renderArena', () => {
-  const idx = appV10Src.indexOf('function renderArena');
-  const slice = appV10Src.slice(idx, idx + 900);
+  const idx = appSrc.indexOf('function renderArena');
+  const slice = appSrc.slice(idx, idx + 900);
   assert.ok(
     slice.includes('arena-intro') && slice.includes('Claims are public ideas being tested'),
     'renderArena must include .arena-intro paragraph explaining what claims are'
@@ -10519,8 +10520,8 @@ test('D-161B: Browse Claims intro copy exists in renderArena', () => {
 });
 
 test('D-161B: graph stats wrapped in arena-stats-details collapsed by default', () => {
-  const idx = appV10Src.indexOf('function renderArena');
-  const slice = appV10Src.slice(idx, idx + 900);
+  const idx = appSrc.indexOf('function renderArena');
+  const slice = appSrc.slice(idx, idx + 900);
   assert.ok(
     slice.includes('arena-stats-details') && slice.includes('<details') && slice.includes('Show public network stats'),
     'renderArena must wrap graphBox() in a <details> element with aria-closed-by-default and "Show public network stats" summary'
@@ -10528,8 +10529,8 @@ test('D-161B: graph stats wrapped in arena-stats-details collapsed by default', 
 });
 
 test('D-161B: graph stats content still exists inside graphBox', () => {
-  const idx = appV10Src.indexOf('function graphBox');
-  const slice = appV10Src.slice(idx, idx + 500);
+  const idx = appSrc.indexOf('function graphBox');
+  const slice = appSrc.slice(idx, idx + 500);
   assert.ok(
     slice.includes("'Claims'") && slice.includes("'Evidence'") && slice.includes("'Truths'"),
     'graphBox must still contain Claims, Evidence, Truths stats — they are moved behind a toggle, not removed'
@@ -10537,8 +10538,8 @@ test('D-161B: graph stats content still exists inside graphBox', () => {
 });
 
 test('D-161B: claim CTA changed to "Investigate →"', () => {
-  const idx = appV10Src.indexOf('function card(');
-  const slice = appV10Src.slice(idx, idx + 1200);
+  const idx = appSrc.indexOf('function card(');
+  const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
     slice.includes('Investigate →'),
     'card() must use "Investigate →" as the claim CTA button label'
@@ -10546,8 +10547,8 @@ test('D-161B: claim CTA changed to "Investigate →"', () => {
 });
 
 test('D-161B: old "Study Claim →" label is removed from card()', () => {
-  const idx = appV10Src.indexOf('function card(');
-  const slice = appV10Src.slice(idx, idx + 900);
+  const idx = appSrc.indexOf('function card(');
+  const slice = appSrc.slice(idx, idx + 900);
   assert.ok(
     !slice.includes('Study Claim →'),
     'card() must not contain the old "Study Claim →" label — it was replaced by "Investigate →"'
@@ -10563,8 +10564,8 @@ test('D-161B: verdict explanation copy exists in index.html filter', () => {
 });
 
 test('D-161B: renderError uses visitor-friendly heading', () => {
-  const idx = appV10Src.indexOf('function renderError');
-  const slice = appV10Src.slice(idx, idx + 250);
+  const idx = appSrc.indexOf('function renderError');
+  const slice = appSrc.slice(idx, idx + 250);
   assert.ok(
     slice.includes('Something went wrong') && !slice.includes('HumanX backend notice'),
     'renderError must use "Something went wrong" heading, not the old "HumanX backend notice" debug copy'
@@ -10610,8 +10611,8 @@ test('D-161B: no admin route changed', () => {
 // ── Section 95 — D-162B: Claim study public reading guide ─────────────────────
 
 test('D-162B: "How this claim is being tested" heading exists in sectionArgumentFlow', () => {
-  const idx = appV10Src.indexOf('function sectionArgumentFlow');
-  const slice = appV10Src.slice(idx, idx + 400);
+  const idx = appSrc.indexOf('function sectionArgumentFlow');
+  const slice = appSrc.slice(idx, idx + 400);
   assert.ok(
     slice.includes('How this claim is being tested'),
     'sectionArgumentFlow must use "How this claim is being tested" as the section heading'
@@ -10619,8 +10620,8 @@ test('D-162B: "How this claim is being tested" heading exists in sectionArgument
 });
 
 test('D-162B: old "Claim Flow" label removed from sectionArgumentFlow', () => {
-  const idx = appV10Src.indexOf('function sectionArgumentFlow');
-  const slice = appV10Src.slice(idx, idx + 400);
+  const idx = appSrc.indexOf('function sectionArgumentFlow');
+  const slice = appSrc.slice(idx, idx + 400);
   assert.ok(
     !slice.includes('>Claim Flow<'),
     'sectionArgumentFlow must not use the old "Claim Flow" heading'
@@ -10628,8 +10629,8 @@ test('D-162B: old "Claim Flow" label removed from sectionArgumentFlow', () => {
 });
 
 test('D-162B: orientation sentence exists near claim title in renderStudy', () => {
-  const idx = appV10Src.indexOf('function renderStudy');
-  const slice = appV10Src.slice(idx, idx + 1200);
+  const idx = appSrc.indexOf('function renderStudy');
+  const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
     slice.includes('study-intro') && slice.includes('evidence, pressure, votes'),
     'renderStudy must include .study-intro orientation sentence for first-time visitors'
@@ -10637,8 +10638,8 @@ test('D-162B: orientation sentence exists near claim title in renderStudy', () =
 });
 
 test('D-162B: meter key copy exists in renderStudy', () => {
-  const idx = appV10Src.indexOf('function renderStudy');
-  const slice = appV10Src.slice(idx, idx + 1800);
+  const idx = appSrc.indexOf('function renderStudy');
+  const slice = appSrc.slice(idx, idx + 1800);
   assert.ok(
     slice.includes('study-meter-key') && slice.includes('Testability shows'),
     'renderStudy must include .study-meter-key inline explanation of what the three meters measure'
@@ -10646,8 +10647,8 @@ test('D-162B: meter key copy exists in renderStudy', () => {
 });
 
 test('D-162B: "Origin and truth trail" heading exists in sectionLineage', () => {
-  const idx = appV10Src.indexOf('function sectionLineage');
-  const slice = appV10Src.slice(idx, idx + 350);
+  const idx = appSrc.indexOf('function sectionLineage');
+  const slice = appSrc.slice(idx, idx + 350);
   assert.ok(
     slice.includes('Origin and truth trail'),
     'sectionLineage must use "Origin and truth trail" as the section heading'
@@ -10655,8 +10656,8 @@ test('D-162B: "Origin and truth trail" heading exists in sectionLineage', () => 
 });
 
 test('D-162B: old "Lineage" heading removed from sectionLineage', () => {
-  const idx = appV10Src.indexOf('function sectionLineage');
-  const slice = appV10Src.slice(idx, idx + 350);
+  const idx = appSrc.indexOf('function sectionLineage');
+  const slice = appSrc.slice(idx, idx + 350);
   assert.ok(
     !slice.includes('>Lineage<'),
     'sectionLineage must not use the old "Lineage" heading'
@@ -10664,8 +10665,8 @@ test('D-162B: old "Lineage" heading removed from sectionLineage', () => {
 });
 
 test('D-162B: vote note exists in renderStudy', () => {
-  const idx = appV10Src.indexOf('function renderStudy');
-  const slice = appV10Src.slice(idx, idx + 2800);
+  const idx = appSrc.indexOf('function renderStudy');
+  const slice = appSrc.slice(idx, idx + 2800);
   assert.ok(
     slice.includes('study-vote-note') && slice.includes('do not directly decide the verdict'),
     'renderStudy must include .study-vote-note explaining that votes do not directly decide the verdict'
@@ -10673,8 +10674,8 @@ test('D-162B: vote note exists in renderStudy', () => {
 });
 
 test('D-162B: RunPack button has title tooltip', () => {
-  const idx = appV10Src.indexOf('function renderStudy');
-  const slice = appV10Src.slice(idx, idx + 2800);
+  const idx = appSrc.indexOf('function renderStudy');
+  const slice = appSrc.slice(idx, idx + 2800);
   assert.ok(
     slice.includes('Build RunPack') && slice.includes('portable investigation packet'),
     'renderStudy Build RunPack button must have a title/tooltip explaining what RunPack does'
@@ -10682,8 +10683,8 @@ test('D-162B: RunPack button has title tooltip', () => {
 });
 
 test('D-162B: D-161B "Investigate →" CTA still present in card()', () => {
-  const idx = appV10Src.indexOf('function card(');
-  const slice = appV10Src.slice(idx, idx + 1200);
+  const idx = appSrc.indexOf('function card(');
+  const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
     slice.includes('Investigate →'),
     '"Investigate →" CTA from D-161B must remain in card() — D-162B must not revert it'
@@ -10711,8 +10712,8 @@ test('D-162B: GET /api/claims/:id remains public-scoped to review_state=public',
 test('D-162B: no sensitive fields rendered in study render functions', () => {
   const studyFns = ['renderStudy', 'sectionEvidence', 'sectionPressure', 'sectionLineage', 'sectionArgumentFlow'];
   for (const fn of studyFns) {
-    const idx = appV10Src.indexOf(`function ${fn}`);
-    const slice = appV10Src.slice(idx, idx + 2500);
+    const idx = appSrc.indexOf(`function ${fn}`);
+    const slice = appSrc.slice(idx, idx + 2500);
     assert.ok(
       !slice.includes('c.email') && !slice.includes('c.is_admin') && !slice.includes('owner_token'),
       `${fn} must not render email, is_admin, or owner_token`
@@ -10735,8 +10736,8 @@ test('D-162B: no admin route changed', () => {
 // ── Section 96 — D-163B: Submit Claim first-time clarity layer ────────────────
 
 test('D-163B: builder-intro copy exists in renderBuilderStep1', () => {
-  const idx = appV10Src.indexOf('function renderBuilderStep1');
-  const slice = appV10Src.slice(idx, idx + 500);
+  const idx = appSrc.indexOf('function renderBuilderStep1');
+  const slice = appSrc.slice(idx, idx + 500);
   assert.ok(
     slice.includes('builder-intro') &&
     slice.includes('Anyone can submit') &&
@@ -10747,8 +10748,8 @@ test('D-163B: builder-intro copy exists in renderBuilderStep1', () => {
 });
 
 test('D-163B: Step 1 footer note mentions review before public display', () => {
-  const idx = appV10Src.indexOf('function renderBuilderStep1');
-  const slice = appV10Src.slice(idx, idx + 2000);
+  const idx = appSrc.indexOf('function renderBuilderStep1');
+  const slice = appSrc.slice(idx, idx + 2000);
   assert.ok(
     slice.includes('reviewed before it appears publicly'),
     'renderBuilderStep1 footer note must mention that the claim is reviewed before appearing publicly'
@@ -10756,8 +10757,8 @@ test('D-163B: Step 1 footer note mentions review before public display', () => {
 });
 
 test('D-163B: Truth-vs-Claim note exists in renderBuilderStep2', () => {
-  const idx = appV10Src.indexOf('function renderBuilderStep2');
-  const slice = appV10Src.slice(idx, idx + 800);
+  const idx = appSrc.indexOf('function renderBuilderStep2');
+  const slice = appSrc.slice(idx, idx + 800);
   assert.ok(
     slice.includes('builder-truth-vs-claim') &&
     slice.includes('Claims are ideas still being tested') &&
@@ -10767,8 +10768,8 @@ test('D-163B: Truth-vs-Claim note exists in renderBuilderStep2', () => {
 });
 
 test('D-163B: success state includes review timeline expectation', () => {
-  const idx = appV10Src.indexOf('function submitBuilderClaim');
-  const slice = appV10Src.slice(idx, idx + 2000);
+  const idx = appSrc.indexOf('function submitBuilderClaim');
+  const slice = appSrc.slice(idx, idx + 2000);
   assert.ok(
     slice.includes('Usually within a few days'),
     'submitBuilderClaim success panel must include "Usually within a few days" review timeline note'
@@ -10802,8 +10803,8 @@ test('D-163B: builder-intro and builder-truth-vs-claim CSS classes defined', () 
 
 test('D-163B: no invite codes rendered in builder steps', () => {
   ['renderBuilderStep1', 'renderBuilderStep2', 'renderBuilderStep3'].forEach(fn => {
-    const idx = appV10Src.indexOf(`function ${fn}`);
-    const slice = appV10Src.slice(idx, idx + 2000);
+    const idx = appSrc.indexOf(`function ${fn}`);
+    const slice = appSrc.slice(idx, idx + 2000);
     assert.ok(
       !slice.includes('invite_codes') && !slice.includes('inv_'),
       `${fn} must not render invite codes`
@@ -10812,8 +10813,8 @@ test('D-163B: no invite codes rendered in builder steps', () => {
 });
 
 test('D-163B: no sensitive fields rendered in builder success states', () => {
-  const idx = appV10Src.indexOf('function submitBuilderClaim');
-  const slice = appV10Src.slice(idx, idx + 2500);
+  const idx = appSrc.indexOf('function submitBuilderClaim');
+  const slice = appSrc.slice(idx, idx + 2500);
   assert.ok(
     !slice.includes('c.email') && !slice.includes('is_admin') && !slice.includes('owner_token'),
     'submitBuilderClaim must not render email, is_admin, or owner_token'
@@ -10835,9 +10836,9 @@ test('D-163B: no admin route changed', () => {
 // ── Section 97 — D-164B: Safer review approval actions ────────────────────────
 
 test('D-164B: inspect-panel Approve uses requestApproveReview not direct reviewDecisionUI', () => {
-  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
-  const end = appV10Src.indexOf('\nfunction ', idx + 1);
-  const body = appV10Src.slice(idx, end);
+  const idx = appSrc.indexOf('function renderReviewInspectPanel');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
   const actionsIdx = body.indexOf('review-inspect-actions');
   const actionsBlock = body.slice(actionsIdx, actionsIdx + 700);
   assert.ok(
@@ -10848,9 +10849,9 @@ test('D-164B: inspect-panel Approve uses requestApproveReview not direct reviewD
 });
 
 test('D-164B: inspect-panel Approve confirm copy "Confirm approve public" exists', () => {
-  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
-  const end = appV10Src.indexOf('\nfunction ', idx + 1);
-  const body = appV10Src.slice(idx, end);
+  const idx = appSrc.indexOf('function renderReviewInspectPanel');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
   assert.ok(
     body.includes('Confirm approve public'),
     'inspect-panel must include "Confirm approve public" confirm-state copy'
@@ -10858,9 +10859,9 @@ test('D-164B: inspect-panel Approve confirm copy "Confirm approve public" exists
 });
 
 test('D-164B: inspect-panel Approve confirm triggers reviewDecisionUI in pending state', () => {
-  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
-  const end = appV10Src.indexOf('\nfunction ', idx + 1);
-  const body = appV10Src.slice(idx, end);
+  const idx = appSrc.indexOf('function renderReviewInspectPanel');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
   assert.ok(
     body.includes('isPendingApprove'),
     'inspect-panel must conditionally call reviewDecisionUI when isPendingApprove is true'
@@ -10868,9 +10869,9 @@ test('D-164B: inspect-panel Approve confirm triggers reviewDecisionUI in pending
 });
 
 test('D-164B: inspect-panel Approve cancel button present in pending state', () => {
-  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
-  const end = appV10Src.indexOf('\nfunction ', idx + 1);
-  const body = appV10Src.slice(idx, end);
+  const idx = appSrc.indexOf('function renderReviewInspectPanel');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
   assert.ok(
     body.includes('cancelApproveReview'),
     'inspect-panel must include cancelApproveReview in the pending-approve confirm block'
@@ -10878,8 +10879,8 @@ test('D-164B: inspect-panel Approve cancel button present in pending state', () 
 });
 
 test('D-164B: keyboard A arms pending approve on first press', () => {
-  const idx = appV10Src.indexOf('function initReviewKb');
-  const slice = appV10Src.slice(idx, idx + 1500);
+  const idx = appSrc.indexOf('function initReviewKb');
+  const slice = appSrc.slice(idx, idx + 1500);
   assert.ok(
     slice.includes('requestApproveReview(id)'),
     'keyboard A shortcut must call requestApproveReview on first press'
@@ -10887,8 +10888,8 @@ test('D-164B: keyboard A arms pending approve on first press', () => {
 });
 
 test('D-164B: keyboard A confirms on second press when already pending', () => {
-  const idx = appV10Src.indexOf('function initReviewKb');
-  const slice = appV10Src.slice(idx, idx + 1500);
+  const idx = appSrc.indexOf('function initReviewKb');
+  const slice = appSrc.slice(idx, idx + 1500);
   assert.ok(
     slice.includes('pendingApproveReviewId===id'),
     'keyboard A must check pendingApproveReviewId===id to distinguish arm vs. confirm'
@@ -10896,8 +10897,8 @@ test('D-164B: keyboard A confirms on second press when already pending', () => {
 });
 
 test('D-164B: keyboard K shortcut remains direct; keyboard R is now two-step (D-172B)', () => {
-  const idx = appV10Src.indexOf('function initReviewKb');
-  const slice = appV10Src.slice(idx, idx + 2000);
+  const idx = appSrc.indexOf('function initReviewKb');
+  const slice = appSrc.slice(idx, idx + 2000);
   // K is still direct (non-destructive keep-pending)
   assert.ok(
     slice.includes("reviewDecisionUI(type,id,'review')"),
@@ -10916,8 +10917,8 @@ test('D-164B: keyboard K shortcut remains direct; keyboard R is now two-step (D-
 });
 
 test('D-164B: admin token input uses type=password', () => {
-  const idx = appV10Src.indexOf('function renderReview');
-  const slice = appV10Src.slice(idx, idx + 1000);
+  const idx = appSrc.indexOf('function renderReview');
+  const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(
     slice.includes('type="password"') && slice.includes('id="adminToken"'),
     'admin token input must use type="password" to mask the token value in the browser UI'
@@ -10937,11 +10938,11 @@ test('D-164B: all five review routes retain requireAdmin', () => {
 
 test('D-164B: admin token not passed to toast or console calls', () => {
   assert.ok(
-    !/toast\([^)]*adminToken\(\)/.test(appV10Src),
+    !/toast\([^)]*adminToken\(\)/.test(appSrc),
     'admin token value must not be passed to toast()'
   );
   assert.ok(
-    !/console\.(log|warn|error)\([^)]*adminToken\(\)/.test(appV10Src),
+    !/console\.(log|warn|error)\([^)]*adminToken\(\)/.test(appSrc),
     'admin token value must not be passed to console.log/warn/error'
   );
 });
@@ -10956,9 +10957,9 @@ test('D-164B: no owner-token enforcement resumed', () => {
 // ── Section 98 — D-165B: Review queue admin UX copy polish ───────────────────
 
 test('D-165B: keyboard hint reflects two-press A (A arm · A again confirm)', () => {
-  const idx = appV10Src.indexOf('function renderReviewInspectPanel');
-  const end = appV10Src.indexOf('\nfunction ', idx + 1);
-  const slice = appV10Src.slice(idx, end > idx ? end : idx + 15000);
+  const idx = appSrc.indexOf('function renderReviewInspectPanel');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const slice = appSrc.slice(idx, end > idx ? end : idx + 15000);
   assert.ok(
     slice.includes('A arm · A again confirm'),
     'keyboard hint must read "A arm · A again confirm" to reflect D-164B two-press approve flow'
@@ -10967,15 +10968,15 @@ test('D-165B: keyboard hint reflects two-press A (A arm · A again confirm)', ()
 
 test('D-165B: old one-shot "A approve" keyboard hint is gone', () => {
   assert.ok(
-    !appV10Src.includes('A approve · K keep'),
+    !appSrc.includes('A approve · K keep'),
     'old "A approve · K keep" hint must be removed — superseded by D-165B two-press wording'
   );
 });
 
 test('D-165B: reviewFilterHelpText contains truth-derived copy', () => {
-  const idx = appV10Src.indexOf('function reviewFilterHelpText');
-  const end = appV10Src.indexOf('\nfunction ', idx + 1);
-  const slice = appV10Src.slice(idx, end > idx ? end : idx + 800);
+  const idx = appSrc.indexOf('function reviewFilterHelpText');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const slice = appSrc.slice(idx, end > idx ? end : idx + 800);
   assert.ok(
     slice.includes('Truth-derived items come from belief/truth flows'),
     'reviewFilterHelpText must include truth-derived help copy'
@@ -10983,9 +10984,9 @@ test('D-165B: reviewFilterHelpText contains truth-derived copy', () => {
 });
 
 test('D-165B: reviewEmptyText contains truth-derived empty state copy', () => {
-  const idx = appV10Src.indexOf('function reviewEmptyText');
-  const end = appV10Src.indexOf('\nfunction ', idx + 1);
-  const slice = appV10Src.slice(idx, end > idx ? end : idx + 1500);
+  const idx = appSrc.indexOf('function reviewEmptyText');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const slice = appSrc.slice(idx, end > idx ? end : idx + 1500);
   assert.ok(
     slice.includes('No truth-derived review items right now'),
     'reviewEmptyText must include truth-derived empty state copy'
@@ -10993,8 +10994,8 @@ test('D-165B: reviewEmptyText contains truth-derived empty state copy', () => {
 });
 
 test('D-165B: Review unavailable error panel includes recovery copy', () => {
-  const idx = appV10Src.indexOf('async function renderReview(');
-  const slice = appV10Src.slice(idx, idx + 2000);
+  const idx = appSrc.indexOf('async function renderReview(');
+  const slice = appSrc.slice(idx, idx + 2000);
   assert.ok(
     slice.includes('Check the admin token above, re-enter it if needed'),
     'renderReview catch block must include recovery copy for Review unavailable state'
@@ -12074,6 +12075,69 @@ test('D-179B: CSP not added to CORS object (no CSP on JSON API responses)', () =
   const corsIdx = workerSrc.indexOf('const CORS');
   const corsSnippet = workerSrc.slice(corsIdx, corsIdx + 300);
   assert.ok(!corsSnippet.includes('content-security-policy'), 'CSP must not be in CORS object — only HTML responses need CSP');
+});
+
+// ── D-181B: Zero-parameter inline handler migration ───────────────────────────
+
+// Dispatcher presence
+test('D-181B: data-action dispatcher is present in app-v10.js', () => {
+  assert.ok(appSrc.includes('_D181B_ZERO_PARAM_ACTIONS'), 'dispatcher object must be present');
+  assert.ok(appSrc.includes("e.target.closest('[data-action]')"), 'delegated click listener must be present');
+});
+
+// Every migrated zero-param handler must have been removed as onclick=
+const migratedHandlers = [
+  'saveAdminTokenAndLoadReview','clearAdminToken','createInviteCodeUI',
+  'builderBack','submitBuilderClaim','submitBuilderTruth',
+  'generateRunPack','copyAIP','downloadRunPack','downloadJSON',
+  'backToArena','addHomeTestUI','saveAnalysisResult',
+  'saveProfileSettingsUI','meCopyProfileLink','exportMyHumanXData',
+  'redeemInviteUI','toggleAccountPanel','submitTruth',
+];
+for (const fn of migratedHandlers) {
+  test(`D-181B: onclick="${fn}()" removed from app-v10.js`, () => {
+    assert.ok(!appSrc.includes(`onclick="${fn}()"`), `onclick="${fn}()" must not remain — migrated to data-action`);
+  });
+  test(`D-181B: data-action="${fn}" present in app-v10.js`, () => {
+    assert.ok(appSrc.includes(`data-action="${fn}"`), `data-action="${fn}" must be present after migration`);
+  });
+}
+
+// Parameterized handlers must NOT have been touched
+test('D-181B: parameterized onclick="selectClaim( still present (Cat C not migrated)', () => {
+  assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must still be present — Cat C not migrated in D-181B');
+});
+test('D-181B: parameterized onclick="setMode( still present (Cat B not migrated)', () => {
+  assert.ok(appSrc.includes("onclick=\"setMode('"), 'setMode inline onclick must still be present — Cat B not migrated in D-181B');
+});
+test('D-181B: parameterized onclick="inspectReviewItem( still present (Cat C not migrated)', () => {
+  assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem inline onclick must still be present — Cat C not migrated in D-181B');
+});
+test('D-181B: parameterized onclick="voteClaim( still present (Cat B not migrated)', () => {
+  assert.ok(appSrc.includes("onclick=\"voteClaim('"), 'voteClaim inline onclick must still be present — Cat B not migrated in D-181B');
+});
+test('D-181B: parameterized onclick="builderNext( still present (Cat B not migrated)', () => {
+  assert.ok(appSrc.includes('onclick="builderNext('), 'builderNext inline onclick must still be present — Cat B not migrated in D-181B');
+});
+
+// CSP unchanged
+test('D-181B: CSP header value unchanged in worker.js', () => {
+  assert.ok(workerSrc.includes("'unsafe-inline'"), "CSP must still contain unsafe-inline — not tightened in D-181B");
+  assert.ok(workerSrc.includes('content-security-policy'), 'CSP header must still be present');
+});
+
+// No oninput/onchange migration happened
+test('D-181B: oninput= handlers still present in app-v10.js (Cat E not migrated)', () => {
+  assert.ok(appSrc.includes('oninput='), 'oninput= handlers must still be present — Cat E not migrated in D-181B');
+});
+test('D-181B: onchange= handlers still present in app-v10.js (Cat E not migrated)', () => {
+  assert.ok(appSrc.includes('onchange='), 'onchange= handlers must still be present — Cat E not migrated in D-181B');
+});
+
+// Belief engine not touched
+test('D-181B: belief engine index.html not modified (out of scope)', () => {
+  const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
+  assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181B');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
