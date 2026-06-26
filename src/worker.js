@@ -84,6 +84,7 @@ export default {
       return json({ error: 'NOT_FOUND' }, 404);
     } catch (err) {
       const message = String(err && err.message ? err.message : err);
+      console.error('[D-180D]', message); // diagnostic only — remove after root cause found
       if (message.includes('MISSING_PSEUDONYMOUS_USER')) return json({ error:'UNAUTHORIZED', message:'Missing x-humanx-user header.' },401);
       if (message.includes('USER_SHADOW_BANNED')) return json({ error:'UNAUTHORIZED', message:'Action not permitted.' },403);
       if (message.includes('RATE_LIMITED')) return json({ error:'RATE_LIMITED', message:'Too many requests. Try again later.' },429);
