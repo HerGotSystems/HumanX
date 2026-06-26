@@ -3,7 +3,7 @@
 export const DEPLOY_META = {
   app:        'humanx',
   checkpoint: 'D-181C-HOTFIX',
-  commit:     'pending',
-  baseline:   'pending',
+  commit:     '5da855e',
+  baseline:   '1441/24/57',
   updated_at: '2026-06-26T00:00:00Z',
 };
