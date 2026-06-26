@@ -619,7 +619,7 @@ async function renderPublicProfileShell(request, env, rawSlug) {
     injected = html.replace('<title>HumanX — Belief → Truth → Claim → Evidence</title>', metaBlock);
   }
 
-  return new Response(injected, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer' } });
+  return new Response(injected, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'content-security-policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" } });
 }
 
 async function getPublicProfile(request, env, rawSlug) {

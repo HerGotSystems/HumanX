@@ -11990,8 +11990,13 @@ test('D-178B: CORS remains wildcard origin with no credentials header', () => {
   assert.ok(!corsSnippet.includes('allow-credentials'), 'CORS must not add allow-credentials');
 });
 
-test('D-178B: no CSP added in this patch', () => {
-  assert.ok(!workerSrc.includes('content-security-policy'), 'no CSP header must be added in D-178B');
+test('D-178B: CSP not on CORS object or json() responses (JSON responses never need CSP)', () => {
+  const corsIdx = workerSrc.indexOf('const CORS');
+  const corsSnippet = workerSrc.slice(corsIdx, corsIdx + 300);
+  assert.ok(!corsSnippet.includes('content-security-policy'), 'CSP must not be in the CORS object — browsers ignore CSP on JSON');
+  const jsonFnIdx = workerSrc.indexOf('function json(');
+  const jsonSnippet = workerSrc.slice(jsonFnIdx, jsonFnIdx + 200);
+  assert.ok(!jsonSnippet.includes('content-security-policy'), 'CSP must not be added to json() helper');
 });
 
 test('D-178B: review routes remain requireAdmin-gated', () => {
@@ -12011,6 +12016,64 @@ test('D-178B: no frontend console logging', () => {
 test('D-178B: admin token input remains type=password', () => {
   const frontendSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
   assert.ok(frontendSrc.includes('type="password"'), 'admin token input must remain password type');
+});
+
+// ── D-179B: Permissive CSP on public HTML response ────────────────────────────
+
+test('D-179B: CSP header present in renderPublicProfileShell response', () => {
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes('content-security-policy'), 'renderPublicProfileShell must include content-security-policy header');
+});
+
+test('D-179B: CSP includes default-src self', () => {
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes("default-src 'self'"), 'CSP must include default-src self');
+});
+
+test('D-179B: CSP includes frame-ancestors none', () => {
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes("frame-ancestors 'none'"), 'CSP must block framing via frame-ancestors none');
+});
+
+test('D-179B: CSP includes object-src none', () => {
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes("object-src 'none'"), 'CSP must block object/embed via object-src none');
+});
+
+test('D-179B: CSP retains unsafe-inline in script-src (required by current app)', () => {
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes("script-src 'self' 'unsafe-inline'"), 'CSP script-src must retain unsafe-inline — 47 inline handlers in app-v10.js');
+});
+
+test('D-179B: CSP retains unsafe-inline in style-src (required by current app)', () => {
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes("style-src 'self' 'unsafe-inline'"), 'CSP style-src must retain unsafe-inline — 25 inline style attrs in app-v10.js');
+});
+
+test('D-179B: CSP includes Google Fonts origins for belief engine', () => {
+  const shellFnIdx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const shellEnd = workerSrc.indexOf('\n}', shellFnIdx + 100) + 10;
+  const shellBody = workerSrc.slice(shellFnIdx, shellEnd);
+  assert.ok(shellBody.includes('fonts.googleapis.com'), 'CSP style-src must allow fonts.googleapis.com for belief engine');
+  assert.ok(shellBody.includes('fonts.gstatic.com'), 'CSP font-src must allow fonts.gstatic.com for belief engine');
+});
+
+test('D-179B: CSP not added to CORS object (no CSP on JSON API responses)', () => {
+  const corsIdx = workerSrc.indexOf('const CORS');
+  const corsSnippet = workerSrc.slice(corsIdx, corsIdx + 300);
+  assert.ok(!corsSnippet.includes('content-security-policy'), 'CSP must not be in CORS object — only HTML responses need CSP');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
