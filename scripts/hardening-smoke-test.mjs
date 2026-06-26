@@ -10874,6 +10874,16 @@ test('D-164B: inspect-panel Approve confirm triggers reviewDecisionUI in pending
   );
 });
 
+test('D-181C-HOTFIX: renderReviewInspectPanel declares isPendingApprove in its own scope', () => {
+  const idx = appSrc.indexOf('function renderReviewInspectPanel');
+  const end = appSrc.indexOf('\nfunction ', idx + 1);
+  const body = appSrc.slice(idx, end);
+  assert.ok(
+    body.includes('const isPendingApprove=pendingApproveReviewId===id'),
+    'renderReviewInspectPanel must declare isPendingApprove locally — missing declaration throws ReferenceError on every re-render when an item is inspected'
+  );
+});
+
 test('D-164B: inspect-panel Approve cancel button present in pending state', () => {
   const idx = appSrc.indexOf('function renderReviewInspectPanel');
   const end = appSrc.indexOf('\nfunction ', idx + 1);
