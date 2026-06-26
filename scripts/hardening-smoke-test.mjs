@@ -2819,9 +2819,10 @@ test('D-101B: .commandbar uses flex / wrap / gap layout', () => {
 test('D-101B: renderError includes a Back to Home recovery action', () => {
   const start = appSrc.indexOf('function renderError');
   const body = appSrc.slice(start, start + 400);
+  // D-181C migrated onclick="setMode('home')" to data-action="setMode" data-value="home"
   assert.ok(
-    body.includes("setMode('home')") && body.includes('Back to Home'),
-    'renderError must offer a Back to Home recovery button calling setMode(home)'
+    body.includes('data-action="setMode"') && body.includes('data-value="home"') && body.includes('Back to Home'),
+    'renderError must offer a Back to Home recovery button via data-action="setMode" data-value="home"'
   );
 });
 
@@ -4048,9 +4049,10 @@ test('D-129F: existing review filter chips still rendered in filter bar', () => 
   const idx = appSrc.indexOf('function renderReviewFilterBar(');
   const end = appSrc.indexOf('\nfunction ', idx + 1);
   const body = appSrc.slice(idx, end);
+  // D-181C migrated onclick="setReviewFilter('${f}')" to data-action="setReviewFilter" data-value="${f}"
   assert.ok(
-    body.includes('review-filter-chips') && body.includes("setReviewFilter("),
-    'renderReviewFilterBar must still output review-filter-chips and setReviewFilter calls'
+    body.includes('review-filter-chips') && body.includes('data-action="setReviewFilter"'),
+    'renderReviewFilterBar must still output review-filter-chips with data-action="setReviewFilter" chips'
   );
 });
 
@@ -6194,10 +6196,11 @@ test('D-137D: evidence and pressure rows show parent claim id as plain text, nev
 test('D-137D: truth rows only offer navigation for public truths', () => {
   const idx = appSrc.indexOf('function meRecentTruthsHtml');
   const slice = appSrc.slice(idx, idx + 800);
+  // D-181C migrated onclick="setMode('truths')" to data-action="setMode" data-value="truths"
   assert.ok(
     slice.includes('const isPublic=state===\'public\'') &&
-    slice.includes("${isPublic?`<button class=\"btn-mini\" onclick=\"setMode('truths')\">"),
-    'meRecentTruthsHtml must only offer the View in Truths action for public rows'
+    slice.includes('data-action="setMode"') && slice.includes('data-value="truths"'),
+    'meRecentTruthsHtml must only offer the View in Truths action for public rows (data-action wired)'
   );
 });
 
@@ -10331,18 +10334,20 @@ test('D-159B: public profile example bridge link exists and points to /u/calenhi
 test('D-159B: Browse Claims card appears before Submit Claim in renderHome', () => {
   const idx = appSrc.indexOf('function renderHome');
   const slice = appSrc.slice(idx, idx + 4000);
-  const browseAt = slice.indexOf("setMode('arena')");
-  const submitAt = slice.indexOf("setMode('submit')");
+  // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
+  const browseAt = slice.indexOf('data-value="arena"');
+  const submitAt = slice.indexOf('data-value="submit"');
   assert.ok(
     browseAt !== -1 && submitAt !== -1 && browseAt < submitAt,
-    'Browse Claims (setMode arena) must appear before Submit Claim (setMode submit) in renderHome card grid'
+    'Browse Claims (data-value arena) must appear before Submit Claim (data-value submit) in renderHome card grid'
   );
 });
 
 test('D-159B: Browse Claims card appears before Belief Engine in renderHome', () => {
   const idx = appSrc.indexOf('function renderHome');
   const slice = appSrc.slice(idx, idx + 4000);
-  const browseAt = slice.indexOf("setMode('arena')");
+  // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
+  const browseAt = slice.indexOf('data-value="arena"');
   const beliefAt = slice.indexOf("humanx-belief-engine");
   assert.ok(
     browseAt !== -1 && beliefAt !== -1 && browseAt < beliefAt,
@@ -10355,9 +10360,10 @@ test('D-159B: Browse Claims card has cc-card-primary class', () => {
   const slice = appSrc.slice(idx, idx + 4000);
   const gridStart = slice.indexOf('cc-card-grid');
   const gridSlice = slice.slice(gridStart, gridStart + 600);
+  // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
   assert.ok(
-    gridSlice.includes("setMode('arena')") && gridSlice.includes('cc-card-primary'),
-    'The first card in the home grid must be Browse Claims and must carry the cc-card-primary class'
+    gridSlice.includes('data-value="arena"') && gridSlice.includes('cc-card-primary'),
+    'The first card in the home grid must be Browse Claims (data-value arena) and must carry the cc-card-primary class'
   );
 });
 
@@ -12107,17 +12113,20 @@ for (const fn of migratedHandlers) {
 test('D-181B: parameterized onclick="selectClaim( still present (Cat C not migrated)', () => {
   assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must still be present — Cat C not migrated in D-181B');
 });
-test('D-181B: parameterized onclick="setMode( still present (Cat B not migrated)', () => {
-  assert.ok(appSrc.includes("onclick=\"setMode('"), 'setMode inline onclick must still be present — Cat B not migrated in D-181B');
+test('D-181C: onclick="setMode( fully migrated — data-action="setMode" present instead', () => {
+  assert.ok(!appSrc.includes("onclick=\"setMode("), 'setMode inline onclick must be gone — migrated in D-181C');
+  assert.ok(appSrc.includes('data-action="setMode"'), 'data-action="setMode" must be present after D-181C migration');
 });
 test('D-181B: parameterized onclick="inspectReviewItem( still present (Cat C not migrated)', () => {
   assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem inline onclick must still be present — Cat C not migrated in D-181B');
 });
-test('D-181B: parameterized onclick="voteClaim( still present (Cat B not migrated)', () => {
-  assert.ok(appSrc.includes("onclick=\"voteClaim('"), 'voteClaim inline onclick must still be present — Cat B not migrated in D-181B');
+test('D-181C: onclick="voteClaim( fully migrated — data-action="voteClaim" present instead', () => {
+  assert.ok(!appSrc.includes("onclick=\"voteClaim('"), 'voteClaim inline onclick must be gone — migrated in D-181C');
+  assert.ok(appSrc.includes('data-action="voteClaim"'), 'data-action="voteClaim" must be present after D-181C migration');
 });
-test('D-181B: parameterized onclick="builderNext( still present (Cat B not migrated)', () => {
-  assert.ok(appSrc.includes('onclick="builderNext('), 'builderNext inline onclick must still be present — Cat B not migrated in D-181B');
+test('D-181C: onclick="builderNext( fully migrated — data-action="builderNext" present instead', () => {
+  assert.ok(!appSrc.includes('onclick="builderNext('), 'builderNext inline onclick must be gone — migrated in D-181C');
+  assert.ok(appSrc.includes('data-action="builderNext"'), 'data-action="builderNext" must be present after D-181C migration');
 });
 
 // CSP unchanged
@@ -12138,6 +12147,94 @@ test('D-181B: onchange= handlers still present in app-v10.js (Cat E not migrated
 test('D-181B: belief engine index.html not modified (out of scope)', () => {
   const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
   assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181B');
+});
+
+// ── D-181C: Literal-parameter chip/filter handler migration ───────────────────
+
+// Dispatcher extended with param-action map
+test('D-181C: _D181C_PARAM_ACTIONS dispatcher map present in app-v10.js', () => {
+  assert.ok(appSrc.includes('_D181C_PARAM_ACTIONS'), 'D-181C param-action map must be declared');
+  assert.ok(appSrc.includes('pfn(btn)'), 'dispatcher must call param handler with btn element');
+});
+
+// All Cat B onclick patterns must be gone
+const catBFunctions = [
+  { fn: 'setMode', attr: 'data-value' },
+  { fn: 'setReviewFilter', attr: 'data-value' },
+  { fn: 'meSetFilter', attr: 'data-value' },
+  { fn: 'setTruthAdminFilter', attr: 'data-value' },
+  { fn: 'voteClaim', attr: 'data-value' },
+  { fn: 'doAttachEvidence', attr: 'data-value' },
+  { fn: 'builderSetCat', attr: 'data-cat' },
+];
+for (const { fn, attr } of catBFunctions) {
+  test(`D-181C: onclick="${fn}( removed from app-v10.js template literals`, () => {
+    assert.ok(!appSrc.includes(`onclick="${fn}(`), `onclick="${fn}(" must be gone — migrated to data-action in D-181C`);
+  });
+  test(`D-181C: data-action="${fn}" + ${attr} present in app-v10.js`, () => {
+    assert.ok(appSrc.includes(`data-action="${fn}"`), `data-action="${fn}" must be present after D-181C migration`);
+  });
+}
+test('D-181C: onclick="builderNext( removed from app-v10.js', () => {
+  assert.ok(!appSrc.includes('onclick="builderNext('), 'builderNext inline onclick must be gone — migrated in D-181C');
+});
+test('D-181C: data-action="builderNext" + data-step attributes present', () => {
+  assert.ok(appSrc.includes('data-action="builderNext"') && appSrc.includes('data-step="1"') && appSrc.includes('data-step="2"'),
+    'builderNext must use data-action="builderNext" with data-step="1" and data-step="2"');
+});
+
+// Specific known data-value assertions for key modes and filters
+test('D-181C: setMode data-value chips present for all home nav modes', () => {
+  for (const v of ['arena','submit','drift','vault','truths','export']) {
+    assert.ok(appSrc.includes(`data-value="${v}"`), `data-value="${v}" must be present in app-v10.js`);
+  }
+});
+test('D-181C: voteClaim data-value chips present for all three vote options', () => {
+  assert.ok(
+    appSrc.includes('data-value="believe"') && appSrc.includes('data-value="reject"') && appSrc.includes('data-value="unsure"'),
+    'all three voteClaim data-value chips must be present'
+  );
+});
+test('D-181C: doAttachEvidence data-value chips present', () => {
+  assert.ok(
+    appSrc.includes('data-value="support"') && appSrc.includes('data-value="pressure"'),
+    'doAttachEvidence data-value chips (support, pressure) must be present'
+  );
+});
+test('D-181C: builderSetCat still uses existing data-cat attribute (no redundant data-value)', () => {
+  assert.ok(!appSrc.includes('onclick="builderSetCat('), 'builderSetCat onclick must be gone');
+  assert.ok(appSrc.includes('data-action="builderSetCat"') && appSrc.includes('data-cat="${c}"'), 'builderSetCat must use data-action + existing data-cat attribute');
+});
+
+// Cat C handlers must remain inline (not touched)
+test('D-181C: Cat C id-interpolated handlers still present (not migrated yet)', () => {
+  assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must remain — Cat C not migrated in D-181C');
+  assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem inline onclick must remain — Cat C not migrated in D-181C');
+  assert.ok(appSrc.includes("onclick=\"promoteBelief('"), 'promoteBelief inline onclick must remain — Cat C not migrated in D-181C');
+});
+
+// oninput/onchange must remain
+test('D-181C: oninput= and onchange= handlers remain untouched (Cat E not migrated)', () => {
+  assert.ok(appSrc.includes('oninput='), 'oninput= must remain — Cat E not migrated in D-181C');
+  assert.ok(appSrc.includes('onchange='), 'onchange= must remain — Cat E not migrated in D-181C');
+});
+
+// D-181B zero-param actions still covered by dispatcher
+test('D-181C: D-181B zero-param actions still present in _D181B_ZERO_PARAM_ACTIONS', () => {
+  assert.ok(appSrc.includes('_D181B_ZERO_PARAM_ACTIONS'), 'D-181B zero-param map must still be present');
+  assert.ok(appSrc.includes('saveAdminTokenAndLoadReview'), 'saveAdminTokenAndLoadReview must remain in dispatcher map');
+  assert.ok(appSrc.includes('generateRunPack'), 'generateRunPack must remain in dispatcher map');
+});
+
+// CSP unchanged
+test('D-181C: CSP header unchanged in worker.js', () => {
+  assert.ok(workerSrc.includes("'unsafe-inline'") && workerSrc.includes('content-security-policy'), 'CSP must remain permissive and present — not tightened in D-181C');
+});
+
+// Belief engine not touched
+test('D-181C: belief engine index.html not modified (out of scope)', () => {
+  const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
+  assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181C');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
