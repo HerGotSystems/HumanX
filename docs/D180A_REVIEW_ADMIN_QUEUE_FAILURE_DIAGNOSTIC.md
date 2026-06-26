@@ -349,3 +349,17 @@ The `reviewQueue()` function explicitly selects `c.archived_by_user` in its clai
 ## No Owner-Token Work Resumed
 
 D-149H hold remains in effect. No owner-token enforcement added or changed.
+
+---
+
+## Resolution (added D-180G — 2026-06-26)
+
+**Primary hypothesis was disproven.** D-180B PRAGMA confirmed migration 0012 was already applied in production — `claims.archived_by_user`, `truths.archived_by_user`, and `pressure_points.archived_by_user` all exist.
+
+**Actual root cause:** `D1_ERROR: no such column: c.damage at offset 244`
+
+The `reviewQueue()` claims SELECT included `c.damage`. This column appears in the `CREATE TABLE` definition in `migrations/0001_init.sql` and `migrations/0003_full_schema.sql` but was **never added to production D1 via an `ALTER TABLE` migration**. Production D1 was initialized before `damage` was added to the schema definition, and no migration was created to backfill it.
+
+**Fix (D-180F, commit 025f9a2):** Removed `c.damage` from the explicit column list in `reviewQueue()`. The column is absent in production, unused in `mapClaim()`, and has no data — removing it from the SELECT has no functional impact. No migration needed or applied.
+
+**Live verification (D-180G):** Review queue loads successfully after D-180F deploy. No 500. Pending/rejected/report filters and cards render correctly.

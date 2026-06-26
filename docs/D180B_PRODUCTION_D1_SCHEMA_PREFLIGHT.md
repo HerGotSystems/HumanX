@@ -249,3 +249,23 @@ Or, if you prefer to skip the PRAGMA step:
 - Run `wrangler tail` in one terminal.
 - Click "Load Queue" in the browser (with correct admin token entered).
 - Paste only the exception line from the tail output (no headers/token values).
+
+---
+
+## Resolution (added D-180G — 2026-06-26)
+
+**Owner confirmed via PRAGMA:** Migration 0012 was already applied in production.
+- `claims.archived_by_user` — **present**
+- `truths.archived_by_user` — **present**
+- `pressure_points.archived_by_user` — **present**
+
+Primary hypothesis (migration 0012 missing) was **disproven**.
+
+**Actual root cause (found in D-180D/E via wrangler tail + temporary console.error):**
+`D1_ERROR: no such column: c.damage at offset 244`
+
+`c.damage` is referenced in the `reviewQueue()` claims SELECT but does not exist in production D1. The column appears in CREATE TABLE schema files (`0001_init.sql`, `0003_full_schema.sql`) but was never added to production via an ALTER TABLE migration. No such migration exists.
+
+**Fix applied in D-180F (commit 025f9a2):** `c.damage` removed from the `reviewQueue()` SELECT. No migration needed. No functional impact — column absent in production, unused in `mapClaim()`.
+
+**Live verified in D-180G:** Review queue loads successfully. No 500.
