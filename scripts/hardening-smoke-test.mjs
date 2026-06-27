@@ -6660,11 +6660,14 @@ test('D-138C: exportMyHumanXData triggers a browser download and shows a toast, 
 });
 
 test('D-138C: archive action appears on non-archived own claim/truth/evidence/pressure rows', () => {
+  // D-181F migrated onclick="meArchiveItemUI(...)" to data-action="meArchiveItem" + data-item-type
+  const hasOldOrNew = (oldStr, itemType) =>
+    appSrc.includes(oldStr) || appSrc.includes(`data-action="meArchiveItem" data-item-type="${itemType}"`);
   assert.ok(
-    appSrc.includes("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('claim','${esc(c.id)}')\">Archive</button>`:''") &&
-    appSrc.includes("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('truth','${esc(t.id)}')\">Archive</button>`:''") &&
-    appSrc.includes("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('evidence','${esc(e.id)}')\">Archive</button>`:''") &&
-    appSrc.includes("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('pressure','${esc(p.id)}')\">Archive</button>`:''"),
+    hasOldOrNew("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('claim','${esc(c.id)}')\">Archive</button>`", 'claim') &&
+    hasOldOrNew("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('truth','${esc(t.id)}')\">Archive</button>`", 'truth') &&
+    hasOldOrNew("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('evidence','${esc(e.id)}')\">Archive</button>`", 'evidence') &&
+    hasOldOrNew("!isArchived?`<button class=\"btn-mini danger\" onclick=\"meArchiveItemUI('pressure','${esc(p.id)}')\">Archive</button>`", 'pressure'),
     'each of the four item-row renderers must render an Archive button only when !isArchived'
   );
 });
@@ -12224,11 +12227,13 @@ test('D-181C: builderSetCat still uses existing data-cat attribute (no redundant
   assert.ok(appSrc.includes('data-action="builderSetCat"') && appSrc.includes('data-cat="${c}"'), 'builderSetCat must use data-action + existing data-cat attribute');
 });
 
-// Cat C handlers must remain inline (not touched)
+// Cat C handlers must remain inline (not touched in D-181C; promoteBelief migrated later in D-181F)
 test('D-181C: Cat C id-interpolated handlers still present (not migrated yet)', () => {
   assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must remain — Cat C not migrated in D-181C');
   assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem inline onclick must remain — Cat C not migrated in D-181C');
-  assert.ok(appSrc.includes("onclick=\"promoteBelief('"), 'promoteBelief inline onclick must remain — Cat C not migrated in D-181C');
+  // promoteBelief was inline at D-181C time; migrated to data-action in D-181F — check either form
+  const promotePresent = appSrc.includes("onclick=\"promoteBelief('") || appSrc.includes('data-action="promoteBelief"');
+  assert.ok(promotePresent, 'promoteBelief must be present (inline or data-action) — migrated in D-181F');
 });
 
 // oninput/onchange must remain
@@ -12289,11 +12294,13 @@ test('D-181D: data-action="navBeliefEngine" present (4 instances) in app-v10.js'
   assert.equal(count, 4, `expected 4 data-action="navBeliefEngine" instances, found ${count}`);
 });
 
-// ID-interpolated handlers still present (Cat C not touched)
+// ID-interpolated handlers still present (Cat C not touched in D-181D; promoteBelief migrated later in D-181F)
 test('D-181D: ID-interpolated handlers remain untouched (Cat C not migrated)', () => {
   assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must remain — Cat C not migrated in D-181D');
   assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem inline onclick must remain — Cat C not migrated in D-181D');
-  assert.ok(appSrc.includes("onclick=\"promoteBelief('"), 'promoteBelief inline onclick must remain — Cat C not migrated in D-181D');
+  // promoteBelief was inline at D-181D time; migrated to data-action in D-181F — check either form
+  const promotePresent = appSrc.includes("onclick=\"promoteBelief('") || appSrc.includes('data-action="promoteBelief"');
+  assert.ok(promotePresent, 'promoteBelief must be present (inline or data-action) — migrated in D-181F');
 });
 
 // Review decision handlers still present (not touched)
@@ -12383,9 +12390,12 @@ test('D-181E: selectClaim, studyFromVault, attachEvidencePrompt remain inline', 
   assert.ok(appSrc.includes("onclick=\"studyFromVault('"), 'studyFromVault inline onclick must remain — not migrated in D-181E');
   assert.ok(appSrc.includes("onclick=\"attachEvidencePrompt('"), 'attachEvidencePrompt inline onclick must remain — not migrated in D-181E');
 });
-test('D-181E: meArchiveItemUI and promoteBelief remain inline', () => {
-  assert.ok(appSrc.includes("onclick=\"meArchiveItemUI('"), 'meArchiveItemUI inline onclick must remain — not migrated in D-181E');
-  assert.ok(appSrc.includes("onclick=\"promoteBelief('"), 'promoteBelief inline onclick must remain — not migrated in D-181E');
+test('D-181E: meArchiveItemUI and promoteBelief present (inline at D-181E time; migrated in D-181F)', () => {
+  // Both were inline when D-181E landed; D-181F migrated them to data-action — check either form
+  const archivePresent = appSrc.includes("onclick=\"meArchiveItemUI('") || appSrc.includes('data-action="meArchiveItem"');
+  const promotePresent = appSrc.includes("onclick=\"promoteBelief('") || appSrc.includes('data-action="promoteBelief"');
+  assert.ok(archivePresent, 'meArchiveItemUI must be present (inline or data-action) — migrated in D-181F');
+  assert.ok(promotePresent, 'promoteBelief must be present (inline or data-action) — migrated in D-181F');
 });
 
 // D-181B/C/D dispatcher still intact
@@ -12404,6 +12414,85 @@ test('D-181E: CSP header unchanged in worker.js', () => {
 test('D-181E: belief engine index.html not modified (out of scope)', () => {
   const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
   assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181E');
+});
+
+// ── D-181F: Dual-param non-review handler migration ───────────────────────────
+
+console.log('\nD-181F: Dual-param non-review handlers (meArchiveItem, promoteBelief)');
+
+// _D181F_DUAL_ACTIONS dispatcher map present
+test('D-181F: _D181F_DUAL_ACTIONS dispatcher map present in app-v10.js', () => {
+  assert.ok(appSrc.includes('_D181F_DUAL_ACTIONS'), '_D181F_DUAL_ACTIONS map must be declared');
+  assert.ok(appSrc.includes('ffn(btn)'), 'dispatcher must call D-181F handler with btn element');
+});
+
+// meArchiveItemUI inline patterns removed (all 4 item types)
+for (const type of ['claim', 'truth', 'evidence', 'pressure']) {
+  test(`D-181F: onclick="meArchiveItemUI('${type}'," removed from app-v10.js`, () => {
+    assert.ok(!appSrc.includes(`onclick="meArchiveItemUI('${type}',`), `meArchiveItemUI('${type}') inline onclick must be gone — migrated in D-181F`);
+  });
+}
+
+// data-action="meArchiveItem" present for all 4 item types
+test('D-181F: data-action="meArchiveItem" present 4 times (one per item type)', () => {
+  const count = (appSrc.match(/data-action="meArchiveItem"/g) || []).length;
+  assert.equal(count, 4, `expected 4 data-action="meArchiveItem" instances, found ${count}`);
+});
+for (const type of ['claim', 'truth', 'evidence', 'pressure']) {
+  test(`D-181F: data-item-type="${type}" present for meArchiveItem`, () => {
+    assert.ok(appSrc.includes(`data-item-type="${type}"`), `data-item-type="${type}" must be present after D-181F migration`);
+  });
+}
+
+// promoteBelief inline patterns removed
+test('D-181F: onclick="promoteBelief( removed from app-v10.js', () => {
+  assert.ok(!appSrc.includes('onclick="promoteBelief('), 'promoteBelief inline onclick must be gone — migrated in D-181F');
+});
+test('D-181F: data-action="promoteBelief" present twice (truth + claim)', () => {
+  const count = (appSrc.match(/data-action="promoteBelief"/g) || []).length;
+  assert.equal(count, 2, `expected 2 data-action="promoteBelief" instances, found ${count}`);
+});
+test('D-181F: promoteBelief uses data-value="truth" and data-value="claim"', () => {
+  const idx = appSrc.indexOf('function beliefSnapshotCard');
+  const slice = appSrc.slice(idx, idx + 1100);
+  assert.ok(
+    slice.includes('data-action="promoteBelief"') &&
+    slice.includes('data-value="truth"') &&
+    slice.includes('data-value="claim"'),
+    'beliefSnapshotCard must use data-action="promoteBelief" with data-value="truth" and data-value="claim"'
+  );
+});
+
+// Scope boundary — review, study, this, computed handlers still inline
+test('D-181F: review decision handlers remain untouched', () => {
+  assert.ok(appSrc.includes("onclick=\"requestRejectReview('"), 'requestRejectReview inline onclick must remain');
+  assert.ok(appSrc.includes("onclick=\"requestApproveReview('"), 'requestApproveReview inline onclick must remain');
+  assert.ok(appSrc.includes("onclick=\"reviewDecisionUI('"), 'reviewDecisionUI inline onclick must remain');
+  assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem inline onclick must remain');
+});
+test('D-181F: selectClaim, studyFromVault, attachEvidencePrompt remain inline', () => {
+  assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must remain — not migrated in D-181F');
+  assert.ok(appSrc.includes("onclick=\"studyFromVault('"), 'studyFromVault inline onclick must remain — not migrated in D-181F');
+  assert.ok(appSrc.includes("onclick=\"attachEvidencePrompt('"), 'attachEvidencePrompt inline onclick must remain — not migrated in D-181F');
+});
+
+// All previous dispatcher maps intact
+test('D-181F: all prior dispatcher maps still present', () => {
+  assert.ok(appSrc.includes('_D181B_ZERO_PARAM_ACTIONS'), 'D-181B map must remain');
+  assert.ok(appSrc.includes('_D181C_PARAM_ACTIONS'), 'D-181C map must remain');
+  assert.ok(appSrc.includes('_D181E_ID_ACTIONS'), 'D-181E map must remain');
+  assert.ok(appSrc.includes('navBeliefEngine'), 'D-181D navBeliefEngine must remain');
+});
+
+// CSP unchanged
+test('D-181F: CSP header unchanged in worker.js', () => {
+  assert.ok(workerSrc.includes("'unsafe-inline'") && workerSrc.includes('content-security-policy'), 'CSP must remain permissive — not tightened in D-181F');
+});
+
+// Belief engine not touched
+test('D-181F: belief engine index.html not modified (out of scope)', () => {
+  const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
+  assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181F');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
