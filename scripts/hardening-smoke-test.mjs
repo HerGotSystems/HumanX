@@ -6982,9 +6982,10 @@ test('D-139B: forbidden wording is absent from the Mirror panel outside the appr
 test('D-139B: empty state links to the Belief Engine', () => {
   const idx = appSrc.indexOf('function meMirrorHtml');
   const slice = appSrc.slice(idx, idx + 600);
+  // D-181D migrated onclick="location.href='...'" to data-action="navBeliefEngine"
+  const hasLink = slice.includes("location.href='/apps/humanx-belief-engine/'") || slice.includes('data-action="navBeliefEngine"');
   assert.ok(
-    slice.includes('Take the Belief Engine to start your Mirror.') &&
-    slice.includes("location.href='/apps/humanx-belief-engine/'"),
+    slice.includes('Take the Belief Engine to start your Mirror.') && hasLink,
     'meMirrorHtml must show the required empty-state copy and link to the Belief Engine when there are no snapshots'
   );
 });
@@ -10347,8 +10348,9 @@ test('D-159B: Browse Claims card appears before Belief Engine in renderHome', ()
   const idx = appSrc.indexOf('function renderHome');
   const slice = appSrc.slice(idx, idx + 4000);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
+  // D-181D migrated onclick="location.href='...'" to data-action="navBeliefEngine"
   const browseAt = slice.indexOf('data-value="arena"');
-  const beliefAt = slice.indexOf("humanx-belief-engine");
+  const beliefAt = slice.indexOf('navBeliefEngine') !== -1 ? slice.indexOf('navBeliefEngine') : slice.indexOf('humanx-belief-engine');
   assert.ok(
     browseAt !== -1 && beliefAt !== -1 && browseAt < beliefAt,
     'Browse Claims must appear before Belief Engine in the home card grid'
@@ -12245,6 +12247,73 @@ test('D-181C: CSP header unchanged in worker.js', () => {
 test('D-181C: belief engine index.html not modified (out of scope)', () => {
   const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
   assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181C');
+});
+
+// ── D-181D: Zero-param missed handlers + navBeliefEngine migration ───────────
+
+console.log('\nD-181D: Zero-param missed handlers + navBeliefEngine');
+
+// Dispatcher extended with toggleReviewAudit, closeAttachModal, navBeliefEngine
+test('D-181D: toggleReviewAudit added to _D181B_ZERO_PARAM_ACTIONS', () => {
+  assert.ok(appSrc.includes('toggleReviewAudit'), 'toggleReviewAudit must be present in dispatcher map');
+  assert.ok(!appSrc.includes('onclick="toggleReviewAudit()"'), 'onclick="toggleReviewAudit()" must be gone — migrated in D-181D');
+  assert.ok(appSrc.includes('data-action="toggleReviewAudit"'), 'data-action="toggleReviewAudit" must be present after D-181D migration');
+});
+
+test('D-181D: closeAttachModal added to _D181B_ZERO_PARAM_ACTIONS', () => {
+  assert.ok(appSrc.includes('closeAttachModal'), 'closeAttachModal must be present in dispatcher map');
+  assert.ok(!appSrc.includes('onclick="closeAttachModal()"'), 'onclick="closeAttachModal()" must be gone — migrated in D-181D');
+  assert.ok(appSrc.includes('data-action="closeAttachModal"'), 'data-action="closeAttachModal" must be present after D-181D migration');
+});
+
+test('D-181D: navBeliefEngine action present in dispatcher', () => {
+  assert.ok(appSrc.includes('navBeliefEngine'), 'navBeliefEngine must be present in dispatcher map');
+  assert.ok(appSrc.includes("navBeliefEngine:()=>location.href='/apps/humanx-belief-engine/'"), 'navBeliefEngine must navigate to /apps/humanx-belief-engine/');
+});
+
+// All 4 belief-engine navigation inline onclick patterns removed
+test('D-181D: onclick="location.href=\'/apps/humanx-belief-engine/\'" (escaped) removed from app-v10.js', () => {
+  assert.ok(!appSrc.includes("onclick=\"location.href=\\'/apps/humanx-belief-engine/\\'\""), 'escaped belief-engine navigation onclick must be gone — migrated in D-181D');
+});
+test('D-181D: onclick="location.href=\'/apps/humanx-belief-engine/\'" (unescaped) removed from app-v10.js', () => {
+  assert.ok(!appSrc.includes("onclick=\"location.href='/apps/humanx-belief-engine/'\""), 'belief-engine navigation onclick must be gone — migrated in D-181D');
+});
+test('D-181D: data-action="navBeliefEngine" present (4 instances) in app-v10.js', () => {
+  const count = (appSrc.match(/data-action="navBeliefEngine"/g) || []).length;
+  assert.equal(count, 4, `expected 4 data-action="navBeliefEngine" instances, found ${count}`);
+});
+
+// ID-interpolated handlers still present (Cat C not touched)
+test('D-181D: ID-interpolated handlers remain untouched (Cat C not migrated)', () => {
+  assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must remain — Cat C not migrated in D-181D');
+  assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem inline onclick must remain — Cat C not migrated in D-181D');
+  assert.ok(appSrc.includes("onclick=\"promoteBelief('"), 'promoteBelief inline onclick must remain — Cat C not migrated in D-181D');
+});
+
+// Review decision handlers still present (not touched)
+test('D-181D: review decision handlers remain untouched', () => {
+  assert.ok(appSrc.includes("onclick=\"requestRejectReview('"), 'requestRejectReview inline onclick must remain — review handlers not migrated in D-181D');
+  assert.ok(appSrc.includes("onclick=\"requestApproveReview('"), 'requestApproveReview inline onclick must remain — review handlers not migrated in D-181D');
+  assert.ok(appSrc.includes("onclick=\"reviewDecisionUI('"), 'reviewDecisionUI inline onclick must remain — review handlers not migrated in D-181D');
+});
+
+// D-181B/C dispatcher still intact
+test('D-181D: D-181B/C dispatcher maps still present', () => {
+  assert.ok(appSrc.includes('_D181B_ZERO_PARAM_ACTIONS'), 'D-181B zero-param map must still be present');
+  assert.ok(appSrc.includes('_D181C_PARAM_ACTIONS'), 'D-181C param-action map must still be present');
+  assert.ok(appSrc.includes('saveAdminTokenAndLoadReview'), 'D-181B entry saveAdminTokenAndLoadReview must remain');
+  assert.ok(appSrc.includes('setMode:b=>setMode(b.dataset.value)'), 'D-181C setMode entry must remain');
+});
+
+// CSP unchanged
+test('D-181D: CSP header unchanged in worker.js', () => {
+  assert.ok(workerSrc.includes("'unsafe-inline'") && workerSrc.includes('content-security-policy'), 'CSP must remain permissive — not tightened in D-181D');
+});
+
+// Belief engine not touched
+test('D-181D: belief engine index.html not modified (out of scope)', () => {
+  const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
+  assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181D');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
