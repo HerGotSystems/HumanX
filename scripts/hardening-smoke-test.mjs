@@ -6168,13 +6168,14 @@ test('D-137D/E: belief snapshots section renders', () => {
 test('D-137D: only public claim rows render an open-study button; non-public rows do not call selectClaim', () => {
   const idx = appSrc.indexOf('function meRecentClaimsHtml');
   const slice = appSrc.slice(idx, idx + 700);
-  assert.ok(
-    slice.includes('const isPublic=state===\'public\'') &&
-    slice.includes('${isPublic?`<button class="btn-mini" onclick="openMyClaimStudy('),
-    'meRecentClaimsHtml must only render the Open Study button for isPublic rows'
-  );
+  // D-181E migrated onclick="openMyClaimStudy(" to data-action="openMyClaimStudy"
+  const hasConditionalBtn =
+    slice.includes("const isPublic=state==='public'") &&
+    (slice.includes('${isPublic?`<button class="btn-mini" onclick="openMyClaimStudy(') ||
+     slice.includes('${isPublic?`<button class="btn-mini" data-action="openMyClaimStudy"'));
+  assert.ok(hasConditionalBtn, 'meRecentClaimsHtml must only render the Open Study button for isPublic rows');
   // openMyClaimStudy is the only path to selectClaim from this list — confirm it's conditional, not unconditional
-  const unconditionalSelectClaim = /<button[^>]*onclick="openMyClaimStudy\('\$\{esc\(c\.id\)\}'\)"[^>]*>Open Study/.test(slice) && !slice.includes('isPublic?');
+  const unconditionalSelectClaim = /<button[^>]*(?:onclick="openMyClaimStudy\(|data-action="openMyClaimStudy")[^>]*>Open Study/.test(slice) && !slice.includes('isPublic?');
   assert.ok(!unconditionalSelectClaim, 'the Open Study button must remain gated behind isPublic, never unconditional');
 });
 
@@ -6356,11 +6357,12 @@ test('D-137E: section order puts Belief Snapshots before Recent Truths/Evidence/
 test('D-137E: public claim open behavior preserved after scan-density polish', () => {
   const idx = appSrc.indexOf('function meRecentClaimsHtml');
   const slice = appSrc.slice(idx, idx + 800);
-  assert.ok(
+  // D-181E migrated onclick="openMyClaimStudy(" to data-action="openMyClaimStudy"
+  const hasConditionalBtn =
     slice.includes("const isPublic=state==='public'") &&
-    slice.includes('${isPublic?`<button class="btn-mini" onclick="openMyClaimStudy('),
-    'meRecentClaimsHtml must still gate Open Study behind isPublic after the D-137E rewrite'
-  );
+    (slice.includes('${isPublic?`<button class="btn-mini" onclick="openMyClaimStudy(') ||
+     slice.includes('${isPublic?`<button class="btn-mini" data-action="openMyClaimStudy"'));
+  assert.ok(hasConditionalBtn, 'meRecentClaimsHtml must still gate Open Study behind isPublic after the D-137E rewrite');
 });
 
 test('D-137E: non-public claim no-open behavior preserved after scan-density polish', () => {
@@ -7752,11 +7754,15 @@ test('D-142B: contradictionCount only — no contradiction text reaches the publ
 test('D-142B: Me snapshot rows show a share control, exclusive across rows, plus a "do not share" option', () => {
   const idx = appSrc.indexOf('function meBeliefSnapshotsHtml');
   const slice = appSrc.slice(idx, idx + 1200);
+  // D-181E migrated onclick="meShareSnapshotUI(" to data-action="meShareSnapshotUI"
+  const hasShareRow =
+    slice.includes("onclick=\"meShareSnapshotUI('${esc(s.id)}')\"") ||
+    slice.includes('data-action="meShareSnapshotUI" data-id="${esc(s.id)}"');
+  const hasNoneRow =
+    slice.includes('onclick="meShareSnapshotUI(null)"') ||
+    slice.includes('data-action="meShareSnapshotUI" data-id=""');
   assert.ok(
-    slice.includes('name="meSharedSnapshot"') &&
-    slice.includes("onclick=\"meShareSnapshotUI('${esc(s.id)}')\"") &&
-    slice.includes('onclick="meShareSnapshotUI(null)"') &&
-    slice.includes('Do not share a snapshot'),
+    slice.includes('name="meSharedSnapshot"') && hasShareRow && hasNoneRow && slice.includes('Do not share a snapshot'),
     'meBeliefSnapshotsHtml must render one radio per snapshot (same name= group for exclusivity) plus a "do not share" option'
   );
 });
@@ -12314,6 +12320,90 @@ test('D-181D: CSP header unchanged in worker.js', () => {
 test('D-181D: belief engine index.html not modified (out of scope)', () => {
   const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
   assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181D');
+});
+
+// ── D-181E: Cat C single-param ID-interpolated non-review handler migration ───
+
+console.log('\nD-181E: Cat C single-param ID-interpolated handlers');
+
+// _D181E_ID_ACTIONS dispatcher map present
+test('D-181E: _D181E_ID_ACTIONS dispatcher map present in app-v10.js', () => {
+  assert.ok(appSrc.includes('_D181E_ID_ACTIONS'), '_D181E_ID_ACTIONS map must be declared');
+  assert.ok(appSrc.includes('efn(btn)'), 'dispatcher must call D-181E handler with btn element');
+});
+
+// All 6 Cat C inline onclick patterns removed
+test('D-181E: onclick="meToggleExpand( removed from app-v10.js', () => {
+  assert.ok(!appSrc.includes('onclick="meToggleExpand('), 'meToggleExpand inline onclick must be gone — migrated in D-181E');
+});
+test('D-181E: onclick="openPublicProfileClaimStudy( removed from app-v10.js', () => {
+  assert.ok(!appSrc.includes('onclick="openPublicProfileClaimStudy('), 'openPublicProfileClaimStudy inline onclick must be gone — migrated in D-181E');
+});
+test('D-181E: onclick="openMyClaimStudy( removed from app-v10.js', () => {
+  assert.ok(!appSrc.includes('onclick="openMyClaimStudy('), 'openMyClaimStudy inline onclick must be gone — migrated in D-181E');
+});
+test('D-181E: onclick="meShareSnapshotUI( removed from app-v10.js', () => {
+  assert.ok(!appSrc.includes('onclick="meShareSnapshotUI('), 'meShareSnapshotUI inline onclick must be gone — migrated in D-181E');
+});
+test('D-181E: onclick="copyAdminInviteCode( removed from app-v10.js', () => {
+  assert.ok(!appSrc.includes('onclick="copyAdminInviteCode('), 'copyAdminInviteCode inline onclick must be gone — migrated in D-181E');
+});
+
+// New data-action hooks present
+test('D-181E: data-action="meToggleExpand" + data-key present in app-v10.js', () => {
+  assert.ok(appSrc.includes('data-action="meToggleExpand"'), 'data-action="meToggleExpand" must be present');
+  assert.ok(appSrc.includes('data-key="${key}"'), 'data-key="${key}" must be present for meToggleExpand');
+});
+test('D-181E: data-action="openPublicProfileClaimStudy" + data-id present', () => {
+  assert.ok(appSrc.includes('data-action="openPublicProfileClaimStudy"'), 'data-action="openPublicProfileClaimStudy" must be present');
+});
+test('D-181E: data-action="openMyClaimStudy" + data-id present', () => {
+  assert.ok(appSrc.includes('data-action="openMyClaimStudy"'), 'data-action="openMyClaimStudy" must be present');
+});
+test('D-181E: data-action="meShareSnapshotUI" present twice (share + none-row)', () => {
+  const count = (appSrc.match(/data-action="meShareSnapshotUI"/g) || []).length;
+  assert.equal(count, 2, `expected 2 data-action="meShareSnapshotUI" instances, found ${count}`);
+});
+test('D-181E: meShareSnapshotUI null-row uses data-id=""', () => {
+  assert.ok(appSrc.includes('data-action="meShareSnapshotUI" data-id=""'), 'null-row must use data-id="" for meShareSnapshotUI — dispatcher maps empty string to null');
+});
+test('D-181E: data-action="copyAdminInviteCode" + data-id present', () => {
+  assert.ok(appSrc.includes('data-action="copyAdminInviteCode"'), 'data-action="copyAdminInviteCode" must be present');
+});
+
+// Scope boundary — review, study, archive, promote handlers still inline
+test('D-181E: review decision handlers remain untouched', () => {
+  assert.ok(appSrc.includes("onclick=\"requestRejectReview('"), 'requestRejectReview inline onclick must remain — not migrated in D-181E');
+  assert.ok(appSrc.includes("onclick=\"requestApproveReview('"), 'requestApproveReview inline onclick must remain — not migrated in D-181E');
+  assert.ok(appSrc.includes("onclick=\"reviewDecisionUI('"), 'reviewDecisionUI inline onclick must remain — not migrated in D-181E');
+  assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem inline onclick must remain — not migrated in D-181E');
+});
+test('D-181E: selectClaim, studyFromVault, attachEvidencePrompt remain inline', () => {
+  assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must remain — not migrated in D-181E');
+  assert.ok(appSrc.includes("onclick=\"studyFromVault('"), 'studyFromVault inline onclick must remain — not migrated in D-181E');
+  assert.ok(appSrc.includes("onclick=\"attachEvidencePrompt('"), 'attachEvidencePrompt inline onclick must remain — not migrated in D-181E');
+});
+test('D-181E: meArchiveItemUI and promoteBelief remain inline', () => {
+  assert.ok(appSrc.includes("onclick=\"meArchiveItemUI('"), 'meArchiveItemUI inline onclick must remain — not migrated in D-181E');
+  assert.ok(appSrc.includes("onclick=\"promoteBelief('"), 'promoteBelief inline onclick must remain — not migrated in D-181E');
+});
+
+// D-181B/C/D dispatcher still intact
+test('D-181E: D-181B/C/D dispatcher maps still present', () => {
+  assert.ok(appSrc.includes('_D181B_ZERO_PARAM_ACTIONS'), 'D-181B zero-param map must still be present');
+  assert.ok(appSrc.includes('_D181C_PARAM_ACTIONS'), 'D-181C param-action map must still be present');
+  assert.ok(appSrc.includes('navBeliefEngine'), 'D-181D navBeliefEngine must still be present');
+});
+
+// CSP unchanged
+test('D-181E: CSP header unchanged in worker.js', () => {
+  assert.ok(workerSrc.includes("'unsafe-inline'") && workerSrc.includes('content-security-policy'), 'CSP must remain permissive — not tightened in D-181E');
+});
+
+// Belief engine not touched
+test('D-181E: belief engine index.html not modified (out of scope)', () => {
+  const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
+  assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181E');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
