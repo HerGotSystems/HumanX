@@ -7793,24 +7793,26 @@ test('D-142B: Me share control calls POST /api/my-humanx/profile-settings with t
   );
 });
 
-test('D-142B: Me preview shows the selected snapshot using only safe summary fields', () => {
+test('D-142B→D-209B: Me preview shows the selected snapshot using only Class-1 safe fields (D-209B removed topAlignmentName/scores)', () => {
   const idx = appSrc.indexOf('function meSharedSnapshotSummary');
-  const slice = appSrc.slice(idx, idx + 700);
+  const slice = appSrc.slice(idx, idx + 400);
   assert.ok(
     slice.includes("rows.find(s=>!!s.public_summary_enabled)") &&
-    slice.includes('topAlignmentName') &&
-    !slice.includes('dimensions_json') && !slice.includes('raw_json') && !slice.includes('stress_points_json'),
-    'meSharedSnapshotSummary must find the shared snapshot and extract only the safe summary fields, never raw/dimension/stress data'
+    slice.includes('contradictionCount') &&
+    slice.includes('createdAt') &&
+    !slice.includes('dimensions_json') && !slice.includes('raw_json') && !slice.includes('stress_points_json') &&
+    !slice.includes('topAlignmentName') && !slice.includes('top_beliefs_json') && !slice.includes('dominant_pattern'),
+    'meSharedSnapshotSummary must find the shared snapshot and return only label/contradictionCount/createdAt (D-209B Class-1 fields only)'
   );
 });
 
-test('D-142B: Me preview required wording exists ("one snapshot, shared by choice" + guardrail disclaimer)', () => {
+test('D-142B→D-209B: Me preview required wording exists (guardrail disclaimers; D-209B aligned with actual public render)', () => {
   const idx = appSrc.indexOf('function meSharedSnapshotCardHtml');
-  const slice = appSrc.slice(idx, idx + 400);
+  const slice = appSrc.slice(idx, idx + 700);
   assert.ok(
-    slice.includes('One snapshot, shared by choice — not your complete profile.') &&
-    slice.includes('Pattern observations from your own answers, not a diagnosis or personality test.'),
-    'meSharedSnapshotCardHtml must render both required disclaimer lines exactly'
+    slice.includes('not a diagnosis or personality test') &&
+    slice.includes('Belief identity details are private by default'),
+    'meSharedSnapshotCardHtml must render disclaimer lines including identity-private guardrail (D-209B alignment)'
   );
 });
 
@@ -7924,19 +7926,19 @@ test('D-142C: radio semantics preserved — exactly one shared name= group, no d
   assert.ok(!/name="meSharedSnapshot\d/.test(slice), 'no per-row-unique radio group names should exist — that would break mutual exclusivity');
 });
 
-test('D-142C: Profile Settings preview shows the selected snapshot summary when one is selected', () => {
+test('D-142C→D-209B: Profile Settings preview shows the selected snapshot summary when one is selected', () => {
   const idx = appSrc.indexOf('function meSharedSnapshotPreviewBlockHtml');
-  const slice = appSrc.slice(idx, idx + 400);
+  const slice = appSrc.slice(idx, idx + 800);
   assert.ok(
-    slice.includes('const s=meSharedSnapshotSummary();') &&
+    slice.includes('meSharedSnapshotSummary()') &&
     slice.includes('meSharedSnapshotCardHtml(s)'),
-    'meSharedSnapshotPreviewBlockHtml must render meSharedSnapshotCardHtml(s) when a snapshot is selected'
+    'meSharedSnapshotPreviewBlockHtml must render meSharedSnapshotCardHtml(s) when a snapshot is selected (D-209B: preview now matches actual public render)'
   );
 });
 
-test('D-142C: Profile Settings preview shows "No belief snapshot will appear publicly." when none is selected', () => {
+test('D-142C→D-209B: Profile Settings preview shows "No belief snapshot will appear publicly." when none is selected', () => {
   const idx = appSrc.indexOf('function meSharedSnapshotPreviewBlockHtml');
-  const slice = appSrc.slice(idx, idx + 400);
+  const slice = appSrc.slice(idx, idx + 500);
   assert.ok(
     slice.includes('No belief snapshot will appear publicly.') &&
     slice.includes('if(!s)return'),
@@ -8015,19 +8017,11 @@ test('D-142C: no raw_json/stress_points_json/dimensions_json/contradictions_json
   }
 });
 
-test('D-142C: only meSharedSnapshotSummary reads top_beliefs_json, and only to extract a single name — the other UI functions never reference it', () => {
-  const summaryIdx = appSrc.indexOf('function meSharedSnapshotSummary');
-  const summarySlice = appSrc.slice(summaryIdx, summaryIdx + 700);
-  assert.ok(
-    summarySlice.includes('shared.top_beliefs_json') &&
-    summarySlice.includes('topBeliefs[0]&&topBeliefs[0].name') &&
-    !summarySlice.includes('topBeliefs,') && !summarySlice.includes('topBeliefs:'),
-    'meSharedSnapshotSummary must parse top_beliefs_json only to extract the first entry\'s name, never pass the array through'
-  );
-  for (const fn of ['meSharedSnapshotCardHtml', 'meSharedSnapshotPreviewBlockHtml', 'renderPublicProfileSnapshotHtml']) {
+test('D-142C→D-209B: no snapshot UI function ever references top_beliefs_json (D-209B removed extraction from meSharedSnapshotSummary)', () => {
+  for (const fn of ['meSharedSnapshotSummary', 'meSharedSnapshotCardHtml', 'meSharedSnapshotPreviewBlockHtml', 'renderPublicProfileSnapshotHtml']) {
     const idx = appSrc.indexOf(`function ${fn}`);
     const slice = appSrc.slice(idx, idx + 1200);
-    assert.ok(!slice.includes('top_beliefs_json'), `${fn} must never reference top_beliefs_json directly — it only receives the already-extracted topAlignmentName`);
+    assert.ok(!slice.includes('top_beliefs_json'), `${fn} must never reference top_beliefs_json — removed from summary in D-209B`);
   }
 });
 
@@ -8040,11 +8034,12 @@ test('D-142C: no comments/likes/follows/social UI added', () => {
   }
 });
 
-test('D-142C: forbidden wording absent outside the approved guardrail disclaimers (diagnosis/personality type/you are/proven/good belief/bad belief/complete profile claim)', () => {
+test('D-142C→D-209B: forbidden wording absent outside the approved guardrail disclaimers (diagnosis/personality type/you are/proven/good belief/bad belief)', () => {
   const fns = ['meSharedSnapshotCardHtml', 'renderPublicProfileSnapshotHtml'];
   const approved = [
-    'Pattern observations from your own answers, not a diagnosis or personality test.',
+    'not a diagnosis or personality test.',
     'A snapshot this person chose to share — pattern observations from their own self-submitted answers, not a diagnosis or personality test.',
+    'A snapshot you chose to share — pattern observations from your own self-submitted answers, not a diagnosis or personality test.',
   ];
   for (const fn of fns) {
     const idx = appSrc.indexOf(`function ${fn}`);
@@ -14419,6 +14414,109 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
 
   test('D-208D: no new migration file added', () => {
     assert.ok(!existsSync(path.join(__dirname, '../migrations/0006_belief_public_fields.sql')), 'D-208D must not add migration files');
+  });
+}
+
+{
+  const src = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+
+  // ── meSharedSnapshotCardHtml identity/score exclusions ────────────────────
+  const cardIdx = src.indexOf('function meSharedSnapshotCardHtml(');
+  const cardSlice = src.slice(cardIdx, cardIdx + 1200);
+
+  test('D-209B: meSharedSnapshotCardHtml does not render dominantPattern', () => {
+    assert.ok(!cardSlice.includes('dominantPattern') && !cardSlice.includes('dominant_pattern'), 'Owner preview card must not render dominantPattern');
+  });
+
+  test('D-209B: meSharedSnapshotCardHtml does not render topAlignmentName', () => {
+    assert.ok(!cardSlice.includes('topAlignmentName') && !cardSlice.includes('Top alignment'), 'Owner preview card must not render topAlignmentName');
+  });
+
+  test('D-209B: meSharedSnapshotCardHtml does not render score meters', () => {
+    assert.ok(!cardSlice.includes('stabilityScore') && !cardSlice.includes('opennessScore') && !cardSlice.includes('pressureScore'), 'Owner preview card must not render score meters');
+  });
+
+  test('D-209B: meSharedSnapshotCardHtml does not render "Self-reported dominant pattern" label', () => {
+    assert.ok(!cardSlice.includes('Self-reported dominant pattern'), 'Owner preview card must not include pattern label heading');
+  });
+
+  test('D-209B: meSharedSnapshotCardHtml renders tension count', () => {
+    assert.ok(cardSlice.includes('contradictionCount') && cardSlice.includes('tension'), 'Owner preview card must render tension count');
+  });
+
+  test('D-209B: meSharedSnapshotCardHtml renders created date', () => {
+    assert.ok(cardSlice.includes('createdAt') && cardSlice.includes('toLocaleDateString'), 'Owner preview card must render snapshot date');
+  });
+
+  test('D-209B: meSharedSnapshotCardHtml includes guardrail "not a score of intelligence, morality, or truth"', () => {
+    assert.ok(cardSlice.includes('not a score of intelligence, morality, or truth'), 'Owner preview card must include intelligence/morality/truth guardrail');
+  });
+
+  test('D-209B: meSharedSnapshotCardHtml includes "Belief identity details are private by default"', () => {
+    assert.ok(cardSlice.includes('Belief identity details are private by default'), 'Owner preview card must state identity details are private');
+  });
+
+  // ── meSharedSnapshotSummary field exclusions ──────────────────────────────
+  const summaryIdx = src.indexOf('function meSharedSnapshotSummary(');
+  const summarySlice = src.slice(summaryIdx, summaryIdx + 600);
+
+  test('D-209B: meSharedSnapshotSummary does not extract dominantPattern', () => {
+    assert.ok(!summarySlice.includes('dominant_pattern') && !summarySlice.includes('dominantPattern'), 'Summary must not extract dominantPattern');
+  });
+
+  test('D-209B: meSharedSnapshotSummary does not extract topAlignmentName', () => {
+    assert.ok(!summarySlice.includes('topAlignmentName') && !summarySlice.includes('top_beliefs_json'), 'Summary must not extract topAlignmentName');
+  });
+
+  test('D-209B: meSharedSnapshotSummary does not extract score fields', () => {
+    assert.ok(!summarySlice.includes('stability_score') && !summarySlice.includes('openness_score') && !summarySlice.includes('pressure_score'), 'Summary must not extract score fields');
+  });
+
+  // ── Sharing helper copy ───────────────────────────────────────────────────
+  test('D-209B: sharing helper says only label/tension/date are shared', () => {
+    assert.ok(src.includes('Shared snapshots show only your chosen label, tension count, and date'), 'Sharing helper must state what is shared');
+  });
+
+  test('D-209B: sharing helper says alignment details stay private', () => {
+    assert.ok(src.includes('Belief alignment details, pattern labels, and reflection cards stay private'), 'Sharing helper must state what stays private');
+  });
+
+  test('D-209B: sharing helper mentions per-field consent future model', () => {
+    assert.ok(src.includes('future per-field consent model'), 'Sharing helper must reference future consent model');
+  });
+
+  test('D-209B: preview label says "this is exactly what others will see"', () => {
+    assert.ok(src.includes('this is exactly what others will see'), 'Preview block must include accuracy label');
+  });
+
+  // ── Public profile API / render regressions ───────────────────────────────
+  test('D-209B: getPublicProfile still does not select top_beliefs_json', () => {
+    const ppIdx = workerSrc.indexOf('getPublicProfile');
+    const ppSlice = workerSrc.slice(ppIdx, ppIdx + 3000);
+    assert.ok(!ppSlice.includes("top_beliefs_json || '[]'") && !ppSlice.includes('SELECT label, dominant_pattern'), 'Public profile must not select top_beliefs_json or dominant_pattern');
+  });
+
+  test('D-209B: renderPublicProfileSnapshotHtml does not render dominantPattern', () => {
+    const ppIdx = src.indexOf('function renderPublicProfileSnapshotHtml(');
+    const ppSlice = src.slice(ppIdx, ppIdx + 800);
+    assert.ok(!ppSlice.includes('dominantPattern') && !ppSlice.includes('dominant_pattern'), 'Public profile card must not render dominantPattern');
+  });
+
+  test('D-209B: renderPublicProfileSnapshotHtml does not render topAlignmentName', () => {
+    const ppIdx = src.indexOf('function renderPublicProfileSnapshotHtml(');
+    const ppSlice = src.slice(ppIdx, ppIdx + 800);
+    assert.ok(!ppSlice.includes('topAlignmentName') && !ppSlice.includes('Top alignment'), 'Public profile card must not render topAlignmentName');
+  });
+
+  test('D-209B: public profile render does not include meBeliefReflectionHtml', () => {
+    const ppIdx = src.indexOf('function renderPublicProfileHtml(');
+    const ppSlice = src.slice(ppIdx, ppIdx + 3000);
+    assert.ok(!ppSlice.includes('meBeliefReflectionHtml'), 'Belief reflection panel must not appear in public profile render');
+  });
+
+  test('D-209B: no new migration file added', () => {
+    assert.ok(!existsSync(path.join(__dirname, '../migrations/0006_belief_public_fields.sql')), 'D-209B must not add migration files');
   });
 }
 
