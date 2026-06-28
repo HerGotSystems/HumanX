@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D209D_BELIEF_PER_FIELD_CONSENT_SPEC.md` ⭐ CURRENT — D-209D PER-FIELD BELIEF CONSENT SPEC
+### `D209E_VISIBILITY_JSON_CLOSEOUT.md` ⭐ CURRENT — D-209E VISIBILITY_JSON MIGRATION CLOSEOUT
+
+D-209E arc closeout (D + E + E1 + E2). Migration 0016 applied: ALTER TABLE belief_snapshots ADD COLUMN visibility_json TEXT (additive, null=all-private). Backend scaffold: parseBeliefVisibility() + beliefVisibilityAllows() live; getPublicProfile parses visibility_json but holds result as _visibility (scaffold only — no new public fields). D-209E1: stabilityScore/opennessScore/pressureScore removed from public sharedSnapshot SELECT and response object (Class-3 sensitive inference requires explicit consent). Public sharedSnapshot now: label + contradictionCount + createdAt only. Deployed version 1f1be492-efd0-4a1c-a778-1285c5e5b8f9. Live sanity PASS. 22 D-209E + 12 D-209E1 smoke tests. Baseline 1839/24/57. Next: D-209F backend consent gate wiring, D-209G owner toggle UI — no public belief expansion before both are live.
+
+### `D209D_BELIEF_PER_FIELD_CONSENT_SPEC.md` — D-209D PER-FIELD BELIEF CONSENT SPEC
 
 Spec only — no code. Defines the full per-field consent model for belief data sharing. Six field groups: (1) basic_snapshot [default on — label/date/tension count], (2) pattern_summary [default off — dominant_pattern renamed patternLabel], (3) alignment_labels [default off — highest risk — named religion/ideology; requires separate acknowledgment; top_beliefs_json never returned raw], (4) scores [default off — stability/openness/pressure], (5) reflection_habits [default off — private-only, excluded from this arc], (6) drift_history [default off — private-only, excluded from this arc]. visibility_json shape defined. API response rules: whitelist per group, no raw blobs, scores omitted from wire when not consented. Warning copy drafted for each group. Implementation sequence: D-209E migration (ALTER TABLE belief_snapshots ADD COLUMN visibility_json TEXT), D-209F backend gating, D-209G toggle UI. What NOT to implement: avatar, ideology badge, religion card by default, share-all button, public ranking, truth level. Highest risk group: alignment_labels. Baseline 1805/24/57.
 
