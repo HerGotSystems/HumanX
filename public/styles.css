@@ -62,8 +62,9 @@
 @media(max-width:600px){.cc-title{font-size:34px}.cc-step-arrow{display:none}.cc-step{flex:0 0 calc(50% - 3px)}.cc-card-grid{grid-template-columns:1fr 1fr}.cc-stat-grid{grid-template-columns:1fr 1fr}.cc-card-when{display:none}}
 @media(max-width:400px){.cc-card-grid{grid-template-columns:1fr}.cc-step{flex:0 0 100%}}
 /* Claim card readability */
-.claim-card{border-left:3px solid var(--line)}
+.claim-card{border-left:3px solid var(--line);cursor:pointer}
 .claim-card:hover{border-left-color:var(--blue)}
+.claim-card:focus{outline:2px solid var(--blue);outline-offset:2px}
 .claim-card-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
 .claim-cat{font-size:8px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:2px 6px;border:1px solid var(--line);border-radius:4px}
 .claim-title{font-size:14px;line-height:1.4;margin:2px 0 4px;font-weight:600;color:var(--text)}
