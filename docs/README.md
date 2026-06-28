@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D197B_DRY_RUN_RESULT_TEMPLATE.md` ⭐ CURRENT — D-197B DRY-RUN RESULT TEMPLATE + FIX INTAKE
+### `D198A_OWNER_DRY_RUN_COMMAND_PACK.md` ⭐ CURRENT — D-198A OWNER DRY-RUN COMMAND PACK
+
+Single-page copy-paste pack for running the Batch 0 dry run without opening other docs. Exact PowerShell commands (git pull, preflight, optional smoke test, optional deploy), 14-item browser checklist shorthand, fill-in result block, PASS/CONDITIONAL PASS/FAIL decision table. Baseline: 1589/24/57.
+
+### `D197B_DRY_RUN_RESULT_TEMPLATE.md` — D-197B DRY-RUN RESULT TEMPLATE + FIX INTAKE
 
 Fill-in template for immediately after the D-197A dry run. Metadata block, 15-step result table, per-issue intake format (ID/summary/repro/expected/actual/severity/fix/target patch), triage rules (P0/P1 block Batch 1; P2 proceed with disclosure; P3 backlog), patch naming convention (D-197C/D/E), PASS/CONDITIONAL PASS/FAIL decision section, copy-paste summary block. Baseline: 1589/24/57.
 
