@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D187_DIRECT_CLAIM_URL_CLOSEOUT.md` ⭐ CURRENT — D-187 DIRECT CLAIM URL CLOSEOUT
+### `D188A_CLAIM_SHARING_UI_AUDIT.md` ⭐ CURRENT — D-188A CLAIM SHARING UI AUDIT
+
+Source-code audit of all claim sharing/copy surfaces. No copy-link UI exists anywhere today. Recommends Study view as P1 (one function, one button, lowest risk), Me claims + public profile claims as P2, Arena cards deferred. Full D-188B scope included. No code changes. Baseline: 1537/24/57.
+
+### `D187_DIRECT_CLAIM_URL_CLOSEOUT.md` — D-187 DIRECT CLAIM URL CLOSEOUT
 
 Two-patch series (D-187A audit + D-187B implementation). `/c/:id` routes now intercepted by Worker: server-rendered OG shell (claim title, description, og-default.png) for public claims; generic noindex shell for missing/private. SPA auto-opens Study mode via `selectClaim(id)` on boot. Live verified 2026-06-28. Baseline: 1537/24/57.
 
