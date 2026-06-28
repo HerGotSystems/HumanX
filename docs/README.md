@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D199C_OWNER_DRY_RUN_CLOSEOUT.md` ⭐ CURRENT — D-199C DRY-RUN CLOSEOUT + BATCH 1 GO
+### `D200A_SOLO_PREVIEW_MODE_PLAN.md` ⭐ CURRENT — D-200A SOLO PREVIEW MODE PLAN
+
+No external testers yet. Owner runs 5 personas (anonymous, verified, mobile, skeptical submitter, moderator) to surface friction before recruiting anyone. Includes test loops, anti-fake-confidence rules, debrief template, and post-preview decision criteria. Baseline: 1589/24/57.
+
+### `D199C_OWNER_DRY_RUN_CLOSEOUT.md` — D-199C DRY-RUN CLOSEOUT + BATCH 1 GO
 
 Dry-run PASS. D-199B a11y polish applied. Final status: ready for Batch 1 (3–5 trusted users, not public). Pre-send checklist, monitoring plan, stop conditions, next actions. Baseline: 1589/24/57.
 
