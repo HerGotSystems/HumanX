@@ -707,6 +707,15 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .me-refl-count{flex:0 0 20px;font-size:11px;color:var(--muted);text-align:right}
 .me-refl-note{margin:0 0 4px;font-style:italic}
 .me-refl-private{margin:6px 0 0;font-style:italic;color:var(--muted)}
+.me-belief-visibility-block{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.me-belief-visibility-title{margin:0 0 6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.me-belief-visibility-row{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);margin:0 0 6px;cursor:pointer}
+.me-belief-visibility-row input{width:auto;margin:0}
+.me-belief-visibility-warn{margin:0 0 4px;font-style:italic;color:var(--muted)}
+.me-belief-visibility-actions{margin-top:8px}
+.me-belief-preview-note{font-size:11px;color:var(--muted);font-style:normal}
+.pp-snapshot-scores{margin-top:10px;padding-top:8px;border-top:1px solid rgba(87,184,255,.18)}
+.pp-snapshot-scores-label{margin:0 0 2px;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.04em}
 .me-profile-settings label{display:block;font-size:11px;color:var(--muted);margin:8px 0 3px}
 .me-profile-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);margin-top:4px}
 .me-profile-toggle input{width:auto}

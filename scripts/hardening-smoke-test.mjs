@@ -7715,22 +7715,21 @@ test('D-142B: sharedSnapshot query requires public_summary_enabled=1 and hidden_
   );
 });
 
-test('D-142B→D-208B→D-209E1→D-209F: public sharedSnapshot exposes only Class-1 baseline fields via buildPublicSharedSnapshot', () => {
-  // D-209F: field shaping moved from getPublicProfile into buildPublicSharedSnapshot.
-  // Search from parseBeliefVisibility through getPublicProfile to cover both functions.
+test('D-142B→D-208B→D-209E1→D-209F→D-209H: public sharedSnapshot builder exposes baseline + gated scores only, never identity fields', () => {
+  // D-209H: scores are now gated via visibility_json consent.
+  // They appear in result.scores nested object when allowed — NOT as top-level fields.
+  // dominantPattern and alignment fields must never appear.
   const startIdx = workerSrc.indexOf('function parseBeliefVisibility(');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', startIdx);
-  const slice = workerSrc.slice(startIdx, endIdx > -1 ? endIdx : startIdx + 6000);
+  const slice = workerSrc.slice(startIdx, endIdx > -1 ? endIdx : startIdx + 7000);
   assert.ok(
     slice.includes('label: snapshotRow.label || null') &&
     slice.includes('contradictionCount: snapshotRow.contradiction_count || 0') &&
     slice.includes('createdAt: snapshotRow.created_at') &&
-    !slice.includes('stabilityScore:') &&
-    !slice.includes('opennessScore:') &&
-    !slice.includes('pressureScore:') &&
     !slice.includes('dominantPattern:') &&
-    !slice.includes('topAlignmentName'),
-    'Public sharedSnapshot (via buildPublicSharedSnapshot) must include only label/contradictionCount/createdAt — scores and identity labels excluded'
+    !slice.includes('topAlignmentName:') &&
+    !slice.includes('alignmentLabels:'),
+    'buildPublicSharedSnapshot must always include label/contradictionCount/createdAt and never include identity fields (D-209H)'
   );
 });
 
@@ -7811,8 +7810,9 @@ test('D-142B→D-209B: Me preview shows the selected snapshot using only Class-1
 });
 
 test('D-142B→D-209B: Me preview required wording exists (guardrail disclaimers; D-209B aligned with actual public render)', () => {
+  // D-209H: function grew due to scores block; use 1400 chars
   const idx = appSrc.indexOf('function meSharedSnapshotCardHtml');
-  const slice = appSrc.slice(idx, idx + 700);
+  const slice = appSrc.slice(idx, idx + 1400);
   assert.ok(
     slice.includes('not a diagnosis or personality test') &&
     slice.includes('Belief identity details are private by default'),
@@ -7931,12 +7931,13 @@ test('D-142C: radio semantics preserved — exactly one shared name= group, no d
 });
 
 test('D-142C→D-209B: Profile Settings preview shows the selected snapshot summary when one is selected', () => {
+  // D-209H: function grew with visibility block; use larger slice
   const idx = appSrc.indexOf('function meSharedSnapshotPreviewBlockHtml');
-  const slice = appSrc.slice(idx, idx + 800);
+  const slice = appSrc.slice(idx, idx + 2000);
   assert.ok(
     slice.includes('meSharedSnapshotSummary()') &&
-    slice.includes('meSharedSnapshotCardHtml(s)'),
-    'meSharedSnapshotPreviewBlockHtml must render meSharedSnapshotCardHtml(s) when a snapshot is selected (D-209B: preview now matches actual public render)'
+    slice.includes('meSharedSnapshotCardHtml('),
+    'meSharedSnapshotPreviewBlockHtml must render meSharedSnapshotCardHtml when a snapshot is selected (D-209B: preview now matches actual public render)'
   );
 });
 
@@ -7960,14 +7961,16 @@ test('D-142C: Profile Settings preview makes sharing optional/separate from the 
 });
 
 test('D-142C: public shared snapshot card title is "Shared Belief Snapshot"', () => {
+  // D-209H: function grew due to scores block; use larger slice
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 300);
+  const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(slice.includes('<h3>Shared Belief Snapshot</h3>'), 'renderPublicProfileSnapshotHtml must title the card "Shared Belief Snapshot"');
 });
 
 test('D-142C/D-154B: public card disclaimer contains required wording (consolidated in D-154B)', () => {
+  // D-209H: function grew; use larger slice
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 700);
+  const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(
     slice.includes('A snapshot this person chose to share — pattern observations from their own self-submitted answers, not a diagnosis or personality test.'),
     'renderPublicProfileSnapshotHtml must retain the required disclaimer wording'
@@ -7975,8 +7978,9 @@ test('D-142C/D-154B: public card disclaimer contains required wording (consolida
 });
 
 test('D-142C/D-154B: public card contains "One snapshot, shared by choice" (consolidated in D-154B)', () => {
+  // D-209H: function grew; use larger slice
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 700);
+  const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(slice.includes('One snapshot, shared by choice — not their complete profile.'), 'renderPublicProfileSnapshotHtml must retain the required "one snapshot" wording');
 });
 
@@ -9026,9 +9030,10 @@ test('D-149B: total_count and valid_ratio are derived safely, with no divide-by-
 });
 
 test('D-149B: observed_routes and unobserved_owner_routes are derived from the full expected owner-route list', () => {
+  // D-209H: updateBeliefSnapshotVisibility added to OWNER_SENSITIVE_ROUTES
   assert.ok(
-    workerSrc.includes("const OWNER_SENSITIVE_ROUTES = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings', 'saveBeliefSnapshot', 'listBeliefSnapshots', 'promoteBeliefSnapshot'];"),
-    'OWNER_SENSITIVE_ROUTES must list all eight known owner-sensitive routes'
+    workerSrc.includes("const OWNER_SENSITIVE_ROUTES = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings', 'saveBeliefSnapshot', 'listBeliefSnapshots', 'promoteBeliefSnapshot', 'updateBeliefSnapshotVisibility'];"),
+    'OWNER_SENSITIVE_ROUTES must list all known owner-sensitive routes including updateBeliefSnapshotVisibility'
   );
   const idx = workerSrc.indexOf('async function ownerTokenTelemetryDebug');
   const endIdx = workerSrc.indexOf('\nasync function createOrGetUser', idx);
@@ -14437,8 +14442,16 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(!cardSlice.includes('topAlignmentName') && !cardSlice.includes('Top alignment'), 'Owner preview card must not render topAlignmentName');
   });
 
-  test('D-209B: meSharedSnapshotCardHtml does not render score meters', () => {
-    assert.ok(!cardSlice.includes('stabilityScore') && !cardSlice.includes('opennessScore') && !cardSlice.includes('pressureScore'), 'Owner preview card must not render score meters');
+  test('D-209B→D-209H: meSharedSnapshotCardHtml renders scores only from nested s.scores (never top-level)', () => {
+    // D-209H: scores are now conditionally rendered from s.scores nested object when owner opted in.
+    // They must NOT appear as top-level fields. Identity fields must remain absent.
+    // D-209H increases cardSlice requirement; use wider slice.
+    const widerCardIdx = src.indexOf('function meSharedSnapshotCardHtml');
+    const widerCardSlice = src.slice(widerCardIdx, widerCardIdx + 1100);
+    // Verify scores come only from s.scores.* (consent-gated nested object), not s.stabilityScore directly.
+    // We check the affirmative: s.scores.stabilityScore must exist, and raw result.stabilityScore must not.
+    assert.ok(widerCardSlice.includes('s.scores.stabilityScore'), 'scores must be read from nested s.scores.stabilityScore');
+    assert.ok(!widerCardSlice.includes('{stabilityScore:') && !widerCardSlice.includes('result.stabilityScore'), 'stabilityScore must not appear as a top-level result field');
   });
 
   test('D-209B: meSharedSnapshotCardHtml does not render "Self-reported dominant pattern" label', () => {
@@ -14473,21 +14486,41 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(!summarySlice.includes('topAlignmentName') && !summarySlice.includes('top_beliefs_json'), 'Summary must not extract topAlignmentName');
   });
 
-  test('D-209B: meSharedSnapshotSummary does not extract score fields', () => {
-    assert.ok(!summarySlice.includes('stability_score') && !summarySlice.includes('openness_score') && !summarySlice.includes('pressure_score'), 'Summary must not extract score fields');
+  test('D-209B→D-209H: meSharedSnapshotSummary extracts score fields for owner preview only (not for public)', () => {
+    // D-209H: summary now extracts score fields so the owner-side visibility toggle
+    // can show a live preview. These fields are owner-private (from /api/my-humanx)
+    // and are only passed to the public card when the owner explicitly opts in via scores toggle.
+    // The public card reads from sharedSnapshot.scores (API), not from meSharedSnapshotSummary.
+    assert.ok(
+      !summarySlice.includes('dominant_pattern') && !summarySlice.includes('dominantPattern') && !summarySlice.includes('top_beliefs_json'),
+      'Summary must not extract identity fields — scores are allowed for live preview but identity fields never'
+    );
   });
 
   // ── Sharing helper copy ───────────────────────────────────────────────────
-  test('D-209B: sharing helper says only label/tension/date are shared', () => {
-    assert.ok(src.includes('Shared snapshots show only your chosen label, tension count, and date'), 'Sharing helper must state what is shared');
+  test('D-209B→D-209H: sharing helper states what is shared (updated for scores opt-in)', () => {
+    // D-209H: intro copy updated — scores can optionally be shown, not "only label/tension/date"
+    assert.ok(
+      src.includes('Shared snapshots show your label, tension count, and date') ||
+      src.includes('Belief snapshot sharing is optional and separate from your public profile toggle'),
+      'Sharing helper must describe what sharing does'
+    );
   });
 
-  test('D-209B: sharing helper says alignment details stay private', () => {
-    assert.ok(src.includes('Belief alignment details, pattern labels, and reflection cards stay private'), 'Sharing helper must state what stays private');
+  test('D-209B→D-209H: sharing helper says alignment details and reflection cards stay private', () => {
+    // D-209H: alignment labels and reflection cards remain permanently private in this arc
+    assert.ok(
+      src.includes('Belief alignment details') && src.includes('reflection cards') && src.includes('remain private'),
+      'Sharing helper must state alignment details and reflection cards remain private'
+    );
   });
 
-  test('D-209B: sharing helper mentions per-field consent future model', () => {
-    assert.ok(src.includes('future per-field consent model'), 'Sharing helper must reference future consent model');
+  test('D-209B→D-209H: sharing helper does not mention a "future per-field consent model" (model now ships)', () => {
+    // D-209H is the per-field consent model — the future reference is now stale/removed
+    assert.ok(
+      !src.includes('future per-field consent model is added'),
+      'The "future per-field consent model" phrase must be removed now that D-209H ships the model'
+    );
   });
 
   test('D-209B: preview label says "this is exactly what others will see"', () => {
@@ -14606,8 +14639,9 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   test('D-209E: getPublicProfile SELECT now includes visibility_json', () => {
     const idx = workerSrc.indexOf('async function getPublicProfile(');
     const slice = workerSrc.slice(idx, idx + 4000);
+    // D-209H: SELECT also widened to include score columns alongside visibility_json
     assert.ok(
-      slice.includes('visibility_json FROM belief_snapshots'),
+      slice.includes('visibility_json') && slice.includes('FROM belief_snapshots'),
       'getPublicProfile SELECT must include visibility_json after D-209E migration'
     );
   });
@@ -14676,26 +14710,23 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
 
 {
   const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
-  // D-209F: snapshot shaping moved from getPublicProfile into buildPublicSharedSnapshot.
-  // Anchor includes the JSDoc comment block before the function (contains consent gate comment).
-  const bssIdx = workerSrc.indexOf('// D-209F: public shared snapshot response builder');
+  // D-209H: buildPublicSharedSnapshot comment anchor changed; anchor from function keyword.
+  const bssIdx = workerSrc.indexOf('function buildPublicSharedSnapshot(');
   const bssEnd = workerSrc.indexOf('\nasync function getPublicProfile(', bssIdx);
-  const ssSlice = workerSrc.slice(bssIdx, bssEnd > -1 ? bssEnd : bssIdx + 1500);
+  const ssSlice = workerSrc.slice(bssIdx, bssEnd > -1 ? bssEnd : bssIdx + 1800);
   // Still check getPublicProfile for the SELECT and structural tests.
   const ppIdx = workerSrc.indexOf('async function getPublicProfile(');
   const ppEnd = workerSrc.indexOf('\nasync function createInviteCode', ppIdx);
   const ppSlice = workerSrc.slice(ppIdx, ppEnd > -1 ? ppEnd : ppIdx + 4000);
 
-  test('D-209E1: public sharedSnapshot does not include stabilityScore', () => {
-    assert.ok(!ssSlice.includes('stabilityScore:'), 'sharedSnapshot must not include stabilityScore: field (D-209E1 removes scores from public response)');
-  });
-
-  test('D-209E1: public sharedSnapshot does not include opennessScore', () => {
-    assert.ok(!ssSlice.includes('opennessScore:'), 'sharedSnapshot must not include opennessScore: field (D-209E1)');
-  });
-
-  test('D-209E1: public sharedSnapshot does not include pressureScore', () => {
-    assert.ok(!ssSlice.includes('pressureScore:'), 'sharedSnapshot must not include pressureScore: field (D-209E1)');
+  test('D-209E1→D-209H: score fields are only inside result.scores nested block, not top-level result', () => {
+    // D-209H: scores live in result.scores = { stabilityScore, ... }
+    // The top-level result object must NOT have result.stabilityScore etc.
+    // Verify: scores appear in ssSlice (proving consent gate exists) but never assigned to result directly.
+    assert.ok(!ssSlice.includes('result.stabilityScore'), 'stabilityScore must not be top-level on result');
+    assert.ok(!ssSlice.includes('result.opennessScore'), 'opennessScore must not be top-level on result');
+    assert.ok(!ssSlice.includes('result.pressureScore'), 'pressureScore must not be top-level on result');
+    assert.ok(ssSlice.includes('result.scores ='), 'scores must be assigned as result.scores nested object');
   });
 
   test('D-209E1: public sharedSnapshot still includes label', () => {
@@ -14710,13 +14741,13 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(ssSlice.includes('createdAt:') && ssSlice.includes('created_at'), 'sharedSnapshot must still include createdAt');
   });
 
-  test('D-209E1: getPublicProfile SELECT does not select score columns', () => {
-    // search for the specific belief_snapshots SELECT within getPublicProfile
+  test('D-209E1→D-209H: getPublicProfile SELECT does not select identity columns', () => {
+    // D-209H: score columns ARE now selected (for consent gating). Identity columns must remain excluded.
     const selIdx = ppSlice.indexOf('SELECT label');
-    const selSlice = ppSlice.slice(selIdx, selIdx + 200);
+    const selSlice = ppSlice.slice(selIdx, selIdx + 250);
     assert.ok(
-      !selSlice.includes('stability_score') && !selSlice.includes('openness_score') && !selSlice.includes('pressure_score'),
-      'getPublicProfile SELECT must not select score columns after D-209E1'
+      !selSlice.includes('dominant_pattern') && !selSlice.includes('top_beliefs_json'),
+      'getPublicProfile SELECT must not select identity columns (dominant_pattern, top_beliefs_json)'
     );
   });
 
@@ -14728,8 +14759,10 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(!ppSlice.includes('topAlignmentName'), 'topAlignmentName must not appear in public sharedSnapshot');
   });
 
-  test('D-209E1: D-209E1 comment present in worker.js', () => {
-    assert.ok(workerSrc.includes('D-209E1:'), 'D-209E1 comment must be present in worker.js');
+  test('D-209E1→D-209H: D-209E1 work is superseded by D-209H — D-209H comment present in worker.js', () => {
+    // D-209E1 comment was replaced when D-209H refactored the scores gate.
+    // Verify D-209H comment is present, which subsumes D-209E1 intent.
+    assert.ok(workerSrc.includes('D-209H:'), 'D-209H comment must be present in worker.js (supersedes D-209E1 scores-removal work)');
   });
 
   test('D-209E1: no new migration file added beyond 0016', () => {
@@ -14775,8 +14808,8 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   });
 
   // ── buildPublicSharedSnapshot field whitelist ─────────────────────────────
-  // Anchor from the JSDoc comment block so the consent gate comment is in scope.
-  const bssIdx = workerSrc.indexOf('// D-209F: public shared snapshot response builder');
+  // D-209H: comment anchor changed from D-209F; use function keyword.
+  const bssIdx = workerSrc.indexOf('function buildPublicSharedSnapshot(');
   const bssEnd = workerSrc.indexOf('\nasync function getPublicProfile(', bssIdx);
   const bssSlice = workerSrc.slice(bssIdx, bssEnd > -1 ? bssEnd : bssIdx + 1800);
 
@@ -14792,45 +14825,35 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(bssSlice.includes('createdAt:') && bssSlice.includes('created_at'), 'buildPublicSharedSnapshot must return createdAt');
   });
 
-  // ── buildPublicSharedSnapshot field blacklist ─────────────────────────────
-  test('D-209F: buildPublicSharedSnapshot does not return stabilityScore', () => {
-    assert.ok(!bssSlice.includes('stabilityScore:'), 'buildPublicSharedSnapshot must not include stabilityScore');
-  });
-
-  test('D-209F: buildPublicSharedSnapshot does not return opennessScore', () => {
-    assert.ok(!bssSlice.includes('opennessScore:'), 'buildPublicSharedSnapshot must not include opennessScore');
-  });
-
-  test('D-209F: buildPublicSharedSnapshot does not return pressureScore', () => {
-    assert.ok(!bssSlice.includes('pressureScore:'), 'buildPublicSharedSnapshot must not include pressureScore');
-  });
-
-  test('D-209F: buildPublicSharedSnapshot does not return dominantPattern', () => {
+  // ── buildPublicSharedSnapshot identity field blacklist ────────────────────
+  // D-209H: score fields are now allowed inside result.scores nested object (gated).
+  // Identity fields must remain absent always.
+  test('D-209F→D-209H: buildPublicSharedSnapshot does not return dominantPattern', () => {
     assert.ok(!bssSlice.includes('dominantPattern:'), 'buildPublicSharedSnapshot must not include dominantPattern');
   });
 
-  test('D-209F: buildPublicSharedSnapshot does not return topAlignmentName', () => {
+  test('D-209F→D-209H: buildPublicSharedSnapshot does not return topAlignmentName', () => {
     assert.ok(!bssSlice.includes('topAlignmentName:'), 'buildPublicSharedSnapshot must not include topAlignmentName');
   });
 
-  test('D-209F: buildPublicSharedSnapshot does not return alignmentLabels', () => {
+  test('D-209F→D-209H: buildPublicSharedSnapshot does not return alignmentLabels', () => {
     assert.ok(!bssSlice.includes('alignmentLabels:'), 'buildPublicSharedSnapshot must not include alignmentLabels');
   });
 
-  test('D-209F: buildPublicSharedSnapshot does not access top_beliefs_json', () => {
-    assert.ok(!bssSlice.includes('top_beliefs_json'), 'buildPublicSharedSnapshot must not access or return top_beliefs_json');
+  test('D-209F→D-209H: buildPublicSharedSnapshot does not access top_beliefs_json in code', () => {
+    // may appear in comments; must not appear in executable code
+    const codeOnly = bssSlice.split('\n').filter(l => !l.trimStart().startsWith('//')).join('\n');
+    assert.ok(!codeOnly.includes('top_beliefs_json'), 'buildPublicSharedSnapshot must not access or return top_beliefs_json in code');
   });
 
-  test('D-209F: buildPublicSharedSnapshot does not access dominant_pattern', () => {
-    assert.ok(!bssSlice.includes('dominant_pattern'), 'buildPublicSharedSnapshot must not access or return dominant_pattern');
+  test('D-209F→D-209H: buildPublicSharedSnapshot does not access dominant_pattern column directly', () => {
+    assert.ok(!bssSlice.includes('snapshotRow.dominant_pattern'), 'buildPublicSharedSnapshot must not access dominant_pattern column');
   });
 
   // ── consent gate comment ──────────────────────────────────────────────────
-  test('D-209F: consent gate comment present in buildPublicSharedSnapshot', () => {
-    assert.ok(
-      bssSlice.includes('sensitive belief groups stay non-public until owner UI consent flow ships'),
-      'buildPublicSharedSnapshot must contain the D-209F consent gate comment'
-    );
+  test('D-209F→D-209H: D-209H comment present in buildPublicSharedSnapshot (scores gate wired)', () => {
+    // D-209H replaced the D-209F "non-public until consent ships" comment with the active scores gate
+    assert.ok(bssSlice.includes('D-209H:') || bssSlice.includes('scores group'), 'buildPublicSharedSnapshot must contain D-209H scores gate reference');
   });
 
   // ── parseBeliefVisibility still defaults sensitive groups false ───────────
@@ -14852,13 +14875,10 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(pbvSlice.includes('scores: false'), 'parseBeliefVisibility safe default must have scores: false');
   });
 
-  // ── no premature public surface additions ─────────────────────────────────
-  test('D-209F: no frontend consent toggle UI added', () => {
+  // ── D-209H ships the frontend consent toggle ──────────────────────────────
+  test('D-209F→D-209H: frontend consent toggle now exists (D-209H ships scores toggle)', () => {
     const feSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
-    assert.ok(
-      !feSrc.includes('visibility_json') && !feSrc.includes('beliefVisibilityToggle') && !feSrc.includes('consentToggle'),
-      'No frontend consent toggle UI should be added before D-209G'
-    );
+    assert.ok(feSrc.includes('meBeliefVisibilityScores'), 'D-209H ships the scores consent toggle — meBeliefVisibilityScores must exist');
   });
 
   test('D-209F: no new migration file added for D-209F', () => {
@@ -14870,6 +14890,223 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
 
   test('D-209F: D-209F comment present in worker.js', () => {
     assert.ok(workerSrc.includes('D-209F:'), 'D-209F comment must be present in worker.js');
+  });
+}
+
+{
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+
+  // ── Backend route ─────────────────────────────────────────────────────────
+  test('D-209H: POST /api/belief-snapshots/:id/visibility route is registered', () => {
+    assert.ok(
+      workerSrc.includes('belief-snapshots') && workerSrc.includes('visibility') && workerSrc.includes('updateBeliefSnapshotVisibility'),
+      'Route for POST /api/belief-snapshots/:id/visibility must be registered'
+    );
+  });
+
+  test('D-209H: updateBeliefSnapshotVisibility in OWNER_SENSITIVE_ROUTES', () => {
+    const sRoutes = workerSrc.indexOf('OWNER_SENSITIVE_ROUTES');
+    const sl = workerSrc.slice(sRoutes, sRoutes + 300);
+    assert.ok(sl.includes('updateBeliefSnapshotVisibility'), 'updateBeliefSnapshotVisibility must be in OWNER_SENSITIVE_ROUTES');
+  });
+
+  test('D-209H: updateBeliefSnapshotVisibility checks snapshot ownership', () => {
+    const idx = workerSrc.indexOf('async function updateBeliefSnapshotVisibility(');
+    const sl = workerSrc.slice(idx, idx + 1200);
+    assert.ok(sl.includes('user_id=?') && sl.includes('SNAPSHOT_NOT_FOUND_OR_NOT_OWNED'), 'handler must verify snapshot ownership and return 404 if not found');
+  });
+
+  test('D-209H: updateBeliefSnapshotVisibility stores visibility_json', () => {
+    const idx = workerSrc.indexOf('async function updateBeliefSnapshotVisibility(');
+    const sl = workerSrc.slice(idx, idx + 1200);
+    assert.ok(sl.includes('SET visibility_json=?') && sl.includes('JSON.stringify'), 'handler must write visibility_json to DB');
+  });
+
+  test('D-209H: updateBeliefSnapshotVisibility only allows scores to be true', () => {
+    const idx = workerSrc.indexOf('async function updateBeliefSnapshotVisibility(');
+    const sl = workerSrc.slice(idx, idx + 1200);
+    assert.ok(sl.includes('scores: body.scores === true'), 'only scores group should be settable from request body');
+  });
+
+  test('D-209H: updateBeliefSnapshotVisibility forces disallowed groups false', () => {
+    const idx = workerSrc.indexOf('async function updateBeliefSnapshotVisibility(');
+    const sl = workerSrc.slice(idx, idx + 1200);
+    assert.ok(
+      sl.includes('pattern_summary: false') &&
+      sl.includes('alignment_labels: false') &&
+      sl.includes('reflection_habits: false') &&
+      sl.includes('drift_history: false'),
+      'all non-scores groups must be forced false in handler'
+    );
+  });
+
+  test('D-209H: updateBeliefSnapshotVisibility ensures basic_snapshot: true', () => {
+    const idx = workerSrc.indexOf('async function updateBeliefSnapshotVisibility(');
+    const sl = workerSrc.slice(idx, idx + 1200);
+    assert.ok(sl.includes('basic_snapshot: true'), 'basic_snapshot must always be true');
+  });
+
+  test('D-209H: updateBeliefSnapshotVisibility never returns raw snapshot fields', () => {
+    const idx = workerSrc.indexOf('async function updateBeliefSnapshotVisibility(');
+    const sl = workerSrc.slice(idx, idx + 1200);
+    assert.ok(
+      !sl.includes('top_beliefs_json') && !sl.includes('dominant_pattern') && !sl.includes('stability_score'),
+      'handler must return only sanitized visibility map, not raw snapshot fields'
+    );
+  });
+
+  // ── buildPublicSharedSnapshot scores gate ─────────────────────────────────
+  const bssIdx = workerSrc.indexOf('// D-209H: scores group now wired');
+  const bssEnd = workerSrc.indexOf('\nasync function getPublicProfile(', bssIdx);
+  const bssSlice = workerSrc.slice(bssIdx, bssEnd > -1 ? bssEnd : bssIdx + 1800);
+
+  test('D-209H: buildPublicSharedSnapshot gates scores via beliefVisibilityAllows', () => {
+    assert.ok(
+      bssSlice.includes("beliefVisibilityAllows(visibility, 'scores')"),
+      "buildPublicSharedSnapshot must gate scores with beliefVisibilityAllows(visibility, 'scores')"
+    );
+  });
+
+  test('D-209H: buildPublicSharedSnapshot wraps scores in nested object', () => {
+    assert.ok(
+      bssSlice.includes('result.scores = {') && bssSlice.includes('stabilityScore:') && bssSlice.includes('opennessScore:') && bssSlice.includes('pressureScore:'),
+      'scores must be returned as a nested scores object with three fields'
+    );
+  });
+
+  test('D-209H: buildPublicSharedSnapshot still excludes dominantPattern and alignment fields', () => {
+    const codeOnly = bssSlice.split('\n').filter(l => !l.trimStart().startsWith('//')).join('\n');
+    assert.ok(
+      !codeOnly.includes('dominantPattern:') && !codeOnly.includes('alignmentLabels:') && !codeOnly.includes('top_beliefs_json'),
+      'buildPublicSharedSnapshot must not include identity or alignment fields in code'
+    );
+  });
+
+  test('D-209H: buildPublicSharedSnapshot still includes baseline Class-1 fields', () => {
+    assert.ok(
+      bssSlice.includes('label:') && bssSlice.includes('contradictionCount:') && bssSlice.includes('createdAt:'),
+      'Class-1 baseline fields must always be present'
+    );
+  });
+
+  // ── getPublicProfile SELECT widened ──────────────────────────────────────
+  test('D-209H: getPublicProfile SELECT includes score columns for consent gating', () => {
+    const ppIdx = workerSrc.indexOf('async function getPublicProfile(');
+    const ppSlice = workerSrc.slice(ppIdx, ppIdx + 3000);
+    const selIdx = ppSlice.indexOf('SELECT label');
+    const selSlice = ppSlice.slice(selIdx, selIdx + 200);
+    assert.ok(
+      selSlice.includes('stability_score') && selSlice.includes('openness_score') && selSlice.includes('pressure_score'),
+      'getPublicProfile SELECT must include score columns so buildPublicSharedSnapshot can gate them'
+    );
+  });
+
+  test('D-209H: getPublicProfile SELECT still excludes dominant_pattern and top_beliefs_json', () => {
+    const ppIdx = workerSrc.indexOf('async function getPublicProfile(');
+    const ppSlice = workerSrc.slice(ppIdx, ppIdx + 3000);
+    const selIdx = ppSlice.indexOf('SELECT label');
+    const selSlice = ppSlice.slice(selIdx, selIdx + 200);
+    assert.ok(
+      !selSlice.includes('dominant_pattern') && !selSlice.includes('top_beliefs_json'),
+      'identity columns must remain excluded from getPublicProfile SELECT'
+    );
+  });
+
+  // ── Frontend owner UI ─────────────────────────────────────────────────────
+  test('D-209H: optional public fields section exists in frontend', () => {
+    assert.ok(appSrc.includes('Optional public fields'), 'Owner UI must have "Optional public fields" section heading');
+  });
+
+  test('D-209H: exactly one scores toggle exists (meBeliefVisibilityScores)', () => {
+    assert.ok(appSrc.includes('meBeliefVisibilityScores'), 'scores checkbox must use id meBeliefVisibilityScores');
+  });
+
+  test('D-209H: explicit save button exists with correct action', () => {
+    assert.ok(appSrc.includes('saveBeliefVisibilityUI') && appSrc.includes('Save public belief visibility'), 'explicit save button with saveBeliefVisibilityUI action must exist');
+  });
+
+  test('D-209H: save action wired in _D181B_ZERO_PARAM_ACTIONS', () => {
+    const actIdx = appSrc.indexOf('_D181B_ZERO_PARAM_ACTIONS');
+    const actSlice = appSrc.slice(actIdx, actIdx + 600);
+    assert.ok(actSlice.includes('saveBeliefVisibilityUI'), 'saveBeliefVisibilityUI must be in _D181B_ZERO_PARAM_ACTIONS');
+  });
+
+  test('D-209H: checkbox uses onchange not data-action (no auto-save via action dispatch)', () => {
+    // The checkbox must NOT have data-action — only onchange for local preview.
+    // data-action on the checkbox would route through the action dispatcher on click.
+    const checkIdx = appSrc.indexOf('meBeliefVisibilityScores');
+    const checkSlice = appSrc.slice(checkIdx - 30, checkIdx + 200);
+    assert.ok(checkSlice.includes('onchange="meBeliefVisibilityPreviewUpdate()') && !checkSlice.includes('data-action'), 'checkbox must use onchange for preview only — no data-action that would auto-save');
+  });
+
+  test('D-209H: warning copy present: not intelligence morality or truth rankings', () => {
+    assert.ok(appSrc.includes('not intelligence, morality, or truth rankings'), 'scores warning copy must be present in frontend');
+  });
+
+  test('D-209H: preview note says public changes only after Save', () => {
+    assert.ok(appSrc.includes('Public profile changes only after Save'), 'preview must tell owner that public profile changes only after explicit Save');
+  });
+
+  test('D-209H: no alignment labels toggle in frontend', () => {
+    assert.ok(!appSrc.includes('meBeliefVisibilityAlignmentLabels') && !appSrc.includes('alignment_labels') , 'no alignment labels toggle must exist in frontend');
+  });
+
+  test('D-209H: no pattern summary toggle in frontend', () => {
+    assert.ok(!appSrc.includes('meBeliefVisibilityPatternSummary') && !appSrc.includes('pattern_summary'), 'no pattern summary toggle must exist in frontend');
+  });
+
+  test('D-209H: no share-all button in frontend', () => {
+    assert.ok(!appSrc.includes('shareAllBeliefFields') && !appSrc.includes('Enable all'), 'no share-all button must exist');
+  });
+
+  test('D-209H: public render uses s.scores nested object (not bare top-level score fields)', () => {
+    const rpIdx = appSrc.indexOf('function renderPublicProfileSnapshotHtml(');
+    const rpSlice = appSrc.slice(rpIdx, rpIdx + 800);
+    // s.scores.stabilityScore is allowed; s.stabilityScore (bare top-level) is not.
+    assert.ok(
+      rpSlice.includes('s.scores') && !rpSlice.includes('s.stabilityScore ') && !rpSlice.includes('"s.stabilityScore"'),
+      'public render must read from nested s.scores object, not bare s.stabilityScore'
+    );
+    // More precise: confirm scores are accessed via s.scores.xxx
+    assert.ok(rpSlice.includes('s.scores.stabilityScore') || rpSlice.includes('s.scores.'), 'scores must come from s.scores nested object');
+  });
+
+  test('D-209H: public render scores block has "Reflection scores" label', () => {
+    const rpIdx = appSrc.indexOf('function renderPublicProfileSnapshotHtml(');
+    const rpSlice = appSrc.slice(rpIdx, rpIdx + 800);
+    assert.ok(rpSlice.includes('Reflection scores'), 'public scores block must have "Reflection scores" label');
+  });
+
+  test('D-209H: public render scores block repeats the reflection signals disclaimer', () => {
+    const rpIdx = appSrc.indexOf('function renderPublicProfileSnapshotHtml(');
+    const rpSlice = appSrc.slice(rpIdx, rpIdx + 800);
+    assert.ok(rpSlice.includes('reflection signals'), 'public scores block must repeat the reflection signals disclaimer');
+  });
+
+  // ── Regression guards ─────────────────────────────────────────────────────
+  test('D-209H: no migration file added', () => {
+    assert.ok(!existsSync(path.join(__dirname, '../migrations/0017_belief_visibility_scores.sql')), 'D-209H requires no migration — visibility_json column already exists');
+  });
+
+  test('D-209H: no raw top_beliefs_json selected or returned in public response path', () => {
+    const ppIdx = workerSrc.indexOf('async function getPublicProfile(');
+    const ppEnd = workerSrc.indexOf('\nasync function createInviteCode', ppIdx);
+    const ppSlice = workerSrc.slice(ppIdx, ppEnd > -1 ? ppEnd : ppIdx + 4000);
+    // top_beliefs_json may appear in comments (as exclusion notes) but must not be in SELECT or object literals
+    const codeLines = ppSlice.split('\n').filter(l => !l.trimStart().startsWith('//'));
+    assert.ok(
+      !codeLines.join('\n').includes('top_beliefs_json'),
+      'top_beliefs_json must not appear in getPublicProfile code (comments excluded)'
+    );
+  });
+
+  test('D-209H: D-209H comment present in worker.js', () => {
+    assert.ok(workerSrc.includes('D-209H:'), 'D-209H comment must be present in worker.js');
+  });
+
+  test('D-209H: D-209H comment present in app-v10.js', () => {
+    assert.ok(appSrc.includes('D-209H:'), 'D-209H comment must be present in app-v10.js');
   });
 }
 

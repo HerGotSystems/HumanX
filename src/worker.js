@@ -71,6 +71,9 @@ export default {
       // (POST below) are blocked for them. D-145B leaves this choice intact.
       if (url.pathname === '/api/belief-snapshots' && request.method === 'GET') return await listBeliefSnapshots(request, env, { json, requireUser: requireUserId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry: (req, route, status, extra) => logOwnerTokenTelemetry(env, req, route, status, extra) });
       if (url.pathname === '/api/belief-snapshots' && request.method === 'POST') return await saveBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry: (req, route, status, extra) => logOwnerTokenTelemetry(env, req, route, status, extra) });
+      // D-209H: per-snapshot per-field visibility consent. Must come before the
+      // bare /api/belief-snapshots routes above so the more-specific path wins.
+      if (url.pathname.match(/^\/api\/belief-snapshots\/[^/]+\/visibility$/) && request.method === 'POST') return await updateBeliefSnapshotVisibility(request, env, url.pathname.split('/')[3]);
       if (url.pathname === '/api/belief-promote' && request.method === 'POST') return await promoteBeliefSnapshot(request, env, { readJson, cleanId, cleanText, json, requireUser: async (req) => requireUser(req, env), makeId, ownerTokenStatus: (req, uid) => ownerTokenStatus(req, env, uid), logOwnerTokenTelemetry: (req, route, status, extra) => logOwnerTokenTelemetry(env, req, route, status, extra) });
       if (url.pathname.match(/^\/api\/claims\/[^/]+$/) && request.method === 'GET') return await getClaim(request, env, url.pathname.split('/').pop());
       if (url.pathname === '/api/evidence' && request.method === 'POST') return await addEvidence(request, env);
@@ -148,7 +151,7 @@ async function seedDemoClaims(request, env) { await ensureUser(env, 'usr_demo_se
 // crashing — this is deliberately surfaced, not swallowed, so a real bug
 // here cannot silently look identical to "no telemetry rows yet".
 const OWNER_TOKEN_STATUS_BUCKETS = ['secret_missing', 'missing', 'invalid', 'expired', 'uid_mismatch', 'valid'];
-const OWNER_SENSITIVE_ROUTES = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings', 'saveBeliefSnapshot', 'listBeliefSnapshots', 'promoteBeliefSnapshot'];
+const OWNER_SENSITIVE_ROUTES = ['getMe', 'myHumanX', 'archiveMyHumanXItem', 'exportMyHumanX', 'saveProfileSettings', 'saveBeliefSnapshot', 'listBeliefSnapshots', 'promoteBeliefSnapshot', 'updateBeliefSnapshotVisibility'];
 const OWNER_TOKEN_TELEMETRY_WINDOWS = { '1h': 3600000, '24h': 86400000, '7d': 604800000 };
 function resolveOwnerTokenTelemetryWindow(request) {
   const url = new URL(request.url);
@@ -530,6 +533,39 @@ async function saveProfileSettings(request, env) {
   return json({ ok: true, profile_public: profilePublic, profile_slug: slug, profile_bio: bio || null, shared_snapshot_id: hasSharedSnapshotField ? sharedSnapshotId : undefined });
 }
 
+// D-209H: owner-only per-field visibility consent for a specific belief snapshot.
+// Only the `scores` group is unlockable in D-209H. All other groups are forced
+// false regardless of what the request body contains.
+// Never returns raw snapshot fields — only the sanitized visibility map.
+async function updateBeliefSnapshotVisibility(request, env, rawSnapshotId) {
+  const userId = await requireUser(request, env);
+  const snapshotId = cleanId(rawSnapshotId);
+  if (!snapshotId) return json({ error: 'INVALID_SNAPSHOT_ID' }, 400);
+  const snapshot = await env.DB.prepare(
+    `SELECT id FROM belief_snapshots WHERE id=? AND user_id=? AND hidden_at IS NULL`
+  ).bind(snapshotId, userId).first();
+  if (!snapshot) return json({ error: 'SNAPSHOT_NOT_FOUND_OR_NOT_OWNED' }, 404);
+
+  const body = await readJson(request);
+
+  // D-209H allowlist: only scores is unlockable. All other groups stay false.
+  // Extend ONLY after dedicated audit + D-209G-style UI per group.
+  const visibility = {
+    basic_snapshot: true,
+    pattern_summary: false,
+    alignment_labels: false,
+    scores: body.scores === true,
+    reflection_habits: false,
+    drift_history: false,
+  };
+
+  await env.DB.prepare(
+    `UPDATE belief_snapshots SET visibility_json=? WHERE id=? AND user_id=?`
+  ).bind(JSON.stringify(visibility), snapshotId, userId).run();
+
+  return json({ ok: true, visibility });
+}
+
 // D-140C: public, no-auth read of an opted-in profile. table is always one
 // of our own fixed internal constants below, never derived from request
 // input — safe to interpolate. Every query filters both review_state and
@@ -709,19 +745,35 @@ function beliefVisibilityAllows(visibility, group) {
 //   drift_history    → not planned for public in this arc
 //   reflection_habits → Class-4 private-only, never public
 //
-// D-209F: sensitive belief groups stay non-public until owner UI consent flow ships.
+// D-209H: scores group now wired. All other sensitive groups remain non-public.
 function buildPublicSharedSnapshot(snapshotRow) {
   if (!snapshotRow) return null;
   // Parse consent map — null/invalid → all sensitive groups false (safe default).
   const visibility = parseBeliefVisibility(snapshotRow.visibility_json);
-  void visibility; // will gate extension points here once D-209G UI ships
 
-  // Class-1 baseline fields only — always safe to share.
-  return {
+  // Class-1 baseline fields — always included when snapshot is shared.
+  const result = {
     label: snapshotRow.label || null,
     contradictionCount: snapshotRow.contradiction_count || 0,
     createdAt: snapshotRow.created_at,
   };
+
+  // D-209H: scores group — exposed only with explicit owner consent.
+  // SELECT must include score columns (see getPublicProfile below).
+  if (beliefVisibilityAllows(visibility, 'scores')) {
+    result.scores = {
+      stabilityScore: snapshotRow.stability_score || 0,
+      opennessScore: snapshotRow.openness_score || 0,
+      pressureScore: snapshotRow.pressure_score || 0,
+    };
+  }
+
+  // pattern_summary — defer to D-209I+ after dedicated audit.
+  // alignment_labels — blocked: requires acknowledgement modal + separate audit.
+  //   NEVER return raw top_beliefs_json under any consent state.
+  // reflection_habits / drift_history — permanently private in this arc.
+
+  return result;
 }
 
 async function getPublicProfile(request, env, rawSlug) {
@@ -745,10 +797,11 @@ async function getPublicProfile(request, env, rawSlug) {
   // (and that isn't hidden) is ever considered — never a list, never the
   // raw answer payload, and never the full contradiction-text blob.
   // D-208B: Belief identity labels are private by default.
-  // D-209E1: scores removed from SELECT and response (Class-3 sensitive inference).
   // D-209F: response shaping delegated to buildPublicSharedSnapshot() — all
   // public belief field additions must go through that function.
-  const sharedSnapshotRow = await env.DB.prepare(`SELECT label, contradiction_count, created_at, visibility_json FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
+  // D-209H: score columns included so buildPublicSharedSnapshot can gate them
+  // via visibility_json.scores. dominant_pattern/top_beliefs_json never selected.
+  const sharedSnapshotRow = await env.DB.prepare(`SELECT label, contradiction_count, created_at, visibility_json, stability_score, openness_score, pressure_score FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
   const sharedSnapshot = buildPublicSharedSnapshot(sharedSnapshotRow);
 
   return json({
