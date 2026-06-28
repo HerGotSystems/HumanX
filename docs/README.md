@@ -58,9 +58,9 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### D-210B — Private Reflection Avatar concept card ⭐ CURRENT
+### `D210_REFLECTION_AVATAR_CLOSEOUT.md` ⭐ CURRENT — D-210C REFLECTION AVATAR CLOSEOUT
 
-Frontend-only. Adds `meReflectionAvatarHtml(data)` to `app-v10.js` — a private static concept card in My HumanX (after Belief reflection, before Recent Truths). CSS: `.me-avatar-card`, `.me-avatar-symbol`, `.me-avatar-chip`, `.me-avatar-note`. Derives 2–4 safe non-ranking habit descriptor chips (Source explorer, Mixed-source investigator, Evidence sorter, Question builder, Pressure mapper, Test planner, Uncertainty friendly, Claim cartographer) from existing private `/api/my-humanx` payload. Required guardrail copy: "Your avatar reflects investigation habits, not intelligence, morality, ideology, or truth." Private notice: "Private concept only. It is not shown on your public profile." No identity/rank/ideology language. No image generation. No public render. No backend change. No migration. 28 new D-210B smoke tests. Baseline 1914/24/57. Deploy needed.
+D-210A/B/C arc. D-210A: guardrail spec (forbidden dimensions, safe metaphors, privacy model, required copy). D-210B: private static Reflection Avatar concept card in My HumanX — `meReflectionAvatarHtml(data)`, frontend-only (app-v10.js + styles.css), derives 2–4 safe habit chips from private payload, guardrail copy and private notice hardcoded, not called from public profile render, no backend, no migration. 28 D-210B smoke tests. Baseline 1914/24/57. ⚠ PENDING OWNER MANUAL DEPLOY + LIVE BROWSER SANITY — Wrangler certificate/proxy/VPN issue blocks CC deploy (same as D-209H). Owner must run `npx wrangler deploy` from local terminal and complete the checklist in D210_REFLECTION_AVATAR_CLOSEOUT.md Section J.
 
 ### `D210A_BELIEF_AVATAR_GUARDRAIL_SPEC.md` — D-210A BELIEF AVATAR GUARDRAIL SPEC
 
