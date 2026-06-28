@@ -13704,6 +13704,96 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   });
 }
 
+// ── D-203B: source type mix chart ─────────────────────────────────────────────
+{
+  const appSlice = appSrc.slice(appSrc.indexOf('function renderSourceTypeMix'), appSrc.indexOf('function renderSourceTypeMix') + 2500);
+
+  test('D-203B: renderSourceTypeMix function exists in app-v10.js', () => {
+    assert.ok(appSrc.includes('function renderSourceTypeMix'), 'renderSourceTypeMix must be defined');
+  });
+
+  test('D-203B: chart aggregates source_type field', () => {
+    assert.ok(appSlice.includes('source_type'), 'renderSourceTypeMix must read source_type');
+  });
+
+  test('D-203B: chart also handles camelCase sourceType field', () => {
+    assert.ok(appSlice.includes('sourceType'), 'renderSourceTypeMix must handle sourceType');
+  });
+
+  test('D-203B: null/missing source_type maps to unknown', () => {
+    assert.ok(appSlice.includes("||'unknown'") || appSlice.includes("|| 'unknown'"), 'missing source_type must fall back to unknown');
+  });
+
+  test('D-203B: chart contains required guardrail copy — activity not proof', () => {
+    assert.ok(appSlice.includes('not proof of truth'), 'renderSourceTypeMix must include "not proof of truth" guardrail note');
+  });
+
+  test('D-203B: chart contains required guardrail copy — origin not truth', () => {
+    assert.ok(appSlice.includes('where material comes from, not whether it is true'), 'renderSourceTypeMix must include origin-not-truth note');
+  });
+
+  test('D-203B: chart includes source label for scripture_tradition', () => {
+    assert.ok(appSrc.includes('scripture_tradition'), 'source type label map must include scripture_tradition');
+  });
+
+  test('D-203B: chart includes source label for myth_folklore', () => {
+    assert.ok(appSrc.includes('myth_folklore'), 'source type label map must include myth_folklore');
+  });
+
+  test('D-203B: chart includes source label for fiction_story', () => {
+    assert.ok(appSrc.includes('fiction_story'), 'source type label map must include fiction_story');
+  });
+
+  test('D-203B: chart unknown-only note present', () => {
+    assert.ok(appSlice.includes('Unknown includes older evidence'), 'renderSourceTypeMix must note that unknown covers legacy items');
+  });
+
+  test('D-203B: chart is injected into study-grid', () => {
+    assert.ok(appSrc.includes('st-mix-panel'), 'st-mix-panel section must appear in study-grid');
+  });
+
+  test('D-203B: chart does not contain banned framing "Top Truths"', () => {
+    assert.ok(!appSlice.toLowerCase().includes('top truths'), 'renderSourceTypeMix must not use "Top Truths"');
+  });
+
+  test('D-203B: chart does not contain banned framing "Most Proven"', () => {
+    assert.ok(!appSlice.toLowerCase().includes('most proven'), 'renderSourceTypeMix must not use "Most Proven"');
+  });
+
+  test('D-203B: chart does not contain banned framing "Truth Score"', () => {
+    assert.ok(!appSlice.toLowerCase().includes('truth score'), 'renderSourceTypeMix must not use "Truth Score"');
+  });
+
+  test('D-203B: chart does not contain banned framing "Verified by AI"', () => {
+    assert.ok(!appSlice.toLowerCase().includes('verified by ai'), 'renderSourceTypeMix must not use "Verified by AI"');
+  });
+
+  test('D-203B: chart does not contain banned framing "Majority Says True"', () => {
+    assert.ok(!appSlice.toLowerCase().includes('majority says true'), 'renderSourceTypeMix must not use "Majority Says True"');
+  });
+
+  test('D-203B: chart does not reference claim scoring or status', () => {
+    assert.ok(!appSlice.includes('evidence_score') && !appSlice.includes('survivability') && !appSlice.includes('testability'),
+      'renderSourceTypeMix must not touch claim scoring fields');
+  });
+
+  test('D-203B: st-mix CSS class exists in styles.css', () => {
+    const cssSrc = readFileSync('public/styles.css', 'utf8');
+    assert.ok(cssSrc.includes('st-mix-card'), 'styles.css must include .st-mix-card');
+  });
+
+  test('D-203B: st-mix bar uses neutral blue color not green truth color', () => {
+    const cssSrc = readFileSync('public/styles.css', 'utf8');
+    const stMixBlock = cssSrc.slice(cssSrc.indexOf('D-203B'), cssSrc.indexOf('D-203B') + 600);
+    assert.ok(stMixBlock.includes('var(--blue)'), 'st-mix-bar must use --blue (neutral), not --green (truth color)');
+    assert.ok(!stMixBlock.includes('var(--green)'), 'st-mix-bar must not use --green (reserved for truth/approval)');
+  });
+
+  test('D-203B: worker.js not changed (no backend changes for this feature)', () => {
+    assert.ok(!workerSrc.includes('renderSourceTypeMix'), 'worker.js must not reference renderSourceTypeMix — frontend-only feature');
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

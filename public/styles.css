@@ -744,3 +744,14 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 @media(max-width:400px){.account-panel-popover{max-width:calc(100vw - 16px)}}
 /* D-185C side-panel scroll anchor — gives 8px breathing room when block:'start' lands on mobile */
 @media(max-width:900px){.study-mode #side-tools{scroll-margin-top:8px}}
+/* D-203B source type mix chart */
+.st-mix-card{padding:10px 0 4px}
+.st-mix-title{font-size:13px;font-weight:600;margin:0 0 2px;color:var(--fg)}
+.st-mix-meta{margin:0 0 8px}
+.st-mix-row{display:grid;grid-template-columns:130px 1fr 56px;align-items:center;gap:6px;margin:3px 0}
+.st-mix-label{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-mix-bar-wrap{height:6px;background:#0d1018;border-radius:999px;overflow:hidden}
+.st-mix-bar{height:100%;background:var(--blue);border-radius:999px;opacity:.7}
+.st-mix-count{font-size:10px;color:var(--muted);text-align:right}
+.ev-origin-note{color:var(--muted);font-style:italic;margin:4px 0}
+@media(max-width:600px){.st-mix-row{grid-template-columns:100px 1fr 48px}}
