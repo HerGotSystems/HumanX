@@ -7714,13 +7714,21 @@ test('D-142B: sharedSnapshot query requires public_summary_enabled=1 and hidden_
   );
 });
 
-test('D-142B: public sharedSnapshot response exposes only the safe field set', () => {
+test('D-142B→D-208B: public sharedSnapshot response exposes only the privacy-safe field set (dominant_pattern and top_beliefs_json removed in D-208B)', () => {
   const idx = workerSrc.indexOf('async function getPublicProfile');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
   const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
+  // D-208B: dominant_pattern and top_beliefs_json are excluded from the public response.
+  // Safe fields: label, stabilityScore, opennessScore, pressureScore, contradictionCount, createdAt
   assert.ok(
-    /sharedSnapshot = \{\s*label: sharedSnapshotRow\.label \|\| null,\s*dominantPattern: sharedSnapshotRow\.dominant_pattern \|\| null,\s*stabilityScore: sharedSnapshotRow\.stability_score \|\| 0,\s*opennessScore: sharedSnapshotRow\.openness_score \|\| 0,\s*pressureScore: sharedSnapshotRow\.pressure_score \|\| 0,\s*topAlignmentName,\s*contradictionCount: sharedSnapshotRow\.contradiction_count \|\| 0,\s*createdAt: sharedSnapshotRow\.created_at,\s*\};/.test(slice),
-    'the public sharedSnapshot object must be exactly {label,dominantPattern,stabilityScore,opennessScore,pressureScore,topAlignmentName,contradictionCount,createdAt} — no more, no less'
+    slice.includes('label: sharedSnapshotRow.label || null') &&
+    slice.includes('stabilityScore: sharedSnapshotRow.stability_score || 0') &&
+    slice.includes('opennessScore: sharedSnapshotRow.openness_score || 0') &&
+    slice.includes('pressureScore: sharedSnapshotRow.pressure_score || 0') &&
+    slice.includes('contradictionCount: sharedSnapshotRow.contradiction_count || 0') &&
+    !slice.includes('dominantPattern:') &&
+    !slice.includes('topAlignmentName'),
+    'sharedSnapshot must include label/scores/contradictionCount but exclude dominantPattern and topAlignmentName (D-208B privacy rule)'
   );
 });
 
@@ -7736,14 +7744,17 @@ test('D-142B: public response never exposes raw_json/stress_points_json/dimensio
   );
 });
 
-test('D-142B: topAlignmentName is extracted server-side from the first top_beliefs_json entry, never the full array', () => {
+test('D-142B→D-208B: top_beliefs_json not used in SELECT or parsed in getPublicProfile (only appears in comment)', () => {
   const idx = workerSrc.indexOf('async function getPublicProfile');
   const slice = workerSrc.slice(idx, idx + 4200);
+  // top_beliefs_json may appear in the D-208B explanatory comment — check it is not in SELECT or parsed
   assert.ok(
-    slice.includes("const topBeliefs = JSON.parse(sharedSnapshotRow.top_beliefs_json || '[]');") &&
-    slice.includes('topBeliefs[0] && topBeliefs[0].name') &&
-    !slice.includes('topBeliefs,') && !slice.includes('topBeliefs:'),
-    'getPublicProfile must parse top_beliefs_json only to extract the first entry\'s name, never pass the array through to the response'
+    !slice.includes("SELECT label, dominant_pattern") &&
+    !slice.includes('top_beliefs_json,') &&
+    !slice.includes("top_beliefs_json || '[]'") &&
+    !slice.includes('topAlignmentName') &&
+    !slice.includes('topBeliefs[0]'),
+    'getPublicProfile SELECT must not include top_beliefs_json, and must not parse or expose topAlignmentName (D-208B removes these as privacy risk)'
   );
 });
 
@@ -7803,14 +7814,16 @@ test('D-142B: Me preview required wording exists ("one snapshot, shared by choic
   );
 });
 
-test('D-142B/D-142C/D-154B: public profile snapshot card uses third-person wording and the same field set', () => {
+test('D-142B/D-142C/D-154B→D-208B: public profile snapshot card uses third-person wording and privacy-safe field set (dominantPattern and topAlignmentName removed in D-208B)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
   const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
     slice.includes('not their complete profile') &&
     slice.includes('from their own self-submitted answers, not a diagnosis or personality test') &&
-    slice.includes('s.dominantPattern') && slice.includes('s.stabilityScore') && slice.includes('s.topAlignmentName') && slice.includes('s.contradictionCount'),
-    'renderPublicProfileSnapshotHtml must use third-person disclaimer wording and only the safe field set'
+    slice.includes('s.contradictionCount') &&
+    !slice.includes('s.dominantPattern') &&
+    !slice.includes('s.topAlignmentName'),
+    'renderPublicProfileSnapshotHtml must use third-person disclaimer, show contradictionCount, and NOT render dominantPattern or topAlignmentName (D-208B privacy rule)'
   );
 });
 
@@ -7961,26 +7974,26 @@ test('D-142C/D-154B: public card contains "One snapshot, shared by choice" (cons
   assert.ok(slice.includes('One snapshot, shared by choice — not their complete profile.'), 'renderPublicProfileSnapshotHtml must retain the required "one snapshot" wording');
 });
 
-test('D-142C: public card frames dominantPattern as a self-reported pattern, not a bare label', () => {
+test('D-142C→D-208B: dominantPattern not rendered on public card (removed in D-208B — belief identity labels are private by default)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
   const slice = appSrc.slice(idx, idx + 900);
   assert.ok(
-    slice.includes('Self-reported dominant pattern') &&
-    slice.includes('${esc(s.dominantPattern||\'Pattern not labeled\')}'),
-    'renderPublicProfileSnapshotHtml must prefix the dominant pattern with "Self-reported dominant pattern" framing copy'
+    !slice.includes('Self-reported dominant pattern') &&
+    !slice.includes('s.dominantPattern'),
+    'renderPublicProfileSnapshotHtml must not render dominantPattern or its framing label (D-208B removes this as a belief identity risk)'
   );
 });
 
-test('D-142C: public card shows scores and createdAt but never raw fields', () => {
+test('D-142C→D-208B: public card shows contradictionCount and createdAt but never raw fields or identity labels', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
   const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
-    slice.includes("meter('Stability',s.stabilityScore)") &&
-    slice.includes("meter('Openness',s.opennessScore)") &&
-    slice.includes("meter('Pressure',s.pressureScore)") &&
+    slice.includes('s.contradictionCount') &&
     slice.includes('s.createdAt') &&
-    !slice.includes('dimensions') && !slice.includes('raw_json') && !slice.includes('stress_points') && !slice.includes('top_beliefs_json') && !slice.includes('contradictions_json'),
-    'renderPublicProfileSnapshotHtml must show only stability/openness/pressure/createdAt — never raw/dimension/stress/full-array fields'
+    !slice.includes('dimensions') && !slice.includes('raw_json') && !slice.includes('stress_points') &&
+    !slice.includes('top_beliefs_json') && !slice.includes('contradictions_json') &&
+    !slice.includes('s.dominantPattern') && !slice.includes('s.topAlignmentName'),
+    'renderPublicProfileSnapshotHtml must show contradictionCount/createdAt only — never raw fields or belief identity labels (D-208B)'
   );
 });
 
@@ -9689,21 +9702,25 @@ test('D-154B: "View in HumanX" CTA replaces the old "Open Study" label in public
   );
 });
 
-test('D-154B: duplicate snapshot disclaimers are consolidated to one sentence', () => {
-  const snapshotFn = appSrc.match(/function renderPublicProfileSnapshotHtml[\s\S]*?^function /m)?.[0] || '';
+test('D-154B→D-208B: snapshot has at least 2 pp-disclaimer elements (original + D-208B guardrail added)', () => {
+  const fnIdx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+  const fnEnd = appSrc.indexOf('\nfunction ', fnIdx + 1);
+  const snapshotFn = appSrc.slice(fnIdx, fnEnd > fnIdx ? fnEnd : fnIdx + 1200);
   const disclaimerCount = (snapshotFn.match(/pp-disclaimer/g)||[]).length;
   assert.ok(
-    disclaimerCount <= 1,
-    `renderPublicProfileSnapshotHtml must have at most 1 pp-disclaimer (found ${disclaimerCount})`
+    disclaimerCount >= 2,
+    `renderPublicProfileSnapshotHtml must have at least 2 pp-disclaimer paragraphs (original + D-208B privacy/guardrail note; found ${disclaimerCount})`
   );
 });
 
-test('D-154B: snapshot disclaimers consolidated into a single pp-disclaimer element', () => {
-  const snapshotFn = appSrc.match(/function renderPublicProfileSnapshotHtml[\s\S]*?^function /m)?.[0] || '';
-  const disclaimerCount = (snapshotFn.match(/pp-disclaimer/g)||[]).length;
+test('D-154B→D-208B: snapshot disclaimers include both original wording and D-208B guardrail', () => {
+  const fnIdx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+  const fnEnd = appSrc.indexOf('\nfunction ', fnIdx + 1);
+  const snapshotFn = appSrc.slice(fnIdx, fnEnd > fnIdx ? fnEnd : fnIdx + 1200);
   assert.ok(
-    disclaimerCount === 1,
-    `renderPublicProfileSnapshotHtml must have exactly 1 pp-disclaimer (found ${disclaimerCount}) — two separate disclaimer paragraphs from D-142C consolidated in D-154B`
+    snapshotFn.includes('from their own self-submitted answers') &&
+    snapshotFn.includes('not a score of intelligence, morality, or truth'),
+    'renderPublicProfileSnapshotHtml must include both the original disclaimer and the D-208B guardrail sentence'
   );
 });
 
@@ -10257,25 +10274,24 @@ test('D-158B: pressure section conditionally wrapped in renderPublicProfileHtml'
   );
 });
 
-test('D-158B: bio fallback is computed from snapshot dominantPattern and topAlignmentName', () => {
+test('D-158B→D-208B: bio fallback does not use dominantPattern or topAlignmentName (belief identity fields removed from public profile in D-208B)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
   const slice = appSrc.slice(idx, idx + 3500);
   assert.ok(
-    slice.includes('pp-bio-fallback') &&
-    slice.includes('sn.dominantPattern') &&
-    slice.includes('sn.topAlignmentName') &&
-    slice.includes('Belief pattern:') &&
-    slice.includes('Top alignment:'),
-    'renderPublicProfileHtml must compute a bio fallback line from snapshot dominantPattern and topAlignmentName'
+    !slice.includes('sn.dominantPattern') &&
+    !slice.includes('sn.topAlignmentName') &&
+    !slice.includes('Belief pattern:') &&
+    !slice.includes('Top alignment:'),
+    'renderPublicProfileHtml must not compute bio fallback from dominantPattern or topAlignmentName (D-208B removes these as privacy risk)'
   );
 });
 
-test('D-158B: bio fallback only shown when bio is absent', () => {
+test('D-158B→D-208B: bio fallback variable still exists but is empty string (bfParts dead code removed)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
   const slice = appSrc.slice(idx, idx + 3500);
   assert.ok(
-    slice.includes('!p.bio') && slice.includes('bioFallback') && slice.includes('p.bio?'),
-    'renderPublicProfileHtml must guard bio fallback behind !p.bio and show real bio when present'
+    slice.includes('bioFallback') && slice.includes("p.bio?"),
+    'renderPublicProfileHtml must still have bioFallback binding and bio conditional in template'
   );
 });
 
@@ -10398,13 +10414,12 @@ test('D-159B: cc-bridge-link CSS exists in styles.css', () => {
   );
 });
 
-test('D-159B: D-158B public profile features all preserved after home changes', () => {
+test('D-159B→D-208B: public profile core features preserved (snapshot render, context block, section suppression; bio-fallback now empty per D-208B)', () => {
   assert.ok(
     appSrc.includes('renderPublicProfileSnapshotHtml(sn)') &&
     appSrc.includes('pp-context-block') &&
-    appSrc.includes('pp-bio-fallback') &&
     appSrc.includes("if(!rows||!rows.length)return''"),
-    'D-159B home changes must not affect D-158B public profile: snapshot-first, bio fallback, section suppression all intact'
+    'D-159B home changes must not affect public profile: snapshot render, context block, and section suppression must all be intact'
   );
 });
 
@@ -14196,6 +14211,129 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
 
   test('D-207B: worker.js not changed', () => {
     assert.ok(!workerSrc.includes('inv-overview'), 'worker.js must not reference inv-overview — frontend-only layout');
+  });
+}
+
+// ── D-208B: Belief Engine privacy + framing patch ────────────────────────────
+{
+  const beSrc = readFileSync('public/apps/humanx-belief-engine/index.html', 'utf8');
+
+  // ── Backend: public profile must not expose identity fields ─────────────────
+  test('D-208B: getPublicProfile does not select top_beliefs_json', () => {
+    // The SELECT for the public sharedSnapshot must not include top_beliefs_json
+    const ppIdx = workerSrc.indexOf('async function getPublicProfile');
+    const ppSlice = workerSrc.slice(ppIdx, ppIdx + 2000);
+    assert.ok(!ppSlice.includes('top_beliefs_json'), 'getPublicProfile SELECT must not include top_beliefs_json');
+  });
+
+  test('D-208B: getPublicProfile does not select dominant_pattern', () => {
+    const ppIdx = workerSrc.indexOf('async function getPublicProfile');
+    const ppSlice = workerSrc.slice(ppIdx, ppIdx + 2000);
+    assert.ok(!ppSlice.includes('dominant_pattern'), 'getPublicProfile SELECT must not include dominant_pattern');
+  });
+
+  test('D-208B: sharedSnapshot object does not include dominantPattern key', () => {
+    const ppIdx = workerSrc.indexOf('async function getPublicProfile');
+    const ppSlice = workerSrc.slice(ppIdx, ppIdx + 2000);
+    assert.ok(!ppSlice.includes('dominantPattern:'), 'sharedSnapshot must not expose dominantPattern');
+  });
+
+  test('D-208B: sharedSnapshot object does not include topAlignmentName key', () => {
+    const ppIdx = workerSrc.indexOf('async function getPublicProfile');
+    const ppSlice = workerSrc.slice(ppIdx, ppIdx + 2000);
+    assert.ok(!ppSlice.includes('topAlignmentName'), 'sharedSnapshot must not expose topAlignmentName');
+  });
+
+  test('D-208B: D-208B comment present in worker.js', () => {
+    assert.ok(workerSrc.includes('D-208B'), 'D-208B comment must be present in worker.js');
+  });
+
+  test('D-208B: private-by-default comment present in worker.js', () => {
+    assert.ok(workerSrc.includes('private by default'), 'worker.js must document that belief identity labels are private by default');
+  });
+
+  // ── Frontend: public profile render must not expose identity fields ──────────
+  test('D-208B: renderPublicProfileSnapshotHtml does not render dominantPattern', () => {
+    const fnIdx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+    const fnEnd = appSrc.indexOf('\nfunction ', fnIdx + 1);
+    const fnSlice = appSrc.slice(fnIdx, fnEnd > fnIdx ? fnEnd : fnIdx + 1000);
+    assert.ok(!fnSlice.includes('dominantPattern'), 'renderPublicProfileSnapshotHtml must not render dominantPattern');
+  });
+
+  test('D-208B: renderPublicProfileSnapshotHtml does not render topAlignmentName', () => {
+    const fnIdx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+    const fnEnd = appSrc.indexOf('\nfunction ', fnIdx + 1);
+    const fnSlice = appSrc.slice(fnIdx, fnEnd > fnIdx ? fnEnd : fnIdx + 1000);
+    assert.ok(!fnSlice.includes('topAlignmentName'), 'renderPublicProfileSnapshotHtml must not render topAlignmentName');
+  });
+
+  test('D-208B: public profile snapshot shows guardrail "not a score of intelligence, morality, or truth"', () => {
+    const fnIdx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+    const fnEnd = appSrc.indexOf('\nfunction ', fnIdx + 1);
+    const fnSlice = appSrc.slice(fnIdx, fnEnd > fnIdx ? fnEnd : fnIdx + 1200);
+    assert.ok(fnSlice.includes('not a score of intelligence, morality, or truth'), 'public profile snapshot must include guardrail copy');
+  });
+
+  test('D-208B: public profile snapshot shows "Belief identity details are private by default"', () => {
+    const fnIdx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
+    const fnEnd = appSrc.indexOf('\nfunction ', fnIdx + 1);
+    const fnSlice = appSrc.slice(fnIdx, fnEnd > fnIdx ? fnEnd : fnIdx + 1200);
+    assert.ok(fnSlice.includes('private by default'), 'public profile snapshot must say belief identity details are private by default');
+  });
+
+  test('D-208B: renderPublicProfileHtml does not use bfParts for belief identity fallback', () => {
+    const fnIdx = appSrc.indexOf('function renderPublicProfileHtml');
+    const fnEnd = appSrc.indexOf('\nfunction ', fnIdx + 1);
+    const fnSlice = appSrc.slice(fnIdx, fnEnd > fnIdx ? fnEnd : fnIdx + 2000);
+    assert.ok(!fnSlice.includes('bfParts'), 'renderPublicProfileHtml must not use bfParts (dead code removed)');
+    assert.ok(!fnSlice.includes('dominantPattern'), 'renderPublicProfileHtml must not reference dominantPattern');
+  });
+
+  // ── Belief Engine copy ───────────────────────────────────────────────────────
+  test('D-208B: "Belief DNA" label removed from Belief Engine', () => {
+    assert.ok(!beSrc.includes('Belief DNA'), '"Belief DNA" must not appear in belief engine HTML');
+  });
+
+  test('D-208B: "Identity Fragmentation" label removed from Belief Engine', () => {
+    assert.ok(!beSrc.includes('Identity Fragmentation'), '"Identity Fragmentation" must not appear in belief engine HTML');
+  });
+
+  test('D-208B: "Belief Pattern" heading present in Belief Engine', () => {
+    assert.ok(beSrc.includes('Belief Pattern'), '"Belief Pattern" heading must be present in belief engine');
+  });
+
+  test('D-208B: "Belief Origin Mix" heading present in Belief Engine', () => {
+    assert.ok(beSrc.includes('Belief Origin Mix'), '"Belief Origin Mix" heading must be present in belief engine');
+  });
+
+  test('D-208B: guardrail sentence present in Belief Engine results', () => {
+    assert.ok(beSrc.includes('not a score of intelligence, morality, or truth'), 'guardrail sentence must appear in belief engine results screen');
+  });
+
+  // ── My HumanX Mirror guardrail ───────────────────────────────────────────────
+  test('D-208B: Mirror guardrail includes "Private belief reflections are for self-study"', () => {
+    assert.ok(appSrc.includes('Private belief reflections are for self-study'), 'meMirrorGuardrailHtml must include self-study copy');
+  });
+
+  test('D-208B: Mirror guardrail includes "not personality labels or truth rankings"', () => {
+    assert.ok(appSrc.includes('not personality labels or truth rankings'), 'meMirrorGuardrailHtml must include anti-ranking copy');
+  });
+
+  // ── Banned framing must not have been introduced ─────────────────────────────
+  test('D-208B: no "truth level" framing added', () => {
+    assert.ok(!appSrc.toLowerCase().includes('truth level'), 'app-v10.js must not use "truth level" framing');
+  });
+
+  test('D-208B: no "purity" framing added', () => {
+    assert.ok(!appSrc.toLowerCase().includes('purity score') && !appSrc.toLowerCase().includes('moral purity'), 'app-v10.js must not use purity score framing');
+  });
+
+  test('D-208B: no "ideology score" framing added', () => {
+    assert.ok(!appSrc.toLowerCase().includes('ideology score'), 'app-v10.js must not use ideology score framing');
+  });
+
+  test('D-208B: no new migration file 0006 was added', () => {
+    assert.ok(!existsSync(path.join(__dirname, '../migrations/0006_belief_public_fields.sql')), 'D-208B must not add new migration files');
   });
 }
 

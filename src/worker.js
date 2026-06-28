@@ -688,23 +688,18 @@ async function getPublicProfile(request, env, rawSlug) {
   // D-142B: optional, narrow, public-safe belief snapshot summary. Only the
   // single snapshot the owner explicitly marked public_summary_enabled=1
   // (and that isn't hidden) is ever considered — never a list, never the
-  // raw answer payload, and never the full contradiction-text blob or the
-  // full alignment-array blob (only a single extracted name, below).
-  const sharedSnapshotRow = await env.DB.prepare(`SELECT label, dominant_pattern, stability_score, openness_score, pressure_score, top_beliefs_json, contradiction_count, created_at FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
+  // raw answer payload, and never the full contradiction-text blob.
+  // D-208B: Belief identity labels are private by default; public exposure
+  // requires explicit per-field opt-in. dominant_pattern and top_beliefs_json
+  // are excluded — they can contain named religious/ideological alignments.
+  const sharedSnapshotRow = await env.DB.prepare(`SELECT label, stability_score, openness_score, pressure_score, contradiction_count, created_at FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
   let sharedSnapshot = null;
   if (sharedSnapshotRow) {
-    let topAlignmentName = null;
-    try {
-      const topBeliefs = JSON.parse(sharedSnapshotRow.top_beliefs_json || '[]');
-      if (Array.isArray(topBeliefs) && topBeliefs[0] && topBeliefs[0].name) topAlignmentName = String(topBeliefs[0].name);
-    } catch {}
     sharedSnapshot = {
       label: sharedSnapshotRow.label || null,
-      dominantPattern: sharedSnapshotRow.dominant_pattern || null,
       stabilityScore: sharedSnapshotRow.stability_score || 0,
       opennessScore: sharedSnapshotRow.openness_score || 0,
       pressureScore: sharedSnapshotRow.pressure_score || 0,
-      topAlignmentName,
       contradictionCount: sharedSnapshotRow.contradiction_count || 0,
       createdAt: sharedSnapshotRow.created_at,
     };
