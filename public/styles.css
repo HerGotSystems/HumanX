@@ -92,7 +92,9 @@
 /* Investigation board */
 .inv-board-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 6px;padding:6px 2px 4px;border-top:1px solid var(--line)}
 .inv-board-head span{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.inv-board-sub{font-size:10px;text-transform:none;letter-spacing:0;font-weight:400;font-style:italic;opacity:.75}
 .inv-board-actions{display:flex;gap:4px;margin-left:auto}
+.btn-mini{font-size:11px;padding:6px 10px;min-height:36px;line-height:1}
 .inv-sec-head{margin-bottom:8px}
 .inv-sec-title{display:flex;align-items:center;gap:7px;margin-bottom:3px}
 .inv-sec-title h3{margin:0;font-size:13px;color:var(--text)}
@@ -737,3 +739,6 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .pp-snapshot-label{margin:2px 0;font-weight:700;color:var(--text)}
 .pp-snapshot-pattern-label{margin:8px 0 2px;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.04em}
 .pp-snapshot-date{margin:8px 0 0;color:var(--muted)}
+/* D-185B mobile quick fixes */
+@media(max-width:500px){.verdict-qualifier{display:none}.me-profile-actions{flex-direction:column}}
+@media(max-width:400px){.account-panel-popover{max-width:calc(100vw - 16px)}}
