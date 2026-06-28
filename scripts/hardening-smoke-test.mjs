@@ -8142,12 +8142,12 @@ test('D-143B: OG route never includes sharedSnapshot/dominantPattern/raw_json/st
   );
 });
 
-test('D-186C: og:image wired into public profile shell (og-default.svg)', () => {
+test('D-186C: og:image wired into public profile shell (og-default.png)', () => {
   const idx = workerSrc.indexOf('async function renderPublicProfileShell');
   const slice = workerSrc.slice(idx, idx + 2700);
   assert.ok(
-    slice.includes('og:image') && slice.includes('og-default.svg'),
-    'D-186C: renderPublicProfileShell must inject og:image pointing to og-default.svg'
+    slice.includes('og:image') && slice.includes('og-default.png'),
+    'D-186C: renderPublicProfileShell must inject og:image pointing to og-default.png'
   );
 });
 
