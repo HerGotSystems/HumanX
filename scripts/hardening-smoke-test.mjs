@@ -8094,7 +8094,7 @@ test('D-143B: public slug injects title + og:title + og:description + og:type + 
     slice.includes('<meta property="og:description" content="${description}">') &&
     slice.includes('<meta property="og:type" content="profile">') &&
     slice.includes('<meta property="og:url" content="${profileUrl}">') &&
-    slice.includes('<meta name="twitter:card" content="summary">'),
+    (slice.includes('<meta name="twitter:card" content="summary">') || slice.includes('<meta name="twitter:card" content="summary_large_image">')),
     'renderPublicProfileShell must inject all six required meta tags for a public profile'
   );
 });
@@ -8142,9 +8142,13 @@ test('D-143B: OG route never includes sharedSnapshot/dominantPattern/raw_json/st
   );
 });
 
-test('D-143B: no OG image endpoint added', () => {
-  assert.ok(!workerSrc.includes('og-image'), 'no GET .../og-image route should exist yet — deferred per the D-143A audit');
-  assert.ok(!workerSrc.includes('og:image'), 'no og:image meta tag should be injected in this patch');
+test('D-186C: og:image wired into public profile shell (og-default.svg)', () => {
+  const idx = workerSrc.indexOf('async function renderPublicProfileShell');
+  const slice = workerSrc.slice(idx, idx + 2700);
+  assert.ok(
+    slice.includes('og:image') && slice.includes('og-default.svg'),
+    'D-186C: renderPublicProfileShell must inject og:image pointing to og-default.svg'
+  );
 });
 
 test('D-143B: no mutating endpoint added (renderPublicProfileShell/loadPublicProfileSummary are GET-only reads)', () => {
@@ -8351,7 +8355,7 @@ test('D-144B: existing OG tags remain intact alongside the new noindex/canonical
     slice.includes('<meta property="og:description" content="${description}">') &&
     slice.includes('<meta property="og:type" content="profile">') &&
     slice.includes('<meta property="og:url" content="${profileUrl}">') &&
-    slice.includes('<meta name="twitter:card" content="summary">'),
+    (slice.includes('<meta name="twitter:card" content="summary">') || slice.includes('<meta name="twitter:card" content="summary_large_image">')),
     'all five D-143B OG/Twitter tags must still be injected for resolved public profiles'
   );
 });

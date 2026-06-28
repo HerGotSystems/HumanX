@@ -615,7 +615,8 @@ async function renderPublicProfileShell(request, env, rawSlug) {
     const profileUrl = escHtml(`${url.origin}/u/${encodeURIComponent(summary.slug)}`);
     // canonical only ever appears here, for a resolved public profile — never
     // for the generic/private/not-found branch above.
-    const metaBlock = `<title>${title}</title>\n${noindexTag}\n<link rel="canonical" href="${profileUrl}">\n<meta property="og:title" content="${title}">\n<meta property="og:description" content="${description}">\n<meta property="og:type" content="profile">\n<meta property="og:url" content="${profileUrl}">\n<meta name="twitter:card" content="summary">`;
+    const ogImage = escHtml(`${url.origin}/og-default.svg`);
+    const metaBlock = `<title>${title}</title>\n${noindexTag}\n<link rel="canonical" href="${profileUrl}">\n<meta property="og:title" content="${title}">\n<meta property="og:description" content="${description}">\n<meta property="og:type" content="profile">\n<meta property="og:url" content="${profileUrl}">\n<meta property="og:image" content="${ogImage}">\n<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:image" content="${ogImage}">`;
     injected = html.replace('<title>HumanX — Belief → Truth → Claim → Evidence</title>', metaBlock);
   }
 

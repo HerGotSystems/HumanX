@@ -1,0 +1,21 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="g1" cx="20%" cy="0%" r="55%" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#a066ff" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#07080d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2" cx="90%" cy="0%" r="45%" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff3b5c" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#07080d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#07080d"/>
+  <rect width="1200" height="630" fill="url(#g1)"/>
+  <rect width="1200" height="630" fill="url(#g2)"/>
+  <rect x="0" y="0" width="1200" height="4" fill="#57b8ff" opacity="0.6"/>
+  <text x="100" y="290" font-family="-apple-system,system-ui,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="110" font-weight="800" fill="#eef3ff" letter-spacing="-3">HumanX</text>
+  <text x="104" y="360" font-family="-apple-system,system-ui,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="30" font-weight="600" fill="#57b8ff" letter-spacing="3">CLAIMS · EVIDENCE · PRESSURE · STUDY</text>
+  <text x="104" y="420" font-family="-apple-system,system-ui,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="22" fill="#8c97ad">Map personal belief. Pressure-test public claims with structured evidence.</text>
+  <line x1="100" y1="495" x2="1100" y2="495" stroke="#273044" stroke-width="1"/>
+  <text x="104" y="530" font-family="-apple-system,system-ui,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="17" fill="#8c97ad" letter-spacing="1">Early access · invite-only preview · humanx.rinkimirikata.com</text>
+</svg>
