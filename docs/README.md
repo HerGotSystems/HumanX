@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D189_CONTRIBUTION_LOOP_CLOSEOUT.md` ⭐ CURRENT — D-189 CONTRIBUTION LOOP CLOSEOUT
+### `D190A_PRODUCT_READINESS_AUDIT.md` ⭐ CURRENT — D-190A PRODUCT READINESS AUDIT
+
+Read-only audit for first external users. 4 P0 blockers (D1 live label, Review tab visible, calenhir example link, Reports in graph stats), 5 P1s (anon submit gate, anon handle, Vault/Drift/Truths explanations), plus P2/P3 polish. Readiness verdict: cautiously ready for 5–20 trusted preview users, not ready for broad sharing. Baseline: 1566/24/57.
+
+### `D189_CONTRIBUTION_LOOP_CLOSEOUT.md` — D-189 CONTRIBUTION LOOP CLOSEOUT
 
 Three-patch series (D-189A audit + B quick fixes + C microcopy). All review-gated toasts now say so. Immediately visible items (tests, analysis) say so. Vote toast confirms specific vote. side-panel focus buttons open collapsed sections. Flow panel empty rows have inline CTA buttons. Next-action hint shows for 4s after evidence/pressure submit. Baseline: 1566/24/57.
 
