@@ -742,3 +742,5 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 /* D-185B mobile quick fixes */
 @media(max-width:500px){.verdict-qualifier{display:none}.me-profile-actions{flex-direction:column}}
 @media(max-width:400px){.account-panel-popover{max-width:calc(100vw - 16px)}}
+/* D-185C side-panel scroll anchor — gives 8px breathing room when block:'start' lands on mobile */
+@media(max-width:900px){.study-mode #side-tools{scroll-margin-top:8px}}
