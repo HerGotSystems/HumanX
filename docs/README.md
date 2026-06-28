@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D201C_SOURCE_TAXONOMY_MIGRATION_PREFLIGHT.md` ⭐ CURRENT — D-201C MIGRATION PREFLIGHT (NOT YET APPLIED)
+### `D201D_SOURCE_TAXONOMY_API_SPEC.md` ⭐ CURRENT — D-201D SOURCE TAXONOMY API SPEC
+
+Exact enums (SOURCE_TYPES 11 values, EVIDENCE_STRENGTHS 5 values), request/response shapes, server validation plan (BAD_SOURCE_TYPE/BAD_EVIDENCE_STRENGTH 400s), all 8 read-query touch points, RunPack output_contract note, Review UI plan, backward-compat table, 3-phase implementation sequence, column guard pattern. Migration must apply before any code reads/writes new columns. Baseline: 1599/24/57.
+
+### `D201C_SOURCE_TAXONOMY_MIGRATION_PREFLIGHT.md` — D-201C MIGRATION PREFLIGHT (NOT YET APPLIED)
 
 Migration file `migrations/0015_evidence_source_taxonomy.sql` adds `source_type` and `evidence_strength` columns to `evidence` table — additive only, no data rewrite, quality column untouched. 10 smoke tests added. Migration NOT yet applied to production. Baseline: 1599/24/57.
 
