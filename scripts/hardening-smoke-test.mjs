@@ -1070,9 +1070,10 @@ test('createAipPacket checks review_state public before buildRunPack (D-38)', ()
 console.log('\n23. D-42B: Evidence moderation backend guards');
 
 test("insertEvidence INSERT includes review_state column and default param (D-42B)", () => {
+  // D-201E extended INSERT to also include source_type,evidence_strength — check review_state is still there
   assert.ok(
-    workerSrc.includes("INSERT INTO evidence (id,claim_id,user_id,stance,quality,title,body,source_url,created_at,review_state)"),
-    "insertEvidence INSERT must include review_state column"
+    workerSrc.includes("INSERT INTO evidence") && workerSrc.includes("review_state") && workerSrc.includes("source_type,evidence_strength"),
+    "insertEvidence INSERT must include review_state and new taxonomy columns"
   );
   assert.ok(
     workerSrc.includes("reviewState='review'"),
@@ -13423,12 +13424,91 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(existsSync(preflightPath), 'docs/D201C_SOURCE_TAXONOMY_MIGRATION_PREFLIGHT.md must exist');
   });
 
-  test('D-201C: preflight doc contains gated apply warning', () => {
+  test('D-201C: preflight doc references Option A gate', () => {
     const preflightPath = path.join(__dirname, '../docs/D201C_SOURCE_TAXONOMY_MIGRATION_PREFLIGHT.md');
     const preflightSrc = existsSync(preflightPath) ? readFileSync(preflightPath, 'utf8') : '';
+    // After migration was applied (D-201E0) the doc says READY/APPLIED rather than DO NOT RUN.
+    // Test confirms the doc still documents the apply sequence and the Option A gate.
     assert.ok(
-      preflightSrc.includes('DO NOT RUN') || preflightSrc.includes('DO NOT APPLY'),
-      'preflight doc must contain a gated apply warning'
+      preflightSrc.includes('Option A') || preflightSrc.includes('DO NOT RUN') || preflightSrc.includes('DO NOT APPLY'),
+      'preflight doc must reference Option A gate or apply warning'
+    );
+  });
+
+  // D-201E: Backend adoption smoke tests
+  test('D-201E: SOURCE_TYPES constant exists in worker.js', () => {
+    assert.ok(workerSrc.includes('SOURCE_TYPES'), 'worker.js must define SOURCE_TYPES');
+  });
+
+  test('D-201E: EVIDENCE_STRENGTHS constant exists in worker.js', () => {
+    assert.ok(workerSrc.includes('EVIDENCE_STRENGTHS'), 'worker.js must define EVIDENCE_STRENGTHS');
+  });
+
+  test('D-201E: cleanSourceType helper exists in worker.js', () => {
+    assert.ok(workerSrc.includes('function cleanSourceType'), 'worker.js must define cleanSourceType');
+  });
+
+  test('D-201E: cleanEvidenceStrength helper exists in worker.js', () => {
+    assert.ok(workerSrc.includes('function cleanEvidenceStrength'), 'worker.js must define cleanEvidenceStrength');
+  });
+
+  test('D-201E: insertEvidence signature includes sourceType and evidenceStrength params', () => {
+    assert.ok(
+      workerSrc.includes("sourceType='unknown', evidenceStrength='unknown'"),
+      'insertEvidence must accept sourceType and evidenceStrength params with unknown defaults'
+    );
+  });
+
+  test('D-201E: insertEvidence INSERT includes source_type and evidence_strength columns', () => {
+    assert.ok(
+      workerSrc.includes('source_type,evidence_strength') || workerSrc.includes('source_type, evidence_strength'),
+      'insertEvidence INSERT must include source_type and evidence_strength columns'
+    );
+  });
+
+  test('D-201E: addEvidence validates BAD_SOURCE_TYPE', () => {
+    assert.ok(workerSrc.includes('BAD_SOURCE_TYPE'), 'addEvidence must return BAD_SOURCE_TYPE for invalid source_type');
+  });
+
+  test('D-201E: addEvidence validates BAD_EVIDENCE_STRENGTH', () => {
+    assert.ok(workerSrc.includes('BAD_EVIDENCE_STRENGTH'), 'addEvidence must return BAD_EVIDENCE_STRENGTH for invalid evidence_strength');
+  });
+
+  test('D-201E: claimDetail direct SELECT includes source_type', () => {
+    assert.ok(
+      workerSrc.includes("source_type, evidence_strength, source_url, stance, 'direct' AS link_type"),
+      'claimDetail direct SELECT must include source_type and evidence_strength'
+    );
+  });
+
+  test('D-201E: claimDetail reused SELECT includes source_type', () => {
+    assert.ok(
+      workerSrc.includes("e.source_type, e.evidence_strength, e.source_url, e.stance, 'reused' AS link_type"),
+      'claimDetail reused SELECT must include e.source_type and e.evidence_strength'
+    );
+  });
+
+  test('D-201E: claimLineage evidenceLinks map includes sourceType and evidenceStrength', () => {
+    assert.ok(
+      workerSrc.includes('sourceType:e.source_type') || workerSrc.includes('sourceType: e.source_type'),
+      'claimLineage evidenceLinks must map sourceType from e.source_type'
+    );
+  });
+
+  test('D-201E: evidence-vault.js SELECT includes source_type', () => {
+    const vaultSrc = readFileSync(path.join(__dirname, '../src/evidence-vault.js'), 'utf8');
+    assert.ok(vaultSrc.includes('e.source_type'), 'evidence-vault.js SELECT must include e.source_type');
+  });
+
+  test('D-201E: evidence-vault.js map includes sourceType', () => {
+    const vaultSrc = readFileSync(path.join(__dirname, '../src/evidence-vault.js'), 'utf8');
+    assert.ok(vaultSrc.includes('sourceType:'), 'evidence-vault.js map must include sourceType');
+  });
+
+  test('D-201E: quality field still present in worker.js insertEvidence return', () => {
+    assert.ok(
+      workerSrc.includes('quality, title, body, source_url:sourceUrl, source_type:sourceType'),
+      'insertEvidence return must still include legacy quality field alongside new fields'
     );
   });
 }
