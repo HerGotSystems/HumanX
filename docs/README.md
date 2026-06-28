@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1589 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1886 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D209G_OWNER_CONSENT_UI_API_AUDIT.md` ⭐ CURRENT — D-209G OWNER CONSENT UI/API AUDIT
+### `D209I_SCORES_CONSENT_CLOSEOUT.md` ⭐ CURRENT — D-209I SCORES CONSENT ARC CLOSEOUT
+
+D-209G/H/I arc closeout. Scores-only public belief consent end-to-end: POST /api/belief-snapshots/:id/visibility (authenticated, ownership-checked, scores allowlist, all other groups forced false). buildPublicSharedSnapshot gates nested scores object {stabilityScore, opennessScore, pressureScore} behind beliefVisibilityAllows(visibility,'scores'). Owner UI: scores toggle (preview-only on change, save button required). No auto-save. Reversible. Public fields when scores=true: label + contradictionCount + createdAt + scores nested object. alignment_labels/pattern_summary/reflection_habits/drift_history/dominant_pattern/top_beliefs_json permanently excluded. No migration needed (visibility_json live since 0016). Baseline 1886/24/57. Live sanity PASS (toggle ON → save → public visible; toggle OFF → save → public hidden).
+
+### `D209G_OWNER_CONSENT_UI_API_AUDIT.md` — D-209G OWNER CONSENT UI/API AUDIT
 
 Audit of the safest path to owner per-field belief visibility controls. Documents current share model (public_summary_enabled via saveProfileSettings, no existing visibility_json update route), proposed UI location (below meSharedSnapshotPreviewBlockHtml in Profile Settings, scores-only toggle in D-209H), proposed route (POST /api/belief-snapshots/:id/visibility, scores allowlist only, blocked groups forced false, basic_snapshot always true), public response wiring plan (buildPublicSharedSnapshot scores gate, SELECT widening required), field group rollout (scores first, pattern_summary/alignment_labels deferred, reflection_habits/drift_history permanently blocked in this arc), required warnings, and testing plan. Highest-risk UI mistake: auto-save on toggle. D-209H scope: scores-only end-to-end (endpoint + UI toggle + live preview + smoke tests). No code changes in this task.
 
