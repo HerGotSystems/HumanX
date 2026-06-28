@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D204_EVIDENCE_STRENGTH_MIX_CLOSEOUT.md` ⭐ CURRENT — D-204 EVIDENCE STRENGTH MIX CLOSEOUT
+### `D205_TEST_ACTIVITY_CLOSEOUT.md` ⭐ CURRENT — D-205 TEST ACTIVITY CHART CLOSEOUT
+
+Third per-claim Study chart: Test Activity (renderTestActivityMix in app-v10.js). Audit found: home_tests has difficulty (easy/medium/hard) and safety_level but no status field — tests are proposals only, no pass/fail exists. Chart aggregates difficulty in fixed order (easy/medium/hard/unknown); null→unknown; title is "Test activity" not "Test results" or "Test coverage" (both ruled out — no results exist, no coverage standard exists). Placed before tests-panel, after pressure-panel (not crowding top evidence chart area). Does not use quality, votes, AI, scoring, or safety_level. Guardrail: "submitted test activity, not proof of truth" and "not a final verdict." CSS reuses .st-mix-* classes. No backend changes. 19 smoke tests. Deploy + sanity PASS. Future: if status/result column added to home_tests, requires separate guardrail review before charting. Baseline: 1705/24/57.
+
+### `D204_EVIDENCE_STRENGTH_MIX_CLOSEOUT.md` — D-204 EVIDENCE STRENGTH MIX CLOSEOUT
 
 Second per-claim Study chart: Evidence Strength Mix (renderEvidenceStrengthMix in app-v10.js). Reads evidence_strength/evidenceStrength from already-loaded evidence array; null→unknown; fixed enum order unknown/weak/moderate/strong/disputed; does not use quality, votes, AI verdicts, or scoring; guardrail copy on every render ("not whether the claim is proven"). Injected as es-mix-panel between st-mix-panel and evidence-panel. CSS reuses D-203B .st-mix-* classes intentionally — matched visual pair. No backend changes. 21 smoke tests. Deploy + sanity PASS. Next safe charts: Test Coverage per claim, Pressure Category Mix per claim. Still deferred: global leaderboards, ideology charts, AI dashboards, belief identity cards. Baseline: 1686/24/57.
 
