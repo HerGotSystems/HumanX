@@ -37,6 +37,9 @@ export default {
       // this one path pattern only — no global not_found_handling/SPA
       // fallback change in wrangler.toml.
       if (url.pathname.match(/^\/u\/[^/]+$/) && request.method === 'GET') return await renderPublicProfileShell(request, env, url.pathname.split('/').pop());
+      // D-187B: intercept /c/:id before the static-asset fallback so a shared
+      // claim link gets server-rendered OG meta tags — mirrors /u/:slug pattern.
+      if (url.pathname.match(/^\/c\/[^/]+$/) && request.method === 'GET') return await renderClaimShell(request, env, url.pathname.split('/').pop());
       if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
       if (!env.DB) return fallbackApi(request, url);
       if (url.pathname === '/api/debug' && request.method === 'GET') { const adminError = requireAdmin(request, env); if (adminError) return adminError; return debugState(request, env); }
@@ -617,6 +620,49 @@ async function renderPublicProfileShell(request, env, rawSlug) {
     // for the generic/private/not-found branch above.
     const ogImage = escHtml(`${url.origin}/og-default.png`);
     const metaBlock = `<title>${title}</title>\n${noindexTag}\n<link rel="canonical" href="${profileUrl}">\n<meta property="og:title" content="${title}">\n<meta property="og:description" content="${description}">\n<meta property="og:type" content="profile">\n<meta property="og:url" content="${profileUrl}">\n<meta property="og:image" content="${ogImage}">\n<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:image" content="${ogImage}">`;
+    injected = html.replace('<title>HumanX — Belief → Truth → Claim → Evidence</title>', metaBlock);
+  }
+
+  return new Response(injected, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'content-security-policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" } });
+}
+
+// D-187B: lightweight single-claim lookup for the /c/:id OG shell.
+// Returns null for missing, rejected, or non-public claims — never
+// distinguishes "not found" from "private" to the caller.
+async function loadClaimSummary(env, rawId) {
+  if (!env.DB || !rawId) return null;
+  const row = await env.DB.prepare(
+    `SELECT id, claim, status, category, evidence_score FROM claims WHERE id=? AND COALESCE(review_state,'public')='public'`
+  ).bind(String(rawId).slice(0, 80)).first();
+  return row || null;
+}
+
+// D-187B: OG shell for /c/:id — mirrors renderPublicProfileShell().
+// Always returns index.html; only injects claim-specific tags when the
+// id resolves to a public claim. No user data, no auth, no mutations.
+async function renderClaimShell(request, env, rawId) {
+  const url = new URL(request.url);
+  const indexRequest = new Request(new URL('/', url.origin), request);
+  const indexResponse = await env.ASSETS.fetch(indexRequest);
+  const noindexTag = '<meta name="robots" content="noindex">';
+  const html = await indexResponse.text();
+  const summary = env.DB ? await loadClaimSummary(env, rawId) : null;
+
+  let injected;
+  if (!summary) {
+    injected = html.replace(
+      '<title>HumanX — Belief → Truth → Claim → Evidence</title>',
+      `<title>HumanX — Belief → Truth → Claim → Evidence</title>\n${noindexTag}`
+    );
+  } else {
+    const rawText = String(summary.claim || '');
+    const titleText = rawText.length > 80 ? rawText.slice(0, 77) + '...' : rawText;
+    const title = `${escHtml(titleText)} — HumanX`;
+    const descParts = [summary.status || 'Claim', summary.category || 'General', `Evidence: ${summary.evidence_score ?? '?'}/10`];
+    const description = escHtml(descParts.join(' · ') + '. Pressure-tested on HumanX.');
+    const claimUrl = escHtml(`${url.origin}/c/${encodeURIComponent(rawId)}`);
+    const ogImage = escHtml(`${url.origin}/og-default.png`);
+    const metaBlock = `<title>${title}</title>\n${noindexTag}\n<link rel="canonical" href="${claimUrl}">\n<meta property="og:title" content="${title}">\n<meta property="og:description" content="${description}">\n<meta property="og:type" content="article">\n<meta property="og:url" content="${claimUrl}">\n<meta property="og:image" content="${ogImage}">\n<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:image" content="${ogImage}">`;
     injected = html.replace('<title>HumanX — Belief → Truth → Claim → Evidence</title>', metaBlock);
   }
 

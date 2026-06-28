@@ -12787,6 +12787,117 @@ test('D-181I: belief engine index.html not modified (out of scope)', () => {
   assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181I');
 });
 
+// ── Section 100 — D-187B: Direct claim URL /c/:id ────────────────────────────
+
+test('D-187B: Worker has /c/:id route intercept before static-asset fallback', () => {
+  assert.ok(
+    workerSrc.includes("url.pathname.match(/^\\/c\\/[^/]+$/)") &&
+    workerSrc.includes('renderClaimShell'),
+    'worker.js must intercept GET /c/:id and delegate to renderClaimShell'
+  );
+});
+
+test('D-187B: loadClaimSummary uses review_state public filter', () => {
+  const idx = workerSrc.indexOf('async function loadClaimSummary');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes("COALESCE(review_state,'public')='public'"),
+    "loadClaimSummary must filter by COALESCE(review_state,'public')='public'"
+  );
+});
+
+test('D-187B: renderClaimShell emits og:image pointing to og-default.png', () => {
+  const idx = workerSrc.indexOf('async function renderClaimShell');
+  const slice = workerSrc.slice(idx, idx + 2000);
+  assert.ok(
+    slice.includes('og:image') && slice.includes('og-default.png'),
+    'renderClaimShell must inject og:image referencing og-default.png'
+  );
+});
+
+test('D-187B: renderClaimShell emits og:type article', () => {
+  const idx = workerSrc.indexOf('async function renderClaimShell');
+  const slice = workerSrc.slice(idx, idx + 2000);
+  assert.ok(
+    slice.includes('og:type') && slice.includes('article'),
+    'renderClaimShell must use og:type=article for claim content'
+  );
+});
+
+test('D-187B: renderClaimShell falls back to generic shell for missing/private claims', () => {
+  const idx = workerSrc.indexOf('async function renderClaimShell');
+  const slice = workerSrc.slice(idx, idx + 1200);
+  assert.ok(
+    slice.includes('noindexTag') && slice.includes('if (!summary)'),
+    'renderClaimShell must inject noindex and return generic shell when claim is missing/private'
+  );
+});
+
+test('D-187B: renderClaimShell does not expose private/rejected claims', () => {
+  const idx = workerSrc.indexOf('async function loadClaimSummary');
+  const slice = workerSrc.slice(idx, idx + 400);
+  assert.ok(
+    !slice.includes('review') || slice.includes("COALESCE(review_state,'public')='public'"),
+    'loadClaimSummary must only return public claims — never private/review/rejected'
+  );
+});
+
+test('D-187B: SPA has parseDirectClaimPath function', () => {
+  assert.ok(
+    appSrc.includes('function parseDirectClaimPath'),
+    'app-v10.js must define parseDirectClaimPath()'
+  );
+});
+
+test('D-187B: parseDirectClaimPath matches /c/:id path pattern', () => {
+  const idx = appSrc.indexOf('function parseDirectClaimPath');
+  const slice = appSrc.slice(idx, idx + 200);
+  // regex in source uses \/c\/ so check for backslash-slash-c or the /c path segment
+  assert.ok(
+    slice.includes('\\/c\\/') || slice.includes("'/c/'") || slice.includes('"/c/"'),
+    'parseDirectClaimPath must contain a /c/ path pattern in its regex'
+  );
+});
+
+test('D-187B: boot() calls selectClaim when initialClaimId is set', () => {
+  const idx = appSrc.indexOf('async function boot');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes('initialClaimId') && slice.includes('selectClaim(initialClaimId)'),
+    'boot() must detect initialClaimId from parseDirectClaimPath and call selectClaim(initialClaimId)'
+  );
+});
+
+test('D-187B: boot() uses parseDirectClaimPath', () => {
+  const idx = appSrc.indexOf('async function boot');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('parseDirectClaimPath'),
+    'boot() must call parseDirectClaimPath() to detect direct claim URLs'
+  );
+});
+
+test('D-187B: selectClaim not modified — hard rule preserved', () => {
+  const idx = appSrc.indexOf('async function selectClaim');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes("api('/api/claims/'+id)") &&
+    slice.includes('renderStudy()'),
+    'selectClaim must remain unmodified — still calls /api/claims/:id and renderStudy'
+  );
+});
+
+test('D-187B: no admin/review/token logic added', () => {
+  const idx = workerSrc.indexOf('async function loadClaimSummary');
+  const slice = workerSrc.slice(idx, idx + 1600);
+  assert.ok(
+    !slice.includes('requireAdmin') &&
+    !slice.includes('HUMANX_ADMIN_TOKEN') &&
+    !slice.includes('reviewDecision'),
+    'D-187B claim shell functions must contain no admin/token/review-decision logic'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

@@ -101,9 +101,11 @@ function parsePublicProfileHash(){const m=String(location.hash||'').match(/^#\/u
 // the existing #/u/:slug hash. Hash takes priority if somehow both are present.
 function parsePublicProfilePath(){const m=String(location.pathname||'').match(/^\/u\/([^/?#]+)\/?$/);return m?decodeURIComponent(m[1]):null}
 function resolvePublicProfileSlug(){return parsePublicProfileHash()||parsePublicProfilePath()}
+// D-187B: detect /c/:id direct claim link — mirrors parsePublicProfilePath().
+function parseDirectClaimPath(){const m=String(location.pathname||'').match(/^\/c\/([^/?#]+)\/?$/);return m?decodeURIComponent(m[1]):null}
 function applyHashRoute(){const slug=parsePublicProfileHash();if(slug){publicProfileSlug=slug;mode='publicProfile';render()}else if(mode==='publicProfile'){mode='home';render()}}
 window.addEventListener('hashchange',applyHashRoute);
-async function boot(){user=localUser();document.getElementById('who').textContent=user.handle;const initialSlug=resolvePublicProfileSlug();if(initialSlug){publicProfileSlug=initialSlug;mode='publicProfile'}try{const h=await api('/api/health');live=h.mode==='d1-live';setStatus(live?'D1 live':'Demo fallback',live);await ensureSession();document.getElementById('who').textContent=user.handle;loadMe().catch(()=>{});await Promise.all([loadGraphStatus(),loadClaims(false)]);render()}catch(e){setStatus('Backend unreachable',false,true);renderError(e)}}
+async function boot(){user=localUser();document.getElementById('who').textContent=user.handle;const initialSlug=resolvePublicProfileSlug();const initialClaimId=parseDirectClaimPath();if(initialSlug){publicProfileSlug=initialSlug;mode='publicProfile'}try{const h=await api('/api/health');live=h.mode==='d1-live';setStatus(live?'D1 live':'Demo fallback',live);await ensureSession();document.getElementById('who').textContent=user.handle;loadMe().catch(()=>{});await Promise.all([loadGraphStatus(),loadClaims(false)]);if(initialClaimId){lastModeBeforeStudy='arena';mode='arena';document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('tab-arena')?.classList.add('active');await selectClaim(initialClaimId)}else{render()}}catch(e){setStatus('Backend unreachable',false,true);renderError(e)}}
 
 // D-136C: account panel (anonymous/verified state + invite-code redeem).
 // Reuses the existing x-humanx-user identity — never mints a new user id,
