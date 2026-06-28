@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D190C_INVITE_GATE_MESSAGING_AUDIT.md` ⭐ CURRENT — D-190C INVITE GATE MESSAGING AUDIT
+### `D190_EXTERNAL_PREVIEW_READINESS_CLOSEOUT.md` ⭐ CURRENT — D-190E EXTERNAL PREVIEW READINESS CLOSEOUT
+
+Four-patch D-190 series (A audit + B P0 trust fixes + C invite-gate audit + D soft messaging). All P0 blockers resolved. Verdict: ready for 5–20 trusted preview users, not yet public launch. Remaining: real invite/request-access path, social preview pass, public feedback/contact path. Baseline: 1589/24/57.
+
+### `D190C_INVITE_GATE_MESSAGING_AUDIT.md` — D-190C INVITE GATE MESSAGING AUDIT
 
 Read-only audit of all contribution actions vs. the home page invite promise. 7 actions correctly open to anon. 5 actions with copy mismatch (home says invite required, UI doesn't). 0 backend hard gates on verified. Recommendation: 5 soft-gate copy changes in D-190D only — no hard blocks, no backend changes. Baseline: 1578/24/57.
 
