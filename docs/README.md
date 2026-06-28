@@ -58,7 +58,12 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D199B_DRY_RUN_ACCESSIBILITY_POLISH.md` ⭐ CURRENT — D-199B ACCESSIBILITY POLISH (inline notes)
+### `D199C_OWNER_DRY_RUN_CLOSEOUT.md` ⭐ CURRENT — D-199C DRY-RUN CLOSEOUT + BATCH 1 GO
+
+Dry-run PASS. D-199B a11y polish applied. Final status: ready for Batch 1 (3–5 trusted users, not public). Pre-send checklist, monitoring plan, stop conditions, next actions. Baseline: 1589/24/57.
+
+### `D199B_DRY_RUN_ACCESSIBILITY_POLISH.md` — D-199B ACCESSIBILITY POLISH
+
 Accessibility/autofill polish from dry-run DevTools Issues: added `name` attributes to all major form fields (evidence, builder, truths, tests, analysis, admin invite), `for` attributes to all Builder labels, `autocomplete` hints on invite-code fields. No logic or ID changes. Baseline: 1589/24/57.
 
 ### `D199A_DRY_RUN_WAIT_STATE.md` — D-199A DRY-RUN WAIT STATE
