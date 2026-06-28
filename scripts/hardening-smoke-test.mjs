@@ -14520,6 +14520,156 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   });
 }
 
+{
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const migPath = path.join(__dirname, '../migrations/0016_belief_visibility_json.sql');
+  const migSrc = existsSync(migPath) ? readFileSync(migPath, 'utf8') : '';
+
+  // ── Migration file ─────────────────────────────────────────────────────────
+  test('D-209E: migration file 0016_belief_visibility_json.sql exists', () => {
+    assert.ok(existsSync(migPath), 'migration 0016_belief_visibility_json.sql must exist');
+  });
+
+  test('D-209E: migration adds visibility_json TEXT column to belief_snapshots', () => {
+    assert.ok(
+      migSrc.includes('ALTER TABLE belief_snapshots ADD COLUMN visibility_json TEXT'),
+      'migration must add visibility_json TEXT to belief_snapshots'
+    );
+  });
+
+  test('D-209E: migration SQL statements have no DROP', () => {
+    const stmts = migSrc.split('\n').filter(l => !l.trimStart().startsWith('--'));
+    assert.ok(!stmts.join('\n').toUpperCase().includes('DROP '), 'migration SQL must not contain DROP (outside comments)');
+  });
+
+  test('D-209E: migration SQL statements have no UPDATE', () => {
+    const stmts = migSrc.split('\n').filter(l => !l.trimStart().startsWith('--'));
+    assert.ok(!stmts.join('\n').toUpperCase().includes('UPDATE '), 'migration SQL must not contain UPDATE (outside comments)');
+  });
+
+  test('D-209E: migration SQL statements have no DELETE', () => {
+    const stmts = migSrc.split('\n').filter(l => !l.trimStart().startsWith('--'));
+    assert.ok(!stmts.join('\n').toUpperCase().includes('DELETE '), 'migration SQL must not contain DELETE (outside comments)');
+  });
+
+  test('D-209E: migration SQL statement has no NOT NULL constraint', () => {
+    const stmts = migSrc.split('\n').filter(l => !l.trimStart().startsWith('--'));
+    assert.ok(!stmts.join('\n').toUpperCase().includes('NOT NULL'), 'migration SQL must not add NOT NULL (outside comments)');
+  });
+
+  // ── parseBeliefVisibility helper ──────────────────────────────────────────
+  test('D-209E: parseBeliefVisibility function exists in worker.js', () => {
+    assert.ok(workerSrc.includes('function parseBeliefVisibility('), 'parseBeliefVisibility must be defined in worker.js');
+  });
+
+  test('D-209E: beliefVisibilityAllows function exists in worker.js', () => {
+    assert.ok(workerSrc.includes('function beliefVisibilityAllows('), 'beliefVisibilityAllows must be defined in worker.js');
+  });
+
+  test('D-209E: parseBeliefVisibility returns safe default for null input', () => {
+    const idx = workerSrc.indexOf('function parseBeliefVisibility(');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(slice.includes('if (!raw) return safe'), 'parseBeliefVisibility must return safe default when input is null/empty');
+  });
+
+  test('D-209E: parseBeliefVisibility has try/catch for invalid JSON', () => {
+    const idx = workerSrc.indexOf('function parseBeliefVisibility(');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(slice.includes('try {') && slice.includes('} catch {'), 'parseBeliefVisibility must catch JSON parse errors');
+  });
+
+  test('D-209E: parseBeliefVisibility safe default has basic_snapshot:true', () => {
+    const idx = workerSrc.indexOf('function parseBeliefVisibility(');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(slice.includes('basic_snapshot: true'), 'safe default must have basic_snapshot:true');
+  });
+
+  test('D-209E: parseBeliefVisibility safe default has all sensitive groups false', () => {
+    const idx = workerSrc.indexOf('function parseBeliefVisibility(');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(
+      slice.includes('pattern_summary: false') &&
+      slice.includes('alignment_labels: false') &&
+      slice.includes('scores: false') &&
+      slice.includes('reflection_habits: false') &&
+      slice.includes('drift_history: false'),
+      'safe default must have all sensitive groups set to false'
+    );
+  });
+
+  // ── getPublicProfile SELECT includes visibility_json ──────────────────────
+  test('D-209E: getPublicProfile SELECT now includes visibility_json', () => {
+    const idx = workerSrc.indexOf('async function getPublicProfile(');
+    const slice = workerSrc.slice(idx, idx + 4000);
+    assert.ok(
+      slice.includes('visibility_json FROM belief_snapshots'),
+      'getPublicProfile SELECT must include visibility_json after D-209E migration'
+    );
+  });
+
+  test('D-209E: D-209E scaffold comment present in worker.js', () => {
+    assert.ok(
+      workerSrc.includes('D-209E scaffold only: sensitive groups remain non-public'),
+      'D-209E scaffold comment must be present in worker.js'
+    );
+  });
+
+  // ── Public API still excludes sensitive fields ────────────────────────────
+  test('D-209E: getPublicProfile still does not select dominant_pattern', () => {
+    const idx = workerSrc.indexOf('async function getPublicProfile(');
+    const slice = workerSrc.slice(idx, idx + 4000);
+    assert.ok(!slice.includes('SELECT label, dominant_pattern'), 'getPublicProfile must not select dominant_pattern');
+  });
+
+  test('D-209E: getPublicProfile still does not select top_beliefs_json', () => {
+    const idx = workerSrc.indexOf('async function getPublicProfile(');
+    const slice = workerSrc.slice(idx, idx + 4000);
+    assert.ok(!slice.includes("top_beliefs_json || '[]'") && !slice.includes('top_beliefs_json FROM belief'), 'getPublicProfile must not select top_beliefs_json');
+  });
+
+  test('D-209E: sharedSnapshot response object does not include alignmentLabels yet', () => {
+    const idx = workerSrc.indexOf('sharedSnapshot = {');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(!slice.includes('alignmentLabels'), 'sharedSnapshot must not include alignmentLabels (D-209E scaffold only)');
+  });
+
+  test('D-209E: sharedSnapshot response object does not include patternLabel yet', () => {
+    const idx = workerSrc.indexOf('sharedSnapshot = {');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(!slice.includes('patternLabel'), 'sharedSnapshot must not include patternLabel (D-209E scaffold only)');
+  });
+
+  // ── Frontend: no consent toggles added yet ────────────────────────────────
+  test('D-209E: meBeliefVisibilityTogglesHtml not yet added to app-v10.js', () => {
+    assert.ok(!appSrc.includes('meBeliefVisibilityTogglesHtml'), 'consent toggle UI must not be added until D-209G');
+  });
+
+  // ── Preflight doc ─────────────────────────────────────────────────────────
+  test('D-209E: preflight doc exists', () => {
+    assert.ok(
+      existsSync(path.join(__dirname, '../docs/D209E_VISIBILITY_JSON_MIGRATION_PREFLIGHT.md')),
+      'D209E_VISIBILITY_JSON_MIGRATION_PREFLIGHT.md must exist'
+    );
+  });
+
+  test('D-209E: preflight doc contains deploy ordering warning', () => {
+    const preflight = readFileSync(path.join(__dirname, '../docs/D209E_VISIBILITY_JSON_MIGRATION_PREFLIGHT.md'), 'utf8');
+    assert.ok(
+      preflight.includes('Do not deploy') && preflight.includes('before applying this migration'),
+      'preflight doc must include deploy ordering warning'
+    );
+  });
+
+  test('D-209E: preflight doc contains migration apply command', () => {
+    const preflight = readFileSync(path.join(__dirname, '../docs/D209E_VISIBILITY_JSON_MIGRATION_PREFLIGHT.md'), 'utf8');
+    assert.ok(
+      preflight.includes('wrangler d1 migrations apply'),
+      'preflight doc must include wrangler d1 migrations apply command'
+    );
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

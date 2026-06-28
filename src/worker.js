@@ -669,6 +669,30 @@ async function renderClaimShell(request, env, rawId) {
   return new Response(injected, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'content-security-policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" } });
 }
 
+// D-209E: per-field belief visibility consent helpers.
+// parseBeliefVisibility: safely parses the visibility_json column value.
+//   - null / empty / invalid JSON → safe default (all sensitive groups false)
+//   - unknown keys are ignored
+//   - basic_snapshot defaults true (matches current public baseline)
+// beliefVisibilityAllows: checks a single group against the parsed map.
+//   - returns false for any group not explicitly set to true
+//   - D-209E scaffold only: sensitive groups remain non-public until
+//     explicit UI + consent flow ships (D-209G). The helper is wired in
+//     now so D-209F can gate fields without further plumbing changes.
+function parseBeliefVisibility(raw) {
+  const safe = { basic_snapshot: true, pattern_summary: false, alignment_labels: false, scores: false, reflection_habits: false, drift_history: false };
+  if (!raw) return safe;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return safe;
+    return { ...safe, ...parsed };
+  } catch { return safe; }
+}
+function beliefVisibilityAllows(visibility, group) {
+  if (!visibility || typeof visibility !== 'object') return group === 'basic_snapshot';
+  return visibility[group] === true;
+}
+
 async function getPublicProfile(request, env, rawSlug) {
   const summary = await loadPublicProfileSummary(env, rawSlug);
   // Same 404 for a missing slug, an invalid slug, and a slug that exists but
@@ -692,9 +716,17 @@ async function getPublicProfile(request, env, rawSlug) {
   // D-208B: Belief identity labels are private by default; public exposure
   // requires explicit per-field opt-in. dominant_pattern and top_beliefs_json
   // are excluded — they can contain named religious/ideological alignments.
-  const sharedSnapshotRow = await env.DB.prepare(`SELECT label, stability_score, openness_score, pressure_score, contradiction_count, created_at FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
+  // D-209E: visibility_json added to SELECT for future consent gating.
+  // parseBeliefVisibility() scaffolded; sensitive groups still non-public
+  // (D-209E scaffold only — no new fields exposed until D-209G UI ships).
+  const sharedSnapshotRow = await env.DB.prepare(`SELECT label, stability_score, openness_score, pressure_score, contradiction_count, created_at, visibility_json FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
   let sharedSnapshot = null;
   if (sharedSnapshotRow) {
+    // D-209E scaffold: parse visibility consent; currently only basic_snapshot
+    // fields are returned publicly. Sensitive groups (pattern_summary,
+    // alignment_labels, scores) remain gated until D-209G UI is live.
+    const _visibility = parseBeliefVisibility(sharedSnapshotRow.visibility_json);
+    void _visibility; // referenced here so D-209F can gate fields without touching SELECT
     sharedSnapshot = {
       label: sharedSnapshotRow.label || null,
       stabilityScore: sharedSnapshotRow.stability_score || 0,
