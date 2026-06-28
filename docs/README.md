@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D205_TEST_ACTIVITY_CLOSEOUT.md` ⭐ CURRENT — D-205 TEST ACTIVITY CHART CLOSEOUT
+### `D206_PRESSURE_MIX_CLOSEOUT.md` ⭐ CURRENT — D-206 PRESSURE MIX CHART CLOSEOUT
+
+Fourth per-claim Study chart: Pressure Mix (renderPressureCategoryMix in app-v10.js). Audit: pressure_points has severity (1-5) only; label/kind columns exist in schema but are null in all rows and not returned by getClaim(). Chart aggregates severity using existing pressureSeverityLabel(). Title is "Pressure mix" — not "Debunking mix" (no adjudication) or "Claim weakness" (measures activity not weakness). Placed as pm-mix-panel before pressure-panel. Bar color var(--yellow) matching existing pressure badge, not var(--green). Does not use votes, AI verdicts, evidence strength, source type, or scoring. Guardrail: "challenge activity not proof claim is false." No backend changes. 20 smoke tests. Deploy + sanity PASS. Chart arc complete: all 4 per-claim Study charts live (Source Type Mix, Evidence Strength Mix, Pressure Mix, Test Activity) — all frontend-only, all D-203A compliant. Baseline: 1725/24/57.
+
+### `D205_TEST_ACTIVITY_CLOSEOUT.md` — D-205 TEST ACTIVITY CHART CLOSEOUT
 
 Third per-claim Study chart: Test Activity (renderTestActivityMix in app-v10.js). Audit found: home_tests has difficulty (easy/medium/hard) and safety_level but no status field — tests are proposals only, no pass/fail exists. Chart aggregates difficulty in fixed order (easy/medium/hard/unknown); null→unknown; title is "Test activity" not "Test results" or "Test coverage" (both ruled out — no results exist, no coverage standard exists). Placed before tests-panel, after pressure-panel (not crowding top evidence chart area). Does not use quality, votes, AI, scoring, or safety_level. Guardrail: "submitted test activity, not proof of truth" and "not a final verdict." CSS reuses .st-mix-* classes. No backend changes. 19 smoke tests. Deploy + sanity PASS. Future: if status/result column added to home_tests, requires separate guardrail review before charting. Baseline: 1705/24/57.
 
