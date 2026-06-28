@@ -757,3 +757,13 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 @media(max-width:600px){.st-mix-row{grid-template-columns:100px 1fr 48px}}
 /* D-206A pressure mix bar — uses --yellow to match existing pressure badge color, not --green (truth) */
 .st-mix-bar.pm-bar{background:var(--yellow);opacity:.65}
+/* D-207B investigation overview group */
+.inv-overview{grid-column:1/-1;border:1px solid var(--line);border-radius:12px;padding:10px 12px 8px;margin-bottom:2px;background:#080b12}
+.inv-overview[open] .inv-overview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:8px 0 6px}
+.inv-overview summary.inv-overview-summary{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);cursor:pointer;user-select:none;list-style:none;padding:2px 0}
+.inv-overview summary.inv-overview-summary::after{content:' ▾';font-size:10px;opacity:.6}
+.inv-overview:not([open]) summary.inv-overview-summary::after{content:' ▸'}
+.inv-overview-desc{color:var(--muted);margin:4px 0 0}
+.inv-overview-note{margin:4px 0 2px}
+@media(max-width:900px){.inv-overview[open] .inv-overview-grid{grid-template-columns:1fr}}
+@media print{details.inv-overview{display:block}details.inv-overview>*{display:revert}}

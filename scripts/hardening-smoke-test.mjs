@@ -13948,10 +13948,14 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(taIdx < tsIdx, 'ta-mix-panel must appear before tests-panel in study-grid');
   });
 
-  test('D-205A: ta-mix-panel appears after evidence-panel', () => {
-    const taIdx = appSrc.indexOf('ta-mix-panel');
-    const evIdx = appSrc.indexOf('evidence-panel');
-    assert.ok(taIdx > evIdx, 'ta-mix-panel must appear after evidence-panel in study-grid');
+  test('D-205A: ta-mix-panel is inside inv-overview (D-207B reorder: charts grouped before content panels)', () => {
+    // D-207B moved all chart panels inside <details class="inv-overview"> which precedes evidence-panel.
+    // The old position test (ta after evidence) is intentionally superseded by the grouping.
+    const sgIdx = appSrc.indexOf('class="study-grid"');
+    const sgSlice = appSrc.slice(sgIdx, sgIdx + 1500);
+    const overviewEnd = sgSlice.indexOf('</details>');
+    const overviewSlice = sgSlice.slice(0, overviewEnd);
+    assert.ok(overviewSlice.includes('ta-mix-panel'), 'ta-mix-panel must be inside inv-overview group');
   });
 
   test('D-205A: chart does not use quality, evidence_score, votes, or AI verdicts', () => {
@@ -14041,10 +14045,13 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(pmIdx < prIdx, 'pm-mix-panel must appear before pressure-panel in study-grid');
   });
 
-  test('D-206A: pm-mix-panel appears after evidence-panel', () => {
-    const pmIdx = appSrc.indexOf('pm-mix-panel');
-    const evIdx = appSrc.indexOf('evidence-panel');
-    assert.ok(pmIdx > evIdx, 'pm-mix-panel must appear after evidence-panel in study-grid');
+  test('D-206A: pm-mix-panel is inside inv-overview (D-207B reorder: charts grouped before content panels)', () => {
+    // D-207B moved all chart panels inside <details class="inv-overview"> which precedes evidence-panel.
+    const sgIdx = appSrc.indexOf('class="study-grid"');
+    const sgSlice = appSrc.slice(sgIdx, sgIdx + 1500);
+    const overviewEnd = sgSlice.indexOf('</details>');
+    const overviewSlice = sgSlice.slice(0, overviewEnd);
+    assert.ok(overviewSlice.includes('pm-mix-panel'), 'pm-mix-panel must be inside inv-overview group');
   });
 
   test('D-206A: chart does not contain banned framing "Debunked"', () => {
@@ -14087,6 +14094,108 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
 
   test('D-206A: worker.js not changed', () => {
     assert.ok(!workerSrc.includes('renderPressureCategoryMix'), 'worker.js must not reference renderPressureCategoryMix — frontend-only');
+  });
+}
+
+// ── D-207B: investigation overview grouping ───────────────────────────────────
+{
+  // Find the study-grid injection string for structural tests
+  const sgIdx = appSrc.indexOf('class="study-grid"');
+  const sgSlice = appSrc.slice(sgIdx, sgIdx + 1500);
+
+  test('D-207B: inv-overview details element exists in study-grid', () => {
+    assert.ok(sgSlice.includes('inv-overview'), 'inv-overview must appear inside study-grid');
+  });
+
+  test('D-207B: details element has open attribute by default', () => {
+    assert.ok(sgSlice.includes('<details class="inv-overview" open>'), 'inv-overview must have open attribute');
+  });
+
+  test('D-207B: summary says Investigation overview', () => {
+    assert.ok(sgSlice.includes('Investigation overview'), 'summary must read "Investigation overview"');
+  });
+
+  test('D-207B: activity charts helper copy present', () => {
+    assert.ok(sgSlice.includes('Activity charts for this claim'), 'inv-overview-desc must be present');
+  });
+
+  test('D-207B: shared overview guardrail note present', () => {
+    assert.ok(sgSlice.includes('investigation context') || appSrc.includes('inv-overview-note'), 'shared inv-overview-note must exist');
+  });
+
+  test('D-207B: shared guardrail copy says not a final verdict', () => {
+    assert.ok(appSrc.includes('inv-overview-note'), 'inv-overview-note class must exist in app-v10.js');
+    const noteIdx = appSrc.indexOf('inv-overview-note');
+    const noteSlice = appSrc.slice(noteIdx, noteIdx + 300);
+    assert.ok(noteSlice.includes('not a final verdict'), 'inv-overview-note must include "not a final verdict"');
+  });
+
+  test('D-207B: all four chart renders inside inv-overview-grid', () => {
+    const gridStart = sgSlice.indexOf('inv-overview-grid');
+    const gridEnd = sgSlice.indexOf('</details>');
+    const gridSlice = sgSlice.slice(gridStart, gridEnd);
+    assert.ok(gridSlice.includes('renderSourceTypeMix'), 'renderSourceTypeMix must be inside inv-overview-grid');
+    assert.ok(gridSlice.includes('renderEvidenceStrengthMix'), 'renderEvidenceStrengthMix must be inside inv-overview-grid');
+    assert.ok(gridSlice.includes('renderPressureCategoryMix'), 'renderPressureCategoryMix must be inside inv-overview-grid');
+    assert.ok(gridSlice.includes('renderTestActivityMix'), 'renderTestActivityMix must be inside inv-overview-grid');
+  });
+
+  test('D-207B: evidence-panel still renders outside the overview', () => {
+    const afterDetails = sgSlice.slice(sgSlice.indexOf('</details>'));
+    assert.ok(afterDetails.includes('evidence-panel'), 'evidence-panel must appear after </details>');
+  });
+
+  test('D-207B: pressure-panel still renders outside the overview', () => {
+    const afterDetails = sgSlice.slice(sgSlice.indexOf('</details>'));
+    assert.ok(afterDetails.includes('pressure-panel'), 'pressure-panel must appear after </details>');
+  });
+
+  test('D-207B: tests-panel still renders outside the overview', () => {
+    const afterDetails = sgSlice.slice(sgSlice.indexOf('</details>'));
+    assert.ok(afterDetails.includes('tests-panel'), 'tests-panel must appear after </details>');
+  });
+
+  test('D-207B: inv-overview CSS exists in styles.css', () => {
+    const cssSrc = readFileSync('public/styles.css', 'utf8');
+    assert.ok(cssSrc.includes('.inv-overview'), '.inv-overview must be defined in styles.css');
+  });
+
+  test('D-207B: inv-overview-grid CSS defined', () => {
+    const cssSrc = readFileSync('public/styles.css', 'utf8');
+    assert.ok(cssSrc.includes('inv-overview-grid'), '.inv-overview-grid must be defined in styles.css');
+  });
+
+  test('D-207B: inv-overview uses no green truth styling', () => {
+    const cssSrc = readFileSync('public/styles.css', 'utf8');
+    const overviewCss = cssSrc.slice(cssSrc.indexOf('.inv-overview'), cssSrc.indexOf('.inv-overview') + 600);
+    assert.ok(!overviewCss.includes('var(--green)'), 'inv-overview CSS must not use --green (truth color)');
+  });
+
+  test('D-207B: summary label contains no banned framing "Truth Score"', () => {
+    assert.ok(!sgSlice.toLowerCase().includes('truth score'), 'overview summary must not use "Truth Score"');
+  });
+
+  test('D-207B: summary label contains no banned framing "Most Proven"', () => {
+    assert.ok(!sgSlice.toLowerCase().includes('most proven'), 'overview summary must not use "Most Proven"');
+  });
+
+  test('D-207B: summary label contains no banned framing "Verified by AI"', () => {
+    assert.ok(!sgSlice.toLowerCase().includes('verified by ai'), 'overview must not use "Verified by AI"');
+  });
+
+  test('D-207B: summary label contains no banned framing "Majority Says True"', () => {
+    assert.ok(!sgSlice.toLowerCase().includes('majority says true'), 'overview must not use "Majority Says True"');
+  });
+
+  test('D-207B: individual chart shortened notes preserved', () => {
+    assert.ok(appSrc.includes('Origin describes where material comes from'), 'renderSourceTypeMix shortened note must be present');
+    assert.ok(appSrc.includes('Strength labels describe categorization, not proof'), 'renderEvidenceStrengthMix shortened note must be present');
+    assert.ok(appSrc.includes('Pressure shows where support may need testing'), 'renderPressureCategoryMix shortened note must be present');
+    assert.ok(appSrc.includes('Recorded tests are investigation activity, not verdicts'), 'renderTestActivityMix shortened note must be present');
+  });
+
+  test('D-207B: worker.js not changed', () => {
+    assert.ok(!workerSrc.includes('inv-overview'), 'worker.js must not reference inv-overview — frontend-only layout');
   });
 }
 
