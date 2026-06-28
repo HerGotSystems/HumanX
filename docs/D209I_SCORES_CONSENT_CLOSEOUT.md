@@ -1,11 +1,11 @@
 # D-209I — Scores-Only Consent Arc Closeout
 
 **Arc:** D-209G (audit) → D-209H (implementation) → D-209I (closeout)
-**Status:** CODE COMPLETE — PENDING OWNER MANUAL DEPLOY + LIVE SANITY
+**Status:** COMPLETE — PASS — owner manual deploy and live ON/OFF sanity completed
 **Baseline:** 1886 passed / 0 failed / 24 (belief-engine) / 57 (route)
 **HEAD at closeout:** see D-209I commit
 
-> ⚠ **Deploy not completed by CC.** Wrangler could not reach the Cloudflare API during this session due to a certificate/proxy/VPN issue on the machine. The D-209H worker code is committed and pushed at `3dbed11`. Owner must deploy manually and complete the live sanity checklist below before this arc can be recorded as fully live.
+> **Deploy note:** CC could not deploy during the D-209I session — Wrangler failed to reach the Cloudflare API due to a certificate/proxy/VPN issue. Owner deployed commit `3dbed11` manually and completed live sanity verification.
 
 ---
 
@@ -158,43 +158,29 @@ These fields are never returned in the public belief snapshot response under any
 
 ---
 
-## Live Sanity Status
+## Live Sanity Result
 
-**PENDING OWNER MANUAL DEPLOY + LIVE SANITY**
+**PASS — owner manual deploy and live ON/OFF sanity completed**
 
-CC was unable to deploy D-209H during the D-209I session. Wrangler (`npx wrangler deploy`) failed with a certificate mismatch error, caused by a corporate proxy or VPN intercepting TLS on this machine. The worker code is committed and pushed at `3dbed11` — no code changes are needed.
+Deploy was performed manually by owner (commit `3dbed11`). CC could not deploy via Wrangler due to a certificate/proxy/VPN issue in the CC session.
 
-### Deploy instructions
+| Check | Result |
+|---|---|
+| Optional public fields section visible in Profile Settings | PASS |
+| Exactly one toggle: "Show reflection scores on public profile" | PASS |
+| Warning copy visible: "scores are reflection signals, not intelligence, morality, or truth rankings" | PASS |
+| Toggle ON → preview updates locally (no backend call, no auto-save) | PASS |
+| Public profile unchanged before Save | PASS |
+| Save → public profile shows label + contradictionCount + date + nested Reflection scores | PASS |
+| Public profile does not show dominant pattern | PASS |
+| Public profile does not show top alignment | PASS |
+| Public profile does not show alignment labels | PASS |
+| Public profile does not show religion/ideology/worldview labels | PASS |
+| Public profile does not show private reflection cards | PASS |
+| Public profile does not show pattern summary | PASS |
+| Toggle OFF → Save → Reflection scores hidden on public profile | PASS |
 
-```powershell
-cd C:\Users\veltr\HumanX
-git pull
-npx wrangler deploy
-```
-
-Run from a terminal not subject to the VPN/proxy intercept. No migration is required.
-
-### Manual verification checklist
-
-Complete this checklist after deploying. Record actual results to replace this table.
-
-| Check | Expected | Actual |
-|---|---|---|
-| Optional public fields section visible in Profile Settings | Present | — |
-| Exactly one toggle: "Show reflection scores on public profile" | Present | — |
-| Warning copy visible: "scores are reflection signals, not intelligence, morality, or truth rankings" | Present | — |
-| Toggle ON → preview updates locally without backend call | Preview updates, no network request | — |
-| Public profile unchanged before Save | No scores visible | — |
-| Save → public profile shows label + contradictionCount + date + Reflection scores | All four present | — |
-| Public profile does not show dominant pattern | Absent | — |
-| Public profile does not show top alignment | Absent | — |
-| Public profile does not show alignment labels | Absent | — |
-| Public profile does not show religion/ideology/worldview labels | Absent | — |
-| Public profile does not show private reflection cards | Absent | — |
-| Public profile does not show pattern summary | Absent | — |
-| Toggle OFF → Save → Reflection scores hidden on public profile | Scores absent | — |
-
-Live PASS may only be recorded after all checks above show the expected result. Update this section and the docs/README.md entry when done.
+Scores opt-in is confirmed reversible. No auto-save occurred at any point. Public shared snapshot uses nested `scores` object only when opt-in is true.
 
 ---
 
