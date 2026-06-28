@@ -10767,10 +10767,9 @@ test('D-163B: builder-intro copy exists in renderBuilderStep1', () => {
 });
 
 test('D-163B: Step 1 footer note mentions review before public display', () => {
-  const idx = appSrc.indexOf('function renderBuilderStep1');
-  const slice = appSrc.slice(idx, idx + 2000);
+  const fn = appSrc.match(/function renderBuilderStep1[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
-    slice.includes('reviewed before it appears publicly'),
+    fn.includes('reviewed before it appears publicly'),
     'renderBuilderStep1 footer note must mention that the claim is reviewed before appearing publicly'
   );
 });
