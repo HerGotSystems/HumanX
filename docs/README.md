@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D186A_PUBLIC_LANDING_SHARING_READINESS_AUDIT.md` ⭐ CURRENT — D-186A PUBLIC LANDING / SHARING AUDIT
+### `D186_PUBLIC_SHARING_READINESS_CLOSEOUT.md` ⭐ CURRENT — D-186 PUBLIC SHARING READINESS CLOSEOUT
+
+Five-patch series (D-186A–E): source-code audit + root OG tags + hero access copy + profile Browse CTA + og:image PNG. 7 of 12 audit issues fixed. No backend changes. Baseline: 1525/24/57.
+
+### `D186A_PUBLIC_LANDING_SHARING_READINESS_AUDIT.md` — D-186A PUBLIC LANDING / SHARING AUDIT
 
 Source-code audit of first-time visitor flows, public profile routes, OG/social sharing, and anonymous-user capabilities. 12 issues found (3 P1, 4 P2, 5 P3). No code changes. Baseline: 1525/24/57.
 
