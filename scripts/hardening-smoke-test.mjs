@@ -9991,10 +9991,12 @@ test('D-156A: copyPublicProfileLink clipboard fallback does not call backend', (
   );
 });
 
-test('D-156A: copyPublicProfileLink is called with (this, slug) from renderPublicProfileHtml', () => {
+test('D-156A: copyPublicProfileLink is called with (this, slug) from renderPublicProfileHtml (or via data-action after D-181I)', () => {
+  const hasOldForm = appSrc.includes("copyPublicProfileLink(this,'");
+  const hasNewForm = appSrc.includes('data-action="copyPublicProfileLink" data-slug=');
   assert.ok(
-    appSrc.includes("copyPublicProfileLink(this,'"),
-    'renderPublicProfileHtml must call copyPublicProfileLink(this, slug) so the button reference is passed'
+    hasOldForm || hasNewForm,
+    'renderPublicProfileHtml must invoke copyPublicProfileLink — either inline (this, slug) or via data-action dispatcher (D-181I)'
   );
 });
 
@@ -12637,11 +12639,13 @@ test('D-181H: claimMeta.btnAction still used inline in truthCard (excluded)', ()
   );
 });
 
-test('D-181H: copyPublicProfileLink(this, still inline in renderPublicProfileHtml (excluded)', () => {
+test('D-181H: copyPublicProfileLink present in renderPublicProfileHtml (inline in D-181H, data-action after D-181I)', () => {
   const fn = appSrc.match(/function renderPublicProfileHtml[\s\S]*?^function /m)?.[0] || '';
+  const hasOldForm = fn.includes("onclick=\"copyPublicProfileLink(this,'");
+  const hasNewForm = fn.includes('data-action="copyPublicProfileLink"');
   assert.ok(
-    fn.includes("onclick=\"copyPublicProfileLink(this,'"),
-    'copyPublicProfileLink inline onclick must remain — not migrated in D-181H'
+    hasOldForm || hasNewForm,
+    'copyPublicProfileLink must be present in renderPublicProfileHtml — either inline (D-181H) or data-action (D-181I)'
   );
 });
 
@@ -12673,6 +12677,110 @@ test('D-181H: CSP header unchanged in worker.js', () => {
 test('D-181H: belief engine index.html not modified (out of scope)', () => {
   const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
   assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181H');
+});
+
+// ── D-181I: copyPublicProfileLink + clearFilterAndLoadClaims migration ────────
+
+console.log('\nD-181I: copyPublicProfileLink(this,slug) + line-149 multi-statement inline');
+
+// clearFilterAndLoadClaims — zero-param action
+test('D-181I: clearFilterAndLoadClaims entry in _D181B_ZERO_PARAM_ACTIONS', () => {
+  assert.ok(
+    appSrc.includes("clearFilterAndLoadClaims:()=>{document.getElementById('filter').value='all';loadClaims(true)}"),
+    '_D181B_ZERO_PARAM_ACTIONS must include clearFilterAndLoadClaims arrow that sets #filter and calls loadClaims(true)'
+  );
+});
+
+test('D-181I: line-149 multi-statement inline removed from renderArena', () => {
+  const fn = appSrc.match(/function renderArena[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    !fn.includes("onclick=\"document.getElementById"),
+    'renderArena must not contain the old multi-statement inline onclick — migrated in D-181I'
+  );
+});
+
+test('D-181I: data-action="clearFilterAndLoadClaims" present in renderArena empty-state', () => {
+  const fn = appSrc.match(/function renderArena[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('data-action="clearFilterAndLoadClaims"'),
+    'renderArena empty-state must use data-action="clearFilterAndLoadClaims" after D-181I'
+  );
+});
+
+test('D-181I: Show all button text preserved in renderArena', () => {
+  const fn = appSrc.match(/function renderArena[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('>Show all</button>'),
+    'renderArena Show all button text must be preserved after D-181I'
+  );
+});
+
+// copyPublicProfileLink — id-param action (btn + data-slug)
+test('D-181I: copyPublicProfileLink entry in _D181E_ID_ACTIONS', () => {
+  assert.ok(
+    appSrc.includes('copyPublicProfileLink:b=>copyPublicProfileLink(b,b.dataset.slug)'),
+    '_D181E_ID_ACTIONS must include copyPublicProfileLink entry that passes btn and dataset.slug'
+  );
+});
+
+test('D-181I: onclick="copyPublicProfileLink(this, removed from app-v10.js', () => {
+  assert.ok(
+    !appSrc.includes("onclick=\"copyPublicProfileLink(this,'"),
+    'copyPublicProfileLink inline onclick must be gone — migrated in D-181I'
+  );
+});
+
+test('D-181I: data-action="copyPublicProfileLink" present in renderPublicProfileHtml', () => {
+  const fn = appSrc.match(/function renderPublicProfileHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('data-action="copyPublicProfileLink"'),
+    'renderPublicProfileHtml must use data-action="copyPublicProfileLink" after D-181I'
+  );
+});
+
+test('D-181I: data-slug attribute present alongside copyPublicProfileLink action', () => {
+  assert.ok(
+    appSrc.includes('data-action="copyPublicProfileLink" data-slug='),
+    'copyPublicProfileLink button must carry data-slug attribute after D-181I'
+  );
+});
+
+// Excluded handlers still inline
+test('D-181I: claimMeta.btnAction still inline in truthCard (excluded)', () => {
+  const fn = appSrc.match(/function truthCard[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('onclick="${claimMeta.btnAction}"'),
+    'claimMeta.btnAction must remain inline in truthCard — not migrated in D-181I'
+  );
+});
+
+test('D-181I: selectClaim, studyFromVault, attachEvidencePrompt remain inline (Cat F)', () => {
+  assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must remain — excluded Cat F');
+  assert.ok(appSrc.includes("onclick=\"studyFromVault('"), 'studyFromVault inline onclick must remain — excluded Cat F');
+  assert.ok(appSrc.includes("onclick=\"attachEvidencePrompt('"), 'attachEvidencePrompt inline onclick must remain — excluded Cat F');
+});
+
+test('D-181I: review decision handlers remain untouched (Cat I)', () => {
+  assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem must remain inline — Cat I excluded');
+  assert.ok(appSrc.includes("onclick=\"reviewDecisionUI('"), 'reviewDecisionUI must remain inline — Cat I excluded');
+  assert.ok(appSrc.includes("onclick=\"requestApproveReview('"), 'requestApproveReview must remain inline — Cat I excluded');
+});
+
+// All prior dispatcher maps present
+test('D-181I: all prior dispatcher maps still present', () => {
+  assert.ok(appSrc.includes('_D181B_ZERO_PARAM_ACTIONS'), 'D-181B map must remain');
+  assert.ok(appSrc.includes('_D181C_PARAM_ACTIONS'), 'D-181C map must remain');
+  assert.ok(appSrc.includes('_D181E_ID_ACTIONS'), 'D-181E map must remain');
+  assert.ok(appSrc.includes('_D181F_DUAL_ACTIONS'), 'D-181F map must remain');
+});
+
+test('D-181I: CSP header unchanged in worker.js', () => {
+  assert.ok(workerSrc.includes("'unsafe-inline'") && workerSrc.includes('content-security-policy'), 'CSP must remain permissive — not tightened in D-181I');
+});
+
+test('D-181I: belief engine index.html not modified (out of scope)', () => {
+  const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
+  assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181I');
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
