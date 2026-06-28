@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1274 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1525 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D183_ONBOARDING_CLARITY_CLOSEOUT.md` ⭐ CURRENT — D-183 ONBOARDING CLARITY SERIES CLOSEOUT
+### `D184_FIRST_USER_FLOW_CLOSEOUT.md` ⭐ CURRENT — D-184 FIRST-USER FLOW QA CLOSEOUT
+
+Seven-patch frontend-only series (D-184A–G): QA walkthrough + 10 targeted friction fixes across Study, Arena, Home, and RunPack. No backend, no logic changes. Baseline: 1525/24/57.
+
+### `D183_ONBOARDING_CLARITY_CLOSEOUT.md` — D-183 ONBOARDING CLARITY SERIES CLOSEOUT
 
 Six-patch frontend-only series (D-183A–F): first-use helper copy and empty-state guidance across Home, Claim Builder, Study/Arena, RunPack/Export, Truths/Drift, and My HumanX/Profile. No backend, no logic changes. Baseline: 1525/24/57.
 
