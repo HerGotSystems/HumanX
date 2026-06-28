@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1886 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1914 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D210A_BELIEF_AVATAR_GUARDRAIL_SPEC.md` ⭐ CURRENT — D-210A BELIEF AVATAR GUARDRAIL SPEC
+### D-210B — Private Reflection Avatar concept card ⭐ CURRENT
+
+Frontend-only. Adds `meReflectionAvatarHtml(data)` to `app-v10.js` — a private static concept card in My HumanX (after Belief reflection, before Recent Truths). CSS: `.me-avatar-card`, `.me-avatar-symbol`, `.me-avatar-chip`, `.me-avatar-note`. Derives 2–4 safe non-ranking habit descriptor chips (Source explorer, Mixed-source investigator, Evidence sorter, Question builder, Pressure mapper, Test planner, Uncertainty friendly, Claim cartographer) from existing private `/api/my-humanx` payload. Required guardrail copy: "Your avatar reflects investigation habits, not intelligence, morality, ideology, or truth." Private notice: "Private concept only. It is not shown on your public profile." No identity/rank/ideology language. No image generation. No public render. No backend change. No migration. 28 new D-210B smoke tests. Baseline 1914/24/57. Deploy needed.
+
+### `D210A_BELIEF_AVATAR_GUARDRAIL_SPEC.md` — D-210A BELIEF AVATAR GUARDRAIL SPEC
 
 Spec only — no code. Defines safe and forbidden dimensions, visual metaphors, data sources, privacy model, copy principles, and test requirements for the avatar/show-off layer. Forbidden dimensions (permanent): intelligence, morality, truth level, ideological tribe, religious correctness, political alignment, purity, conspiracy score, credibility ranking. Safe dimensions: investigation style, source diversity, evidence habits, pressure openness, test-seeking, uncertainty posture, reflection mode, exploration rhythm. Required guardrail copy: "Your avatar reflects investigation habits, not intelligence, morality, ideology, or truth." Privacy model: private by default; sharing requires explicit opt-in; no auto-generate; preview-before-publish. Biggest risk: framing drift toward identity label. D-210B recommendation: private static Reflection Avatar concept card in My HumanX, frontend only (app-v10.js + styles.css), no backend, no migration, no public surface change, deploy needed.
 
