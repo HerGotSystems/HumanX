@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D206_PRESSURE_MIX_CLOSEOUT.md` ⭐ CURRENT — D-206 PRESSURE MIX CHART CLOSEOUT
+### `D207A_STUDY_VIEW_DENSITY_AUDIT.md` ⭐ CURRENT — D-207A STUDY VIEW DENSITY AUDIT
+
+Docs/audit only. Documents current Study layout (8 panels in study-grid: 4 chart panels + 4 content panels; 2-column grid collapses to 1 column at ≤900px). Strengths: per-claim charts, D-203A guardrails, no extra API calls, no truth score. Density risks: 2 chart panels before evidence on desktop, ~520px of chart scroll on mobile before first evidence card, 4 × ev-origin-note becoming visual noise, empty-state charts on new claims show 4 "nothing yet" messages, "analytical before investigatory" impression. Mobile risks: bar label wrapping at ≤360px, action buttons pushed far down, repeated notes adding ~130px. Recommends Option 2: wrap 4 chart panels in <details class="inv-overview" open> with "Investigation overview" summary + shared consolidated guardrail note replacing 4 individual bottom notes. Reduces mobile note clutter while preserving collapse-to-skip behavior. D-207B should be a small code patch: app-v10.js + styles.css, ~10 new smoke tests. Baseline: 1725/24/57.
+
+### `D206_PRESSURE_MIX_CLOSEOUT.md` — D-206 PRESSURE MIX CHART CLOSEOUT
 
 Fourth per-claim Study chart: Pressure Mix (renderPressureCategoryMix in app-v10.js). Audit: pressure_points has severity (1-5) only; label/kind columns exist in schema but are null in all rows and not returned by getClaim(). Chart aggregates severity using existing pressureSeverityLabel(). Title is "Pressure mix" — not "Debunking mix" (no adjudication) or "Claim weakness" (measures activity not weakness). Placed as pm-mix-panel before pressure-panel. Bar color var(--yellow) matching existing pressure badge, not var(--green). Does not use votes, AI verdicts, evidence strength, source type, or scoring. Guardrail: "challenge activity not proof claim is false." No backend changes. 20 smoke tests. Deploy + sanity PASS. Chart arc complete: all 4 per-claim Study charts live (Source Type Mix, Evidence Strength Mix, Pressure Mix, Test Activity) — all frontend-only, all D-203A compliant. Baseline: 1725/24/57.
 
