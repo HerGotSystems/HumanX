@@ -44,6 +44,14 @@
 .cc-card-when{font-size:9px;line-height:1.35;color:#5e6878;font-style:italic;margin-top:2px}
 .cc-card-action{font-size:10px;color:var(--blue);margin-top:auto;padding-top:8px;font-weight:600;letter-spacing:.01em}
 .cc-card-primary .cc-card-action{color:var(--purple)}
+.cc-start-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cc-start-step{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:rgba(16,19,29,.7)}
+.cc-start-n{font-size:9px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em}
+.cc-start-step b{font-size:12px;color:var(--text)}
+.cc-start-desc{font-size:10px;line-height:1.4;color:var(--muted);flex:1}
+.cc-start-btn{margin-top:8px;font-size:10px;padding:5px 9px;align-self:flex-start}
+@media(max-width:700px){.cc-start-strip{grid-template-columns:1fr 1fr}}
+@media(max-width:400px){.cc-start-strip{grid-template-columns:1fr}}
 .cc-workflow{display:flex;align-items:stretch;gap:6px;flex-wrap:wrap}
 .cc-step{display:flex;flex-direction:column;flex:1;min-width:120px;padding:12px;background:rgba(16,19,29,.7);border:1px solid var(--line);border-radius:12px;gap:5px}
 .cc-step b{font-size:11px;color:var(--text)}
