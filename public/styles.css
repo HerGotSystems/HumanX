@@ -755,3 +755,5 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .st-mix-count{font-size:10px;color:var(--muted);text-align:right}
 .ev-origin-note{color:var(--muted);font-style:italic;margin:4px 0}
 @media(max-width:600px){.st-mix-row{grid-template-columns:100px 1fr 48px}}
+/* D-206A pressure mix bar — uses --yellow to match existing pressure badge color, not --green (truth) */
+.st-mix-bar.pm-bar{background:var(--yellow);opacity:.65}

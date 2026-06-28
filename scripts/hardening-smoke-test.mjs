@@ -13993,6 +13993,103 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   });
 }
 
+// ── D-206A: pressure mix chart ────────────────────────────────────────────────
+{
+  const pmSlice = appSrc.slice(appSrc.indexOf('function renderPressureCategoryMix'), appSrc.indexOf('function renderPressureCategoryMix') + 2000);
+
+  test('D-206A: renderPressureCategoryMix function exists in app-v10.js', () => {
+    assert.ok(appSrc.includes('function renderPressureCategoryMix'), 'renderPressureCategoryMix must be defined');
+  });
+
+  test('D-206A: chart reads severity field from pressure rows', () => {
+    assert.ok(pmSlice.includes('severity'), 'renderPressureCategoryMix must read severity field');
+  });
+
+  test('D-206A: PRESSURE_SEVERITY_ORDER constant exists with values 1-5', () => {
+    const orderIdx = appSrc.indexOf('PRESSURE_SEVERITY_ORDER');
+    const orderSlice = appSrc.slice(orderIdx, orderIdx + 60);
+    assert.ok(orderSlice.includes('1') && orderSlice.includes('5'), 'PRESSURE_SEVERITY_ORDER must include 1 through 5');
+  });
+
+  test('D-206A: null/zero severity counted as unknown', () => {
+    assert.ok(pmSlice.includes('unknownCount'), 'missing/zero severity must be tracked separately');
+  });
+
+  test('D-206A: guardrail copy — challenge activity not proof claim is false', () => {
+    assert.ok(pmSlice.includes('not proof that a claim is false'), 'renderPressureCategoryMix must include claim-not-false guardrail');
+  });
+
+  test('D-206A: guardrail copy — pressure helps investigation', () => {
+    assert.ok(pmSlice.includes('Pressure helps investigation'), 'renderPressureCategoryMix must include investigation-help framing');
+  });
+
+  test('D-206A: unknown/missing note present', () => {
+    assert.ok(pmSlice.includes('Unknown includes older pressure'), 'renderPressureCategoryMix must note that unknown covers legacy items');
+  });
+
+  test('D-206A: empty state copy present', () => {
+    assert.ok(pmSlice.includes('No pressure submitted yet'), 'renderPressureCategoryMix must have empty state');
+  });
+
+  test('D-206A: pm-mix-panel injected into study-grid', () => {
+    assert.ok(appSrc.includes('pm-mix-panel'), 'pm-mix-panel section must appear in study-grid');
+  });
+
+  test('D-206A: pm-mix-panel appears before pressure-panel', () => {
+    const pmIdx = appSrc.indexOf('pm-mix-panel');
+    const prIdx = appSrc.indexOf('pressure-panel');
+    assert.ok(pmIdx < prIdx, 'pm-mix-panel must appear before pressure-panel in study-grid');
+  });
+
+  test('D-206A: pm-mix-panel appears after evidence-panel', () => {
+    const pmIdx = appSrc.indexOf('pm-mix-panel');
+    const evIdx = appSrc.indexOf('evidence-panel');
+    assert.ok(pmIdx > evIdx, 'pm-mix-panel must appear after evidence-panel in study-grid');
+  });
+
+  test('D-206A: chart does not contain banned framing "Debunked"', () => {
+    assert.ok(!pmSlice.toLowerCase().includes('debunked'), 'renderPressureCategoryMix must not use "Debunked"');
+  });
+
+  test('D-206A: chart does not contain banned framing "False by pressure"', () => {
+    assert.ok(!pmSlice.toLowerCase().includes('false by pressure'), 'renderPressureCategoryMix must not use "False by pressure"');
+  });
+
+  test('D-206A: chart does not contain banned framing "Pressure wins"', () => {
+    assert.ok(!pmSlice.toLowerCase().includes('pressure wins'), 'renderPressureCategoryMix must not use "Pressure wins"');
+  });
+
+  test('D-206A: chart does not contain banned framing "Truth Score"', () => {
+    assert.ok(!pmSlice.toLowerCase().includes('truth score'), 'renderPressureCategoryMix must not use "Truth Score"');
+  });
+
+  test('D-206A: chart does not contain banned framing "Verified by AI"', () => {
+    assert.ok(!pmSlice.toLowerCase().includes('verified by ai'), 'renderPressureCategoryMix must not use "Verified by AI"');
+  });
+
+  test('D-206A: chart does not contain banned framing "Majority Says True"', () => {
+    assert.ok(!pmSlice.toLowerCase().includes('majority says true'), 'renderPressureCategoryMix must not use "Majority Says True"');
+  });
+
+  test('D-206A: chart does not use evidence_score, votes, or AI verdicts', () => {
+    assert.ok(
+      !pmSlice.includes('evidence_score') && !pmSlice.includes('beliefYes') && !pmSlice.includes('analysis_results'),
+      'renderPressureCategoryMix must not reference scoring, votes, or AI verdicts'
+    );
+  });
+
+  test('D-206A: pm-bar uses --yellow not --green', () => {
+    const cssSrc = readFileSync('public/styles.css', 'utf8');
+    const pmCssBlock = cssSrc.slice(cssSrc.indexOf('D-206A'), cssSrc.indexOf('D-206A') + 200);
+    assert.ok(pmCssBlock.includes('var(--yellow)'), 'pm-bar must use --yellow (pressure color), not --green (truth color)');
+    assert.ok(!pmCssBlock.includes('var(--green)'), 'pm-bar must not use --green');
+  });
+
+  test('D-206A: worker.js not changed', () => {
+    assert.ok(!workerSrc.includes('renderPressureCategoryMix'), 'worker.js must not reference renderPressureCategoryMix — frontend-only');
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
