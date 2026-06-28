@@ -14337,6 +14337,91 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   });
 }
 
+{
+  const src = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const css = readFileSync(path.join(__dirname, '../public/styles.css'), 'utf8');
+
+  test('D-208D: meBeliefReflectionHtml function exists in app-v10.js', () => {
+    assert.ok(src.includes('function meBeliefReflectionHtml('), 'meBeliefReflectionHtml must be defined');
+  });
+
+  test('D-208D: meReflectionSourceCardHtml function exists', () => {
+    assert.ok(src.includes('function meReflectionSourceCardHtml('), 'meReflectionSourceCardHtml must be defined');
+  });
+
+  test('D-208D: meReflectionStrengthCardHtml function exists', () => {
+    assert.ok(src.includes('function meReflectionStrengthCardHtml('), 'meReflectionStrengthCardHtml must be defined');
+  });
+
+  test('D-208D: meReflectionActivityCardHtml function exists', () => {
+    assert.ok(src.includes('function meReflectionActivityCardHtml('), 'meReflectionActivityCardHtml must be defined');
+  });
+
+  test('D-208D: Belief reflection panel heading exists', () => {
+    assert.ok(src.includes('<h3>Belief reflection</h3>'), '"Belief reflection" panel heading must be present');
+  });
+
+  test('D-208D: private reflection guardrail copy present', () => {
+    assert.ok(src.includes('Private reflection only — not a public identity label.'), 'Per-card private reflection guardrail must be present');
+  });
+
+  test('D-208D: panel-level guardrail uses "Private self-study" framing', () => {
+    assert.ok(src.includes('Private self-study based on how you interact'), 'Panel guardrail must use self-study framing');
+  });
+
+  test('D-208D: panel-level guardrail says "Not a personality label or truth ranking"', () => {
+    assert.ok(src.includes('Not a personality label or truth ranking'), 'Panel guardrail must include not-a-label copy');
+  });
+
+  test('D-208D: panel-level guardrail says "not a score of intelligence, morality, or truth"', () => {
+    assert.ok(src.includes('Belief patterns describe how you interact with claims. They are not a score of intelligence, morality, or truth.'), 'Panel guardrail must include intelligence/morality/truth disclaimer');
+  });
+
+  test('D-208D: meBeliefReflectionHtml is injected into renderMeHtml', () => {
+    assert.ok(src.includes('meBeliefReflectionHtml(data)'), 'meBeliefReflectionHtml must be called from renderMeHtml');
+  });
+
+  test('D-208D: source habits card uses sourceTypeLabel', () => {
+    assert.ok(src.includes('meReflectionSourceCardHtml') && src.includes('sourceTypeLabel'), 'source card must use sourceTypeLabel');
+  });
+
+  test('D-208D: evidence strength card uses evidenceStrengthLabel', () => {
+    assert.ok(src.includes('meReflectionStrengthCardHtml') && src.includes('evidenceStrengthLabel'), 'strength card must use evidenceStrengthLabel');
+  });
+
+  test('D-208D: no identity/religion label exposed in Belief reflection', () => {
+    const idx = src.indexOf('function meBeliefReflectionHtml(');
+    const slice = src.slice(idx, idx + 2000);
+    assert.ok(!slice.includes('dominantPattern') && !slice.includes('dominant_pattern') && !slice.includes('topAlignment'), 'Belief reflection cards must not expose identity labels');
+  });
+
+  test('D-208D: me-refl-row CSS class defined in styles.css', () => {
+    assert.ok(css.includes('.me-refl-row'), '.me-refl-row must be defined in styles.css');
+  });
+
+  test('D-208D: me-refl-bar CSS class defined in styles.css', () => {
+    assert.ok(css.includes('.me-refl-bar{'), '.me-refl-bar must be defined in styles.css');
+  });
+
+  test('D-208D: me-refl-private CSS class defined in styles.css', () => {
+    assert.ok(css.includes('.me-refl-private'), '.me-refl-private must be defined in styles.css');
+  });
+
+  test('D-208D: public profile render does not include meBeliefReflectionHtml', () => {
+    const ppIdx = src.indexOf('function renderPublicProfileHtml(');
+    const ppSlice = src.slice(ppIdx, ppIdx + 3000);
+    assert.ok(!ppSlice.includes('meBeliefReflectionHtml'), 'Belief reflection panel must not appear in public profile render');
+  });
+
+  test('D-208D: home_tests used as data source for activity card', () => {
+    assert.ok(src.includes('data.home_tests'), 'Activity card must read from data.home_tests');
+  });
+
+  test('D-208D: no new migration file added', () => {
+    assert.ok(!existsSync(path.join(__dirname, '../migrations/0006_belief_public_fields.sql')), 'D-208D must not add migration files');
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
