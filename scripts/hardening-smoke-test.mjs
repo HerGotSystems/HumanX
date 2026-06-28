@@ -3405,7 +3405,7 @@ test('D-113B: no backend/D1/wrangler/deploy references added in CSS density chan
 
 function renderTruthsBody() {
   const start = appSrc.indexOf('function renderTruths');
-  return start === -1 ? '' : appSrc.slice(start, start + 2800);
+  return start === -1 ? '' : appSrc.slice(start, start + 3000);
 }
 
 test('D-114B: Add-a-Truth form wrapped in .truth-add-details', () => {
