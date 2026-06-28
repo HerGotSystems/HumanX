@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D184_FIRST_USER_FLOW_CLOSEOUT.md` ⭐ CURRENT — D-184 FIRST-USER FLOW QA CLOSEOUT
+### `D185_MOBILE_LAYOUT_POLISH_CLOSEOUT.md` ⭐ CURRENT — D-185 MOBILE LAYOUT POLISH CLOSEOUT
+
+Three-patch series (D-185A–C): source-code mobile audit + 5 CSS quick fixes + Study side-panel scroll-to-top fix. No backend, no logic changes. Baseline: 1525/24/57.
+
+### `D184_FIRST_USER_FLOW_CLOSEOUT.md` — D-184 FIRST-USER FLOW QA CLOSEOUT
 
 Seven-patch frontend-only series (D-184A–G): QA walkthrough + 10 targeted friction fixes across Study, Arena, Home, and RunPack. No backend, no logic changes. Baseline: 1525/24/57.
 
