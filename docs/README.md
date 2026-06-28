@@ -58,7 +58,10 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D199A_DRY_RUN_WAIT_STATE.md` ⭐ CURRENT — D-199A DRY-RUN WAIT STATE
+### `D199B_DRY_RUN_ACCESSIBILITY_POLISH.md` ⭐ CURRENT — D-199B ACCESSIBILITY POLISH (inline notes)
+Accessibility/autofill polish from dry-run DevTools Issues: added `name` attributes to all major form fields (evidence, builder, truths, tests, analysis, admin invite), `for` attributes to all Builder labels, `autocomplete` hints on invite-code fields. No logic or ID changes. Baseline: 1589/24/57.
+
+### `D199A_DRY_RUN_WAIT_STATE.md` — D-199A DRY-RUN WAIT STATE
 
 Handoff doc: owner runs the dry run now using D-198A command pack, pastes result block back. Next step determined by PASS / CONDITIONAL PASS / FAIL. No further code or docs needed before the dry run. Complete launch doc index included. Baseline: 1589/24/57.
 
