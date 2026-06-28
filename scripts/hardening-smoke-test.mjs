@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -1573,9 +1573,10 @@ test('D-90C: renderReviewInspectPanel canMarkDup excludes pressure (D-90C)', () 
 });
 
 test('D-90C: addCaseItem pressure toast updated (D-90C)', () => {
+  // D-189C updated wording; accept both old and new form
   assert.ok(
-    appSrc.includes("'Pressure point submitted for review.'"),
-    "addCaseItem must toast 'Pressure point submitted for review.' for pressure"
+    appSrc.includes("'Pressure point submitted for review.'") || appSrc.includes("'Pressure submitted for review."),
+    "addCaseItem must toast a 'Pressure submitted for review' message for pressure"
   );
   assert.ok(
     !appSrc.includes("'Attack / pressure attached to selected claim.'"),
@@ -2168,7 +2169,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -13092,6 +13093,76 @@ test('D-189B: flow panel pressure empty slot has focusAddPressure button', () =>
   assert.ok(
     slice.includes('focusAddPressure') && slice.includes('No pressure attached yet'),
     'flow panel pressure empty slot must include a focusAddPressure action button'
+  );
+});
+
+// ── Section 103 — D-189C: Contribution reward/feedback microcopy ─────────────
+
+test('D-189C: pressure toast updated to mention approval (consistent with evidence)', () => {
+  const idx = appSrc.indexOf('function addCaseItem');
+  const slice = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    slice.includes('Pressure submitted for review') && slice.includes('approval'),
+    'pressure toast must say "Pressure submitted for review" and mention approval'
+  );
+});
+
+test('D-189C: old "Pressure point submitted for review" phrasing gone from addCaseItem', () => {
+  const idx = appSrc.indexOf('function addCaseItem');
+  const slice = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    !slice.includes('Pressure point submitted for review'),
+    'old pressure toast phrasing must be replaced'
+  );
+});
+
+test('D-189C: next-action inline hint set after addCaseItem success', () => {
+  const idx = appSrc.indexOf('function addCaseItem');
+  const slice = appSrc.slice(idx, idx + 1200);
+  assert.ok(
+    slice.includes('evidence-attach-note') && slice.includes('setTimeout'),
+    'addCaseItem must update evidence-attach-note with next-action hint then restore'
+  );
+});
+
+test('D-189C: test toast mentions Tests section', () => {
+  const idx = appSrc.indexOf('function addHomeTestUI');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes('Tests section'),
+    'test success toast must mention Tests section'
+  );
+});
+
+test('D-189C: test toast no longer just says "Test added"', () => {
+  assert.ok(
+    !appSrc.includes("toast('Test added')"),
+    'bare "Test added" toast must be replaced with more informative version'
+  );
+});
+
+test('D-189C: analysis toast mentions verdict shown', () => {
+  const idx = appSrc.indexOf('function saveAnalysisResult');
+  const slice = appSrc.slice(idx, idx + 800);
+  assert.ok(
+    slice.includes('verdict'),
+    'analysis success toast must mention verdict'
+  );
+});
+
+test('D-189C: vote toast uses specific vote label', () => {
+  const idx = appSrc.indexOf('function voteClaim');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('Believe') && slice.includes('Reject') && slice.includes('Unsure'),
+    'vote toast must include specific vote labels (Believe/Reject/Unsure)'
+  );
+});
+
+test('D-189C: vote toast no longer just says "Vote recorded"', () => {
+  assert.ok(
+    !appSrc.includes("toast('Vote recorded')"),
+    'bare "Vote recorded" toast must be replaced with vote-specific version'
   );
 });
 
