@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D191A_EXTERNAL_PREVIEW_LAUNCH_CHECKLIST.md` ⭐ CURRENT — D-191A EXTERNAL PREVIEW LAUNCH CHECKLIST
+### `D191B_PREVIEW_USER_INVITE_PACK.md` ⭐ CURRENT — D-191B PREVIEW USER INVITE PACK
+
+Short + long invite messages, plain-words product description, suggested try-list (8 flows), 7 feedback questions, copy-paste feedback reply template, known limitations to disclose, operator notes (preflight, Review queue, bug tracking). Baseline: 1589/24/57.
+
+### `D191A_EXTERNAL_PREVIEW_LAUNCH_CHECKLIST.md` — D-191A EXTERNAL PREVIEW LAUNCH CHECKLIST
 
 Docs + runnable preflight script (`node scripts/preview-launch-check.mjs`). 22 automated checks (source files, no jargon, OG metadata, direct claim URL, Review tab gating, invite messaging, baseline). 14 manual browser checks across P0/P1/P2. Stop/go decision table. Known limitations and feedback questions for preview users. Baseline: 1589/24/57.
 
