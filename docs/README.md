@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D209E_VISIBILITY_JSON_CLOSEOUT.md` ⭐ CURRENT — D-209E VISIBILITY_JSON MIGRATION CLOSEOUT
+### `D209G_OWNER_CONSENT_UI_API_AUDIT.md` ⭐ CURRENT — D-209G OWNER CONSENT UI/API AUDIT
+
+Audit of the safest path to owner per-field belief visibility controls. Documents current share model (public_summary_enabled via saveProfileSettings, no existing visibility_json update route), proposed UI location (below meSharedSnapshotPreviewBlockHtml in Profile Settings, scores-only toggle in D-209H), proposed route (POST /api/belief-snapshots/:id/visibility, scores allowlist only, blocked groups forced false, basic_snapshot always true), public response wiring plan (buildPublicSharedSnapshot scores gate, SELECT widening required), field group rollout (scores first, pattern_summary/alignment_labels deferred, reflection_habits/drift_history permanently blocked in this arc), required warnings, and testing plan. Highest-risk UI mistake: auto-save on toggle. D-209H scope: scores-only end-to-end (endpoint + UI toggle + live preview + smoke tests). No code changes in this task.
+
+### `D209E_VISIBILITY_JSON_CLOSEOUT.md` — D-209E VISIBILITY_JSON MIGRATION CLOSEOUT
 
 D-209E arc closeout (D + E + E1 + E2). Migration 0016 applied: ALTER TABLE belief_snapshots ADD COLUMN visibility_json TEXT (additive, null=all-private). Backend scaffold: parseBeliefVisibility() + beliefVisibilityAllows() live; getPublicProfile parses visibility_json but holds result as _visibility (scaffold only — no new public fields). D-209E1: stabilityScore/opennessScore/pressureScore removed from public sharedSnapshot SELECT and response object (Class-3 sensitive inference requires explicit consent). Public sharedSnapshot now: label + contradictionCount + createdAt only. Deployed version 1f1be492-efd0-4a1c-a778-1285c5e5b8f9. Live sanity PASS. 22 D-209E + 12 D-209E1 smoke tests. Baseline 1839/24/57. Next: D-209F backend consent gate wiring, D-209G owner toggle UI — no public belief expansion before both are live.
 
