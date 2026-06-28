@@ -13794,6 +13794,108 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   });
 }
 
+// ── D-204A: evidence strength mix chart ───────────────────────────────────────
+{
+  const esSlice = appSrc.slice(appSrc.indexOf('function renderEvidenceStrengthMix'), appSrc.indexOf('function renderEvidenceStrengthMix') + 2500);
+
+  test('D-204A: renderEvidenceStrengthMix function exists in app-v10.js', () => {
+    assert.ok(appSrc.includes('function renderEvidenceStrengthMix'), 'renderEvidenceStrengthMix must be defined');
+  });
+
+  test('D-204A: chart aggregates evidence_strength field', () => {
+    assert.ok(esSlice.includes('evidence_strength'), 'renderEvidenceStrengthMix must read evidence_strength');
+  });
+
+  test('D-204A: chart handles camelCase evidenceStrength field', () => {
+    assert.ok(esSlice.includes('evidenceStrength'), 'renderEvidenceStrengthMix must handle evidenceStrength');
+  });
+
+  test('D-204A: null/missing evidence_strength maps to unknown', () => {
+    assert.ok(esSlice.includes("||'unknown'") || esSlice.includes("|| 'unknown'"), 'missing evidence_strength must fall back to unknown');
+  });
+
+  test('D-204A: chart uses fixed enum order constant', () => {
+    assert.ok(appSrc.includes('EVIDENCE_STRENGTH_ORDER'), 'EVIDENCE_STRENGTH_ORDER constant must be defined');
+  });
+
+  test('D-204A: fixed enum order covers all 5 values', () => {
+    const orderIdx = appSrc.indexOf('EVIDENCE_STRENGTH_ORDER');
+    const orderSlice = appSrc.slice(orderIdx, orderIdx + 120);
+    assert.ok(
+      orderSlice.includes("'unknown'") && orderSlice.includes("'weak'") &&
+      orderSlice.includes("'moderate'") && orderSlice.includes("'strong'") &&
+      orderSlice.includes("'disputed'"),
+      'EVIDENCE_STRENGTH_ORDER must include all 5 values'
+    );
+  });
+
+  test('D-204A: chart does not read quality field', () => {
+    assert.ok(!esSlice.includes('.quality') && !esSlice.includes("'quality'") && !esSlice.includes('"quality"'),
+      'renderEvidenceStrengthMix must not use quality field');
+  });
+
+  test('D-204A: evidenceStrengthLabel helper exists', () => {
+    assert.ok(appSrc.includes('function evidenceStrengthLabel'), 'evidenceStrengthLabel must be defined');
+  });
+
+  test('D-204A: guardrail copy — activity not proof of truth', () => {
+    assert.ok(esSlice.includes('not proof of truth'), 'renderEvidenceStrengthMix must include "not proof of truth" guardrail note');
+  });
+
+  test('D-204A: guardrail copy — strength labels not whether claim is proven', () => {
+    assert.ok(esSlice.includes('not whether the claim is proven'), 'renderEvidenceStrengthMix must include strength-not-proof note');
+  });
+
+  test('D-204A: unknown-all note present', () => {
+    assert.ok(esSlice.includes('Unknown includes older evidence'), 'renderEvidenceStrengthMix must note that unknown covers legacy items');
+  });
+
+  test('D-204A: es-mix panel injected into study-grid', () => {
+    assert.ok(appSrc.includes('es-mix-panel'), 'es-mix-panel section must appear in study-grid');
+  });
+
+  test('D-204A: es-mix panel appears after st-mix-panel (strength after source type)', () => {
+    const stIdx = appSrc.indexOf('st-mix-panel');
+    const esIdx = appSrc.indexOf('es-mix-panel');
+    assert.ok(esIdx > stIdx, 'es-mix-panel must appear after st-mix-panel in study-grid');
+  });
+
+  test('D-204A: es-mix panel appears before evidence-panel', () => {
+    const esIdx = appSrc.indexOf('es-mix-panel');
+    const evIdx = appSrc.indexOf('evidence-panel');
+    assert.ok(esIdx < evIdx, 'es-mix-panel must appear before evidence-panel in study-grid');
+  });
+
+  test('D-204A: chart does not contain banned framing "Truth Score"', () => {
+    assert.ok(!esSlice.toLowerCase().includes('truth score'), 'renderEvidenceStrengthMix must not use "Truth Score"');
+  });
+
+  test('D-204A: chart does not contain banned framing "Most Proven"', () => {
+    assert.ok(!esSlice.toLowerCase().includes('most proven'), 'renderEvidenceStrengthMix must not use "Most Proven"');
+  });
+
+  test('D-204A: chart does not contain banned framing "Strongest Claim"', () => {
+    assert.ok(!esSlice.toLowerCase().includes('strongest claim'), 'renderEvidenceStrengthMix must not use "Strongest Claim"');
+  });
+
+  test('D-204A: chart does not contain banned framing "Verified by AI"', () => {
+    assert.ok(!esSlice.toLowerCase().includes('verified by ai'), 'renderEvidenceStrengthMix must not use "Verified by AI"');
+  });
+
+  test('D-204A: chart does not contain banned framing "Majority Says True"', () => {
+    assert.ok(!esSlice.toLowerCase().includes('majority says true'), 'renderEvidenceStrengthMix must not use "Majority Says True"');
+  });
+
+  test('D-204A: chart does not reference claim scoring fields', () => {
+    assert.ok(!esSlice.includes('evidence_score') && !esSlice.includes('survivability') && !esSlice.includes('testability'),
+      'renderEvidenceStrengthMix must not touch claim scoring fields');
+  });
+
+  test('D-204A: worker.js not changed', () => {
+    assert.ok(!workerSrc.includes('renderEvidenceStrengthMix'), 'worker.js must not reference renderEvidenceStrengthMix — frontend-only');
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
