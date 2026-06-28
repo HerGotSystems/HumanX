@@ -13021,7 +13021,7 @@ test('D-188C: Arena card() still does not include copyClaimLink', () => {
 
 test('D-189B: evidence toast mentions review approval', () => {
   const idx = appSrc.indexOf('function addCaseItem');
-  const slice = appSrc.slice(idx, idx + 1000);
+  const slice = appSrc.slice(idx, idx + 1500);
   assert.ok(
     slice.includes('submitted for review') && slice.includes('approval'),
     'evidence toast must mention review and approval, not just "attached"'
@@ -13030,7 +13030,7 @@ test('D-189B: evidence toast mentions review approval', () => {
 
 test('D-189B: evidence toast no longer says "attached to selected claim"', () => {
   const idx = appSrc.indexOf('function addCaseItem');
-  const slice = appSrc.slice(idx, idx + 1000);
+  const slice = appSrc.slice(idx, idx + 1500);
   assert.ok(
     !slice.includes('Evidence attached to selected claim'),
     'old misleading evidence toast must be gone'
@@ -13124,7 +13124,7 @@ test('D-189C: old "Pressure point submitted for review" phrasing gone from addCa
 
 test('D-189C: next-action inline hint set after addCaseItem success', () => {
   const idx = appSrc.indexOf('function addCaseItem');
-  const slice = appSrc.slice(idx, idx + 1200);
+  const slice = appSrc.slice(idx, idx + 1700);
   assert.ok(
     slice.includes('evidence-attach-note') && slice.includes('setTimeout'),
     'addCaseItem must update evidence-attach-note with next-action hint then restore'
@@ -13510,6 +13510,81 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
       workerSrc.includes('quality, title, body, source_url:sourceUrl, source_type:sourceType'),
       'insertEvidence return must still include legacy quality field alongside new fields'
     );
+  });
+
+  // D-201F: Frontend source taxonomy UI smoke tests
+  test('D-201F: eSourceType select exists in index.html', () => {
+    assert.ok(indexSrc.includes('id="eSourceType"'), 'index.html must contain eSourceType select');
+  });
+
+  test('D-201F: eEvidenceStrength select exists in index.html', () => {
+    assert.ok(indexSrc.includes('id="eEvidenceStrength"'), 'index.html must contain eEvidenceStrength select');
+  });
+
+  test('D-201F: eSourceType has scripture_tradition option', () => {
+    assert.ok(indexSrc.includes('value="scripture_tradition"'), 'eSourceType must include scripture_tradition option');
+  });
+
+  test('D-201F: helper copy "Origin is not proof" exists in index.html', () => {
+    assert.ok(indexSrc.includes('Origin is not proof'), 'index.html must contain the "Origin is not proof" helper copy');
+  });
+
+  test('D-201F: addCaseItem sends sourceType in payload', () => {
+    assert.ok(appSrc.includes("sourceType:document.getElementById('eSourceType')"), 'addCaseItem must read and send eSourceType');
+  });
+
+  test('D-201F: addCaseItem sends evidenceStrength in payload', () => {
+    assert.ok(appSrc.includes("evidenceStrength:document.getElementById('eEvidenceStrength')"), 'addCaseItem must read and send eEvidenceStrength');
+  });
+
+  test('D-201F: addCaseItem still sends legacy quality field', () => {
+    assert.ok(
+      appSrc.includes("quality:document.getElementById('eQuality').value"),
+      'addCaseItem must still send legacy quality field'
+    );
+  });
+
+  test('D-201F: addCaseItem resets eSourceType to unknown after submit', () => {
+    assert.ok(
+      appSrc.includes("document.getElementById('eSourceType').value='unknown'"),
+      'addCaseItem must reset eSourceType to unknown after submit'
+    );
+  });
+
+  test('D-201F: addCaseItem resets eEvidenceStrength to unknown after submit', () => {
+    assert.ok(
+      appSrc.includes("document.getElementById('eEvidenceStrength').value='unknown'"),
+      'addCaseItem must reset eEvidenceStrength to unknown after submit'
+    );
+  });
+
+  test('D-201F: sourceTypeLabel helper exists in app-v10.js', () => {
+    assert.ok(appSrc.includes('function sourceTypeLabel'), 'app-v10.js must define sourceTypeLabel helper');
+  });
+
+  test('D-201F: evidenceItem renders source type label', () => {
+    assert.ok(appSrc.includes('ev-source-type'), 'evidenceItem must include ev-source-type pill for source type display');
+  });
+
+  test('D-201F: evidenceItem renders strength label', () => {
+    assert.ok(appSrc.includes('ev-strength'), 'evidenceItem must include ev-strength pill for strength display');
+  });
+
+  test('D-201F: scripture/tradition origin note exists in evidenceItem', () => {
+    assert.ok(
+      appSrc.includes('Origin/tradition source — not empirical proof by itself'),
+      'evidenceItem must show origin/tradition contextual note'
+    );
+  });
+
+  test('D-201F: isOriginSource helper covers scripture_tradition', () => {
+    assert.ok(appSrc.includes("'scripture_tradition'"), 'isOriginSource must include scripture_tradition');
+  });
+
+  test('D-201F: scoring (recalcClaimScore) not referenced in new taxonomy code', () => {
+    // Source type/strength display must not affect scoring. Verify no new recalcClaimScore call was introduced.
+    const scoreCallCount = (appSrc.match(/recalcClaimScore/g) || []).length;
+    assert.strictEqual(scoreCallCount, 0, 'app-v10.js must not call recalcClaimScore (scoring stays in backend only)');
   });
 }
 
