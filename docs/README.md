@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D185_MOBILE_LAYOUT_POLISH_CLOSEOUT.md` ⭐ CURRENT — D-185 MOBILE LAYOUT POLISH CLOSEOUT
+### `D186A_PUBLIC_LANDING_SHARING_READINESS_AUDIT.md` ⭐ CURRENT — D-186A PUBLIC LANDING / SHARING AUDIT
+
+Source-code audit of first-time visitor flows, public profile routes, OG/social sharing, and anonymous-user capabilities. 12 issues found (3 P1, 4 P2, 5 P3). No code changes. Baseline: 1525/24/57.
+
+### `D185_MOBILE_LAYOUT_POLISH_CLOSEOUT.md` — D-185 MOBILE LAYOUT POLISH CLOSEOUT
 
 Three-patch series (D-185A–C): source-code mobile audit + 5 CSS quick fixes + Study side-panel scroll-to-top fix. No backend, no logic changes. Baseline: 1525/24/57.
 
