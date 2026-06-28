@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D201_SOURCE_TAXONOMY_CLOSEOUT.md` ⭐ CURRENT — D-201 SOURCE TAXONOMY CLOSEOUT
+### `D202A_HUMANX_EPISTEMOLOGY_MODEL.md` ⭐ CURRENT — D-202A EPISTEMOLOGY MODEL
+
+Defines what HumanX is and is not: a structured claim-analysis environment, not a truth machine. Covers operational definitions (claim/truth/evidence/pressure/test/belief/confidence/source type/moderation), nine critical separations (popularity ≠ truth, confidence ≠ accuracy, source origin ≠ proof, moderation ≠ endorsement, etc.), the investigation loop, the role of scripture/myth/tradition, aggregate chart warning principles, eight future risk modes (ideology capture, brigading, pseudo-scientific aesthetics, interface confidence conflation, moderation overreach, gamification, drift exploitation, RunPack authority laundering), and the product principle: *HumanX maps and pressures claims. Humans still interpret reality.* Reference document for all future feature decisions. Baseline: 1628/24/57.
+
+### `D201_SOURCE_TAXONOMY_CLOSEOUT.md` — D-201 SOURCE TAXONOMY CLOSEOUT
 
 Full arc closeout: migration 0015 applied to production, D-201E backend (enums, helpers, insertEvidence, all read paths) deployed, D-201F frontend (eSourceType/eEvidenceStrength selects, evidenceItem display, origin-source note) deployed, live sanity PASS. Final state: quality kept as legacy, source_type records origin/category, evidence_strength records self-assessed weight, scoring unchanged. Remaining: RunPack output_contract note, aggregate charts, Belief Engine integration. Baseline: 1628/24/57.
 
