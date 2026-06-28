@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D191C_PREVIEW_OPERATOR_RUNBOOK.md` ⭐ CURRENT — D-191C PREVIEW OPERATOR RUNBOOK
+### `D192A_LIGHTWEIGHT_ANALYTICS_AUDIT.md` ⭐ CURRENT — D-192A LIGHTWEIGHT ANALYTICS AUDIT
+
+Read-only observability audit. Maps what is visible today (graph counts, Review queue, debug state, owner-token telemetry) vs. what is invisible (Study opens, Copy Link clicks, Builder drop-off, bounce). Top metrics: votes delta, home_tests delta, aip_packets delta, Review queue volume, verified user count. D-192B deferred until after first wave feedback — manual observation sufficient for 5–20 users. Baseline: 1589/24/57.
+
+### `D191C_PREVIEW_OPERATOR_RUNBOOK.md` — D-191C PREVIEW OPERATOR RUNBOOK
 
 Full lifecycle runbook for running a 5–20 user trusted preview. Covers: pre-send checklist, daily Review queue routine, bug triage (P0–P3 with response times), feedback tracker format, invite code tracking rules, what to say when things break, stop/expand decision criteria, and known limitations. Baseline: 1589/24/57.
 
