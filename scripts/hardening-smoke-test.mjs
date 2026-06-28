@@ -13586,6 +13586,122 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     const scoreCallCount = (appSrc.match(/recalcClaimScore/g) || []).length;
     assert.strictEqual(scoreCallCount, 0, 'app-v10.js must not call recalcClaimScore (scoring stays in backend only)');
   });
+
+  // D-202C: RunPack anti-authority-laundering smoke tests
+  test('D-202C: output_contract does not contain "Proven"', () => {
+    const idx = workerSrc.indexOf('output_contract');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(!slice.includes('"Proven"') && !slice.includes("'Proven'") && !slice.includes('| Proven'),
+      'output_contract must not contain "Proven" verdict label');
+  });
+
+  test('D-202C: output_contract does not contain "Disproven"', () => {
+    const idx = workerSrc.indexOf('output_contract');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(!slice.includes('Disproven'), 'output_contract must not contain "Disproven" verdict label');
+  });
+
+  test('D-202C: output_contract does not contain "Reality Collapse"', () => {
+    const idx = workerSrc.indexOf('output_contract');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(!slice.includes('Reality Collapse'), 'output_contract must not contain "Reality Collapse" verdict label');
+  });
+
+  test('D-202C: output_contract contains "Strongly Supported"', () => {
+    const idx = workerSrc.indexOf('output_contract');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(slice.includes('Strongly Supported'), 'output_contract must contain "Strongly Supported" safe verdict label');
+  });
+
+  test('D-202C: output_contract contains "Strongly Contested"', () => {
+    const idx = workerSrc.indexOf('output_contract');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(slice.includes('Strongly Contested'), 'output_contract must contain "Strongly Contested" safe verdict label');
+  });
+
+  test('D-202C: output_contract contains "Internally Contradictory"', () => {
+    const idx = workerSrc.indexOf('output_contract');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(slice.includes('Internally Contradictory'), 'output_contract must contain "Internally Contradictory" safe verdict label');
+  });
+
+  test('D-202C: output_contract contains "not independent verification" warning', () => {
+    const idx = workerSrc.indexOf('output_contract');
+    const slice = workerSrc.slice(idx, idx + 800);
+    assert.ok(slice.includes('not independent verification'), 'output_contract must contain provenance warning');
+  });
+
+  test('D-202C: output_contract contains source_type_note for scripture/tradition', () => {
+    const idx = workerSrc.indexOf('output_contract');
+    const slice = workerSrc.slice(idx, idx + 1000);
+    assert.ok(slice.includes('source_type_note'), 'output_contract must contain source_type_note field');
+  });
+
+  test('D-202C: buildRunPack instruction does not say "call a claim proven"', () => {
+    const idx = workerSrc.indexOf('instruction:');
+    const slice = workerSrc.slice(idx, idx + 600);
+    assert.ok(slice.includes('Do not call a claim proven'), 'instruction must explicitly forbid calling a claim proven');
+  });
+
+  test('D-202C: analysisItem renders "not independent verification" provenance note', () => {
+    assert.ok(
+      appSrc.includes('not independent verification'),
+      'analysisItem must show "not independent verification" provenance note'
+    );
+  });
+
+  test('D-202C: LEGACY_VERDICT_MAP maps "Proven" to safer label', () => {
+    assert.ok(
+      appSrc.includes("'Proven':'Strongly Supported'") || appSrc.includes('"Proven":"Strongly Supported"'),
+      'LEGACY_VERDICT_MAP must remap legacy "Proven" label to "Strongly Supported"'
+    );
+  });
+
+  test('D-202C: LEGACY_VERDICT_MAP maps "Disproven" to safer label', () => {
+    assert.ok(
+      appSrc.includes("'Disproven':'Strongly Contested'") || appSrc.includes('"Disproven":"Strongly Contested"'),
+      'LEGACY_VERDICT_MAP must remap legacy "Disproven" label to "Strongly Contested"'
+    );
+  });
+
+  test('D-202C: LEGACY_VERDICT_MAP maps "Reality Collapse" to safer label', () => {
+    assert.ok(
+      appSrc.includes("'Reality Collapse':'Internally Contradictory'") || appSrc.includes('"Reality Collapse":"Internally Contradictory"'),
+      'LEGACY_VERDICT_MAP must remap legacy "Reality Collapse" to "Internally Contradictory"'
+    );
+  });
+
+  test('D-202C: sectionAnalyses paste area contains verification warning', () => {
+    const idx = appSrc.indexOf('function sectionAnalyses');
+    const slice = appSrc.slice(idx, idx + 1200);
+    assert.ok(
+      slice.includes('not as verification') || slice.includes('not as a verdict'),
+      'sectionAnalyses paste area must warn against treating AI output as verification'
+    );
+  });
+
+  test('D-202C: rp-return-section paste area contains verification warning', () => {
+    const idx = appSrc.indexOf('rp-return-section');
+    const slice = appSrc.slice(idx, idx + 600);
+    assert.ok(
+      slice.includes('not independent verification'),
+      'rp-return-section paste area must warn this is not independent verification'
+    );
+  });
+
+  test('D-202C: no "AI verified" wording in app-v10.js', () => {
+    assert.ok(
+      !appSrc.toLowerCase().includes('ai verified') && !appSrc.includes('AI verified'),
+      'app-v10.js must not contain "AI verified" wording'
+    );
+  });
+
+  test('D-202C: no "AI verified" wording in worker.js', () => {
+    assert.ok(
+      !workerSrc.toLowerCase().includes('ai verified'),
+      'worker.js must not contain "AI verified" wording'
+    );
+  });
 }
 
 // ── Summary ───────────────────────────────────────────────────────────────────
