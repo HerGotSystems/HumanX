@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D202A_HUMANX_EPISTEMOLOGY_MODEL.md` ⭐ CURRENT — D-202A EPISTEMOLOGY MODEL
+### `D202B_RUNPACK_AUTHORITY_LAUNDERING_AUDIT.md` ⭐ CURRENT — D-202B AUTHORITY LAUNDERING AUDIT
+
+Audit of where RunPack/AI outputs could be mistaken for independent verification. Identifies five surfaces at risk: "Proven" in output_contract verdict (HIGH — green badge, implies verification standard the system cannot meet), missing provenance note on analysisItem() card (HIGH), paste surfaces lack AI-input warning (MEDIUM), analyses currently visible to all claim viewers not just submitter (MEDIUM-HIGH), no packet_id/ai_model stored (MEDIUM). Documents the full authority-laundering failure loop. Required language principles. D-202C quick-fix spec: remove "Proven"/"Disproven" from verdict vocabulary, add source_type_note to output_contract, add provenance note to analysisItem(), update two paste-surface copy blocks. Long-term: packet_id FK, AI-output badge, circular-citation detector, re-entry rule. Hard stops: no "AI verified" wording, no auto status upgrades from AI output, no aggregate AI consensus score. Baseline: 1628/24/57.
+
+### `D202A_HUMANX_EPISTEMOLOGY_MODEL.md` — D-202A EPISTEMOLOGY MODEL
 
 Defines what HumanX is and is not: a structured claim-analysis environment, not a truth machine. Covers operational definitions (claim/truth/evidence/pressure/test/belief/confidence/source type/moderation), nine critical separations (popularity ≠ truth, confidence ≠ accuracy, source origin ≠ proof, moderation ≠ endorsement, etc.), the investigation loop, the role of scripture/myth/tradition, aggregate chart warning principles, eight future risk modes (ideology capture, brigading, pseudo-scientific aesthetics, interface confidence conflation, moderation overreach, gamification, drift exploitation, RunPack authority laundering), and the product principle: *HumanX maps and pressures claims. Humans still interpret reality.* Reference document for all future feature decisions. Baseline: 1628/24/57.
 
