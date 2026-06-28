@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D193A_PREVIEW_FEEDBACK_INGESTION_AUDIT.md` ⭐ CURRENT — D-193A PREVIEW FEEDBACK INGESTION AUDIT
+### `D194A_PREVIEW_MODERATION_PRESSURE_AUDIT.md` ⭐ CURRENT — D-194A PREVIEW MODERATION PRESSURE AUDIT
+
+Moderation survivability audit for 5–20 preview users. Covers rate limits, review states, duplicate detection, shadow-ban gap, queue bottlenecks, 5 abuse scenarios, and estimated operator load (10–15 min/day for medium wave). Verdict: survivable with daily queue checks. D-194B optional before wave 1 — only if shadow-ban gap is a concern. Baseline: 1589/24/57.
+
+### `D193A_PREVIEW_FEEDBACK_INGESTION_AUDIT.md` — D-193A PREVIEW FEEDBACK INGESTION AUDIT
 
 Workflow audit for collecting and triaging feedback from 5–20 preview users. Recommends manual private doc with flat row template (date/user/device/flow/issue/severity/status). P0–P3 + FR severity tiers. Escalation rules, spam handling, what not to collect. D-193B deferred until after wave 1. Baseline: 1589/24/57.
 
