@@ -719,7 +719,11 @@ async function getPublicProfile(request, env, rawSlug) {
   // D-209E: visibility_json added to SELECT for future consent gating.
   // parseBeliefVisibility() scaffolded; sensitive groups still non-public
   // (D-209E scaffold only — no new fields exposed until D-209G UI ships).
-  const sharedSnapshotRow = await env.DB.prepare(`SELECT label, stability_score, openness_score, pressure_score, contradiction_count, created_at, visibility_json FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
+  // D-209E1: scores (stability/openness/pressure) removed from public response.
+  // Public sharedSnapshot is now label + contradictionCount + createdAt only,
+  // matching the documented public sharing baseline from D-209C/D-209D.
+  // Scores are retained in private /api/my-humanx; not selected here.
+  const sharedSnapshotRow = await env.DB.prepare(`SELECT label, contradiction_count, created_at, visibility_json FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
   let sharedSnapshot = null;
   if (sharedSnapshotRow) {
     // D-209E scaffold: parse visibility consent; currently only basic_snapshot
@@ -729,9 +733,6 @@ async function getPublicProfile(request, env, rawSlug) {
     void _visibility; // referenced here so D-209F can gate fields without touching SELECT
     sharedSnapshot = {
       label: sharedSnapshotRow.label || null,
-      stabilityScore: sharedSnapshotRow.stability_score || 0,
-      opennessScore: sharedSnapshotRow.openness_score || 0,
-      pressureScore: sharedSnapshotRow.pressure_score || 0,
       contradictionCount: sharedSnapshotRow.contradiction_count || 0,
       createdAt: sharedSnapshotRow.created_at,
     };

@@ -7714,21 +7714,24 @@ test('D-142B: sharedSnapshot query requires public_summary_enabled=1 and hidden_
   );
 });
 
-test('D-142B→D-208B: public sharedSnapshot response exposes only the privacy-safe field set (dominant_pattern and top_beliefs_json removed in D-208B)', () => {
+test('D-142B→D-208B→D-209E1: public sharedSnapshot response exposes only Class-1 baseline fields (scores removed in D-209E1)', () => {
   const idx = workerSrc.indexOf('async function getPublicProfile');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
   const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
-  // D-208B: dominant_pattern and top_beliefs_json are excluded from the public response.
-  // Safe fields: label, stabilityScore, opennessScore, pressureScore, contradictionCount, createdAt
+  // D-208B: dominant_pattern and top_beliefs_json excluded.
+  // D-209E1: stabilityScore/opennessScore/pressureScore also removed — scores are
+  // Class-3 sensitive inference and require explicit consent (D-209D spec).
+  // Public sharedSnapshot is now label + contradictionCount + createdAt only.
   assert.ok(
     slice.includes('label: sharedSnapshotRow.label || null') &&
-    slice.includes('stabilityScore: sharedSnapshotRow.stability_score || 0') &&
-    slice.includes('opennessScore: sharedSnapshotRow.openness_score || 0') &&
-    slice.includes('pressureScore: sharedSnapshotRow.pressure_score || 0') &&
     slice.includes('contradictionCount: sharedSnapshotRow.contradiction_count || 0') &&
+    slice.includes('createdAt: sharedSnapshotRow.created_at') &&
+    !slice.includes('stabilityScore:') &&
+    !slice.includes('opennessScore:') &&
+    !slice.includes('pressureScore:') &&
     !slice.includes('dominantPattern:') &&
     !slice.includes('topAlignmentName'),
-    'sharedSnapshot must include label/scores/contradictionCount but exclude dominantPattern and topAlignmentName (D-208B privacy rule)'
+    'sharedSnapshot must include only label/contradictionCount/createdAt — scores and identity labels excluded (D-209E1)'
   );
 });
 
@@ -14666,6 +14669,77 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(
       preflight.includes('wrangler d1 migrations apply'),
       'preflight doc must include wrangler d1 migrations apply command'
+    );
+  });
+}
+
+{
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+  const ppIdx = workerSrc.indexOf('async function getPublicProfile(');
+  const ppEnd = workerSrc.indexOf('\nasync function createInviteCode', ppIdx);
+  const ppSlice = workerSrc.slice(ppIdx, ppEnd > -1 ? ppEnd : ppIdx + 4000);
+  const ssIdx = ppSlice.indexOf('sharedSnapshot = {');
+  const ssSlice = ppSlice.slice(ssIdx, ssIdx + 400);
+
+  test('D-209E1: public sharedSnapshot does not include stabilityScore', () => {
+    assert.ok(!ssSlice.includes('stabilityScore'), 'sharedSnapshot must not include stabilityScore (D-209E1 removes scores from public response)');
+  });
+
+  test('D-209E1: public sharedSnapshot does not include opennessScore', () => {
+    assert.ok(!ssSlice.includes('opennessScore'), 'sharedSnapshot must not include opennessScore (D-209E1)');
+  });
+
+  test('D-209E1: public sharedSnapshot does not include pressureScore', () => {
+    assert.ok(!ssSlice.includes('pressureScore'), 'sharedSnapshot must not include pressureScore (D-209E1)');
+  });
+
+  test('D-209E1: public sharedSnapshot still includes label', () => {
+    assert.ok(ssSlice.includes('label: sharedSnapshotRow.label'), 'sharedSnapshot must still include label');
+  });
+
+  test('D-209E1: public sharedSnapshot still includes contradictionCount', () => {
+    assert.ok(ssSlice.includes('contradictionCount: sharedSnapshotRow.contradiction_count'), 'sharedSnapshot must still include contradictionCount');
+  });
+
+  test('D-209E1: public sharedSnapshot still includes createdAt', () => {
+    assert.ok(ssSlice.includes('createdAt: sharedSnapshotRow.created_at'), 'sharedSnapshot must still include createdAt');
+  });
+
+  test('D-209E1: getPublicProfile SELECT does not select score columns', () => {
+    // search for the specific belief_snapshots SELECT within getPublicProfile
+    const selIdx = ppSlice.indexOf('SELECT label');
+    const selSlice = ppSlice.slice(selIdx, selIdx + 200);
+    assert.ok(
+      !selSlice.includes('stability_score') && !selSlice.includes('openness_score') && !selSlice.includes('pressure_score'),
+      'getPublicProfile SELECT must not select score columns after D-209E1'
+    );
+  });
+
+  test('D-209E1: getPublicProfile still excludes dominant_pattern', () => {
+    assert.ok(!ppSlice.includes('dominantPattern:') && !ppSlice.includes('dominant_pattern,'), 'dominant_pattern must not appear in public sharedSnapshot');
+  });
+
+  test('D-209E1: getPublicProfile still excludes topAlignmentName', () => {
+    assert.ok(!ppSlice.includes('topAlignmentName'), 'topAlignmentName must not appear in public sharedSnapshot');
+  });
+
+  test('D-209E1: D-209E1 comment present in worker.js', () => {
+    assert.ok(workerSrc.includes('D-209E1:'), 'D-209E1 comment must be present in worker.js');
+  });
+
+  test('D-209E1: no new migration file added beyond 0016', () => {
+    assert.ok(
+      !existsSync(path.join(__dirname, '../migrations/0017_belief_scores_removal.sql')),
+      'D-209E1 is a response-shaping fix only — no migration needed'
+    );
+  });
+
+  test('D-209E1: private /api/my-humanx still selects score columns for owner', () => {
+    const myIdx = workerSrc.indexOf('async function myHumanX(');
+    const mySlice = workerSrc.slice(myIdx, myIdx + 4000);
+    assert.ok(
+      mySlice.includes('stability_score') || mySlice.includes('SELECT *'),
+      'private my-humanx endpoint must still return score data to the owner'
     );
   });
 }
