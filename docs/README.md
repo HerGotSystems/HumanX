@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D197A_OWNER_DRY_RUN_EXECUTION_CHECKLIST.md` ⭐ CURRENT — D-197A OWNER DRY-RUN EXECUTION CHECKLIST
+### `D197B_DRY_RUN_RESULT_TEMPLATE.md` ⭐ CURRENT — D-197B DRY-RUN RESULT TEMPLATE + FIX INTAKE
+
+Fill-in template for immediately after the D-197A dry run. Metadata block, 15-step result table, per-issue intake format (ID/summary/repro/expected/actual/severity/fix/target patch), triage rules (P0/P1 block Batch 1; P2 proceed with disclosure; P3 backlog), patch naming convention (D-197C/D/E), PASS/CONDITIONAL PASS/FAIL decision section, copy-paste summary block. Baseline: 1589/24/57.
+
+### `D197A_OWNER_DRY_RUN_EXECUTION_CHECKLIST.md` — D-197A OWNER DRY-RUN EXECUTION CHECKLIST
 
 Batch 0 dry-run script for the owner to run before inviting anyone. 15 browser steps (Home → Arena → Study → Vote → Copy link → /c/:id → evidence → pressure → test → Builder → My HumanX → profile → RunPack → Review queue → mobile). Record template, PASS/FAIL criteria, cleanup instructions. Budget 45–65 min. Baseline: 1589/24/57.
 
