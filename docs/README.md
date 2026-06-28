@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D196A_PREVIEW_SEED_USER_BATCH_PLAN.md` ⭐ CURRENT — D-196A PREVIEW SEED-USER BATCH PLAN
+### `D197A_OWNER_DRY_RUN_EXECUTION_CHECKLIST.md` ⭐ CURRENT — D-197A OWNER DRY-RUN EXECUTION CHECKLIST
+
+Batch 0 dry-run script for the owner to run before inviting anyone. 15 browser steps (Home → Arena → Study → Vote → Copy link → /c/:id → evidence → pressure → test → Builder → My HumanX → profile → RunPack → Review queue → mobile). Record template, PASS/FAIL criteria, cleanup instructions. Budget 45–65 min. Baseline: 1589/24/57.
+
+### `D196A_PREVIEW_SEED_USER_BATCH_PLAN.md` — D-196A PREVIEW SEED-USER BATCH PLAN
 
 Batch 0 (owner dry run) → Batch 1 (3–5 trusted) → Batch 2 (10–20). Five user profiles to cover. Who not to invite. 7-step try-list, feedback template, 5–7 day minimum between batches, explicit go/no-go criteria for Batch 2, stop criteria, and daily operator routine. Baseline: 1589/24/57.
 
