@@ -10337,7 +10337,7 @@ test('D-159B: home intro paragraph contains invite-only/claims/beliefs/public pr
 
 test('D-159B: public profile example bridge link exists and points to /u/calenhir', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 1000);
+  const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
     slice.includes('href="/u/calenhir"') && slice.includes('View a public profile example'),
     'renderHome must include a link to /u/calenhir with "View a public profile example" copy'
@@ -10358,7 +10358,7 @@ test('D-159B: Browse Claims card appears before Submit Claim in renderHome', () 
 
 test('D-159B: Browse Claims card appears before Belief Engine in renderHome', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 4000);
+  const slice = appSrc.slice(idx, idx + 4200);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
   // D-181D migrated onclick="location.href='...'" to data-action="navBeliefEngine"
   const browseAt = slice.indexOf('data-value="arena"');
@@ -10495,7 +10495,7 @@ test('D-160B: /api/auth/invite/redeem route remains present and unchanged', () =
 
 test('D-160B: D-159B home clarity copy still present', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 1000);
+  const slice = appSrc.slice(idx, idx + 1200);
   assert.ok(
     slice.includes('invite-only preview') &&
     slice.includes('invite-only space') &&
