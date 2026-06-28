@@ -12898,6 +12898,96 @@ test('D-187B: no admin/review/token logic added', () => {
   );
 });
 
+// ── Section 101 — D-188B: Study view Copy Claim Link button ──────────────────
+
+test('D-188B: copyClaimLink function is defined in app-v10.js', () => {
+  assert.ok(
+    appSrc.includes('function copyClaimLink('),
+    'copyClaimLink must be defined'
+  );
+});
+
+test('D-188B: copyClaimLink constructs /c/ URL', () => {
+  const idx = appSrc.indexOf('function copyClaimLink(');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('/c/') || slice.includes('\\/c\\/'),
+    'copyClaimLink must use /c/ path segment'
+  );
+});
+
+test('D-188B: copyClaimLink uses location.origin', () => {
+  const idx = appSrc.indexOf('function copyClaimLink(');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('location.origin'),
+    'copyClaimLink must use location.origin for domain-agnostic URL'
+  );
+});
+
+test('D-188B: copyClaimLink uses navigator.clipboard', () => {
+  const idx = appSrc.indexOf('function copyClaimLink(');
+  const slice = appSrc.slice(idx, idx + 400);
+  assert.ok(
+    slice.includes('navigator.clipboard'),
+    'copyClaimLink must use navigator.clipboard with fallback'
+  );
+});
+
+test('D-188B: copyClaimLink button present in renderStudy study-actions', () => {
+  const idx = appSrc.indexOf('function renderStudy');
+  const slice = appSrc.slice(idx, idx + 3000);
+  assert.ok(
+    slice.includes('copyClaimLink') && slice.includes('study-actions'),
+    'renderStudy must include a copyClaimLink button inside study-actions'
+  );
+});
+
+test('D-188B: copyClaimLink button has btn-mini class and data-action in Study', () => {
+  const idx = appSrc.indexOf('function renderStudy');
+  const slice = appSrc.slice(idx, idx + 3000);
+  assert.ok(
+    slice.includes('data-action="copyClaimLink"') && slice.includes('btn-mini'),
+    'Copy link button must use data-action="copyClaimLink" and btn-mini class'
+  );
+});
+
+test('D-188B: copyClaimLink wired in _D181E_ID_ACTIONS dispatch table', () => {
+  const idx = appSrc.indexOf('_D181E_ID_ACTIONS=');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('copyClaimLink'),
+    'copyClaimLink must be in _D181E_ID_ACTIONS'
+  );
+});
+
+test('D-188B: no copyClaimLink button added to card() Arena cards', () => {
+  const idx = appSrc.indexOf('function card(');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
+    !slice.includes('copyClaimLink'),
+    'Arena card() must not contain copyClaimLink — Study-only in D-188B'
+  );
+});
+
+test('D-188B: no copyClaimLink button added to meRecentClaimsHtml', () => {
+  const idx = appSrc.indexOf('function meRecentClaimsHtml');
+  const slice = appSrc.slice(idx, idx + 1000);
+  assert.ok(
+    !slice.includes('copyClaimLink'),
+    'meRecentClaimsHtml must not contain copyClaimLink in D-188B (Study-only)'
+  );
+});
+
+test('D-188B: no copyClaimLink button added to renderPublicProfileClaimsHtml', () => {
+  const idx = appSrc.indexOf('function renderPublicProfileClaimsHtml');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    !slice.includes('copyClaimLink'),
+    'renderPublicProfileClaimsHtml must not contain copyClaimLink in D-188B (Study-only)'
+  );
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
