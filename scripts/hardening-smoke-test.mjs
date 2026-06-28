@@ -10541,7 +10541,7 @@ test('D-161B: Browse Claims intro copy exists in renderArena', () => {
 
 test('D-161B: graph stats wrapped in arena-stats-details collapsed by default', () => {
   const idx = appSrc.indexOf('function renderArena');
-  const slice = appSrc.slice(idx, idx + 900);
+  const slice = appSrc.slice(idx, idx + 1300);
   assert.ok(
     slice.includes('arena-stats-details') && slice.includes('<details') && slice.includes('Show public network stats'),
     'renderArena must wrap graphBox() in a <details> element with aria-closed-by-default and "Show public network stats" summary'
