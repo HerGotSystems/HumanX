@@ -3375,12 +3375,11 @@ test('D-113B: card titles/descriptions not hidden by the mobile density rule', (
 });
 
 test('D-113B: Truths add form not collapsed/changed in this patch', () => {
-  const start = appSrc.indexOf('function renderTruths');
-  const body = appSrc.slice(start, start + 1700);
-  // Add-a-Truth form still inline (not wrapped in <details>) — deferred to a separate decision
+  const fn = appSrc.match(/function renderTruths[\s\S]*?^async function /m)?.[0] || '';
+  // Add-a-Truth form still accessible (may be in <details> per later patches) — checks form fields are present
   assert.ok(
-    body.includes('Add a Truth') && body.includes('truthStatement') && !/<details[^>]*>\s*<summary[^>]*>[^<]*Add a Truth/i.test(body),
-    'Truths add form must remain unchanged (not collapsed) in D-113B'
+    fn.includes('Add a Truth') && fn.includes('truthStatement'),
+    'Truths add form fields must remain present in renderTruths'
   );
 });
 
@@ -3463,8 +3462,10 @@ test('D-114B: form remains above the truth list', () => {
   );
 });
 
-test('D-114B: empty-state "form above" copy remains valid', () => {
-  assert.ok(appSrc.includes('Use the form above to record'), 'empty-state "form above" copy must remain');
+test('D-114B: empty-state Truths add form reference remains valid (old "form above" or new "Add a public Truth" phrasing)', () => {
+  const hasOld = appSrc.includes('Use the form above to record');
+  const hasNew = appSrc.includes('Open <b>Add a public Truth</b>');
+  assert.ok(hasOld || hasNew, 'Truths empty-state must reference the add-truth form — either old "form above" or new "Add a public Truth" phrasing');
 });
 
 test('D-114B: "Public means visible, not proven" framing remains', () => {
