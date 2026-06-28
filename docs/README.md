@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D190_EXTERNAL_PREVIEW_READINESS_CLOSEOUT.md` ⭐ CURRENT — D-190E EXTERNAL PREVIEW READINESS CLOSEOUT
+### `D191A_EXTERNAL_PREVIEW_LAUNCH_CHECKLIST.md` ⭐ CURRENT — D-191A EXTERNAL PREVIEW LAUNCH CHECKLIST
+
+Docs + runnable preflight script (`node scripts/preview-launch-check.mjs`). 22 automated checks (source files, no jargon, OG metadata, direct claim URL, Review tab gating, invite messaging, baseline). 14 manual browser checks across P0/P1/P2. Stop/go decision table. Known limitations and feedback questions for preview users. Baseline: 1589/24/57.
+
+### `D190_EXTERNAL_PREVIEW_READINESS_CLOSEOUT.md` — D-190E EXTERNAL PREVIEW READINESS CLOSEOUT
 
 Four-patch D-190 series (A audit + B P0 trust fixes + C invite-gate audit + D soft messaging). All P0 blockers resolved. Verdict: ready for 5–20 trusted preview users, not yet public launch. Remaining: real invite/request-access path, social preview pass, public feedback/contact path. Baseline: 1589/24/57.
 
