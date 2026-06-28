@@ -1,7 +1,7 @@
 # D-210C — Reflection Avatar Closeout
 
 **Scope:** Docs only after D-210A/D-210B reflection-avatar work  
-**Status:** SOURCE/STATIC CLOSEOUT COMPLETE — PENDING OWNER MANUAL DEPLOY + LIVE BROWSER SANITY  
+**Status:** LIVE CLOSEOUT COMPLETE  
 **Baseline:** 1914/24/57  
 **Previous HEAD:** `233861b`  
 **Code changes in this task:** None  
@@ -232,43 +232,29 @@ Confirmed from committed source:
 
 ## J. Live sanity result
 
-**PENDING OWNER MANUAL DEPLOY + LIVE BROWSER SANITY**
+**PASS — owner manual deploy and live browser sanity completed**
 
-CC attempted `npx wrangler deploy` in both the D-210B and D-210C sessions. Both failed with the same error: Wrangler cannot reach the Cloudflare API due to a certificate/proxy/VPN issue on this machine (`wrangler detected that a corporate proxy or VPN might be enabled`). This is the same constraint that required owner manual deploy for D-209H/I.
+> **Historical note:** CC attempted `npx wrangler deploy` in both the D-210B and D-210C sessions. Both failed — Wrangler could not reach the Cloudflare API due to a certificate/proxy/VPN issue on this machine (same constraint as D-209H/I). Owner deployed commit `233861b` manually from local terminal.
 
-The code is committed at `233861b` (D-210B) and all local static checks pass:
+| Check | Result |
+|---|---|
+| "Reflection avatar" appears in My HumanX after Belief reflection | PASS |
+| Card appears before Recent Truths | PASS |
+| Neutral habit descriptor chips only — no rank, ideology, or identity language | PASS |
+| Guardrail copy visible: "not intelligence, morality, ideology, or truth" | PASS |
+| Private notice visible: "not shown on your public profile" | PASS |
+| Reflection avatar absent from public profile | PASS |
+| No public belief identity labels on public profile | PASS |
+| No banned wording on public profile (truth level, purity, ideology type, religious alignment, smart score, HumanX rank, good believer, bad believer) | PASS |
+
+Static checks at closeout:
 
 | Check | Result |
 |---|---|
 | `hardening-smoke-test.mjs` | 1914 passed, 0 failed |
-| `worker-route-static-check.mjs` | 57 passed, 0 failed, 1 warn |
+| `worker-route-static-check.mjs` | 57 passed, 0 failed, 1 warn (pre-existing, non-blocking) |
 
-### Deploy instructions
-
-```powershell
-cd C:\Users\veltr\HumanX
-git pull
-npx wrangler deploy
-```
-
-Run from a terminal not subject to the VPN/proxy intercept. No migration required.
-
-### Manual verification checklist
-
-Complete after deploying. Record actual results to confirm live PASS.
-
-| Check | Expected | Actual |
-|---|---|---|
-| "Reflection avatar" appears in My HumanX after Belief reflection | Present | — |
-| Card appears before Recent Truths | Correct placement | — |
-| Neutral habit descriptor chips only (no rank/ideology/identity language) | Present | — |
-| Guardrail copy visible: "not intelligence, morality, ideology, or truth" | Present | — |
-| Private notice visible: "not shown on your public profile" | Present | — |
-| Reflection avatar absent from public profile | Absent | — |
-| No public belief identity labels on public profile | Absent | — |
-| No banned wording on public profile (truth level, purity, ideology type, religious alignment, smart score, HumanX rank, good believer, bad believer) | All absent | — |
-
-Live PASS may only be recorded after all checks above show the expected result. Update Section J and `docs/README.md` when done.
+No public avatar or profile exposure confirmed. No backend, API, migration, schema, CSP, or external asset changes in this arc.
 
 ---
 
