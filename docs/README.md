@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D208_PRIVATE_BELIEF_REFLECTION_CLOSEOUT.md` ⭐ CURRENT — D-208E PRIVATE BELIEF REFLECTION CLOSEOUT
+### `D209A_BELIEF_CONSENT_MODEL_AUDIT.md` ⭐ CURRENT — D-209A BELIEF CONSENT MODEL AUDIT
+
+Audit only — no code changes. Defines the per-field consent model required before any belief data re-enters the public profile. Maps all 18 belief_snapshots columns into four privacy classes: (1) safe public basics (label, date, contradiction count), (2) sensitive belief identity (dominant_pattern, top_beliefs_json, topAlignmentName — named religion/ideology), (3) sensitive inference (stability/openness/pressure scores, dimensions_json, source habits), (4) private-only reflection (My HumanX cards, raw_json, contradictions_json, stress_points_json). Identifies live gap: owner preview (meSharedSnapshotCardHtml) shows dominantPattern/scores that are no longer on the actual public card — misleading in the safe direction but breaks informed consent. Recommends Option 1 (visibility_json column on belief_snapshots) as the migration path. Recommended D-209B scope: small patch aligning owner preview with actual public render + sharing UI copy update. No new public belief fields until D-209C consent migration + toggle UI are live. Risk summary: public profile LOW, owner preview accuracy MEDIUM, consent model completeness MEDIUM.
+
+### `D208_PRIVATE_BELIEF_REFLECTION_CLOSEOUT.md` — D-208E PRIVATE BELIEF REFLECTION CLOSEOUT
 
 D-208D/E closeout. Adds private-only "Belief reflection" panel to My HumanX below existing Mirror section. Three bar-chart cards: Source habits (source_type distribution), Evidence strength habits (evidence_strength distribution), Investigation activity (evidence/pressure/tests counts). All data from already-loaded /api/my-humanx payload (SELECT * on evidence, home_tests) — no backend changes, no migration. Cards are private-only: renderPublicProfileHtml does not call meBeliefReflectionHtml. Guardrails: "not a score of intelligence, morality, or truth" (panel), "Private reflection only — not a public identity label." (per card). 19 new D-208D smoke tests. Baseline: 1785/24/57. Deploy confirmed, sanity PASS. Public belief labels remain private by default.
 
