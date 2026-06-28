@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D209I_SCORES_CONSENT_CLOSEOUT.md` ⭐ CURRENT — D-209I SCORES CONSENT ARC CLOSEOUT
+### `D210A_BELIEF_AVATAR_GUARDRAIL_SPEC.md` ⭐ CURRENT — D-210A BELIEF AVATAR GUARDRAIL SPEC
+
+Spec only — no code. Defines safe and forbidden dimensions, visual metaphors, data sources, privacy model, copy principles, and test requirements for the avatar/show-off layer. Forbidden dimensions (permanent): intelligence, morality, truth level, ideological tribe, religious correctness, political alignment, purity, conspiracy score, credibility ranking. Safe dimensions: investigation style, source diversity, evidence habits, pressure openness, test-seeking, uncertainty posture, reflection mode, exploration rhythm. Required guardrail copy: "Your avatar reflects investigation habits, not intelligence, morality, ideology, or truth." Privacy model: private by default; sharing requires explicit opt-in; no auto-generate; preview-before-publish. Biggest risk: framing drift toward identity label. D-210B recommendation: private static Reflection Avatar concept card in My HumanX, frontend only (app-v10.js + styles.css), no backend, no migration, no public surface change, deploy needed.
+
+### `D209I_SCORES_CONSENT_CLOSEOUT.md` — D-209I SCORES CONSENT ARC CLOSEOUT
 
 D-209G/H/I arc closeout. Scores-only public belief consent end-to-end: POST /api/belief-snapshots/:id/visibility (authenticated, ownership-checked, scores allowlist, all other groups forced false). buildPublicSharedSnapshot gates nested scores object {stabilityScore, opennessScore, pressureScore} behind beliefVisibilityAllows(visibility,'scores'). Owner UI: scores toggle (preview-only on change, save button required). No auto-save. Reversible. Public fields when scores=true: label + contradictionCount + createdAt + scores nested object. alignment_labels/pattern_summary/reflection_habits/drift_history/dominant_pattern/top_beliefs_json permanently excluded. No migration needed (visibility_json live since 0016). Baseline 1886/24/57. Live sanity PASS — owner manual deploy (CC Wrangler had certificate/proxy/VPN issue); toggle ON + Save made nested scores public; toggle OFF + Save hid them; no auto-save, no alignment labels, no pattern summary, no private reflection cards.
 
