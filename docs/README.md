@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D202B_RUNPACK_AUTHORITY_LAUNDERING_AUDIT.md` ⭐ CURRENT — D-202B AUTHORITY LAUNDERING AUDIT
+### `D202_AUTHORITY_LAUNDERING_CLOSEOUT.md` ⭐ CURRENT — D-202 AUTHORITY LAUNDERING CLOSEOUT
+
+Full arc closeout: D-202A epistemology model, D-202B audit (five surfaces, "Proven" as highest risk), D-202C code fix (removed Proven/Disproven/Reality Collapse from verdict vocabulary; added Strongly Supported/Strongly Contested/Internally Contradictory; added ai_provenance_note + source_type_note to output_contract; instruction forbids claiming independent verification; analysisItem() shows permanent provenance note; paste surfaces warn AI read submitted evidence not external sources; LEGACY_VERDICT_MAP remaps old labels on display without touching DB). Deploy + sanity PASS. Remaining: analysis provenance DB fields, AI-output badge, circular-citation detector, re-entry rule, moderation gate for analysis_results. Baseline: 1645/24/57.
+
+### `D202B_RUNPACK_AUTHORITY_LAUNDERING_AUDIT.md` — D-202B AUTHORITY LAUNDERING AUDIT
 
 Audit of where RunPack/AI outputs could be mistaken for independent verification. Identifies five surfaces at risk: "Proven" in output_contract verdict (HIGH — green badge, implies verification standard the system cannot meet), missing provenance note on analysisItem() card (HIGH), paste surfaces lack AI-input warning (MEDIUM), analyses currently visible to all claim viewers not just submitter (MEDIUM-HIGH), no packet_id/ai_model stored (MEDIUM). Documents the full authority-laundering failure loop. Required language principles. D-202C quick-fix spec: remove "Proven"/"Disproven" from verdict vocabulary, add source_type_note to output_contract, add provenance note to analysisItem(), update two paste-surface copy blocks. Long-term: packet_id FK, AI-output badge, circular-citation detector, re-entry rule. Hard stops: no "AI verified" wording, no auto status upgrades from AI output, no aggregate AI consensus score. Baseline: 1628/24/57.
 
