@@ -12495,6 +12495,186 @@ test('D-181F: belief engine index.html not modified (out of scope)', () => {
   assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181F');
 });
 
+// ── D-181H: Admin + this-ref + backFn handler migration ──────────────────────
+
+console.log('\nD-181H: Admin (copyTruthId, archiveTruthArtefact), ppToggleShowMore, backFn');
+
+// Dispatcher extended
+test('D-181H: _D181E_ID_ACTIONS includes copyTruthId entry', () => {
+  assert.ok(
+    appSrc.includes('copyTruthId:b=>copyTruthId(b.dataset.id)'),
+    '_D181E_ID_ACTIONS must include copyTruthId entry added in D-181H'
+  );
+});
+
+test('D-181H: _D181E_ID_ACTIONS includes archiveTruthArtefact entry', () => {
+  assert.ok(
+    appSrc.includes('archiveTruthArtefact:b=>archiveTruthArtefact(b.dataset.id)'),
+    '_D181E_ID_ACTIONS must include archiveTruthArtefact entry added in D-181H'
+  );
+});
+
+test('D-181H: _D181E_ID_ACTIONS includes ppToggleShowMore entry (passes btn element)', () => {
+  assert.ok(
+    appSrc.includes('ppToggleShowMore:b=>ppToggleShowMore(b)'),
+    '_D181E_ID_ACTIONS must include ppToggleShowMore:b=>ppToggleShowMore(b) added in D-181H'
+  );
+});
+
+// copyTruthId migrated
+test('D-181H: onclick="copyTruthId( removed from app-v10.js', () => {
+  assert.ok(
+    !appSrc.includes('onclick="copyTruthId('),
+    'copyTruthId inline onclick must be gone — migrated in D-181H'
+  );
+});
+
+test('D-181H: data-action="copyTruthId" present in truthCard', () => {
+  const fn = appSrc.match(/function truthCard[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('data-action="copyTruthId"'),
+    'truthCard must use data-action="copyTruthId" after D-181H migration'
+  );
+});
+
+test('D-181H: data-action="copyTruthId" has data-id attribute', () => {
+  assert.ok(
+    appSrc.includes('data-action="copyTruthId" data-id='),
+    'copyTruthId action button must carry data-id attribute'
+  );
+});
+
+// archiveTruthArtefact migrated
+test('D-181H: onclick="archiveTruthArtefact( removed from app-v10.js', () => {
+  assert.ok(
+    !appSrc.includes('onclick="archiveTruthArtefact('),
+    'archiveTruthArtefact inline onclick must be gone — migrated in D-181H'
+  );
+});
+
+test('D-181H: data-action="archiveTruthArtefact" present in truthCard', () => {
+  const fn = appSrc.match(/function truthCard[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('data-action="archiveTruthArtefact"'),
+    'truthCard must use data-action="archiveTruthArtefact" after D-181H migration'
+  );
+});
+
+test('D-181H: data-action="archiveTruthArtefact" has data-id attribute', () => {
+  assert.ok(
+    appSrc.includes('data-action="archiveTruthArtefact" data-id='),
+    'archiveTruthArtefact action button must carry data-id attribute'
+  );
+});
+
+// ppToggleShowMore migrated
+test('D-181H: onclick="ppToggleShowMore(this)" removed from app-v10.js', () => {
+  assert.ok(
+    !appSrc.includes('onclick="ppToggleShowMore(this)"'),
+    'ppToggleShowMore inline onclick must be gone — migrated in D-181H'
+  );
+});
+
+test('D-181H: data-action="ppToggleShowMore" present in renderPublicProfileEvidenceHtml', () => {
+  const fn = appSrc.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('data-action="ppToggleShowMore"'),
+    'renderPublicProfileEvidenceHtml must use data-action="ppToggleShowMore" after D-181H'
+  );
+});
+
+test('D-181H: data-action="ppToggleShowMore" present in renderPublicProfilePressureHtml', () => {
+  const fn = appSrc.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('data-action="ppToggleShowMore"'),
+    'renderPublicProfilePressureHtml must use data-action="ppToggleShowMore" after D-181H'
+  );
+});
+
+test('D-181H: data-more attribute preserved alongside data-action="ppToggleShowMore"', () => {
+  const evFn = appSrc.match(/function renderPublicProfileEvidenceHtml[\s\S]*?^function /m)?.[0] || '';
+  const prFn = appSrc.match(/function renderPublicProfilePressureHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    evFn.includes('data-action="ppToggleShowMore"') && evFn.includes('data-more='),
+    'renderPublicProfileEvidenceHtml must preserve data-more alongside data-action after D-181H'
+  );
+  assert.ok(
+    prFn.includes('data-action="ppToggleShowMore"') && prFn.includes('data-more='),
+    'renderPublicProfilePressureHtml must preserve data-more alongside data-action after D-181H'
+  );
+});
+
+// backFn replaced
+test('D-181H: backFn variable declaration removed from renderPublicProfileHtml', () => {
+  const fn = appSrc.match(/function renderPublicProfileHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    !fn.includes('const backFn='),
+    'renderPublicProfileHtml must not declare const backFn — removed in D-181H'
+  );
+});
+
+test('D-181H: onclick="${backFn}" removed from app-v10.js', () => {
+  assert.ok(
+    !appSrc.includes('onclick="${backFn}"'),
+    'onclick="${backFn}" must be gone — replaced with data-action in D-181H'
+  );
+});
+
+test('D-181H: back button uses data-action="setMode" with computed data-value in renderPublicProfileHtml', () => {
+  const fn = appSrc.match(/function renderPublicProfileHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('data-action="setMode" data-value="${isOwner?\'me\':\'home\'}"'),
+    'renderPublicProfileHtml back button must use data-action="setMode" data-value="${isOwner?\'me\':\'home\'}" after D-181H'
+  );
+});
+
+// Excluded handlers still inline
+test('D-181H: claimMeta.btnAction still used inline in truthCard (excluded)', () => {
+  const fn = appSrc.match(/function truthCard[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes('onclick="${claimMeta.btnAction}"'),
+    'claimMeta.btnAction must remain inline in truthCard — not migrated in D-181H'
+  );
+});
+
+test('D-181H: copyPublicProfileLink(this, still inline in renderPublicProfileHtml (excluded)', () => {
+  const fn = appSrc.match(/function renderPublicProfileHtml[\s\S]*?^function /m)?.[0] || '';
+  assert.ok(
+    fn.includes("onclick=\"copyPublicProfileLink(this,'"),
+    'copyPublicProfileLink inline onclick must remain — not migrated in D-181H'
+  );
+});
+
+test('D-181H: selectClaim, studyFromVault, attachEvidencePrompt remain inline (excluded Cat F)', () => {
+  assert.ok(appSrc.includes("onclick=\"selectClaim('"), 'selectClaim inline onclick must remain — excluded Cat F');
+  assert.ok(appSrc.includes("onclick=\"studyFromVault('"), 'studyFromVault inline onclick must remain — excluded Cat F');
+  assert.ok(appSrc.includes("onclick=\"attachEvidencePrompt('"), 'attachEvidencePrompt inline onclick must remain — excluded Cat F');
+});
+
+test('D-181H: review decision handlers remain untouched (Cat I)', () => {
+  assert.ok(appSrc.includes("onclick=\"inspectReviewItem('"), 'inspectReviewItem must remain inline — Cat I excluded');
+  assert.ok(appSrc.includes("onclick=\"reviewDecisionUI('"), 'reviewDecisionUI must remain inline — Cat I excluded');
+  assert.ok(appSrc.includes("onclick=\"requestApproveReview('"), 'requestApproveReview must remain inline — Cat I excluded');
+  assert.ok(appSrc.includes("onclick=\"requestRejectReview('"), 'requestRejectReview must remain inline — Cat I excluded');
+});
+
+// All prior dispatcher maps still present
+test('D-181H: all prior dispatcher maps still present', () => {
+  assert.ok(appSrc.includes('_D181B_ZERO_PARAM_ACTIONS'), 'D-181B map must remain');
+  assert.ok(appSrc.includes('_D181C_PARAM_ACTIONS'), 'D-181C map must remain');
+  assert.ok(appSrc.includes('_D181E_ID_ACTIONS'), 'D-181E map must remain');
+  assert.ok(appSrc.includes('_D181F_DUAL_ACTIONS'), 'D-181F map must remain');
+});
+
+test('D-181H: CSP header unchanged in worker.js', () => {
+  assert.ok(workerSrc.includes("'unsafe-inline'") && workerSrc.includes('content-security-policy'), 'CSP must remain permissive — not tightened in D-181H');
+});
+
+test('D-181H: belief engine index.html not modified (out of scope)', () => {
+  const beliefSrc = readFileSync(new URL('../public/apps/humanx-belief-engine/index.html', import.meta.url), 'utf8');
+  assert.ok(beliefSrc.includes('onclick='), 'belief engine index.html must still have inline onclick= — not touched in D-181H');
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
