@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1525 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1537 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D187A_DIRECT_CLAIM_URL_READINESS_AUDIT.md` ⭐ CURRENT — D-187A DIRECT CLAIM URL AUDIT
+### `D187_DIRECT_CLAIM_URL_CLOSEOUT.md` ⭐ CURRENT — D-187 DIRECT CLAIM URL CLOSEOUT
+
+Two-patch series (D-187A audit + D-187B implementation). `/c/:id` routes now intercepted by Worker: server-rendered OG shell (claim title, description, og-default.png) for public claims; generic noindex shell for missing/private. SPA auto-opens Study mode via `selectClaim(id)` on boot. Live verified 2026-06-28. Baseline: 1537/24/57.
+
+### `D187A_DIRECT_CLAIM_URL_READINESS_AUDIT.md` — D-187A DIRECT CLAIM URL AUDIT
 
 Source-code audit planning `/c/:id` deep-link support. Full implementation plan: Worker shell, SPA boot patch, OG meta, privacy rules, phased D-187B/C spec. No code changes. Baseline: 1525/24/57.
 
