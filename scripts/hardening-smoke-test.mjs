@@ -6131,7 +6131,7 @@ test('D-137D: account card shows display name/email/handle/user id', () => {
 
 test('D-137D: counts render for claims, truths, evidence, and pressure', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 700);
+  const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(
     slice.includes("meCountsRow('Claims',counts.claims)") &&
     slice.includes("meCountsRow('Truths',counts.truths)") &&
@@ -6150,7 +6150,7 @@ test('D-137D: counts row renders all five review states', () => {
 
 test('D-137D/E: recent claims, truths, evidence, and pressure sections render', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 1700);
+  const slice = appSrc.slice(idx, idx + 2100);
   assert.ok(
     slice.includes('Recent Claims') && slice.includes('Recent Truths') && slice.includes('Recent Evidence') && slice.includes('Recent Pressure'),
     'renderMeHtml must render Recent Claims/Truths/Evidence/Pressure sections'
@@ -6331,7 +6331,7 @@ test('D-137E: state filter applies to claims/truths/evidence/pressure lists, not
 
 test('D-137E: counts remain full totals regardless of the active state filter', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 700);
+  const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(
     slice.includes('const counts=data.counts||{}') &&
     slice.includes("meCountsRow('Claims',counts.claims)") &&
@@ -6342,7 +6342,7 @@ test('D-137E: counts remain full totals regardless of the active state filter', 
 
 test('D-137E: section order puts Belief Snapshots before Recent Truths/Evidence/Pressure', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 1700);
+  const slice = appSrc.slice(idx, idx + 2100);
   const claimsAt = slice.indexOf('Recent Claims');
   const snapshotsAt = slice.indexOf('Belief Snapshots');
   const truthsAt = slice.indexOf('Recent Truths');
@@ -7154,7 +7154,7 @@ test('D-140B: no other public read route was added for profiles', () => {
 
 test('D-140B: frontend Profile Settings panel exists in Me, near the account card', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 400);
+  const slice = appSrc.slice(idx, idx + 900);
   assert.ok(
     appSrc.includes('function meProfileSettingsHtml') &&
     slice.includes('${meAccountCardHtml(u)}${meProfileSettingsHtml(data)}'),
@@ -7213,7 +7213,7 @@ test('D-140B/D-143B: copy share link now uses the real /u/:slug path, not the #/
 
 test('D-140B: copy share link button is disabled/hidden unless the profile is public with a saved slug', () => {
   const idx = appSrc.indexOf('function meProfileSettingsHtml');
-  const slice = appSrc.slice(idx, idx + 1500);
+  const slice = appSrc.slice(idx, idx + 1700);
   assert.ok(
     slice.includes('const canCopy=isPublic&&!!slug') &&
     slice.includes("${canCopy?'':'disabled'}") &&
