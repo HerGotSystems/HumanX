@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D188_CLAIM_SHARING_UI_CLOSEOUT.md` ⭐ CURRENT — D-188 CLAIM SHARING UI CLOSEOUT
+### `D189A_CONTRIBUTION_LOOP_AUDIT.md` ⭐ CURRENT — D-189A CONTRIBUTION LOOP AUDIT
+
+Source-code audit of the evidence/pressure/test/analysis contribution flows. 11 friction points found. Top 5 quick fixes: fix misleading evidence toast, ensure focusAdd* opens collapsed panel, fix false severity reference in pressure empty state, rename "Attach to Selected Claim" button, add clickable CTAs to flow panel empty slots. No code changes. Baseline: 1549/24/57.
+
+### `D188_CLAIM_SHARING_UI_CLOSEOUT.md` — D-188 CLAIM SHARING UI CLOSEOUT
 
 Four-patch series (D-188A audit + B0 test fix + B Study button + C Me/profile rows). copyClaimLink() added; Copy link now present in Study view, My HumanX public claims, and public profile claim rows. Arena cards deferred. Baseline: 1549/24/57.
 
