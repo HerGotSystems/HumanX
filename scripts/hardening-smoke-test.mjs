@@ -12970,21 +12970,43 @@ test('D-188B: no copyClaimLink button added to card() Arena cards', () => {
   );
 });
 
-test('D-188B: no copyClaimLink button added to meRecentClaimsHtml', () => {
+// D-188C extended these surfaces — prohibitions converted to positive assertions below in Section 101
+test('D-188C: copyClaimLink present in meRecentClaimsHtml for public claims', () => {
   const idx = appSrc.indexOf('function meRecentClaimsHtml');
   const slice = appSrc.slice(idx, idx + 1000);
   assert.ok(
-    !slice.includes('copyClaimLink'),
-    'meRecentClaimsHtml must not contain copyClaimLink in D-188B (Study-only)'
+    slice.includes('copyClaimLink'),
+    'meRecentClaimsHtml must include copyClaimLink for public claims (added D-188C)'
   );
 });
 
-test('D-188B: no copyClaimLink button added to renderPublicProfileClaimsHtml', () => {
+test('D-188C: copyClaimLink present in renderPublicProfileClaimsHtml', () => {
   const idx = appSrc.indexOf('function renderPublicProfileClaimsHtml');
   const slice = appSrc.slice(idx, idx + 600);
   assert.ok(
+    slice.includes('copyClaimLink'),
+    'renderPublicProfileClaimsHtml must include copyClaimLink (added D-188C)'
+  );
+});
+
+test('D-188C: Me claims copyClaimLink gated on isPublic', () => {
+  const idx = appSrc.indexOf('function meRecentClaimsHtml');
+  const slice = appSrc.slice(idx, idx + 1000);
+  // copyClaimLink must appear inside the isPublic ternary block, not unconditionally
+  const isPublicIdx = slice.indexOf('isPublic');
+  const copyLinkIdx = slice.indexOf('copyClaimLink');
+  assert.ok(
+    isPublicIdx >= 0 && copyLinkIdx > isPublicIdx,
+    'copyClaimLink in meRecentClaimsHtml must appear after the isPublic guard'
+  );
+});
+
+test('D-188C: Arena card() still does not include copyClaimLink', () => {
+  const idx = appSrc.indexOf('function card(');
+  const slice = appSrc.slice(idx, idx + 1500);
+  assert.ok(
     !slice.includes('copyClaimLink'),
-    'renderPublicProfileClaimsHtml must not contain copyClaimLink in D-188B (Study-only)'
+    'Arena card() must not contain copyClaimLink in D-188C'
   );
 });
 
