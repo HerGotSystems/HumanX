@@ -13896,6 +13896,103 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   });
 }
 
+// ── D-205A: test activity chart ───────────────────────────────────────────────
+{
+  const taSlice = appSrc.slice(appSrc.indexOf('function renderTestActivityMix'), appSrc.indexOf('function renderTestActivityMix') + 2000);
+
+  test('D-205A: renderTestActivityMix function exists in app-v10.js', () => {
+    assert.ok(appSrc.includes('function renderTestActivityMix'), 'renderTestActivityMix must be defined');
+  });
+
+  test('D-205A: chart reads difficulty field from test rows', () => {
+    assert.ok(taSlice.includes('difficulty'), 'renderTestActivityMix must read difficulty field');
+  });
+
+  test('D-205A: null/missing difficulty maps to unknown', () => {
+    assert.ok(taSlice.includes("||'unknown'") || taSlice.includes("|| 'unknown'"), 'missing difficulty must fall back to unknown');
+  });
+
+  test('D-205A: TEST_DIFFICULTY_ORDER constant exists', () => {
+    assert.ok(appSrc.includes('TEST_DIFFICULTY_ORDER'), 'TEST_DIFFICULTY_ORDER must be defined');
+  });
+
+  test('D-205A: fixed difficulty order covers easy, medium, hard, unknown', () => {
+    const orderIdx = appSrc.indexOf('TEST_DIFFICULTY_ORDER');
+    const orderSlice = appSrc.slice(orderIdx, orderIdx + 80);
+    assert.ok(
+      orderSlice.includes("'easy'") && orderSlice.includes("'medium'") &&
+      orderSlice.includes("'hard'") && orderSlice.includes("'unknown'"),
+      'TEST_DIFFICULTY_ORDER must cover all 4 values'
+    );
+  });
+
+  test('D-205A: guardrail copy — submitted test activity not proof of truth', () => {
+    assert.ok(taSlice.includes('submitted test activity, not proof of truth'), 'renderTestActivityMix must include activity-not-proof guardrail');
+  });
+
+  test('D-205A: guardrail copy — recorded test is part of investigation not verdict', () => {
+    assert.ok(taSlice.includes('not a final verdict'), 'renderTestActivityMix must clarify tests are not verdicts');
+  });
+
+  test('D-205A: empty state says no tests recorded yet', () => {
+    assert.ok(taSlice.includes('No tests recorded yet'), 'renderTestActivityMix must have empty state copy');
+  });
+
+  test('D-205A: ta-mix-panel injected into study-grid', () => {
+    assert.ok(appSrc.includes('ta-mix-panel'), 'ta-mix-panel section must appear in study-grid');
+  });
+
+  test('D-205A: ta-mix-panel appears before tests-panel', () => {
+    const taIdx = appSrc.indexOf('ta-mix-panel');
+    const tsIdx = appSrc.indexOf('tests-panel');
+    assert.ok(taIdx < tsIdx, 'ta-mix-panel must appear before tests-panel in study-grid');
+  });
+
+  test('D-205A: ta-mix-panel appears after evidence-panel', () => {
+    const taIdx = appSrc.indexOf('ta-mix-panel');
+    const evIdx = appSrc.indexOf('evidence-panel');
+    assert.ok(taIdx > evIdx, 'ta-mix-panel must appear after evidence-panel in study-grid');
+  });
+
+  test('D-205A: chart does not use quality, evidence_score, votes, or AI verdicts', () => {
+    assert.ok(
+      !taSlice.includes('.quality') && !taSlice.includes('evidence_score') &&
+      !taSlice.includes('beliefYes') && !taSlice.includes('analysis_results'),
+      'renderTestActivityMix must not reference quality, scoring, votes, or AI verdicts'
+    );
+  });
+
+  test('D-205A: chart does not contain banned framing "Truth Score"', () => {
+    assert.ok(!taSlice.toLowerCase().includes('truth score'), 'renderTestActivityMix must not use "Truth Score"');
+  });
+
+  test('D-205A: chart does not contain banned framing "Verified by AI"', () => {
+    assert.ok(!taSlice.toLowerCase().includes('verified by ai'), 'renderTestActivityMix must not use "Verified by AI"');
+  });
+
+  test('D-205A: chart does not contain banned framing "Proven by tests"', () => {
+    assert.ok(!taSlice.toLowerCase().includes('proven by tests'), 'renderTestActivityMix must not use "Proven by tests"');
+  });
+
+  test('D-205A: chart does not contain banned framing "Passed means true"', () => {
+    assert.ok(!taSlice.toLowerCase().includes('passed means true'), 'renderTestActivityMix must not use "Passed means true"');
+  });
+
+  test('D-205A: chart does not contain banned framing "Majority Says True"', () => {
+    assert.ok(!taSlice.toLowerCase().includes('majority says true'), 'renderTestActivityMix must not use "Majority Says True"');
+  });
+
+  test('D-205A: chart title is "Test activity" not a truth-implying label', () => {
+    assert.ok(taSlice.includes('Test activity'), 'chart title must be "Test activity"');
+    assert.ok(!taSlice.toLowerCase().includes('test proof') && !taSlice.toLowerCase().includes('tests proven'),
+      'chart title must not imply proof');
+  });
+
+  test('D-205A: worker.js not changed', () => {
+    assert.ok(!workerSrc.includes('renderTestActivityMix'), 'worker.js must not reference renderTestActivityMix — frontend-only');
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
