@@ -693,6 +693,37 @@ function beliefVisibilityAllows(visibility, group) {
   return visibility[group] === true;
 }
 
+// D-209F: public shared snapshot response builder.
+// All public belief field shaping MUST go through this function.
+// Only fields whitelisted here can appear in the public API response.
+// Sensitive groups require explicit consent + owner UI (D-209G) before
+// they can be added below. Do NOT inline snapshot fields in getPublicProfile.
+//
+// Current public baseline (Class-1 only):
+//   label, contradictionCount, createdAt
+//
+// Future extension points (all require visibility_json consent + D-209G UI):
+//   pattern_summary  → patternLabel (beliefVisibilityAllows(v, 'pattern_summary'))
+//   scores           → stabilityScore, opennessScore, pressureScore (beliefVisibilityAllows(v, 'scores'))
+//   alignment_labels → alignmentLabels sanitized names only, max 3, no pct (beliefVisibilityAllows(v, 'alignment_labels'))
+//   drift_history    → not planned for public in this arc
+//   reflection_habits → Class-4 private-only, never public
+//
+// D-209F: sensitive belief groups stay non-public until owner UI consent flow ships.
+function buildPublicSharedSnapshot(snapshotRow) {
+  if (!snapshotRow) return null;
+  // Parse consent map — null/invalid → all sensitive groups false (safe default).
+  const visibility = parseBeliefVisibility(snapshotRow.visibility_json);
+  void visibility; // will gate extension points here once D-209G UI ships
+
+  // Class-1 baseline fields only — always safe to share.
+  return {
+    label: snapshotRow.label || null,
+    contradictionCount: snapshotRow.contradiction_count || 0,
+    createdAt: snapshotRow.created_at,
+  };
+}
+
 async function getPublicProfile(request, env, rawSlug) {
   const summary = await loadPublicProfileSummary(env, rawSlug);
   // Same 404 for a missing slug, an invalid slug, and a slug that exists but
@@ -713,30 +744,12 @@ async function getPublicProfile(request, env, rawSlug) {
   // single snapshot the owner explicitly marked public_summary_enabled=1
   // (and that isn't hidden) is ever considered — never a list, never the
   // raw answer payload, and never the full contradiction-text blob.
-  // D-208B: Belief identity labels are private by default; public exposure
-  // requires explicit per-field opt-in. dominant_pattern and top_beliefs_json
-  // are excluded — they can contain named religious/ideological alignments.
-  // D-209E: visibility_json added to SELECT for future consent gating.
-  // parseBeliefVisibility() scaffolded; sensitive groups still non-public
-  // (D-209E scaffold only — no new fields exposed until D-209G UI ships).
-  // D-209E1: scores (stability/openness/pressure) removed from public response.
-  // Public sharedSnapshot is now label + contradictionCount + createdAt only,
-  // matching the documented public sharing baseline from D-209C/D-209D.
-  // Scores are retained in private /api/my-humanx; not selected here.
+  // D-208B: Belief identity labels are private by default.
+  // D-209E1: scores removed from SELECT and response (Class-3 sensitive inference).
+  // D-209F: response shaping delegated to buildPublicSharedSnapshot() — all
+  // public belief field additions must go through that function.
   const sharedSnapshotRow = await env.DB.prepare(`SELECT label, contradiction_count, created_at, visibility_json FROM belief_snapshots WHERE user_id=? AND public_summary_enabled=1 AND hidden_at IS NULL LIMIT 1`).bind(userId).first();
-  let sharedSnapshot = null;
-  if (sharedSnapshotRow) {
-    // D-209E scaffold: parse visibility consent; currently only basic_snapshot
-    // fields are returned publicly. Sensitive groups (pattern_summary,
-    // alignment_labels, scores) remain gated until D-209G UI is live.
-    const _visibility = parseBeliefVisibility(sharedSnapshotRow.visibility_json);
-    void _visibility; // referenced here so D-209F can gate fields without touching SELECT
-    sharedSnapshot = {
-      label: sharedSnapshotRow.label || null,
-      contradictionCount: sharedSnapshotRow.contradiction_count || 0,
-      createdAt: sharedSnapshotRow.created_at,
-    };
-  }
+  const sharedSnapshot = buildPublicSharedSnapshot(sharedSnapshotRow);
 
   return json({
     ok: true,

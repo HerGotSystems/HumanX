@@ -7698,8 +7698,9 @@ test('D-142B: GET /api/u/:slug response includes the optional sharedSnapshot fie
   const idx = workerSrc.indexOf('async function getPublicProfile');
   const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
   const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
+  // D-209F: sharedSnapshot is now built by buildPublicSharedSnapshot() and returned as null if no row
   assert.ok(
-    slice.includes('let sharedSnapshot = null;') && slice.includes('sharedSnapshot,'),
+    (slice.includes('let sharedSnapshot = null;') || slice.includes('buildPublicSharedSnapshot(')) && slice.includes('sharedSnapshot,'),
     'getPublicProfile must include an optional sharedSnapshot field in the profile response, defaulting to null'
   );
 });
@@ -7714,24 +7715,22 @@ test('D-142B: sharedSnapshot query requires public_summary_enabled=1 and hidden_
   );
 });
 
-test('D-142B→D-208B→D-209E1: public sharedSnapshot response exposes only Class-1 baseline fields (scores removed in D-209E1)', () => {
-  const idx = workerSrc.indexOf('async function getPublicProfile');
-  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', idx);
-  const slice = workerSrc.slice(idx, endIdx > -1 ? endIdx : idx + 3500);
-  // D-208B: dominant_pattern and top_beliefs_json excluded.
-  // D-209E1: stabilityScore/opennessScore/pressureScore also removed — scores are
-  // Class-3 sensitive inference and require explicit consent (D-209D spec).
-  // Public sharedSnapshot is now label + contradictionCount + createdAt only.
+test('D-142B→D-208B→D-209E1→D-209F: public sharedSnapshot exposes only Class-1 baseline fields via buildPublicSharedSnapshot', () => {
+  // D-209F: field shaping moved from getPublicProfile into buildPublicSharedSnapshot.
+  // Search from parseBeliefVisibility through getPublicProfile to cover both functions.
+  const startIdx = workerSrc.indexOf('function parseBeliefVisibility(');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', startIdx);
+  const slice = workerSrc.slice(startIdx, endIdx > -1 ? endIdx : startIdx + 6000);
   assert.ok(
-    slice.includes('label: sharedSnapshotRow.label || null') &&
-    slice.includes('contradictionCount: sharedSnapshotRow.contradiction_count || 0') &&
-    slice.includes('createdAt: sharedSnapshotRow.created_at') &&
+    slice.includes('label: snapshotRow.label || null') &&
+    slice.includes('contradictionCount: snapshotRow.contradiction_count || 0') &&
+    slice.includes('createdAt: snapshotRow.created_at') &&
     !slice.includes('stabilityScore:') &&
     !slice.includes('opennessScore:') &&
     !slice.includes('pressureScore:') &&
     !slice.includes('dominantPattern:') &&
     !slice.includes('topAlignmentName'),
-    'sharedSnapshot must include only label/contradictionCount/createdAt — scores and identity labels excluded (D-209E1)'
+    'Public sharedSnapshot (via buildPublicSharedSnapshot) must include only label/contradictionCount/createdAt — scores and identity labels excluded'
   );
 });
 
@@ -7762,12 +7761,14 @@ test('D-142B→D-208B: top_beliefs_json not used in SELECT or parsed in getPubli
 });
 
 test('D-142B: contradictionCount only — no contradiction text reaches the public response', () => {
-  const idx = workerSrc.indexOf('async function getPublicProfile');
-  const slice = workerSrc.slice(idx, idx + 4200);
+  // D-209F: field shaping is in buildPublicSharedSnapshot; search from that function.
+  const startIdx = workerSrc.indexOf('function buildPublicSharedSnapshot(');
+  const endIdx = workerSrc.indexOf('\nasync function createInviteCode', startIdx);
+  const slice = workerSrc.slice(startIdx, endIdx > -1 ? endIdx : startIdx + 4000);
   assert.ok(
-    slice.includes('contradictionCount: sharedSnapshotRow.contradiction_count || 0,') &&
+    slice.includes('contradictionCount:') && slice.includes('contradiction_count') &&
     !slice.includes('contradictions_json'),
-    'getPublicProfile must use the integer contradiction_count column, never parse or expose contradictions_json text'
+    'Public sharedSnapshot must use the integer contradiction_count column, never parse or expose contradictions_json text'
   );
 });
 
@@ -14675,34 +14676,38 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
 
 {
   const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+  // D-209F: snapshot shaping moved from getPublicProfile into buildPublicSharedSnapshot.
+  // Anchor includes the JSDoc comment block before the function (contains consent gate comment).
+  const bssIdx = workerSrc.indexOf('// D-209F: public shared snapshot response builder');
+  const bssEnd = workerSrc.indexOf('\nasync function getPublicProfile(', bssIdx);
+  const ssSlice = workerSrc.slice(bssIdx, bssEnd > -1 ? bssEnd : bssIdx + 1500);
+  // Still check getPublicProfile for the SELECT and structural tests.
   const ppIdx = workerSrc.indexOf('async function getPublicProfile(');
   const ppEnd = workerSrc.indexOf('\nasync function createInviteCode', ppIdx);
   const ppSlice = workerSrc.slice(ppIdx, ppEnd > -1 ? ppEnd : ppIdx + 4000);
-  const ssIdx = ppSlice.indexOf('sharedSnapshot = {');
-  const ssSlice = ppSlice.slice(ssIdx, ssIdx + 400);
 
   test('D-209E1: public sharedSnapshot does not include stabilityScore', () => {
-    assert.ok(!ssSlice.includes('stabilityScore'), 'sharedSnapshot must not include stabilityScore (D-209E1 removes scores from public response)');
+    assert.ok(!ssSlice.includes('stabilityScore:'), 'sharedSnapshot must not include stabilityScore: field (D-209E1 removes scores from public response)');
   });
 
   test('D-209E1: public sharedSnapshot does not include opennessScore', () => {
-    assert.ok(!ssSlice.includes('opennessScore'), 'sharedSnapshot must not include opennessScore (D-209E1)');
+    assert.ok(!ssSlice.includes('opennessScore:'), 'sharedSnapshot must not include opennessScore: field (D-209E1)');
   });
 
   test('D-209E1: public sharedSnapshot does not include pressureScore', () => {
-    assert.ok(!ssSlice.includes('pressureScore'), 'sharedSnapshot must not include pressureScore (D-209E1)');
+    assert.ok(!ssSlice.includes('pressureScore:'), 'sharedSnapshot must not include pressureScore: field (D-209E1)');
   });
 
   test('D-209E1: public sharedSnapshot still includes label', () => {
-    assert.ok(ssSlice.includes('label: sharedSnapshotRow.label'), 'sharedSnapshot must still include label');
+    assert.ok(ssSlice.includes('label:') && ssSlice.includes('snapshotRow.label'), 'sharedSnapshot must still include label');
   });
 
   test('D-209E1: public sharedSnapshot still includes contradictionCount', () => {
-    assert.ok(ssSlice.includes('contradictionCount: sharedSnapshotRow.contradiction_count'), 'sharedSnapshot must still include contradictionCount');
+    assert.ok(ssSlice.includes('contradictionCount:') && ssSlice.includes('contradiction_count'), 'sharedSnapshot must still include contradictionCount');
   });
 
   test('D-209E1: public sharedSnapshot still includes createdAt', () => {
-    assert.ok(ssSlice.includes('createdAt: sharedSnapshotRow.created_at'), 'sharedSnapshot must still include createdAt');
+    assert.ok(ssSlice.includes('createdAt:') && ssSlice.includes('created_at'), 'sharedSnapshot must still include createdAt');
   });
 
   test('D-209E1: getPublicProfile SELECT does not select score columns', () => {
@@ -14741,6 +14746,130 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
       mySlice.includes('stability_score') || mySlice.includes('SELECT *'),
       'private my-humanx endpoint must still return score data to the owner'
     );
+  });
+}
+
+{
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+
+  // ── buildPublicSharedSnapshot existence + wiring ──────────────────────────
+  test('D-209F: buildPublicSharedSnapshot helper exists in worker.js', () => {
+    assert.ok(workerSrc.includes('function buildPublicSharedSnapshot('), 'buildPublicSharedSnapshot must be defined in worker.js');
+  });
+
+  test('D-209F: getPublicProfile uses buildPublicSharedSnapshot', () => {
+    const ppIdx = workerSrc.indexOf('async function getPublicProfile(');
+    const ppEnd = workerSrc.indexOf('\nasync function createInviteCode', ppIdx);
+    const ppSlice = workerSrc.slice(ppIdx, ppEnd > -1 ? ppEnd : ppIdx + 3000);
+    assert.ok(ppSlice.includes('buildPublicSharedSnapshot('), 'getPublicProfile must call buildPublicSharedSnapshot()');
+  });
+
+  test('D-209F: getPublicProfile does not inline sharedSnapshot field shaping', () => {
+    const ppIdx = workerSrc.indexOf('async function getPublicProfile(');
+    const ppEnd = workerSrc.indexOf('\nasync function createInviteCode', ppIdx);
+    const ppSlice = workerSrc.slice(ppIdx, ppEnd > -1 ? ppEnd : ppIdx + 3000);
+    assert.ok(
+      !ppSlice.includes('label: sharedSnapshotRow') && !ppSlice.includes('contradictionCount: sharedSnapshotRow'),
+      'getPublicProfile must not inline snapshot fields — shaping belongs in buildPublicSharedSnapshot()'
+    );
+  });
+
+  // ── buildPublicSharedSnapshot field whitelist ─────────────────────────────
+  // Anchor from the JSDoc comment block so the consent gate comment is in scope.
+  const bssIdx = workerSrc.indexOf('// D-209F: public shared snapshot response builder');
+  const bssEnd = workerSrc.indexOf('\nasync function getPublicProfile(', bssIdx);
+  const bssSlice = workerSrc.slice(bssIdx, bssEnd > -1 ? bssEnd : bssIdx + 1800);
+
+  test('D-209F: buildPublicSharedSnapshot returns label', () => {
+    assert.ok(bssSlice.includes('label:') && bssSlice.includes('snapshotRow.label'), 'buildPublicSharedSnapshot must return label');
+  });
+
+  test('D-209F: buildPublicSharedSnapshot returns contradictionCount', () => {
+    assert.ok(bssSlice.includes('contradictionCount:') && bssSlice.includes('contradiction_count'), 'buildPublicSharedSnapshot must return contradictionCount');
+  });
+
+  test('D-209F: buildPublicSharedSnapshot returns createdAt', () => {
+    assert.ok(bssSlice.includes('createdAt:') && bssSlice.includes('created_at'), 'buildPublicSharedSnapshot must return createdAt');
+  });
+
+  // ── buildPublicSharedSnapshot field blacklist ─────────────────────────────
+  test('D-209F: buildPublicSharedSnapshot does not return stabilityScore', () => {
+    assert.ok(!bssSlice.includes('stabilityScore:'), 'buildPublicSharedSnapshot must not include stabilityScore');
+  });
+
+  test('D-209F: buildPublicSharedSnapshot does not return opennessScore', () => {
+    assert.ok(!bssSlice.includes('opennessScore:'), 'buildPublicSharedSnapshot must not include opennessScore');
+  });
+
+  test('D-209F: buildPublicSharedSnapshot does not return pressureScore', () => {
+    assert.ok(!bssSlice.includes('pressureScore:'), 'buildPublicSharedSnapshot must not include pressureScore');
+  });
+
+  test('D-209F: buildPublicSharedSnapshot does not return dominantPattern', () => {
+    assert.ok(!bssSlice.includes('dominantPattern:'), 'buildPublicSharedSnapshot must not include dominantPattern');
+  });
+
+  test('D-209F: buildPublicSharedSnapshot does not return topAlignmentName', () => {
+    assert.ok(!bssSlice.includes('topAlignmentName:'), 'buildPublicSharedSnapshot must not include topAlignmentName');
+  });
+
+  test('D-209F: buildPublicSharedSnapshot does not return alignmentLabels', () => {
+    assert.ok(!bssSlice.includes('alignmentLabels:'), 'buildPublicSharedSnapshot must not include alignmentLabels');
+  });
+
+  test('D-209F: buildPublicSharedSnapshot does not access top_beliefs_json', () => {
+    assert.ok(!bssSlice.includes('top_beliefs_json'), 'buildPublicSharedSnapshot must not access or return top_beliefs_json');
+  });
+
+  test('D-209F: buildPublicSharedSnapshot does not access dominant_pattern', () => {
+    assert.ok(!bssSlice.includes('dominant_pattern'), 'buildPublicSharedSnapshot must not access or return dominant_pattern');
+  });
+
+  // ── consent gate comment ──────────────────────────────────────────────────
+  test('D-209F: consent gate comment present in buildPublicSharedSnapshot', () => {
+    assert.ok(
+      bssSlice.includes('sensitive belief groups stay non-public until owner UI consent flow ships'),
+      'buildPublicSharedSnapshot must contain the D-209F consent gate comment'
+    );
+  });
+
+  // ── parseBeliefVisibility still defaults sensitive groups false ───────────
+  test('D-209F: parseBeliefVisibility safe default keeps pattern_summary false', () => {
+    const pbvIdx = workerSrc.indexOf('function parseBeliefVisibility(');
+    const pbvSlice = workerSrc.slice(pbvIdx, pbvIdx + 600);
+    assert.ok(pbvSlice.includes('pattern_summary: false'), 'parseBeliefVisibility safe default must have pattern_summary: false');
+  });
+
+  test('D-209F: parseBeliefVisibility safe default keeps alignment_labels false', () => {
+    const pbvIdx = workerSrc.indexOf('function parseBeliefVisibility(');
+    const pbvSlice = workerSrc.slice(pbvIdx, pbvIdx + 600);
+    assert.ok(pbvSlice.includes('alignment_labels: false'), 'parseBeliefVisibility safe default must have alignment_labels: false');
+  });
+
+  test('D-209F: parseBeliefVisibility safe default keeps scores false', () => {
+    const pbvIdx = workerSrc.indexOf('function parseBeliefVisibility(');
+    const pbvSlice = workerSrc.slice(pbvIdx, pbvIdx + 600);
+    assert.ok(pbvSlice.includes('scores: false'), 'parseBeliefVisibility safe default must have scores: false');
+  });
+
+  // ── no premature public surface additions ─────────────────────────────────
+  test('D-209F: no frontend consent toggle UI added', () => {
+    const feSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+    assert.ok(
+      !feSrc.includes('visibility_json') && !feSrc.includes('beliefVisibilityToggle') && !feSrc.includes('consentToggle'),
+      'No frontend consent toggle UI should be added before D-209G'
+    );
+  });
+
+  test('D-209F: no new migration file added for D-209F', () => {
+    assert.ok(
+      !existsSync(path.join(__dirname, '../migrations/0017_belief_visibility_gate.sql')),
+      'D-209F is backend refactor only — no migration needed'
+    );
+  });
+
+  test('D-209F: D-209F comment present in worker.js', () => {
+    assert.ok(workerSrc.includes('D-209F:'), 'D-209F comment must be present in worker.js');
   });
 }
 
