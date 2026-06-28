@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D203_AGGREGATE_CHARTS_CLOSEOUT.md` ⭐ CURRENT — D-203 AGGREGATE CHARTS CLOSEOUT
+### `D204_EVIDENCE_STRENGTH_MIX_CLOSEOUT.md` ⭐ CURRENT — D-204 EVIDENCE STRENGTH MIX CLOSEOUT
+
+Second per-claim Study chart: Evidence Strength Mix (renderEvidenceStrengthMix in app-v10.js). Reads evidence_strength/evidenceStrength from already-loaded evidence array; null→unknown; fixed enum order unknown/weak/moderate/strong/disputed; does not use quality, votes, AI verdicts, or scoring; guardrail copy on every render ("not whether the claim is proven"). Injected as es-mix-panel between st-mix-panel and evidence-panel. CSS reuses D-203B .st-mix-* classes intentionally — matched visual pair. No backend changes. 21 smoke tests. Deploy + sanity PASS. Next safe charts: Test Coverage per claim, Pressure Category Mix per claim. Still deferred: global leaderboards, ideology charts, AI dashboards, belief identity cards. Baseline: 1686/24/57.
+
+### `D203_AGGREGATE_CHARTS_CLOSEOUT.md` — D-203 AGGREGATE CHARTS CLOSEOUT
 
 Full arc closeout: D-203A guardrail spec (chart principle — activity not reality; 9 allowed categories; 12 banned framings; required label copy per chart type; visual risk rules — no green for popularity, no trophy language, no truth-score composite, always show n=), D-203B Source Type Mix chart (renderSourceTypeMix in app-v10.js; per-claim horizontal bars from already-loaded evidence array; source_type/sourceType; null→unknown; --blue bar color, --green not used; required guardrail copy on every render; no backend changes; no scoring/votes/AI verdicts used; 20 smoke tests). Deploy + sanity PASS. Remaining safe charts: Evidence Strength Mix, Test Coverage, Pressure Category Mix (all per-claim, no backend needed). Still deferred: global leaderboards, ideology charts, AI confidence dashboards, belief identity cards. Baseline: 1665/24/57.
 
