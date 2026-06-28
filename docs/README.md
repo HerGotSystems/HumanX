@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D194A_PREVIEW_MODERATION_PRESSURE_AUDIT.md` ⭐ CURRENT — D-194A PREVIEW MODERATION PRESSURE AUDIT
+### `D195A_PREVIEW_DEPLOYMENT_SANITY_CHECKLIST.md` ⭐ CURRENT — D-195A PREVIEW DEPLOYMENT SANITY CHECKLIST
+
+"Before sending invites today" deployment sanity checklist. Exact terminal commands (git pull, preflight, optional smoke test, wrangler deploy), 8 manual browser checks (Home, Arena, Study, Copy link, /c/:id, public profile, Review queue, mobile), go/no-go decision table, safe failure handling per failure mode. Worker: humanx at humanx.veltrusky-michal.workers.dev. Baseline: 1589/24/57.
+
+### `D194A_PREVIEW_MODERATION_PRESSURE_AUDIT.md` — D-194A PREVIEW MODERATION PRESSURE AUDIT
 
 Moderation survivability audit for 5–20 preview users. Covers rate limits, review states, duplicate detection, shadow-ban gap, queue bottlenecks, 5 abuse scenarios, and estimated operator load (10–15 min/day for medium wave). Verdict: survivable with daily queue checks. D-194B optional before wave 1 — only if shadow-ban gap is a concern. Baseline: 1589/24/57.
 
