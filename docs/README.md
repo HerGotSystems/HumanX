@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D200A_SOLO_PREVIEW_MODE_PLAN.md` ⭐ CURRENT — D-200A SOLO PREVIEW MODE PLAN
+### `D201A_BELIEF_ENGINE_EXPANSION_ROADMAP.md` ⭐ CURRENT — D-201A BELIEF ENGINE EXPANSION ROADMAP
+
+Audit + roadmap for Belief Engine v2: 8 ranked modules (Contradiction Finder, Origin Tracker, Pressure Profile, Confidence Ladder, Avatar Card, Drift, Global Charts), source-type taxonomy (scripture vs empirical), avatar/identity card spec, aggregate chart framing rules, 4-phase implementation plan. Baseline: 1589/24/57.
+
+### `D200A_SOLO_PREVIEW_MODE_PLAN.md` — D-200A SOLO PREVIEW MODE PLAN
 
 No external testers yet. Owner runs 5 personas (anonymous, verified, mobile, skeptical submitter, moderator) to surface friction before recruiting anyone. Includes test loops, anti-fake-confidence rules, debrief template, and post-preview decision criteria. Baseline: 1589/24/57.
 
