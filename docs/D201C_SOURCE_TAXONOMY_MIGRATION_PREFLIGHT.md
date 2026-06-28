@@ -3,7 +3,7 @@
 **Date:** 2026-06-28
 **HEAD at creation:** `b8a2c98`
 **Migration file:** `migrations/0015_evidence_source_taxonomy.sql`
-**Status:** READY TO PREFLIGHT — NOT YET APPLIED
+**Status:** READY TO PREFLIGHT AND APPLY — Option A in effect (migrate first, code second)
 
 ---
 
@@ -47,15 +47,13 @@ If `quality` does **not** appear — stop. The schema is not in the expected bas
 
 ## Step 2 — Apply
 
-⚠️ **DO NOT RUN THIS YET.**
+**Updated D-201E0:** Option A is in effect. Apply the migration first, then implement backend code in D-201E. The original gate requiring D-201E/F to ship first is superseded.
 
-This command is documented here for completeness. Apply only after:
-- Preflight passes (Step 1 confirms columns absent)
-- Server-side enum validation is implemented in `src/worker.js` (D-201E)
-- Frontend UI fields are implemented in `public/index.html` and `public/app-v10.js` (D-201F)
-- Smoke tests pass at 1589/0
+Gate before applying:
+- Step 1 preflight passed (both columns absent, `quality` present)
+- No uncommitted changes to `src/worker.js` that reference `source_type` or `evidence_strength`
 
-When those conditions are met, apply with:
+Apply with:
 
 ```powershell
 npx wrangler d1 migrations apply humanx --remote
