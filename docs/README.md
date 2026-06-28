@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D202_AUTHORITY_LAUNDERING_CLOSEOUT.md` ⭐ CURRENT — D-202 AUTHORITY LAUNDERING CLOSEOUT
+### `D203A_AGGREGATE_CHART_GUARDRAILS.md` ⭐ CURRENT — D-203A AGGREGATE CHART GUARDRAILS
+
+Docs/audit only — no chart implementation. Establishes rules before any aggregate chart is built. A: chart principle (activity, not reality). B: 9 allowed chart categories (source type mix, evidence strength mix, support/challenge balance, pressure distribution, test coverage, belief drift, moderation state, investigation completeness, user activity). C: banned framings (Top Truths, Most Proven Claims, Truth Score, Reality Ranking, Verified by AI, Majority Says True, Credibility Score, AI Confidence axis). D: required label copy for all chart types. E: visual risk rules (no green for popularity, no trophy language, no ranking by support alone, no single truth score, no fake certainty composite, always show n=). F: recommended first chart — Source Type Mix per claim (per-claim, categorical, reuses D-201 data, no backend needed). G: data requirements (evidence.source_type already in getClaim() response, frontend-only aggregation, null→unknown, min 2 non-null items before display). H: deferred — global leaderboards, AI confidence dashboards, ideology charts, claim scoring histograms, belief identity cards. I: existing surfaces and their current risk level. Baseline: 1645/24/57.
+
+### `D202_AUTHORITY_LAUNDERING_CLOSEOUT.md` — D-202 AUTHORITY LAUNDERING CLOSEOUT
 
 Full arc closeout: D-202A epistemology model, D-202B audit (five surfaces, "Proven" as highest risk), D-202C code fix (removed Proven/Disproven/Reality Collapse from verdict vocabulary; added Strongly Supported/Strongly Contested/Internally Contradictory; added ai_provenance_note + source_type_note to output_contract; instruction forbids claiming independent verification; analysisItem() shows permanent provenance note; paste surfaces warn AI read submitted evidence not external sources; LEGACY_VERDICT_MAP remaps old labels on display without touching DB). Deploy + sanity PASS. Remaining: analysis provenance DB fields, AI-output badge, circular-citation detector, re-entry rule, moderation gate for analysis_results. Baseline: 1645/24/57.
 
