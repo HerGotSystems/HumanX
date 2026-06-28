@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D208_BELIEF_ENGINE_PRIVACY_CLOSEOUT.md` ⭐ CURRENT — D-208 BELIEF ENGINE PRIVACY CLOSEOUT
+### `D208_PRIVATE_BELIEF_REFLECTION_CLOSEOUT.md` ⭐ CURRENT — D-208E PRIVATE BELIEF REFLECTION CLOSEOUT
+
+D-208D/E closeout. Adds private-only "Belief reflection" panel to My HumanX below existing Mirror section. Three bar-chart cards: Source habits (source_type distribution), Evidence strength habits (evidence_strength distribution), Investigation activity (evidence/pressure/tests counts). All data from already-loaded /api/my-humanx payload (SELECT * on evidence, home_tests) — no backend changes, no migration. Cards are private-only: renderPublicProfileHtml does not call meBeliefReflectionHtml. Guardrails: "not a score of intelligence, morality, or truth" (panel), "Private reflection only — not a public identity label." (per card). 19 new D-208D smoke tests. Baseline: 1785/24/57. Deploy confirmed, sanity PASS. Public belief labels remain private by default.
+
+### `D208_BELIEF_ENGINE_PRIVACY_CLOSEOUT.md` — D-208B/C BELIEF ENGINE PRIVACY CLOSEOUT
 
 D-208 arc closeout (D-208A audit + D-208B privacy/framing patch). Critical risk fixed: public profile (/api/u/:slug) was returning dominant_pattern (named belief archetype), top_beliefs_json (named religious/ideological alignment array), and topAlignmentName (e.g. "Traditional Christianity", "Scientific Materialism") for any shared snapshot. All three removed from public response. Safe fields retained: label (owner-written), stabilityScore, opennessScore, pressureScore, contradictionCount, createdAt. Stored data not deleted. Private owner view unchanged. Belief Engine copy: "Belief DNA"→"Belief Pattern", "Identity Fragmentation"→"Belief Origin Mix". Guardrail added to results screen: "not a score of intelligence, morality, or truth". My HumanX Mirror guardrail extended: "Private belief reflections are for self-study. They are not personality labels or truth rankings." No migration needed. 12 new D-208B smoke tests + 10 stale tests updated. Baseline: 1766/24/57. Deploy confirmed, sanity PASS. Public profile belief identity labels now private by default.
 
