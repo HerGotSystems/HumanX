@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D191B_PREVIEW_USER_INVITE_PACK.md` ⭐ CURRENT — D-191B PREVIEW USER INVITE PACK
+### `D191C_PREVIEW_OPERATOR_RUNBOOK.md` ⭐ CURRENT — D-191C PREVIEW OPERATOR RUNBOOK
+
+Full lifecycle runbook for running a 5–20 user trusted preview. Covers: pre-send checklist, daily Review queue routine, bug triage (P0–P3 with response times), feedback tracker format, invite code tracking rules, what to say when things break, stop/expand decision criteria, and known limitations. Baseline: 1589/24/57.
+
+### `D191B_PREVIEW_USER_INVITE_PACK.md` — D-191B PREVIEW USER INVITE PACK
 
 Short + long invite messages, plain-words product description, suggested try-list (8 flows), 7 feedback questions, copy-paste feedback reply template, known limitations to disclose, operator notes (preflight, Review queue, bug tracking). Baseline: 1589/24/57.
 
