@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D186_PUBLIC_SHARING_READINESS_CLOSEOUT.md` ⭐ CURRENT — D-186 PUBLIC SHARING READINESS CLOSEOUT
+### `D187A_DIRECT_CLAIM_URL_READINESS_AUDIT.md` ⭐ CURRENT — D-187A DIRECT CLAIM URL AUDIT
+
+Source-code audit planning `/c/:id` deep-link support. Full implementation plan: Worker shell, SPA boot patch, OG meta, privacy rules, phased D-187B/C spec. No code changes. Baseline: 1525/24/57.
+
+### `D186_PUBLIC_SHARING_READINESS_CLOSEOUT.md` — D-186 PUBLIC SHARING READINESS CLOSEOUT
 
 Five-patch series (D-186A–E): source-code audit + root OG tags + hero access copy + profile Browse CTA + og:image PNG. 7 of 12 audit issues fixed. No backend changes. Baseline: 1525/24/57.
 
