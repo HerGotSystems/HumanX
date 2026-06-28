@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1537 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1549 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,9 +58,13 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D188A_CLAIM_SHARING_UI_AUDIT.md` ⭐ CURRENT — D-188A CLAIM SHARING UI AUDIT
+### `D188_CLAIM_SHARING_UI_CLOSEOUT.md` ⭐ CURRENT — D-188 CLAIM SHARING UI CLOSEOUT
 
-Source-code audit of all claim sharing/copy surfaces. No copy-link UI exists anywhere today. Recommends Study view as P1 (one function, one button, lowest risk), Me claims + public profile claims as P2, Arena cards deferred. Full D-188B scope included. No code changes. Baseline: 1537/24/57.
+Four-patch series (D-188A audit + B0 test fix + B Study button + C Me/profile rows). copyClaimLink() added; Copy link now present in Study view, My HumanX public claims, and public profile claim rows. Arena cards deferred. Baseline: 1549/24/57.
+
+### `D188A_CLAIM_SHARING_UI_AUDIT.md` — D-188A CLAIM SHARING UI AUDIT
+
+Source-code audit of all claim sharing/copy surfaces. No copy-link UI existed anywhere. Recommends Study view as P1, Me claims + public profile as P2, Arena cards deferred. No code changes. Baseline: 1537/24/57.
 
 ### `D187_DIRECT_CLAIM_URL_CLOSEOUT.md` — D-187 DIRECT CLAIM URL CLOSEOUT
 
