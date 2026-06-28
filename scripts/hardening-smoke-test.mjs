@@ -13379,6 +13379,60 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   );
 });
 
+// ── D-201C: Source taxonomy migration file checks ─────────────────────────────
+
+{
+  const migPath = path.join(__dirname, '../migrations/0015_evidence_source_taxonomy.sql');
+  const migSrc = existsSync(migPath) ? readFileSync(migPath, 'utf8') : '';
+
+  test('D-201C: migration file 0015_evidence_source_taxonomy.sql exists', () => {
+    assert.ok(existsSync(migPath), 'migrations/0015_evidence_source_taxonomy.sql must exist');
+  });
+
+  test('D-201C: migration adds source_type column', () => {
+    assert.ok(migSrc.includes('source_type'), 'migration must contain source_type');
+  });
+
+  test('D-201C: migration adds evidence_strength column', () => {
+    assert.ok(migSrc.includes('evidence_strength'), 'migration must contain evidence_strength');
+  });
+
+  test('D-201C: migration has exactly two ALTER TABLE evidence ADD COLUMN statements', () => {
+    const matches = migSrc.match(/ALTER TABLE evidence ADD COLUMN/gi) || [];
+    assert.strictEqual(matches.length, 2, 'migration must have exactly 2 ALTER TABLE evidence ADD COLUMN statements');
+  });
+
+  test('D-201C: migration contains no DROP statement', () => {
+    assert.ok(!/\bDROP\b/i.test(migSrc), 'migration must not contain DROP');
+  });
+
+  test('D-201C: migration contains no DELETE statement', () => {
+    assert.ok(!/\bDELETE\b/i.test(migSrc), 'migration must not contain DELETE');
+  });
+
+  test('D-201C: migration contains no UPDATE statement', () => {
+    assert.ok(!/\bUPDATE\b/i.test(migSrc), 'migration must not contain UPDATE');
+  });
+
+  test('D-201C: migration documents that quality column is kept', () => {
+    assert.ok(migSrc.toLowerCase().includes('quality'), 'migration comments must reference legacy quality column');
+  });
+
+  test('D-201C: preflight doc exists', () => {
+    const preflightPath = path.join(__dirname, '../docs/D201C_SOURCE_TAXONOMY_MIGRATION_PREFLIGHT.md');
+    assert.ok(existsSync(preflightPath), 'docs/D201C_SOURCE_TAXONOMY_MIGRATION_PREFLIGHT.md must exist');
+  });
+
+  test('D-201C: preflight doc contains gated apply warning', () => {
+    const preflightPath = path.join(__dirname, '../docs/D201C_SOURCE_TAXONOMY_MIGRATION_PREFLIGHT.md');
+    const preflightSrc = existsSync(preflightPath) ? readFileSync(preflightPath, 'utf8') : '';
+    assert.ok(
+      preflightSrc.includes('DO NOT RUN') || preflightSrc.includes('DO NOT APPLY'),
+      'preflight doc must contain a gated apply warning'
+    );
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D201B_SOURCE_TAXONOMY_AUDIT.md` ⭐ CURRENT — D-201B SOURCE TAXONOMY AUDIT
+### `D201C_SOURCE_TAXONOMY_MIGRATION_PREFLIGHT.md` ⭐ CURRENT — D-201C MIGRATION PREFLIGHT (NOT YET APPLIED)
+
+Migration file `migrations/0015_evidence_source_taxonomy.sql` adds `source_type` and `evidence_strength` columns to `evidence` table — additive only, no data rewrite, quality column untouched. 10 smoke tests added. Migration NOT yet applied to production. Baseline: 1599/24/57.
+
+### `D201B_SOURCE_TAXONOMY_AUDIT.md` — D-201B SOURCE TAXONOMY AUDIT
 
 Audit of evidence `quality` field conflation; proposes `source_type` (11 values) + `evidence_strength` (5 values) as additive columns; full surface map (14 locations); backward-compat migration in 4 stages; no destructive migration; contextual note rule for scripture/myth/fiction sources. Baseline: 1589/24/57.
 
