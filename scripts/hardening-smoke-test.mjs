@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2169,7 +2169,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -7165,7 +7165,7 @@ test('D-140B: frontend Profile Settings panel exists in Me, near the account car
 
 test('D-140B: public-off disclaimer exists', () => {
   const idx = appSrc.indexOf('function meProfileSettingsHtml');
-  const slice = appSrc.slice(idx, idx + 400);
+  const slice = appSrc.slice(idx, idx + 700);
   assert.ok(
     slice.includes('Off by default. Nothing about your account is public until you turn this on and save.'),
     'meProfileSettingsHtml must render the required off-by-default disclaimer'
@@ -7174,7 +7174,7 @@ test('D-140B: public-off disclaimer exists', () => {
 
 test('D-140B: preview panel exists and is wired to live input changes', () => {
   const idx = appSrc.indexOf('function meProfileSettingsHtml');
-  const slice = appSrc.slice(idx, idx + 1200);
+  const slice = appSrc.slice(idx, idx + 1600);
   assert.ok(
     slice.includes('This is what others would see if you publish.') &&
     slice.includes('id="meProfilePreviewBody"') &&
@@ -7214,7 +7214,7 @@ test('D-140B/D-143B: copy share link now uses the real /u/:slug path, not the #/
 
 test('D-140B: copy share link button is disabled/hidden unless the profile is public with a saved slug', () => {
   const idx = appSrc.indexOf('function meProfileSettingsHtml');
-  const slice = appSrc.slice(idx, idx + 1700);
+  const slice = appSrc.slice(idx, idx + 2100);
   assert.ok(
     slice.includes('const canCopy=isPublic&&!!slug') &&
     slice.includes("${canCopy?'':'disabled'}") &&
@@ -10766,14 +10766,14 @@ test('D-162B: no admin route changed', () => {
 // ── Section 96 — D-163B: Submit Claim first-time clarity layer ────────────────
 
 test('D-163B: builder-intro copy exists in renderBuilderStep1', () => {
+  // D-190D replaced "Anyone can submit" with invite-aware copy; accept either form
   const idx = appSrc.indexOf('function renderBuilderStep1');
-  const slice = appSrc.slice(idx, idx + 500);
+  const slice = appSrc.slice(idx, idx + 700);
   assert.ok(
     slice.includes('builder-intro') &&
-    slice.includes('Anyone can submit') &&
-    slice.includes('pseudonymously') &&
+    (slice.includes('Anyone can submit') || slice.includes('Submit a testable claim')) &&
     slice.includes('after review'),
-    'renderBuilderStep1 must include .builder-intro with "Anyone can submit" pseudonymously and review copy'
+    'renderBuilderStep1 must include .builder-intro with claim-submit intro and review copy'
   );
 });
 
@@ -13275,6 +13275,107 @@ test('D-190B: graphBox still contains Claims and Evidence', () => {
   assert.ok(
     slice.includes("'Claims'") && slice.includes("'Evidence'"),
     'graphBox() must still show Claims and Evidence counts'
+  );
+});
+
+// ── Section 105 — D-190D: soft invite-gate messaging fixes ───────────────────
+
+test('D-190D: Builder Step 1 no longer says "Anyone can submit"', () => {
+  const idx = appSrc.indexOf('function renderBuilderStep1');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    !slice.includes('Anyone can submit'),
+    'renderBuilderStep1 must not say "Anyone can submit" (contradicts home invite promise)'
+  );
+});
+
+test('D-190D: Builder Step 1 mentions redeeming invite for profile association', () => {
+  const idx = appSrc.indexOf('function renderBuilderStep1');
+  const slice = appSrc.slice(idx, idx + 700);
+  assert.ok(
+    slice.includes('Redeem your invite') || slice.includes('redeem your invite'),
+    'renderBuilderStep1 must mention invite redemption for profile tracking'
+  );
+});
+
+test('D-190D: Builder Step 3 shows guest note when not verified', () => {
+  const idx = appSrc.indexOf('function renderBuilderStep3');
+  const slice = appSrc.slice(idx, idx + 3200);
+  assert.ok(
+    slice.includes('Submitting as a guest'),
+    'renderBuilderStep3 must include "Submitting as a guest" note for unverified users'
+  );
+});
+
+test('D-190D: Builder Step 3 guest note is conditional on accountUser.verified', () => {
+  const idx = appSrc.indexOf('function renderBuilderStep3');
+  const slice = appSrc.slice(idx, idx + 3200);
+  assert.ok(
+    slice.includes('accountUser') && slice.includes('verified') && slice.includes('Submitting as a guest'),
+    'renderBuilderStep3 guest note must be gated on accountUser.verified check'
+  );
+});
+
+test('D-190D: patchEvidencePanel sets invite-aware note for unverified users', () => {
+  const idx = appSrc.indexOf('function patchEvidencePanel');
+  const slice = appSrc.slice(idx, idx + 1100);
+  assert.ok(
+    slice.includes('Guest contributions') && slice.includes('Redeem an invite'),
+    'patchEvidencePanel must set invite-aware text on evidence-attach-note for unverified users'
+  );
+});
+
+test('D-190D: patchEvidencePanel keeps approval wording for verified users', () => {
+  const idx = appSrc.indexOf('function patchEvidencePanel');
+  const slice = appSrc.slice(idx, idx + 1100);
+  assert.ok(
+    slice.includes('After approval') || slice.includes('Pending items stay private'),
+    'patchEvidencePanel must retain approval wording for verified users'
+  );
+});
+
+test('D-190D: patchEvidencePanel note is conditional on accountUser.verified', () => {
+  const idx = appSrc.indexOf('function patchEvidencePanel');
+  const slice = appSrc.slice(idx, idx + 1100);
+  assert.ok(
+    slice.includes('accountUser') && slice.includes('verified'),
+    'patchEvidencePanel note must check accountUser.verified'
+  );
+});
+
+test('D-190D: addHomeTestUI toast includes invite note for unverified users', () => {
+  const idx = appSrc.indexOf('function addHomeTestUI');
+  const slice = appSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('Redeem your invite') || slice.includes('redeem your invite'),
+    'addHomeTestUI success toast must include invite reminder for unverified users'
+  );
+});
+
+test('D-190D: addHomeTestUI toast is conditional on accountUser.verified', () => {
+  const idx = appSrc.indexOf('function addHomeTestUI');
+  const slice = appSrc.slice(idx, idx + 900);
+  assert.ok(
+    slice.includes('accountUser') && slice.includes('verified'),
+    'addHomeTestUI toast must be conditional on verified status'
+  );
+});
+
+test('D-190D: meProfileSettingsHtml shows invite note for unverified users', () => {
+  const idx = appSrc.indexOf('function meProfileSettingsHtml');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('Verify your account with an invite code'),
+    'meProfileSettingsHtml must warn unverified users about needing invite for public profile'
+  );
+});
+
+test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUser.verified', () => {
+  const idx = appSrc.indexOf('function meProfileSettingsHtml');
+  const slice = appSrc.slice(idx, idx + 600);
+  assert.ok(
+    slice.includes('accountUser') && slice.includes('verified'),
+    'meProfileSettingsHtml guest note must check accountUser.verified'
   );
 });
 
