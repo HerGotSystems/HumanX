@@ -1,7 +1,7 @@
 # D-213A — Reflection Avatar Accessibility Polish
 
 **Scope:** Frontend only
-**Status:** SOURCE/STATIC COMPLETE — PENDING OWNER DEPLOY + LIVE SANITY
+**Status:** LIVE CLOSEOUT COMPLETE
 **Baseline:** 1980 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 warn pre-existing)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/README.md`
 **Backend changes:** None
@@ -143,23 +143,55 @@ No changes to `renderPublicProfileHtml`. The following remain absent from the pu
 
 ---
 
-## Deploy required
+## Deploy
 
-`public/app-v10.js` and `public/styles.css` changed. Owner must run `npx wrangler deploy` from local terminal. No migration required.
+Owner deployed manually from local terminal after commit `e9ecdc4`. No migration required.
 
-### Live sanity checklist
+### Live sanity checklist — D-213B — ALL PASS
 
 | Check | Expected | Actual |
 |---|---|---|
-| "Hide this" is keyboard-activatable (Tab + Enter) | Hides card | — |
-| "Show again" is keyboard-activatable (Tab + Enter) | Restores card | — |
-| "Hide this" shows visible focus ring on keyboard focus | Visible blue outline | — |
-| "Show again" shows visible focus ring on keyboard focus | Visible blue outline | — |
-| "How this is formed" is keyboard-activatable (Tab + Enter) | Opens disclosure | — |
-| "How this is formed" shows visible focus ring on keyboard focus | Visible blue outline | — |
-| All three button/summary elements are reachable by Tab | Reachable | — |
-| type="button" does not break click behavior | Works normally | — |
-| Reflection avatar card not on public profile | Absent | — |
-| No hide/show controls on public profile | Absent | — |
-| Mobile: "Hide this" tap target comfortable | 32px+ height | — |
-| Mobile: "How this is formed" tap target comfortable | 32px+ height | — |
+| Card reads normally visually | No regression | PASS |
+| "Hide this" click works | Hides card | PASS |
+| "Show again" click works | Restores card | PASS |
+| Hidden placeholder appears correctly | Present | PASS |
+| Hidden state persists after refresh | Persists | PASS |
+| Transparency disclosure opens/closes normally | Works | PASS |
+| Keyboard tab reaches "Hide this" | Reachable | PASS |
+| Keyboard activation works on "Hide this" (Enter/Space) | Hides card | PASS |
+| Keyboard tab reaches "Show again" | Reachable | PASS |
+| Keyboard activation works on "Show again" (Enter/Space) | Restores card | PASS |
+| Keyboard tab reaches disclosure summary | Reachable | PASS |
+| Keyboard activation opens/closes disclosure (Enter/Space) | Opens/closes | PASS |
+| Focus-visible ring on "Hide this" (keyboard focus) | Visible blue outline | PASS |
+| Focus-visible ring on "Show again" (keyboard focus) | Visible blue outline | PASS |
+| Focus-visible ring on disclosure summary (keyboard focus) | Visible blue outline | PASS |
+| Mobile/touch layout does not overflow or break | No overflow | PASS |
+| Guardrail copy visible after restore | Present | PASS |
+| Private notice visible after restore | Present | PASS |
+| Reflection avatar absent from public profile | Absent | PASS |
+| Hide/show controls absent from public profile | Absent | PASS |
+| Hidden placeholder absent from public profile | Absent | PASS |
+| Transparency disclosure absent from public profile | Absent | PASS |
+| No forbidden wording on public profile | All absent | PASS |
+
+### Confirmations
+
+- **Owner deploy:** PASS (manual `wrangler deploy` from owner terminal)
+- **Keyboard behavior:** PASS — Tab reaches all three interactive elements; Enter/Space activates each; focus order logical
+- **Focus-visible rings:** PASS — blue outline appears on keyboard focus for "Hide this", "Show again", and disclosure summary; does not appear on mouse click
+- **Mobile touch targets:** PASS — 32px min-height on hide button and disclosure summary; no overflow on mobile viewport
+- **Private-only:** PASS — Reflection Avatar remains private; `meReflectionAvatarHtml` not called from `renderPublicProfileHtml`
+- **localStorage-only unchanged:** PASS — no changes to hide/show state storage; `humanx.me.reflectionAvatar.hidden` still the only key used
+- **No public profile/avatar exposure:** PASS
+- **No backend changes:** PASS
+- **No API changes:** PASS
+- **No migration:** PASS
+- **No schema changes:** PASS
+- **No CSP changes:** PASS
+- **No external asset changes:** PASS
+
+### Final baselines
+
+- **Hardening smoke:** 1980 passed / 0 failed
+- **Worker route static:** 57 passed / 0 failed / 1 warn (pre-existing, non-blocking)
