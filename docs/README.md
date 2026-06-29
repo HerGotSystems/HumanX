@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2366 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2403 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D230A_REVIEW_QUEUE_DECISION_FEEDBACK.md` ⭐ CURRENT — D-230A/B REVIEW QUEUE DECISION FEEDBACK — LIVE PASS
+### `D231A_REVIEW_QUEUE_ERGONOMICS_REGRESSION_LOCK.md` ⭐ CURRENT — D-231A REVIEW QUEUE ERGONOMICS REGRESSION LOCK
+
+Tests + docs only. No app/CSS/worker changes. No deploy needed. Baseline: 2403/0/24/57. Consolidated regression lock for the D-227→D-230 review queue ergonomics arc: 37 new tests across 7 categories — D-227 selected-card anchor lock (5), D-228 scroll preservation lock (7), D-229 confirm-state clarity lock (6), D-230 decision-feedback lock (7), moderation semantics lock (4), public profile exposure lock (5), deploy integrity lock (3). Any future review UI change breaking these tests requires updating this lock with explicit owner approval. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D230A_REVIEW_QUEUE_DECISION_FEEDBACK.md` — D-230A/B REVIEW QUEUE DECISION FEEDBACK — LIVE PASS
 
 App + CSS + tests + docs. Owner deploy complete (D-230B live sanity 24/24 PASS, 2026-06-29). Baseline: 2366/0/24/57. Adds `reviewDecisionFeedback` state, `clearReviewDecisionFeedback()` helper, and a `role="status" aria-live="polite"` feedback banner in `renderReviewList` showing "Approved review item.", "Kept review item.", or "Rejected review item." after a successful decision. Banner includes a Dismiss button (`type="button"`). Feedback is set in `reviewDecisionUI` after API success, rendered above the inspect panel, cleared on dismiss. 19 new tests + 4 D-129C/D/E window fixes (1200→1500). No moderation semantics change. D-227B/D-228A/D-229A behavior intact. No backend/API/migration/schema/CSP/external asset changes. No public profile exposure.
 
