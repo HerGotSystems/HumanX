@@ -7,6 +7,52 @@
  * Run: node scripts/hardening-smoke-test.mjs
  */
 
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  D-217A SMOKE TEST INDEX                                                   ║
+// ║                                                                              ║
+// ║  Families of guards in this file (search for the D-block comment            ║
+// ║  to jump to a section):                                                      ║
+// ║                                                                              ║
+// ║  BASELINE / ALLOWLIST                                                        ║
+// ║    D-139B  README baseline allowlist (current: 2157 passed, 0 failed)        ║
+// ║                                                                              ║
+// ║  WORKER ROUTE CHECKS                                                         ║
+// ║    (worker-route-static-check.mjs — separate file, 57 checks / 1 warn)      ║
+// ║                                                                              ║
+// ║  BELIEF ENGINE CHECKS                                                        ║
+// ║    (belief-engine-static-check.mjs — separate file, 24 checks)              ║
+// ║                                                                              ║
+// ║  MY HUMANX PRIVATE SURFACE                                                   ║
+// ║    D-155    My HumanX private surface basics                                 ║
+// ║    D-171B   My HumanX archive / profile controls                             ║
+// ║                                                                              ║
+// ║  REFLECTION AVATAR GUARDS                                                    ║
+// ║    D-210B   Reflection Avatar concept card (private only, guardrails)        ║
+// ║    D-211A   Reflection Avatar transparency disclosure                        ║
+// ║    D-212A   Reflection Avatar hide/show control (localStorage only)          ║
+// ║    D-213A   Reflection Avatar accessibility (type=button, focus-visible)     ║
+// ║    D-214A   ★ REGRESSION LOCK — Reflection Avatar private boundary          ║
+// ║                                                                              ║
+// ║  MY HUMANX PRIVACY BOUNDARY                                                  ║
+// ║    D-215A   ★ PRIVACY BOUNDARY LOCK — My HumanX vs public profile           ║
+// ║                                                                              ║
+// ║  PUBLIC PROFILE ALLOWLIST CONTRACT                                           ║
+// ║    D-216A   ★ ALLOWLIST CONTRACT — public profile surface                   ║
+// ║                                                                              ║
+// ║  DEPLOY INTEGRITY CHECKS                                                     ║
+// ║    D-212A / D-213A / D-214A / D-215A / D-216A / D-217A                      ║
+// ║    Each task verifies it did not modify app/CSS/worker/migrations.           ║
+// ║                                                                              ║
+// ║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+// ║  RULES FOR FUTURE SLICES                                                     ║
+// ║  1. Add a new named block with a D-block comment header.                     ║
+// ║  2. Do NOT remove or loosen D-214A / D-215A / D-216A tests without          ║
+// ║     explicit owner approval — these are the privacy boundary fence.          ║
+// ║  3. Update README baseline and the D-139B allowlist when count changes.      ║
+// ║  4. Deploy-only tasks (no app/CSS/worker change) must include a              ║
+// ║     deploy integrity test confirming the relevant files were not modified.   ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
 import assert from 'node:assert/strict';
 import { meaningKey, meaningMatch } from '../src/meaning-key.js';
 
@@ -786,7 +832,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2170,7 +2216,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -16241,6 +16287,103 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(
       !existsSync(path.join(__dirname, '../migrations/0017_pub_allowlist.sql')),
       'D-216A is test/docs-only — no migration needed'
+    );
+  });
+}
+
+// ── D-217A: Hardening smoke maintainability checkpoint ────────────────────────
+{
+  const smokeSrc = readFileSync(path.join(__dirname, '../scripts/hardening-smoke-test.mjs'), 'utf8');
+  const readmeSrc = readFileSync(path.join(__dirname, '../docs/README.md'), 'utf8');
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const cssSrc = readFileSync(path.join(__dirname, '../public/styles.css'), 'utf8');
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+
+  // ── 1. Index is present ───────────────────────────────────────────────────
+  test('D-217A: D-217A index block present in smoke test file', () => {
+    assert.ok(smokeSrc.includes('D-217A SMOKE TEST INDEX'), 'D-217A index comment block must be present in hardening-smoke-test.mjs');
+  });
+
+  test('D-217A: index names Reflection Avatar regression lock (D-214A)', () => {
+    assert.ok(smokeSrc.includes('D-214A') && smokeSrc.includes('REGRESSION LOCK'), 'index must name the D-214A Reflection Avatar regression lock');
+  });
+
+  test('D-217A: index names My HumanX privacy boundary lock (D-215A)', () => {
+    assert.ok(smokeSrc.includes('D-215A') && smokeSrc.includes('PRIVACY BOUNDARY LOCK'), 'index must name the D-215A My HumanX privacy boundary lock');
+  });
+
+  test('D-217A: index names Public Profile allowlist contract (D-216A)', () => {
+    assert.ok(smokeSrc.includes('D-216A') && smokeSrc.includes('ALLOWLIST CONTRACT'), 'index must name the D-216A public profile allowlist contract');
+  });
+
+  test('D-217A: index names deploy integrity checks', () => {
+    assert.ok(smokeSrc.includes('DEPLOY INTEGRITY CHECKS') || smokeSrc.includes('Deploy integrity'), 'index must name deploy integrity checks');
+  });
+
+  test('D-217A: index includes rules for future slices', () => {
+    assert.ok(smokeSrc.includes('RULES FOR FUTURE SLICES'), 'index must include rules for future slices');
+  });
+
+  test('D-217A: index rule forbids loosening D-214A/D-215A/D-216A without owner approval', () => {
+    assert.ok(smokeSrc.includes('D-214A / D-215A / D-216A') || (smokeSrc.includes('D-214A') && smokeSrc.includes('owner approval')), 'index must state D-214/215/216 cannot be loosened without owner approval');
+  });
+
+  // ── 2. Baseline integrity ─────────────────────────────────────────────────
+  test('D-217A: baseline allowlist includes 2157', () => {
+    assert.ok(smokeSrc.includes('2157 passed, 0 failed'), 'baseline allowlist must include 2157 passed, 0 failed');
+  });
+
+  test('D-217A: index baseline count is documented', () => {
+    assert.ok(smokeSrc.includes('2157 passed'), 'D-217A index must document the current 2157 baseline');
+  });
+
+  // ── 3. Privacy locks still active ────────────────────────────────────────
+  test('D-217A: D-214A regression lock tests present', () => {
+    assert.ok(smokeSrc.includes('D-214A: private render boundary'), 'D-214A private render boundary test must still be present');
+  });
+
+  test('D-217A: D-215A privacy boundary lock tests present', () => {
+    assert.ok(smokeSrc.includes('D-215A: renderMeHtml not called from public render path'), 'D-215A privacy boundary test must still be present');
+  });
+
+  test('D-217A: D-216A allowlist contract tests present', () => {
+    assert.ok(smokeSrc.includes('D-216A: renderPublicProfileHtml function exists'), 'D-216A allowlist contract test must still be present');
+  });
+
+  test('D-217A: D-214A forbidden wording check still present', () => {
+    assert.ok(smokeSrc.includes('D-214A: "HumanX rank" absent from app UI'), 'D-214A forbidden wording check must still be present');
+  });
+
+  // ── 4. README references D-214A, D-215A, D-216A docs ─────────────────────
+  test('D-217A: README references D-214A regression lock doc', () => {
+    assert.ok(readmeSrc.includes('D214A_REFLECTION_AVATAR_REGRESSION_LOCK'), 'README must reference D-214A regression lock doc');
+  });
+
+  test('D-217A: README references D-215A privacy boundary lock doc', () => {
+    assert.ok(readmeSrc.includes('D215A_MY_HUMANX_PRIVACY_BOUNDARY_LOCK'), 'README must reference D-215A privacy boundary lock doc');
+  });
+
+  test('D-217A: README references D-216A allowlist contract doc', () => {
+    assert.ok(readmeSrc.includes('D216A_PUBLIC_PROFILE_ALLOWLIST_CONTRACT'), 'README must reference D-216A allowlist contract doc');
+  });
+
+  // ── 5. Deploy integrity ───────────────────────────────────────────────────
+  test('D-217A: D-217A does not modify public/app-v10.js', () => {
+    assert.ok(!appSrc.includes('D-217A'), 'D-217A must not modify app-v10.js');
+  });
+
+  test('D-217A: D-217A does not modify public/styles.css', () => {
+    assert.ok(!cssSrc.includes('D-217A'), 'D-217A must not modify styles.css');
+  });
+
+  test('D-217A: D-217A does not modify src/worker.js', () => {
+    assert.ok(!workerSrc.includes('D-217A'), 'D-217A must not modify worker.js');
+  });
+
+  test('D-217A: D-217A does not require migration', () => {
+    assert.ok(
+      !existsSync(path.join(__dirname, '../migrations/0017_smoke_index.sql')),
+      'D-217A is test/docs-only — no migration needed'
     );
   });
 }
