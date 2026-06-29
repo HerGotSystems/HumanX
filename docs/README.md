@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D226A_PUBLIC_PROFILE_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-226A PUBLIC PROFILE MILESTONE CHECKPOINT
+### `D227A_REVIEW_QUEUE_SCANABILITY_AUDIT.md` ⭐ CURRENT — D-227A REVIEW QUEUE SCANABILITY AUDIT
+
+Docs only. No app UI, CSS, or worker changes. Deploy not needed. Baseline unchanged: 2290/0/24/57. Audits the current Review/moderation UI: full UI structure (filter bar, overview strip, audit summary, inspect panel position, card anatomy, keyboard shortcuts), all 8 current moderation actions, 6 concrete friction points (inspect panel detached from card, full re-render on every action, action button duplication across card/panel, no selected-card anchor, keyboard hint clarity, no filtered-item count), 5 safe improvement slices (D-227B through D-231A), risk boundaries, and test recommendations. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D226A_PUBLIC_PROFILE_MILESTONE_CHECKPOINT.md` — D-226A PUBLIC PROFILE MILESTONE CHECKPOINT
 
 Docs only. No app UI, CSS, or worker changes. Deploy not needed. Updates `docs/PROJECT_STATE.md` as authoritative project reference after the completed D-220→D-225 public profile polish arc. Records current baseline (2290/0/24/57), full arc summary, deployment state (5 owner live deploys, D-225A tests/docs only), public profile current behavior table, privacy guarantees (no new public data fields; no private/avatar exposure; D-214A/D-215A/D-216A/D-225A locks active), future rules, and suggested next lanes. No backend/API/migration/schema/CSP/external asset changes.
 
