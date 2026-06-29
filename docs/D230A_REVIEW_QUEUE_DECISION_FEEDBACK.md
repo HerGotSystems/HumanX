@@ -1,7 +1,7 @@
 # D-230A — Review Queue Decision Feedback
 
 **Scope:** App + CSS + tests + docs
-**Status:** COMPLETE — owner deploy needed
+**Status:** COMPLETE — live PASS (D-230B)
 **Baseline:** 2366 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D230A_REVIEW_QUEUE_DECISION_FEEDBACK.md`, `docs/README.md`
 **App UI changes:** Yes — `reviewDecisionUI`, `renderReviewList`
@@ -153,30 +153,37 @@ Confirmed. All changes are frontend JS, CSS, and copy only.
 
 ---
 
-## Live sanity checklist — pending owner deploy
+## Live sanity checklist — D-230B PASS (2026-06-29)
 
-Owner deploy required before marking live PASS (D-230B).
+Owner deploy completed from terminal. All 24 live sanity items confirmed PASS.
 
-- [ ] Deploy via `wrangler deploy` from owner terminal
-- [ ] Open Review tab with admin token
-- [ ] Queue loads without console-breaking errors
-- [ ] Approve a card via two-step confirm — confirm "Approved review item." banner appears below filter bar
-- [ ] Reject a card via two-step confirm — confirm "Rejected review item." banner appears
-- [ ] Keep Pending a card — confirm "Kept review item." banner appears
-- [ ] Dismiss button clears the banner
-- [ ] A second decision overwrites the previous banner message
-- [ ] Banner has visible green-tinted styling (subtle, not alarming)
-- [ ] Banner does not steal focus
-- [ ] Screen reader check (if available): banner announced after decision without interrupting flow
-- [ ] Existing toast still fires alongside banner (not replaced)
-- [ ] Keyboard shortcuts (A/R/K) still work as before
-- [ ] Filter/sort behavior unchanged
-- [ ] D-227B: Inspect still marks selected card and scrolls it into view
-- [ ] D-228A: Filter/sort still preserve scroll position
-- [ ] D-229A: Reject/Approve armed states still show confirm styling
-- [ ] Public profile pages unchanged — no feedback banner or decision copy
-- [ ] No console errors
-- [ ] No backend/API behavior changed
+- [x] Deploy via `wrangler deploy` from owner terminal — PASS
+- [x] Open Review tab with admin token — PASS
+- [x] Queue loads without console-breaking errors — PASS
+- [x] Completing Approve shows banner: "Approved review item." — PASS
+- [x] Completing Keep Pending / cleanup shows banner: "Kept review item." — PASS
+- [x] Completing Reject shows banner: "Rejected review item." — PASS
+- [x] Banner appears near the review queue, not in public profile — PASS
+- [x] Banner uses status/live-region behavior and does not steal focus — PASS
+- [x] Dismiss button is visible — PASS
+- [x] Dismiss button clears the banner — PASS
+- [x] Dismiss button does not affect queue contents — PASS
+- [x] Existing toast behavior still works alongside banner — PASS
+- [x] Two-step confirm behavior unchanged — PASS
+- [x] Approve outcome unchanged — PASS
+- [x] Keep/Cleanup outcome unchanged — PASS
+- [x] Reject outcome unchanged — PASS
+- [x] Keyboard shortcuts unchanged — PASS
+- [x] Filters/sort unchanged — PASS
+- [x] D-227B selected-card anchor still works — PASS
+- [x] D-228A scroll preservation still works — PASS
+- [x] D-229A confirm-state clarity still works — PASS
+- [x] Public profile pages do not contain review feedback copy/classes — PASS
+- [x] No backend/API behavior changed — PASS
+- [x] No console errors — PASS
+
+**Hardening smoke (post-deploy):** 2366 passed / 0 failed
+**Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug`)
 
 ---
 
@@ -187,4 +194,4 @@ Owner deploy required before marking live PASS (D-230B).
 - **No Reflection Avatar / public avatar exposure:** Confirmed
 - **No backend/API/migration/schema/CSP/external asset changes:** Confirmed
 - **No moderation semantics change:** Confirmed
-- **Deploy needed:** Yes — owner deploy + browser sanity before marking live PASS (D-230B)
+- **Deploy needed:** No — deploy complete, live PASS recorded (D-230B)

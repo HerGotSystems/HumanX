@@ -53,9 +53,9 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D230A_REVIEW_QUEUE_DECISION_FEEDBACK.md` ⭐ CURRENT — D-230A REVIEW QUEUE DECISION FEEDBACK (DEPLOY NEEDED)
+### `D230A_REVIEW_QUEUE_DECISION_FEEDBACK.md` ⭐ CURRENT — D-230A/B REVIEW QUEUE DECISION FEEDBACK — LIVE PASS
 
-App + CSS + tests + docs. **Owner deploy needed.** Baseline: 2366/0/24/57. Adds `reviewDecisionFeedback` state, `clearReviewDecisionFeedback()` helper, and a `role="status" aria-live="polite"` feedback banner in `renderReviewList` showing "Approved review item.", "Kept review item.", or "Rejected review item." after a successful decision. Banner includes a Dismiss button (`type="button"`). Feedback is set in `reviewDecisionUI` after API success, rendered above the inspect panel, cleared on dismiss. 19 new tests + 4 D-129C/D/E window fixes (1200→1500). No moderation semantics change. D-227B/D-228A/D-229A behavior intact. No backend/API/migration/schema/CSP/external asset changes. No public profile exposure.
+App + CSS + tests + docs. Owner deploy complete (D-230B live sanity 24/24 PASS, 2026-06-29). Baseline: 2366/0/24/57. Adds `reviewDecisionFeedback` state, `clearReviewDecisionFeedback()` helper, and a `role="status" aria-live="polite"` feedback banner in `renderReviewList` showing "Approved review item.", "Kept review item.", or "Rejected review item." after a successful decision. Banner includes a Dismiss button (`type="button"`). Feedback is set in `reviewDecisionUI` after API success, rendered above the inspect panel, cleared on dismiss. 19 new tests + 4 D-129C/D/E window fixes (1200→1500). No moderation semantics change. D-227B/D-228A/D-229A behavior intact. No backend/API/migration/schema/CSP/external asset changes. No public profile exposure.
 
 ### `D229A_REVIEW_QUEUE_CONFIRM_STATE_CLARITY.md` — D-229A/B REVIEW QUEUE CONFIRM-STATE CLARITY — LIVE PASS
 
