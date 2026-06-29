@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2418 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2429 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D233A_DUPLICATE_REVIEW_UX_AUDIT.md` ⭐ CURRENT — D-233A DUPLICATE REVIEW UX AUDIT
+### `D233B_RESOLVE_SIMILAR_SCROLL_ANCHOR.md` ⭐ CURRENT — D-233B RESOLVE SIMILAR SCROLL ANCHOR (DEPLOY NEEDED)
+
+App fix + tests + docs. Deploy needed: yes. Baseline: 2429/0/24/57. Fixes D-233A friction finding F-6: after dismissing a `~similar` advisory via `resolveSimilarUI`, the review queue now scrolls back to the dismissed claim's card (`scrollToReviewAnchor(claimId)` added after `renderReviewList()` in the success path), matching the existing `markDuplicateUI` behavior. One-line change in `public/app-v10.js`. 11 new smoke tests: core fix, call order, parity with markDuplicateUI, scrollToReviewAnchor existence, API routes unchanged, modal copy unchanged, queue load before scroll, public profile exclusion, deploy integrity. No CSS, no worker, no backend/API/migration/schema/CSP/external asset changes. No duplicate/advisory semantics change. Live sanity checklist pending owner deploy.
+
+### `D233A_DUPLICATE_REVIEW_UX_AUDIT.md` — D-233A DUPLICATE REVIEW UX AUDIT
 
 Docs + tiny smoke tests. No app/CSS/worker changes. No deploy needed. Baseline: 2418/0/24/57. Audits the current duplicate/near-duplicate handling in the review queue: two-concept data surface (`near_duplicate_of` advisory vs `duplicate_of` explicit), card/inspect/audit-summary UI display, all available actions (`markDuplicateUI`, `resolveSimilarUI`, `openReviewClaimStudy`), 7 concrete friction findings (F-1: manual ID entry in mark-duplicate modal; F-2: similar field shows ID not text; F-3: openReviewClaimStudy navigates away; F-4: resolveSimilarUI modal shows ID not text; F-5: Dupes filter conflates advisory+explicit; F-6: resolveSimilarUI missing scroll anchor; F-7: no similarity confidence signal). 4 safe next slices proposed (D-233B scroll fix, D-234A similar text display, D-235A pre-populate modal, D-236A regression lock). 15 new guard tests confirming existing hooks + public profile exclusion. No backend/API/migration/schema/CSP/external asset changes.
 
