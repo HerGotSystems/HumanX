@@ -1,7 +1,7 @@
 # D-220A — Public Profile Visual Polish
 
 **Scope:** Frontend / CSS + tests + docs
-**Status:** COMPLETE — pending owner deploy (D-220B live closeout)
+**Status:** LIVE CLOSEOUT COMPLETE (D-220B)
 **Baseline:** 2209 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D220A_PUBLIC_PROFILE_VISUAL_POLISH.md`, `docs/README.md`
 **App UI changes:** Yes
@@ -148,32 +148,55 @@ D-220A explicit test block: 15 tests:
 
 ---
 
-## Live sanity checklist (pending owner deploy — D-220B)
+## Live sanity checklist — D-220B PASS
 
-After owner manually deploys from terminal:
+Owner deploy completed from terminal. All checks PASS.
 
-- [ ] Public profile loads without errors (`/u/your-slug`)
-- [ ] Counts card (Claims / Truths / Evidence / Pressure badges) appears immediately below the name/bio header
-- [ ] "About this profile page" context block appears collapsed (not expanded) on first load
-- [ ] Clicking "About this profile page" expands the context block
-- [ ] Claim rows show text + category on top line; action buttons on a separate lower row with a light separator
-- [ ] "View in HumanX →" and "Copy link" buttons still work
-- [ ] If profile has no truths: "No public truths on this profile yet." message shows in the truths section
-- [ ] If profile has no claims: "No public claims yet." message shows in the claims section
-- [ ] If evidence/pressure sections are empty: they are fully suppressed (not shown at all)
-- [ ] Shared belief snapshot (if present) appears between counts and context block
-- [ ] Mobile: action buttons wrap cleanly on narrow viewport
-- [ ] Mobile: "About this profile page" toggle is easily tappable (≥32px)
-- [ ] Focus ring visible on "About this profile page" summary when tabbing
-- [ ] No Reflection Avatar content visible anywhere on the public profile
-- [ ] No private My HumanX sections visible on the public profile
-- [ ] Browser console: no JS errors
+- [x] Public profile loads without errors (`/u/your-slug`)
+- [x] Counts card (Claims / Truths / Evidence / Pressure badges) appears immediately below the name/bio header
+- [x] "About this profile page" context block appears collapsed (not expanded) on first load
+- [x] Clicking "About this profile page" expands the context block
+- [x] Claim rows show text + category on top line; action buttons on a separate lower row with a light separator
+- [x] "View in HumanX →" and "Copy link" buttons still work
+- [x] If profile has no truths: "No public truths on this profile yet." message shows in the truths section
+- [x] If profile has no claims: "No public claims yet." message shows in the claims section
+- [x] If evidence/pressure sections are empty: they are fully suppressed (not shown at all)
+- [x] Shared belief snapshot (if present) appears between counts and context block
+- [x] Mobile: action buttons wrap cleanly on narrow viewport
+- [x] Mobile: "About this profile page" toggle is easily tappable (≥32px)
+- [x] Focus ring visible on "About this profile page" summary when tabbing
+- [x] No Reflection Avatar content visible anywhere on the public profile
+- [x] No private My HumanX sections visible on the public profile
+- [x] No hide/show controls visible on public profile
+- [x] No transparency disclosure from avatar visible
+- [x] No localStorage / device-local wording visible
+- [x] No forbidden public wording visible (truth level / purity / ideology type / religious alignment / smart score / HumanX rank / good believer / bad believer)
+- [x] Public profile exposes no data fields beyond the allowlist
+- [x] Browser console: no JS errors
+
+---
+
+## D-220B live closeout record
+
+- **Owner deploy:** PASS — deployed from owner terminal
+- **Hardening smoke post-deploy:** 2209 passed / 0 failed
+- **Worker route static post-deploy:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`)
+- **Counts card placement:** PASS — appears above snapshot and claims
+- **Collapsed context disclosure:** PASS — "About this profile page" collapsed on load, expands on click
+- **Claim action layout:** PASS — buttons wrap in `pp-item-actions` row below claim text
+- **Public truths empty state:** PASS — "No public truths on this profile yet." renders when no truths
+- **Mobile/no-overflow:** PASS — layout wraps cleanly on narrow viewport
+- **Public allowlist compliance:** PASS — no undocumented public markers
+- **No new public data fields:** PASS — presentation-only change confirmed
+- **No private My HumanX exposure:** PASS — no dashboard controls visible
+- **No Reflection Avatar / public avatar exposure:** PASS — avatar absent from public profile
 
 ---
 
 ## Confirmations
 
-- **Deploy needed:** Yes — app-v10.js and styles.css changed
+- **Deploy needed:** No — live closeout complete
+- **Deploy status:** LIVE — deployed and verified
 - **App UI changed:** Yes (counts reordered, context block collapsible, claim button layout, truths empty state)
 - **CSS changed:** Yes (`.pp-vocab-details`, `.pp-vocab-summary`, `.pp-item-actions` added)
 - **Worker (`src/worker.js`) unchanged:** Confirmed
