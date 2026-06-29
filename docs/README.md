@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2429 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2448 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D233B_RESOLVE_SIMILAR_SCROLL_ANCHOR.md` ⭐ CURRENT — D-233B/C RESOLVE SIMILAR SCROLL ANCHOR — LIVE PASS
+### `D234A_SIMILAR_ADVISORY_DISPLAY_CLARITY.md` ⭐ CURRENT — D-234A SIMILAR ADVISORY DISPLAY CLARITY (DEPLOY NEEDED)
+
+App + CSS + tests + docs. Deploy needed: yes. Baseline: 2448/0/24/57. Addresses D-233A findings F-2 and F-4: (1) inspect panel advisory banner restructured — `review-similar-note` now column-flex with `review-similar-note-head` (badge + "Similar claim advisory" label) and `review-similar-body` ("Advisory only... Review manually before deciding — normal moderation actions still apply."); (2) `Similar claim (advisory)` field prefixes raw ID with "Possible related claim:"; (3) `resolveSimilarUI` modal copy updated to "Dismiss the similar-claim advisory for this review item?" with explicit "does not approve, reject, or merge" paragraph. Raw ID remains visible in all contexts. 5 new CSS sub-classes. 19 new smoke tests + 4 window-slice fixes (D-129B/C: 12000→13500, 13000→13500) + 1 D-233B modal-copy test updated. No `near_duplicate_of` semantics change. No backend/API/migration/schema/CSP/external asset changes. No public profile exposure. Live sanity checklist pending owner deploy.
+
+### `D233B_RESOLVE_SIMILAR_SCROLL_ANCHOR.md` — D-233B/C RESOLVE SIMILAR SCROLL ANCHOR — LIVE PASS
 
 App fix + tests + docs. Deploy complete. Baseline: 2429/0/24/57. Fixes D-233A friction finding F-6: after dismissing a `~similar` advisory via `resolveSimilarUI`, the review queue now scrolls back to the dismissed claim's card (`scrollToReviewAnchor(claimId)` added after `renderReviewList()` in the success path), matching the existing `markDuplicateUI` behavior. One-line change in `public/app-v10.js`. 11 new smoke tests: core fix, call order, parity with markDuplicateUI, scrollToReviewAnchor existence, API routes unchanged, modal copy unchanged, queue load before scroll, public profile exclusion, deploy integrity. No CSS, no worker, no backend/API/migration/schema/CSP/external asset changes. No duplicate/advisory semantics change. D-233C live sanity: 11/11 PASS (2026-06-29).
 
