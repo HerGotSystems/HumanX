@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2308 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2327 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D227B_REVIEW_QUEUE_SELECTED_CARD_ANCHOR.md` ⭐ CURRENT — D-227B/C REVIEW QUEUE SELECTED-CARD ANCHOR — LIVE PASS
+### `D228A_REVIEW_QUEUE_SCROLL_PRESERVATION.md` ⭐ CURRENT — D-228A REVIEW QUEUE SCROLL PRESERVATION (DEPLOY NEEDED)
+
+App + tests + docs. No CSS changes. **Owner deploy needed.** Baseline: 2327/0/24/57. Adds `withReviewScrollPreserved(fn)` helper that captures `window.scrollY`, runs the render, then restores scroll via `requestAnimationFrame`; wraps 9 pure local re-renders (filter, sort, confirm-step toggles, audit toggle) to preserve scroll; `inspectReviewItem` intentionally excluded so D-227B selected-card scroll wins; `reviewDecisionUI` excluded so `scrollToReviewAnchor` handles post-decision; 19 new lock tests. No moderation semantics change. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D227B_REVIEW_QUEUE_SELECTED_CARD_ANCHOR.md` — D-227B/C REVIEW QUEUE SELECTED-CARD ANCHOR — LIVE PASS
 
 App + CSS + tests + docs. Owner deploy complete (D-227C live sanity 20/20 PASS, 2026-06-29). Baseline: 2308/0/24/57. Adds `data-review-selected="true"` attribute to the selected review card article; adds `scrollSelectedReviewCardIntoView()` helper that uses `requestAnimationFrame` and optional chaining to scroll the selected card into view after inspect panel opens; enhances `.review-card-selected` CSS with 2px ring and background accent; 18 new lock tests. No moderation semantics change. No backend/API/migration/schema/CSP/external asset changes.
 
