@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2221 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2237 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-219A (2026-06-29). Covers full D-210→D-218 hardening arc, current baseline, privacy boundary state, deployment state, safe next-work rules.
 
-### `D221A_PUBLIC_PROFILE_ACCESSIBILITY.md` ⭐ CURRENT — D-221A/D-221B PUBLIC PROFILE ACCESSIBILITY LIVE PASS
+### `D222A_PUBLIC_PROFILE_COPY_LINK.md` ⭐ CURRENT — D-222A PUBLIC PROFILE COPY LINK AFFORDANCE (PENDING DEPLOY)
+
+Frontend/CSS + tests + docs. **Deploy needed: yes** (app-v10.js and styles.css changed). No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Adds "Copy profile link" button to the public profile header card for both owners and non-owners: uses `window.location.href`, shows "Link copied" on success, shows "Copy failed — use browser address bar" on clipboard failure, falls back to `execCommand` when Clipboard API unavailable, `try/catch` throughout. Button has `type="button"`, `.pp-copy-link` class, focus-visible CSS, mobile `min-height:44px`. Helper updated from constructing slug-based URL to using `window.location.href`. D-216A allowlist updated: +3 entries (`pp-copy-link`, `Copy profile link`, `Link copied`). D-156A test updated: "Copied!" → "Link copied" (intentional). 13 new D-222A tests. Baseline 2237/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
+
+### `D221A_PUBLIC_PROFILE_ACCESSIBILITY.md` — D-221A/D-221B PUBLIC PROFILE ACCESSIBILITY LIVE PASS
 
 CSS + tests + docs. **Deploy: LIVE** — owner deployed from terminal; D-221B live sanity all PASS. No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Keyboard / screen-reader / mobile-touch improvements within the D-216A public profile allowlist: (1) `.pp-item-actions .btn-mini:focus-visible` — scoped focus ring for public profile claim action buttons (previously no pp-scoped focus style); (2) mobile touch target — `@media(max-width:640px)` sets `min-height:44px; padding:10px 12px` on `.pp-item-actions .btn-mini` (previously `min-height:36px` only); no new public classes or copy introduced; no allowlist update needed. 12 new D-221A tests. Baseline 2221/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
 
