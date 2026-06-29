@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2078 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2157 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D215A_MY_HUMANX_PRIVACY_BOUNDARY_LOCK.md` ⭐ CURRENT — D-215A MY HUMANX PRIVACY BOUNDARY LOCK
+### `D216A_PUBLIC_PROFILE_ALLOWLIST_CONTRACT.md` ⭐ CURRENT — D-216A PUBLIC PROFILE ALLOWLIST CONTRACT
+
+Tests + docs only. No app UI changes, no CSS changes, no deploy needed. Complements D-214A/D-215A denylists with a positive contract for the public profile surface. Defines `PUBLIC_PROFILE_ALLOWED_MARKERS` (19 CSS classes and copy markers that MUST be present) and `PUBLIC_PROFILE_PRIVATE_DENYLIST` (22 private markers that MUST NOT appear in content helpers). 79 new D-216A tests: public render function contract (6), positive allowlist assertions (19), private denylist for content helpers (22), private helper exclusion from orchestrator (11), backend API shape (10 — top_beliefs_json/dominant_pattern/alignment_labels/avatar_hidden absent; slug/displayName/buildPublicSharedSnapshot present), deploy integrity (3). Baseline 2157/0/24/57. Worker route static 57/0/1 warn (pre-existing, non-blocking). Deny-by-default rule: any new public profile field must be named in docs and tests before merge. No backend, no API, no migration, no schema, no CSP, no external asset, no app UI changes.
+
+### `D215A_MY_HUMANX_PRIVACY_BOUNDARY_LOCK.md` — D-215A MY HUMANX PRIVACY BOUNDARY LOCK
 
 Tests + docs only. No app UI changes, no CSS changes, no deploy needed. Adds 43 new D-215A tests locking the broader My HumanX private surface: private/public render separation (11 — renderMeHtml, meMirrorHtml, meBeliefReflectionHtml, meAccountCardHtml, meProfileSettingsHtml, private copy absent from public render), public-profile-stays-presentation-only (6 — meRerender, saveBeliefVisibilityUI, export/filter/slice controls absent), no localStorage/public coupling (4), backend/API boundary (5 — no preference/avatar routes in worker), public forbidden wording compound phrases (10), renderMeHtml wiring integrity (4), deploy lock (3). Baseline 2078/0/24/57. Worker route static 57/0/1 warn (pre-existing, non-blocking). Future rule: any public profile expansion must state what is made public, what remains private, and which tests are updated. No backend, no API, no migration, no schema, no CSP, no external asset, no app UI changes.
 
