@@ -138,6 +138,18 @@ function baseOf(path) {
   return path.replace(/\/:[^/]+/g, '').replace(/\/$/, '');
 }
 
+// ── D-218A: Known parameterised routes ────────────────────────────────────────
+// Routes documented with /:param notation that are implemented in worker.js as
+// regex matches (url.pathname.match(...)) rather than literal strings. The static
+// checker cannot extract regex-based routes, so these will always appear in the
+// "docs-only" list. They are not missing — they are known false positives.
+// Any route NOT in this set that triggers the parameterised-route warning is NEW
+// and requires explicit review before being added here.
+const KNOWN_PARAM_ROUTES = new Set([
+  '/api/u/:slug',          // GET — implemented as url.pathname.match(/^\/api\/u\/[^/]+$/)
+  '/api/claims/:id',       // GET — implemented as url.pathname.match(/^\/api\/claims\/[^/]+$/)
+]);
+
 // ── High-risk routes ───────────────────────────────────────────────────────────
 
 const HIGH_RISK_ROUTES = [
@@ -237,7 +249,11 @@ async function main() {
   } else {
     for (const r of docsOnly) {
       if (r.includes('/:')) {
-        warn(`${r} — parameterised route; expected absence from literal routing block (known limitation)`);
+        if (KNOWN_PARAM_ROUTES.has(r)) {
+          warn(`${r} — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`);
+        } else {
+          warn(`${r} — NEW parameterised route not in KNOWN_PARAM_ROUTES; add to set after confirming regex implementation in worker.js`);
+        }
       } else {
         warn(`${r} — documented but not found as literal string in src/worker.js (delegated, removed, or docs stale)`);
       }

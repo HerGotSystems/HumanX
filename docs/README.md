@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2177 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2186 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D217A_HARDENING_SMOKE_INDEX.md` ⭐ CURRENT — D-217A HARDENING SMOKE INDEX
+### `D218A_WORKER_ROUTE_WARNING_AUDIT.md` ⭐ CURRENT — D-218A WORKER ROUTE WARNING AUDIT
+
+Checker improvement + docs. No app UI changes, no CSS changes, no worker changes, no deploy needed. Audits the one recurring `worker-route-static-check.mjs` warning. Root cause: `/api/u/:slug` is implemented in worker.js via regex (`url.pathname.match(/^\/api\/u\/[^/]+$/)`) rather than a literal string — the static checker can only extract string literals, so the route appears absent. Classification: **known false positive / static analysis limitation**. Runtime impact: none. Privacy impact: none. Fix: added `KNOWN_PARAM_ROUTES` Set to `worker-route-static-check.mjs`; updated warning message to distinguish "known" from "NEW parameterised route not in KNOWN_PARAM_ROUTES" so future unknown parameterised routes emit a distinct high-urgency warning. Pass/fail/warn count unchanged (57/0/1). 9 new D-218A smoke tests. Baseline 2186/0/24/57. No D-218B follow-up needed — warning is fully understood and mitigated. No backend, no API, no migration, no schema, no CSP, no external asset, no worker, no app UI changes.
+
+### `D217A_HARDENING_SMOKE_INDEX.md` — D-217A HARDENING SMOKE INDEX
 
 Tests + docs only. No app UI changes, no CSS changes, no deploy needed. Adds a structured comment index near the top of `hardening-smoke-test.mjs` listing all major guard families (baseline/allowlist, worker route, belief engine, My HumanX private surface, Reflection Avatar arc, ★ D-214A regression lock, ★ D-215A privacy boundary lock, ★ D-216A allowlist contract, deploy integrity) with D-block navigation anchors and rules for future slices. 20 new D-217A maintainability tests verifying index presence, key lock tests still active, README references intact, deploy integrity. Baseline 2177/0/24/57. Worker route static 57/0/1 warn (pre-existing, non-blocking). Rule: D-214A/D-215A/D-216A privacy locks cannot be loosened without a new spec + explicit owner approval. No backend, no API, no migration, no schema, no CSP, no external asset, no app UI changes.
 
