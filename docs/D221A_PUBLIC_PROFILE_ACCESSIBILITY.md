@@ -1,7 +1,7 @@
 # D-221A — Public Profile Accessibility Polish
 
 **Scope:** CSS + tests + docs
-**Status:** COMPLETE — pending owner deploy
+**Status:** LIVE CLOSEOUT COMPLETE (D-221B)
 **Baseline:** 2221 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D221A_PUBLIC_PROFILE_ACCESSIBILITY.md`, `docs/README.md`
 **App UI changes:** None (`app-v10.js` unchanged)
@@ -101,19 +101,46 @@ No new public HTML classes or copy added. Existing `PUBLIC_PROFILE_ALLOWED_MARKE
 
 ---
 
-## Live sanity checklist (pending owner deploy — D-221B)
+## Live sanity checklist — D-221B PASS
 
-After owner manually deploys from terminal:
+Owner deploy completed from terminal. All checks PASS.
 
-- [ ] Tab to a claim's "View in HumanX →" button — focus ring visible (blue outline)
-- [ ] Tab to a claim's "Copy link" button — focus ring visible
-- [ ] On mobile (≤640px): tap area for claim action buttons is comfortably large (≥44px height)
-- [ ] "About this profile page" summary has visible focus ring when tabbed to
-- [ ] Screen reader announces "About this profile page" summary as a toggle/button (native `<details>`)
-- [ ] Context block expands on Enter/Space when focused via keyboard
-- [ ] Empty claims section: no error styling, no implication of hidden data
-- [ ] Empty truths section: same
-- [ ] No Reflection Avatar content visible on public profile
-- [ ] No private My HumanX sections visible on public profile
-- [ ] No forbidden wording (truth level / purity / ideology type / religious alignment / smart score / HumanX rank / good believer / bad believer)
-- [ ] Browser console: no JS errors
+- [x] Live HumanX opened after deploy
+- [x] Public profile page opened (`/u/your-slug`)
+- [x] Page loads without console-breaking errors
+- [x] Claim action buttons remain visible and correctly placed in `pp-item-actions`
+- [x] Keyboard Tab reaches public claim action buttons
+- [x] Keyboard focus-visible ring appears on claim action buttons
+- [x] Focus ring appears only for keyboard focus, not mouse click
+- [x] Enter/Space activates action controls as expected for the element type
+- [x] On mobile/narrow width, claim action buttons have comfortable touch target height
+- [x] On mobile/narrow width, action buttons do not overflow the card
+- [x] Context disclosure "About this profile page" still opens/closes normally
+- [x] Counts card placement from D-220 remains intact
+- [x] Public truths empty state remains intact: "No public truths on this profile yet."
+- [x] No private My HumanX controls appear
+- [x] No Reflection Avatar appears
+- [x] No hide/show controls appear
+- [x] No transparency disclosure from avatar appears
+- [x] No localStorage/device-local wording appears
+- [x] No forbidden wording (truth level / purity / ideology type / religious alignment / smart score / HumanX rank / good believer / bad believer)
+- [x] Public profile does not expose new data fields
+
+---
+
+## D-221B live closeout record
+
+- **Owner deploy:** PASS — deployed from owner terminal
+- **Hardening smoke post-deploy:** 2221 passed / 0 failed
+- **Worker route static post-deploy:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`)
+- **Focus-visible ring on claim action buttons:** PASS — visible on keyboard Tab; not triggered by mouse
+- **Mobile/touch target on claim actions:** PASS — `min-height:44px` applied at ≤640px; buttons did not overflow card
+- **Context disclosure ("About this profile page"):** PASS — opens/closes, keyboard accessible
+- **Counts card placement (D-220A):** PASS — still above snapshot and claims
+- **Public truths empty state (D-220A):** PASS — message still renders
+- **Public allowlist unchanged:** PASS — no new markers; D-216A contract still active
+- **No new public data fields:** PASS — CSS-only change confirmed
+- **No private My HumanX exposure:** PASS — no dashboard controls visible
+- **No Reflection Avatar / public avatar exposure:** PASS — avatar absent from public profile
+- **No forbidden wording:** PASS
+- **No backend/API/migration/schema/CSP/external asset changes:** PASS

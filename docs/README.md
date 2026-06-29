@@ -53,9 +53,9 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-219A (2026-06-29). Covers full D-210→D-218 hardening arc, current baseline, privacy boundary state, deployment state, safe next-work rules.
 
-### `D221A_PUBLIC_PROFILE_ACCESSIBILITY.md` ⭐ CURRENT — D-221A PUBLIC PROFILE ACCESSIBILITY POLISH (PENDING DEPLOY)
+### `D221A_PUBLIC_PROFILE_ACCESSIBILITY.md` ⭐ CURRENT — D-221A/D-221B PUBLIC PROFILE ACCESSIBILITY LIVE PASS
 
-CSS + tests + docs. **Deploy needed: yes** (styles.css changed). No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Keyboard / screen-reader / mobile-touch improvements within the D-216A public profile allowlist: (1) `.pp-item-actions .btn-mini:focus-visible` — scoped focus ring for public profile claim action buttons (previously no pp-scoped focus style); (2) mobile touch target — `@media(max-width:640px)` sets `min-height:44px; padding:10px 12px` on `.pp-item-actions .btn-mini` (previously `min-height:36px` only); no new public classes or copy introduced; no allowlist update needed. 12 new D-221A tests. Baseline 2221/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
+CSS + tests + docs. **Deploy: LIVE** — owner deployed from terminal; D-221B live sanity all PASS. No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Keyboard / screen-reader / mobile-touch improvements within the D-216A public profile allowlist: (1) `.pp-item-actions .btn-mini:focus-visible` — scoped focus ring for public profile claim action buttons (previously no pp-scoped focus style); (2) mobile touch target — `@media(max-width:640px)` sets `min-height:44px; padding:10px 12px` on `.pp-item-actions .btn-mini` (previously `min-height:36px` only); no new public classes or copy introduced; no allowlist update needed. 12 new D-221A tests. Baseline 2221/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
 
 ### `D220A_PUBLIC_PROFILE_VISUAL_POLISH.md` — D-220A/D-220B PUBLIC PROFILE VISUAL POLISH LIVE PASS
 
