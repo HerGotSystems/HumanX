@@ -1,7 +1,7 @@
 # D-234A — Similar Advisory Display Clarity
 
 **Scope:** App + CSS + tests + docs
-**Status:** COMPLETE — deploy needed
+**Status:** COMPLETE — D-234B live sanity PASS
 **Baseline:** 2448 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D234A_SIMILAR_ADVISORY_DISPLAY_CLARITY.md`, `docs/README.md`
 **App UI changes:** Yes — inspect panel banner, Similar claim field, resolveSimilarUI modal copy
@@ -11,7 +11,7 @@
 **Schema change:** None
 **Backend/API change:** None
 **New public data fields:** None
-**Deploy needed:** Yes
+**Deploy needed:** Yes — owner deploy complete (D-234B)
 
 ---
 
@@ -185,23 +185,25 @@ One D-233B test also updated: "modal copy unchanged — 'Dismiss the similarity 
 
 ---
 
-## Live sanity checklist (pending owner deploy)
+## Live sanity checklist — D-234B PASS
 
-- [ ] Deploy to production via owner terminal
-- [ ] Open Review queue — find a claim with `~similar` badge
-- [ ] Inspect the claim — advisory banner shows "Similar claim advisory" label and "Review manually before deciding" copy
-- [ ] Advisory banner still uses amber background/border (not red/green)
-- [ ] `Similar claim (advisory)` inspect field now shows "Possible related claim: clm_abc123 ↗"
-- [ ] Raw claim ID still visible in the field
-- [ ] Click "Dismiss ~Similar" — modal now says "Dismiss the similar-claim advisory for this review item?"
-- [ ] Modal shows "Possible related claim: clm_abc123" on its own line
-- [ ] Modal says "This does not approve, reject, or merge the claim"
-- [ ] Confirm dismiss — advisory clears, page scrolls to anchor (D-233B parity)
-- [ ] Normal Approve/Keep/Reject actions unchanged
-- [ ] Mark Duplicate modal unchanged
-- [ ] `~similar` badge on card unchanged
-- [ ] Public profile pages do not contain review-similar-note or review-similar-advisory
-- [ ] No console errors
+- [x] Deploy to production via owner terminal
+- [x] Open Review queue — find a claim with `~similar` badge
+- [x] Inspect the claim — advisory banner shows "Similar claim advisory" label and "Review manually before deciding" copy
+- [x] Advisory banner still uses amber background/border (not red/green)
+- [x] `Similar claim (advisory)` inspect field now shows "Possible related claim: clm_abc123 ↗"
+- [x] Raw claim ID still visible in the field
+- [x] Click "Dismiss ~Similar" — modal now says "Dismiss the similar-claim advisory for this review item?"
+- [x] Modal shows "Possible related claim: clm_abc123" on its own line
+- [x] Modal says "This does not approve, reject, or merge the claim"
+- [x] Confirm dismiss — advisory clears, page scrolls to anchor (D-233B parity)
+- [x] Normal Approve/Keep/Reject actions unchanged
+- [x] Mark Duplicate modal unchanged
+- [x] `~similar` badge on card unchanged
+- [x] Public profile pages do not contain review-similar-note or review-similar-advisory
+- [x] No console errors
+
+**Live sanity result:** 15/15 PASS (D-234B, 2026-06-29)
 
 ---
 
@@ -216,4 +218,19 @@ One D-233B test also updated: "modal copy unchanged — 'Dismiss the similarity 
 - **No merge/canonical behavior added:** Confirmed
 - **Raw ID remains visible:** Confirmed
 - **No public profile exposure:** Confirmed
-- **Deploy needed:** Yes
+- **Deploy needed:** Yes — owner deploy complete (D-234B)
+- **Owner deploy:** PASS
+- **Live similar-advisory sanity:** PASS — inspect panel advisory banner shows "Similar claim advisory" label + "Review manually before deciding"; Similar claim field shows "Possible related claim: {id}"; dismiss modal says "Dismiss the similar-claim advisory" + "does not approve, reject, or merge"
+- **Raw ID remains visible:** PASS — raw claim ID visible in inspect panel field and dismiss modal
+- **Advisory-only semantics unchanged:** Confirmed
+- **No merge/canonical behavior:** Confirmed
+- **Resolve-similar scroll from D-233B:** Confirmed intact
+- **Normal moderation actions (Approve/Keep/Reject):** Confirmed unchanged
+- **D-227B selected-card anchor:** Confirmed intact
+- **D-228A scroll preservation:** Confirmed intact
+- **D-229A confirm-state clarity:** Confirmed intact
+- **D-230A decision feedback:** Confirmed intact
+- **No public profile exposure:** Confirmed
+- **Hardening smoke:** 2448 passed / 0 failed
+- **Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug` — D-218A documented)
+- **D-234B live sanity:** 15/15 PASS
