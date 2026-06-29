@@ -242,6 +242,15 @@
 .btn-approve-confirm{background:linear-gradient(135deg,#0a5c2e,#0d3d1f);border:1px solid #2fbf7188!important;color:#7fffb8;font-weight:700}
 .btn-approve-confirm:hover{background:linear-gradient(135deg,#0d7a3d,#0a5c2e)}
 .btn-approve-cancel{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
+/* D-229A: card-level approve-pending highlight (mirrors review-card-reject-pending) */
+.review-card-approve-pending{border-color:#2fbf7188!important;box-shadow:0 0 0 1px #2fbf7122}
+/* D-229A: armed confirm actions wrapper */
+.review-confirm-armed{background:rgba(255,255,255,.03);border-radius:8px;padding:4px 6px;outline:1px solid rgba(255,255,255,.08)}
+/* D-229A: cleanup confirm state (neutral amber — not reject red) */
+.review-cleanup-confirm-msg{font-size:11px;font-weight:600;color:#ffd166;display:flex;align-items:center;flex:1 1 100%;padding:2px 0}
+.btn-cleanup-confirm{background:linear-gradient(135deg,#3d2b00,#1e1500);border:1px solid #ffd16688!important;color:#ffd166;font-weight:700}
+.btn-cleanup-confirm:hover{background:linear-gradient(135deg,#5c4000,#3d2b00)}
+.btn-cleanup-cancel{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
 .review-reason-tag{font-size:11px;color:var(--muted);margin:0 0 5px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 /* Submit Claim writing guide */
 .claim-guide{border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin-bottom:6px;background:rgba(8,11,18,.5)}
