@@ -53,9 +53,9 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D233B_RESOLVE_SIMILAR_SCROLL_ANCHOR.md` ⭐ CURRENT — D-233B RESOLVE SIMILAR SCROLL ANCHOR (DEPLOY NEEDED)
+### `D233B_RESOLVE_SIMILAR_SCROLL_ANCHOR.md` ⭐ CURRENT — D-233B/C RESOLVE SIMILAR SCROLL ANCHOR — LIVE PASS
 
-App fix + tests + docs. Deploy needed: yes. Baseline: 2429/0/24/57. Fixes D-233A friction finding F-6: after dismissing a `~similar` advisory via `resolveSimilarUI`, the review queue now scrolls back to the dismissed claim's card (`scrollToReviewAnchor(claimId)` added after `renderReviewList()` in the success path), matching the existing `markDuplicateUI` behavior. One-line change in `public/app-v10.js`. 11 new smoke tests: core fix, call order, parity with markDuplicateUI, scrollToReviewAnchor existence, API routes unchanged, modal copy unchanged, queue load before scroll, public profile exclusion, deploy integrity. No CSS, no worker, no backend/API/migration/schema/CSP/external asset changes. No duplicate/advisory semantics change. Live sanity checklist pending owner deploy.
+App fix + tests + docs. Deploy complete. Baseline: 2429/0/24/57. Fixes D-233A friction finding F-6: after dismissing a `~similar` advisory via `resolveSimilarUI`, the review queue now scrolls back to the dismissed claim's card (`scrollToReviewAnchor(claimId)` added after `renderReviewList()` in the success path), matching the existing `markDuplicateUI` behavior. One-line change in `public/app-v10.js`. 11 new smoke tests: core fix, call order, parity with markDuplicateUI, scrollToReviewAnchor existence, API routes unchanged, modal copy unchanged, queue load before scroll, public profile exclusion, deploy integrity. No CSS, no worker, no backend/API/migration/schema/CSP/external asset changes. No duplicate/advisory semantics change. D-233C live sanity: 11/11 PASS (2026-06-29).
 
 ### `D233A_DUPLICATE_REVIEW_UX_AUDIT.md` — D-233A DUPLICATE REVIEW UX AUDIT
 

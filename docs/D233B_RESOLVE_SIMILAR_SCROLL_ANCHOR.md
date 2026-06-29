@@ -1,7 +1,7 @@
 # D-233B — Resolve Similar Scroll Anchor
 
 **Scope:** App fix + tests + docs
-**Status:** COMPLETE — deploy needed
+**Status:** COMPLETE — D-233C live sanity PASS
 **Baseline:** 2429 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `scripts/hardening-smoke-test.mjs`, `docs/D233B_RESOLVE_SIMILAR_SCROLL_ANCHOR.md`, `docs/README.md`
 **App UI changes:** Yes — `resolveSimilarUI` scroll behavior
@@ -11,7 +11,7 @@
 **Schema change:** None
 **Backend/API change:** None
 **New public data fields:** None
-**Deploy needed:** Yes
+**Deploy needed:** Yes — owner deploy complete (D-233C)
 
 ---
 
@@ -112,19 +112,21 @@ Single insertion. No other app-v10.js change.
 
 ---
 
-## Live sanity checklist (pending owner deploy)
+## Live sanity checklist — D-233C PASS
 
-- [ ] Deploy to production via owner terminal
-- [ ] Open Review queue with at least one `~similar`-flagged claim
-- [ ] Inspect the claim — "Dismiss ~Similar" button visible in dupSection
-- [ ] Click "Dismiss ~Similar" — advisory dismiss modal appears
-- [ ] Confirm "Dismiss Advisory" — modal closes, toast "Similar advisory cleared." appears
-- [ ] Verify review queue scrolls back to the dismissed claim's card (not to the top)
-- [ ] Verify `~similar` badge and `review-card-similar` class no longer appear on the card after dismiss
-- [ ] Open a different claim and click "Mark Duplicate..." — complete the flow — verify it still scrolls to anchor (parity unchanged)
-- [ ] Refresh queue — verify dismissed advisory is cleared in the data (claim shows as normal review item)
-- [ ] Verify no console errors during dismiss flow
-- [ ] Verify public profile does not contain any advisory or duplicate-modal internals
+- [x] Deploy to production via owner terminal
+- [x] Open Review queue with at least one `~similar`-flagged claim
+- [x] Inspect the claim — "Dismiss ~Similar" button visible in dupSection
+- [x] Click "Dismiss ~Similar" — advisory dismiss modal appears
+- [x] Confirm "Dismiss Advisory" — modal closes, toast "Similar advisory cleared." appears
+- [x] Verify review queue scrolls back to the dismissed claim's card (not to the top)
+- [x] Verify `~similar` badge and `review-card-similar` class no longer appear on the card after dismiss
+- [x] Open a different claim and click "Mark Duplicate..." — complete the flow — verify it still scrolls to anchor (parity unchanged)
+- [x] Refresh queue — verify dismissed advisory is cleared in the data (claim shows as normal review item)
+- [x] Verify no console errors during dismiss flow
+- [x] Verify public profile does not contain any advisory or duplicate-modal internals
+
+**Live sanity result:** 11/11 PASS (D-233C, 2026-06-29)
 
 ---
 
@@ -137,4 +139,15 @@ Single insertion. No other app-v10.js change.
 - **No backend/API/migration/schema/CSP/external asset changes:** Confirmed
 - **No duplicate/advisory semantics change:** Confirmed
 - **No public profile exposure:** Confirmed
-- **Deploy needed:** Yes
+- **Deploy needed:** Yes — owner deploy complete (D-233C)
+- **Owner deploy:** PASS
+- **Live resolve-similar scroll-to-anchor:** PASS — page scrolls back to dismissed item card after advisory dismiss
+- **markDuplicateUI parity:** PASS — both functions scroll to anchor on success
+- **D-227B selected-card anchor:** Confirmed intact
+- **D-228A scroll preservation:** Confirmed intact
+- **D-229A confirm-state clarity:** Confirmed intact
+- **D-230A decision feedback:** Confirmed intact
+- **Normal moderation actions (Approve/Keep/Reject):** Confirmed unchanged
+- **Hardening smoke:** 2429 passed / 0 failed
+- **Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug` — D-218A documented)
+- **D-233C live sanity:** 11/11 PASS
