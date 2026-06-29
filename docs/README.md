@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2543 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2573 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-238A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc, current baseline 2526/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D239B_BACK_TO_REVIEW_SCROLL_RESTORE.md` ⭐ CURRENT — D-239B/C BACK TO REVIEW SCROLL RESTORE — LIVE PASS
+### `D240A_REVIEW_TO_STUDY_NAVIGATION_REGRESSION_LOCK.md` ⭐ CURRENT — D-240A REVIEW-TO-STUDY NAVIGATION REGRESSION LOCK
+
+Tests + docs only. Deploy not needed. Baseline: 2573/0/24/57. Locks D-239A/D-239B behavior: 30 new regression tests covering review-origin capture (openReviewClaimStudy sets lastModeBeforeStudy + lastInspectedReviewItemId), Study header "← Back to Review" wiring, backToArena() item restore + setMode("review"), post-render RAF scroll (scrollToReviewAnchor(_savedId) guarded by _savedId), no-queue-reload guarantee, no pushState, D-227B/D-228A/D-229A/D-230A/D-233B/D-236A compat, public exposure isolation (5 checks), and deploy integrity. App/CSS/worker unchanged. No backend/API/migration/schema/CSP/external asset changes. Future rule: any Review/Study navigation change must preserve this lock or update it with owner approval.
+
+### `D239B_BACK_TO_REVIEW_SCROLL_RESTORE.md` — D-239B/C BACK TO REVIEW SCROLL RESTORE — LIVE PASS
 
 App + tests + docs. Deploy complete (D-239C). Baseline: 2543/0/24/57. HEAD: 5c12a10. Addresses D-239A F-1: `backToArena()` now calls `scrollToReviewAnchor(_savedId)` via `requestAnimationFrame` after restoring `inspectedReviewItem` and calling `setMode('review')`. One line added. No queue reload. Non-review origins (vault/truths/me/arena) unchanged. No browser `pushState`. Null-safe guard: scroll only fires when `_savedId` is non-null. D-227B/D-228A/D-229A/D-230A/D-233B/D-234A/D-235A/D-236A behavior all confirmed intact. 17 new smoke tests. No CSS/worker/backend/API/migration/schema/CSP/external asset changes. D-239C live sanity: 13/13 PASS (2026-06-29).
 
