@@ -1,7 +1,7 @@
 # D-235A — Similar Advisory Copy ID
 
 **Scope:** App + CSS + tests + docs
-**Status:** COMPLETE — deploy needed
+**Status:** COMPLETE — D-235B live sanity PASS
 **Baseline:** 2467 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D235A_SIMILAR_ADVISORY_COPY_ID.md`, `docs/README.md`
 **App UI changes:** Yes — Copy ID button + code element in inspect panel Similar claim advisory field
@@ -11,7 +11,7 @@
 **Schema change:** None
 **Backend/API change:** None
 **New public data fields:** None
-**Deploy needed:** Yes
+**Deploy needed:** Yes — owner deploy complete (D-235B)
 
 ---
 
@@ -164,22 +164,24 @@ The ID is now in a `<code>` element (selectable) separate from the Study link. T
 
 ---
 
-## Live sanity checklist (pending owner deploy)
+## Live sanity checklist — D-235B PASS
 
-- [ ] Deploy to production via owner terminal
-- [ ] Open Review queue — find a claim with `~similar` badge
-- [ ] Inspect the claim — advisory field shows `clm_abc123` in a code element
-- [ ] "↗ Study" link still works (opens Study View for the related claim)
-- [ ] "Copy ID" button visible next to the Study link
-- [ ] Click "Copy ID" — toast shows "ID copied"
-- [ ] Paste clipboard — confirms raw claim ID was copied (not URL, not full page)
-- [ ] Click the `clm_...` code element — whole ID selects in one click (`user-select:all`)
-- [ ] Advisory banner copy from D-234A still intact ("Similar claim advisory", "Review manually before deciding")
-- [ ] Dismiss ~Similar modal still works and still scrolls to anchor (D-233B parity)
-- [ ] Normal Approve/Keep/Reject actions unchanged
-- [ ] Mark Duplicate modal — can paste copied ID directly into the canonical target field
-- [ ] `~similar` badge on card unchanged
-- [ ] No console errors
+- [x] Deploy to production via owner terminal
+- [x] Open Review queue — find a claim with `~similar` badge
+- [x] Inspect the claim — advisory field shows `clm_abc123` in a code element
+- [x] "↗ Study" link still works (opens Study View for the related claim)
+- [x] "Copy ID" button visible next to the Study link
+- [x] Click "Copy ID" — toast shows "ID copied"
+- [x] Paste clipboard — confirms raw claim ID was copied (not URL, not full page)
+- [x] Click the `clm_...` code element — whole ID selects in one click (`user-select:all`)
+- [x] Advisory banner copy from D-234A still intact ("Similar claim advisory", "Review manually before deciding")
+- [x] Dismiss ~Similar modal still works and still scrolls to anchor (D-233B parity)
+- [x] Normal Approve/Keep/Reject actions unchanged
+- [x] Mark Duplicate modal — can paste copied ID directly into the canonical target field
+- [x] `~similar` badge on card unchanged
+- [x] No console errors
+
+**Live sanity result:** 14/14 PASS (D-235B, 2026-06-29)
 
 ---
 
@@ -195,4 +197,18 @@ The ID is now in a `<code>` element (selectable) separate from the Study link. T
 - **No merge/canonical behavior added:** Confirmed
 - **Raw ID remains visible:** Confirmed — in `<code class="review-similar-id-code">` element
 - **No public profile exposure:** Confirmed
-- **Deploy needed:** Yes
+- **Deploy needed:** Yes — owner deploy complete (D-235B)
+- **Owner deploy:** PASS
+- **Live Copy ID sanity:** PASS — "Copy ID" button present, toast "ID copied" on success, clipboard contains only raw claim ID, `clm_...` code element single-click selectable
+- **Clipboard copies only raw ID:** Confirmed — not URL, not page, not full advisory text
+- **No navigation/queue mutation:** Confirmed — Copy ID does not navigate, approve, reject, keep, merge, or mark duplicate
+- **Advisory-only semantics unchanged:** Confirmed
+- **No backend/API lookup:** Confirmed
+- **No merge/canonical behavior:** Confirmed
+- **D-233B resolve-similar scroll:** Confirmed intact
+- **D-234A similar advisory display:** Confirmed intact
+- **Normal moderation actions (Approve/Keep/Reject):** Confirmed unchanged
+- **No public profile exposure:** Confirmed
+- **Hardening smoke:** 2467 passed / 0 failed
+- **Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug` — D-218A documented)
+- **D-235B live sanity:** 14/14 PASS
