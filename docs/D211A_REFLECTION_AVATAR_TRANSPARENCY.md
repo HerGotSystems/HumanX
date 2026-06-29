@@ -1,7 +1,7 @@
 # D-211A — Reflection Avatar Transparency
 
 **Scope:** Frontend only
-**Status:** SOURCE/STATIC COMPLETE — PENDING OWNER DEPLOY + LIVE SANITY
+**Status:** LIVE CLOSEOUT COMPLETE
 **Baseline:** 1933 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 warn pre-existing)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/README.md`
 **Backend changes:** None
@@ -96,14 +96,33 @@ One pre-existing D-139B test ("forbidden wording absent from Mirror panel") was 
 
 `public/app-v10.js` and `public/styles.css` changed. Owner must run `npx wrangler deploy` from local terminal. No migration required.
 
-### Live sanity checklist
+---
 
-| Check | Expected | Actual |
-|---|---|---|
-| "How this is formed" disclosure visible in Reflection avatar card | Present, collapsed by default | — |
-| Disclosure expands on click to show source signal counts | Expands correctly | — |
-| Counts shown match user's actual evidence/pressure/test counts | Correct | — |
-| Non-ranking disclaimer visible in body | Present | — |
-| Private-and-not-public copy visible in body | Present | — |
-| Disclosure absent from public profile | Absent | — |
-| No forbidden wording on public profile | All absent | — |
+## Live sanity result
+
+**PASS — owner manual deploy and live browser sanity completed**
+
+> **Historical note:** CC Wrangler could not reach the Cloudflare API during the D-211A session due to a certificate/proxy/VPN issue (same constraint as D-209H/I and D-210B/C). Owner deployed commit `08db623` manually from local terminal.
+
+| Check | Result |
+|---|---|
+| "How this is formed" disclosure visible in Reflection avatar card, collapsed by default | PASS |
+| Disclosure opens and closes normally | PASS |
+| Disclosure sits between habit chips and guardrail/private copy | PASS |
+| Counts shown for Evidence added, Pressure checks, Tests created | PASS |
+| Non-ranking disclaimer visible: "not a score, rank, diagnosis, ideology, morality label, intelligence label, or truth rating" | PASS |
+| Private notice visible: "Private concept only. It is not shown on your public profile." | PASS |
+| Guardrail copy visible: "Your avatar reflects investigation habits, not intelligence, morality, ideology, or truth." | PASS |
+| Reflection Avatar absent from public profile | PASS |
+| Transparency disclosure absent from public profile | PASS |
+| No public belief identity labels | PASS |
+| No forbidden wording on public profile (truth level, purity, ideology type, religious alignment, smart score, HumanX rank, good believer, bad believer) | PASS |
+
+Static checks at closeout:
+
+| Check | Result |
+|---|---|
+| `hardening-smoke-test.mjs` | 1933 passed, 0 failed |
+| `worker-route-static-check.mjs` | 57 passed, 0 failed, 1 warn (pre-existing, non-blocking) |
+
+No public avatar or profile exposure confirmed. No backend, API, migration, schema, CSP, or external asset changes in this task.
