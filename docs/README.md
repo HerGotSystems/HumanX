@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2275 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2290 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-219A (2026-06-29). Covers full D-210→D-218 hardening arc, current baseline, privacy boundary state, deployment state, safe next-work rules.
 
-### `D224A_PUBLIC_PROFILE_EMPTY_STATES.md` ⭐ CURRENT — D-224A/D-224B PUBLIC PROFILE EMPTY-STATE POLISH LIVE PASS
+### `D225A_PUBLIC_PROFILE_POLISH_REGRESSION_LOCK.md` ⭐ CURRENT — D-225A PUBLIC PROFILE POLISH REGRESSION LOCK
+
+Tests + docs only. No app UI, no CSS, no worker changes. Deploy not needed. Seals the D-220→D-224 public profile polish arc with cross-arc regression tests: (1) page structure order — counts before sectionNav before snapshot before claims; (2) all D-220→D-224 CSS classes present; (3) D-222 copy-link helper integrity — `window.location.href`, `Link copied`, failure copy, no localStorage/fetch; (4) D-223 section nav — all four anchors always present, pure HTML; (5) D-224 empty-state — snapshot id always emitted, claims/truths use `pp-empty-card`; (6) D-216A allowlist contains all arc markers; (7) privacy boundary — no private markers in entire public render path; (8) forbidden wording absent from all public render functions; (9) D-221 accessibility — focus-visible rings and mobile touch targets for all public interactive elements; (10) D-225A deploy integrity — arc tags absent from worker.js; (11) empty-state copy public-safe; (12) copy-link button present in header; (13) README references all arc docs D220A→D225A. 13 new D-225A tests. Baseline 2290/24/57. No privacy boundary change. D-214A/D-215A/D-216A locks active. Future rule: any public profile polish change must preserve D-220→D-224 behavior or explicitly update this regression lock with owner approval.
+
+### `D224A_PUBLIC_PROFILE_EMPTY_STATES.md` — D-224A/D-224B PUBLIC PROFILE EMPTY-STATE POLISH LIVE PASS
 
 Frontend/CSS + tests + docs. **Deploy: LIVE** — owner deployed from terminal; D-224B live sanity all PASS. No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Polishes empty states for snapshot/claims/truths: snapshot renders styled `pp-empty-card` with `id="public-snapshot"` always (no longer returns empty string — `id` target always present); claims and truths empty states changed from `p.pp-empty` to `div.pp-empty-card + p.pp-empty-title`. Snapshot nav link in section nav now always rendered (no longer conditional on `sn`). New CSS: `.pp-empty-card`, `.pp-empty-title`, `.pp-empty-note`. D-216A allowlist +5 entries. D-142C/D-154B/D-208B window extended for longer function. D-223A snapshot conditional test updated (D-224A: now always present). 13 new D-224A tests (+5 allowlist forEach). Baseline 2275/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
 

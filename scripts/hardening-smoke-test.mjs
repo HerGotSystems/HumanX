@@ -832,7 +832,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2216,7 +2216,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -16844,6 +16844,181 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
 
   test('D-224A: deploy integrity — D-224A absent from worker.js', () => {
     assert.ok(!workerSrc.includes('D-224A'), 'D-224A must not modify worker.js');
+  });
+}
+
+// ── D-225A: Public Profile polish regression lock (D-220 → D-224 arc) ──────────
+{
+  // Shared slices for arc lock tests
+  const d225PubStart = appSrc.indexOf('function renderPublicProfileClaimsHtml(');
+  const d225PubEnd = appSrc.indexOf('\nasync function renderPublicProfile(');
+  const d225PubSrc = appSrc.slice(d225PubStart, d225PubEnd > -1 ? d225PubEnd : d225PubStart + 12000);
+
+  const d225OrchStart = appSrc.indexOf('\nfunction renderPublicProfileHtml(');
+  const d225OrchSrc = appSrc.slice(d225OrchStart, d225PubEnd > -1 ? d225PubEnd : d225OrchStart + 5000);
+
+  const d225CopyFnSrc = appSrc.match(/function copyPublicProfileLink[\s\S]*?^function /m)?.[0] || '';
+
+  const d225SnapStart = appSrc.indexOf('function renderPublicProfileSnapshotHtml(');
+  const d225SnapEnd = appSrc.indexOf('\nfunction copyPublicProfileLink(');
+  const d225SnapSrc = appSrc.slice(d225SnapStart, d225SnapEnd > -1 ? d225SnapEnd : d225SnapStart + 1500);
+
+  test('D-225A lock: D-220→D-224 page structure order — counts, sectionNav, snapshot, claims all in correct order in return template', () => {
+    const returnStart = d225OrchSrc.indexOf('return`');
+    const tpl = d225OrchSrc.slice(returnStart);
+    const countsPos = tpl.indexOf('${countsCard}');
+    const navPos = tpl.indexOf('${sectionNav}');
+    const snapPos = tpl.indexOf('renderPublicProfileSnapshotHtml(');
+    const claimsPos = tpl.indexOf('id="public-claims"');
+    assert.ok(countsPos > -1 && navPos > -1 && snapPos > -1 && claimsPos > -1, 'return template must contain countsCard, sectionNav, snapshot, and claims');
+    assert.ok(countsPos < navPos, 'countsCard must precede sectionNav in return template');
+    assert.ok(navPos < snapPos, 'sectionNav must precede renderPublicProfileSnapshotHtml in return template');
+    assert.ok(snapPos < claimsPos, 'snapshot must precede claims section in return template');
+  });
+
+  test('D-225A lock: all D-220→D-224 CSS classes present in styles.css', () => {
+    // D-220A classes
+    assert.ok(cssSrc.includes('.pp-vocab-details'), 'D-220A: .pp-vocab-details must still be in CSS');
+    assert.ok(cssSrc.includes('.pp-item-actions'), 'D-220A: .pp-item-actions must still be in CSS');
+    // D-221A additions
+    assert.ok(cssSrc.includes('.pp-item-actions .btn-mini:focus-visible'), 'D-221A: .pp-item-actions .btn-mini:focus-visible must still be in CSS');
+    // D-222A additions
+    assert.ok(cssSrc.includes('.pp-copy-link'), 'D-222A: .pp-copy-link must still be in CSS');
+    // D-223A additions
+    assert.ok(cssSrc.includes('.pp-section-nav'), 'D-223A: .pp-section-nav must still be in CSS');
+    assert.ok(cssSrc.includes('.pp-nav-link'), 'D-223A: .pp-nav-link must still be in CSS');
+    // D-224A additions
+    assert.ok(cssSrc.includes('.pp-empty-card'), 'D-224A: .pp-empty-card must still be in CSS');
+    assert.ok(cssSrc.includes('.pp-empty-title'), 'D-224A: .pp-empty-title must still be in CSS');
+    assert.ok(cssSrc.includes('.pp-empty-note'), 'D-224A: .pp-empty-note must still be in CSS');
+  });
+
+  test('D-225A lock: D-222 copy-link helper integrity — window.location.href, Link copied, failure copy, no localStorage, no fetch', () => {
+    assert.ok(d225CopyFnSrc.includes('window.location.href'), 'D-222A lock: copyPublicProfileLink must use window.location.href');
+    assert.ok(d225CopyFnSrc.includes("'Link copied'"), 'D-222A lock: success text must be "Link copied"');
+    assert.ok(d225CopyFnSrc.includes('Copy failed'), 'D-222A lock: failure copy must still be present');
+    assert.ok(d225CopyFnSrc.includes('use browser address bar'), 'D-222A lock: failure copy must say "use browser address bar"');
+    assert.ok(!d225CopyFnSrc.includes('localStorage'), 'D-222A lock: copyPublicProfileLink must not use localStorage');
+    assert.ok(!d225CopyFnSrc.includes('fetch(') && !d225CopyFnSrc.includes('await api('), 'D-222A lock: copyPublicProfileLink must not call fetch or api()');
+  });
+
+  test('D-225A lock: D-223 section nav — all four public anchors always present, no JS', () => {
+    const navMatch = d225OrchSrc.match(/sectionNav=`[\s\S]*?`/)?.[0] || '';
+    assert.ok(navMatch.includes('href="#public-snapshot"'), 'D-223/D-224 lock: Snapshot nav link must always be present');
+    assert.ok(navMatch.includes('href="#public-claims"'), 'D-223 lock: Claims nav link must be present');
+    assert.ok(navMatch.includes('href="#public-truths"'), 'D-223 lock: Truths nav link must be present');
+    assert.ok(navMatch.includes('href="#public-about"'), 'D-223 lock: About nav link must be present');
+    assert.ok(!navMatch.includes('onclick') && !navMatch.includes('addEventListener'), 'D-223 lock: sectionNav must use pure HTML anchors only');
+  });
+
+  test('D-225A lock: D-224 empty-state — snapshot id always emitted, claims/truths use pp-empty-card', () => {
+    // Snapshot: id always in function (both empty and real return paths)
+    assert.ok(d225SnapSrc.includes('id="public-snapshot"'), 'D-224 lock: id="public-snapshot" must always be emitted by renderPublicProfileSnapshotHtml');
+    // Claims and truths: pp-empty-card class
+    const claimsEmptySlice = appSrc.slice(appSrc.indexOf('function renderPublicProfileClaimsHtml'), appSrc.indexOf('function renderPublicProfileClaimsHtml') + 250);
+    assert.ok(claimsEmptySlice.includes('pp-empty-card'), 'D-224 lock: claims empty-state must use pp-empty-card');
+    const truthsEmptySlice = appSrc.slice(appSrc.indexOf('function renderPublicProfileTruthsHtml'), appSrc.indexOf('function renderPublicProfileTruthsHtml') + 200);
+    assert.ok(truthsEmptySlice.includes('pp-empty-card'), 'D-224 lock: truths empty-state must use pp-empty-card');
+  });
+
+  test('D-225A lock: D-220→D-224 public allowlist contains all arc markers', () => {
+    const smokeSelf = readFileSync(path.join(__dirname, 'hardening-smoke-test.mjs'), 'utf8');
+    // D-220A markers
+    assert.ok(smokeSelf.includes("'pp-item-actions'"), 'D-225A lock: allowlist must include pp-item-actions');
+    assert.ok(smokeSelf.includes("'pp-vocab-details'"), 'D-225A lock: allowlist must include pp-vocab-details');
+    // D-222A markers
+    assert.ok(smokeSelf.includes("'pp-copy-link'"), 'D-225A lock: allowlist must include pp-copy-link');
+    assert.ok(smokeSelf.includes("'Copy profile link'"), 'D-225A lock: allowlist must include "Copy profile link"');
+    assert.ok(smokeSelf.includes("'Link copied'"), 'D-225A lock: allowlist must include "Link copied"');
+    // D-223A markers
+    assert.ok(smokeSelf.includes("'pp-section-nav'"), 'D-225A lock: allowlist must include pp-section-nav');
+    assert.ok(smokeSelf.includes("'pp-nav-link'"), 'D-225A lock: allowlist must include pp-nav-link');
+    assert.ok(smokeSelf.includes("'public-snapshot'"), 'D-225A lock: allowlist must include public-snapshot');
+    assert.ok(smokeSelf.includes("'public-claims'"), 'D-225A lock: allowlist must include public-claims');
+    assert.ok(smokeSelf.includes("'public-truths'"), 'D-225A lock: allowlist must include public-truths');
+    assert.ok(smokeSelf.includes("'public-about'"), 'D-225A lock: allowlist must include public-about');
+    // D-224A markers
+    assert.ok(smokeSelf.includes("'pp-empty-card'"), 'D-225A lock: allowlist must include pp-empty-card');
+    assert.ok(smokeSelf.includes("'pp-empty-title'"), 'D-225A lock: allowlist must include pp-empty-title');
+    assert.ok(smokeSelf.includes("'pp-empty-note'"), 'D-225A lock: allowlist must include pp-empty-note');
+  });
+
+  test('D-225A lock: privacy boundary — no private markers in entire public render path (D-220→D-224 arc)', () => {
+    const privateMarkers = [
+      'meReflectionAvatarHtml', 'isMeReflectionAvatarHidden', 'meRerender',
+      'humanx.me.reflectionAvatar.hidden', 'renderMeHtml', 'meMirrorHtml',
+      'meSharedSnapshotPreviewBlockHtml', 'meAccountCardHtml',
+    ];
+    for (const marker of privateMarkers) {
+      assert.ok(!d225PubSrc.includes(marker), `D-225A lock: public render path must not contain private marker "${marker}"`);
+    }
+    assert.ok(!d225PubSrc.includes('localStorage'), 'D-225A lock: public render path must not reference localStorage');
+  });
+
+  test('D-225A lock: forbidden public wording absent from all public render functions', () => {
+    const forbidden = [
+      'truth level', 'purity', 'ideology type', 'religious alignment',
+      'smart score', 'HumanX rank', 'good believer', 'bad believer',
+    ];
+    for (const phrase of forbidden) {
+      assert.ok(!d225PubSrc.includes(phrase), `D-225A lock: forbidden wording must be absent from public render path: "${phrase}"`);
+    }
+  });
+
+  test('D-225A lock: D-221 accessibility — focus-visible rings and mobile touch targets both present for public action buttons', () => {
+    assert.ok(cssSrc.includes('.pp-item-actions .btn-mini:focus-visible'), 'D-221A lock: focus-visible ring must still be defined for public claim action buttons');
+    assert.ok(cssSrc.includes('.pp-item-actions .btn-mini{min-height:44px'), 'D-221A lock: mobile touch target must still be defined for public claim action buttons');
+    assert.ok(cssSrc.includes('.pp-copy-link:focus-visible'), 'D-222A lock: focus-visible ring must still be defined for pp-copy-link');
+    assert.ok(cssSrc.includes('.pp-nav-link:focus-visible'), 'D-223A lock: focus-visible ring must still be defined for pp-nav-link');
+  });
+
+  test('D-225A lock: D-225A itself does not modify app-v10.js, styles.css, or worker.js', () => {
+    assert.ok(!workerSrc.includes('D-225A'), 'D-225A must not appear in worker.js — it is tests+docs only');
+    // Verify the lock is docs+test only by checking for D-225A in the smoke test itself (expected)
+    // and NOT in worker or app source
+    const appSrcCheck = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+    assert.ok(!appSrcCheck.includes('D-225A'), 'D-225A must not appear in app-v10.js — it is tests+docs only');
+  });
+
+  test('D-225A lock: README references all D-220→D-224 arc docs and D-225A', () => {
+    assert.ok(readmeSrc.includes('D220A'), 'D-225A lock: README must reference D-220A visual polish');
+    assert.ok(readmeSrc.includes('D221A'), 'D-225A lock: README must reference D-221A accessibility');
+    assert.ok(readmeSrc.includes('D222A'), 'D-225A lock: README must reference D-222A copy link');
+    assert.ok(readmeSrc.includes('D223A'), 'D-225A lock: README must reference D-223A section nav');
+    assert.ok(readmeSrc.includes('D224A'), 'D-225A lock: README must reference D-224A empty states');
+    assert.ok(readmeSrc.includes('D225A'), 'D-225A lock: README must reference D-225A regression lock');
+  });
+
+  test('D-225A lock: D-220 context block — <details>/<summary> disclosure and counts-before-snapshot order still intact', () => {
+    assert.ok(d225OrchSrc.includes('<details'), 'D-220A lock: context block must still use <details> element');
+    assert.ok(d225OrchSrc.includes('About this profile page'), 'D-220A lock: "About this profile page" summary must still be present');
+    assert.ok(d225PubSrc.includes('pp-item-actions'), 'D-220A lock: pp-item-actions must still be present in claims render');
+    const returnStart = d225OrchSrc.indexOf('return`');
+    const tpl = d225OrchSrc.slice(returnStart);
+    assert.ok(tpl.indexOf('${countsCard}') < tpl.indexOf('renderPublicProfileSnapshotHtml('), 'D-220A lock: counts must still precede snapshot in return template');
+  });
+
+  test('D-225A lock: deploy integrity — no D-220→D-224 arc change touches worker.js or migrations', () => {
+    const arcTags = ['D-220A', 'D-221A', 'D-222A', 'D-223A', 'D-224A', 'D-225A'];
+    for (const tag of arcTags) {
+      assert.ok(!workerSrc.includes(tag), `D-225A deploy lock: ${tag} must not appear in worker.js`);
+    }
+  });
+
+  test('D-225A lock: empty-state copy — all three public-safe messages present in render path', () => {
+    assert.ok(d225PubSrc.includes('No public snapshot shared yet.'), 'D-225A lock: snapshot empty-state copy must be present');
+    assert.ok(d225PubSrc.includes('Public sections appear here when shared.'), 'D-225A lock: snapshot empty-state note must be present');
+    assert.ok(d225PubSrc.includes('No public claims yet.'), 'D-225A lock: claims empty-state copy must be present');
+    assert.ok(d225PubSrc.includes('No public truths on this profile yet.'), 'D-225A lock: truths empty-state copy must be present');
+    // Confirm no private/hidden wording in any empty-state copy
+    const emptyReturn = d225SnapSrc.match(/if\(!s\)return'([^']+)'/)?.[1] || '';
+    assert.ok(!emptyReturn.includes('private') && !emptyReturn.includes('hidden'), 'D-225A lock: snapshot empty-state must not imply private/hidden data');
+  });
+
+  test('D-225A lock: copy-link button is present in public profile header for all profiles (owner and non-owner)', () => {
+    assert.ok(d225OrchSrc.includes('pp-copy-link'), 'D-225A lock: pp-copy-link button must still be present in public profile header');
+    assert.ok(d225OrchSrc.includes('Copy profile link'), 'D-225A lock: "Copy profile link" label must still be in header');
+    assert.ok(d225OrchSrc.includes('data-action="copyPublicProfileLink"'), 'D-225A lock: header copy button must still wire to copyPublicProfileLink action');
   });
 }
 
