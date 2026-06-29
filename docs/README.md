@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2035 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2078 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D214A_REFLECTION_AVATAR_REGRESSION_LOCK.md` ⭐ CURRENT — D-214A REFLECTION AVATAR REGRESSION LOCK
+### `D215A_MY_HUMANX_PRIVACY_BOUNDARY_LOCK.md` ⭐ CURRENT — D-215A MY HUMANX PRIVACY BOUNDARY LOCK
+
+Tests + docs only. No app UI changes, no CSS changes, no deploy needed. Adds 43 new D-215A tests locking the broader My HumanX private surface: private/public render separation (11 — renderMeHtml, meMirrorHtml, meBeliefReflectionHtml, meAccountCardHtml, meProfileSettingsHtml, private copy absent from public render), public-profile-stays-presentation-only (6 — meRerender, saveBeliefVisibilityUI, export/filter/slice controls absent), no localStorage/public coupling (4), backend/API boundary (5 — no preference/avatar routes in worker), public forbidden wording compound phrases (10), renderMeHtml wiring integrity (4), deploy lock (3). Baseline 2078/0/24/57. Worker route static 57/0/1 warn (pre-existing, non-blocking). Future rule: any public profile expansion must state what is made public, what remains private, and which tests are updated. No backend, no API, no migration, no schema, no CSP, no external asset, no app UI changes.
+
+### `D214A_REFLECTION_AVATAR_REGRESSION_LOCK.md` — D-214A REFLECTION AVATAR REGRESSION LOCK
 
 Tests + docs only. No app UI changes, no CSS changes, no deploy needed. Adds 55 new D-214A regression tests locking the Reflection Avatar private render boundary (10 markers), public profile exclusion (9 checks), backend/API exclusion (5 checks), data minimization (5 checks), copy guardrails — forbidden wording + identity chip labels (17 checks), accessibility guarantees (6 checks), and deploy integrity (3 checks). Baseline 2035/0/24/57. Worker route static 57/0/1 warn (pre-existing, non-blocking). Future rule: any intentional public exposure of Reflection Avatar requires a new spec + explicit owner approval before regression tests may be updated. No backend, no API, no migration, no schema, no CSP, no external asset, no app UI changes.
 

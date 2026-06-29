@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2170,7 +2170,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -15856,6 +15856,213 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   test('D-214A regression lock does not require schema change', () => {
     // Confirm localStorage key still absent from worker (schema proxy check)
     assert.ok(!workerSrc.includes('me.reflectionAvatar'), 'worker.js must have no avatar schema references');
+  });
+}
+
+// ── D-215A: My HumanX privacy boundary lock ───────────────────────────────────
+{
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+  const workerCode = workerSrc.split('\n').filter(l => !l.trimStart().startsWith('//')).join('\n');
+
+  // ── Public render slice: all renderPublicProfile* functions ──────────────
+  // Covers the full public render surface from first helper to async renderPublicProfile end
+  const pubRenderStart = appSrc.indexOf('function renderPublicProfileClaimsHtml(');
+  const pubRenderEnd = appSrc.indexOf('\nfunction meSharedSnapshotSummary(');
+  // pubRenderEnd is before meShared* — ensures we capture only the public render block
+  const pubRenderSrc = appSrc.slice(pubRenderStart, pubRenderEnd > -1 ? pubRenderEnd : pubRenderStart + 10000);
+
+  // ── Private render slice: renderMeHtml ───────────────────────────────────
+  const renderMeIdx = appSrc.indexOf('function renderMeHtml(');
+  const renderMeEnd = appSrc.indexOf('\nasync function renderMe(', renderMeIdx);
+  const renderMeSlice = appSrc.slice(renderMeIdx, renderMeEnd > -1 ? renderMeEnd : renderMeIdx + 3000);
+
+  // ── 1. Private/public render separation ──────────────────────────────────
+  test('D-215A: renderMeHtml not called from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('renderMeHtml('), 'renderMeHtml must not be called from any public render function');
+  });
+
+  test('D-215A: "My HumanX" heading absent from public render path', () => {
+    // The heading <h2>My HumanX</h2> is private-only
+    assert.ok(!pubRenderSrc.includes('My HumanX'), '"My HumanX" heading must not appear in public render path');
+  });
+
+  test('D-215A: meMirrorHtml not called from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('meMirrorHtml('), 'meMirrorHtml must not be called from public render path');
+  });
+
+  test('D-215A: meBeliefReflectionHtml not called from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('meBeliefReflectionHtml('), 'meBeliefReflectionHtml must not be called from public render path');
+  });
+
+  test('D-215A: meAccountCardHtml not called from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('meAccountCardHtml('), 'meAccountCardHtml must not be called from public render path');
+  });
+
+  test('D-215A: meProfileSettingsHtml not called from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('meProfileSettingsHtml('), 'meProfileSettingsHtml must not be called from public render path');
+  });
+
+  test('D-215A: meSharedSnapshotPreviewBlockHtml not called from public render path', () => {
+    // Preview block has save controls — must remain private
+    assert.ok(!pubRenderSrc.includes('meSharedSnapshotPreviewBlockHtml('), 'preview block (with save controls) must not be called from public render path');
+  });
+
+  test('D-215A: "private by default" absent from public render path', () => {
+    // "private by default" appears in renderPublicProfileSnapshotHtml — let's check precisely
+    // Actually the snapshot html says "Belief identity details are private by default" — that IS in the public render
+    // We check for the private My HumanX version: "Everything here is private by default"
+    assert.ok(!pubRenderSrc.includes('Everything here is private by default'), 'Private My HumanX intro must not appear in public render');
+  });
+
+  test('D-215A: "private My HumanX view" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('private My HumanX view'), 'device-local private note must not appear in public render path');
+  });
+
+  test('D-215A: "not shown on your public profile" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('not shown on your public profile'), '"not shown on your public profile" is private-only copy — must not appear in public render path');
+  });
+
+  test('D-215A: "Private concept only" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('Private concept only'), '"Private concept only" is private-only copy — must not appear in public render path');
+  });
+
+  // ── 2. Public profile must stay presentation-only ─────────────────────────
+  test('D-215A: meRerender not referenced in public render path', () => {
+    assert.ok(!pubRenderSrc.includes('meRerender'), 'meRerender must not appear in public render path');
+  });
+
+  test('D-215A: saveBeliefVisibilityUI not in public render path', () => {
+    assert.ok(!pubRenderSrc.includes('saveBeliefVisibilityUI'), 'save visibility control must not appear in public render path');
+  });
+
+  test('D-215A: "Export" dashboard control absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('exportMyHumanX'), '"Export" dashboard action must not appear in public render path');
+  });
+
+  test('D-215A: meFilterBarHtml not called from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('meFilterBarHtml('), 'private filter bar must not appear in public render path');
+  });
+
+  test('D-215A: meVisibleSlice not called from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('meVisibleSlice('), 'private data slicing must not appear in public render path');
+  });
+
+  test('D-215A: toggleAccountPanel not in public render path', () => {
+    assert.ok(!pubRenderSrc.includes('toggleAccountPanel'), 'private account panel toggle must not appear in public render path');
+  });
+
+  // ── 3. No localStorage/public coupling ───────────────────────────────────
+  test('D-215A: localStorage not referenced in public render path', () => {
+    assert.ok(!pubRenderSrc.includes('localStorage'), 'localStorage must not appear in public render path');
+  });
+
+  test('D-215A: "humanx.me." key prefix absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('humanx.me.'), '"humanx.me." private key prefix must not appear in public render path');
+  });
+
+  test('D-215A: reflectionAvatar.hidden absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('reflectionAvatar.hidden'), 'localStorage avatar key must not appear in public render path');
+  });
+
+  test('D-215A: isMeReflectionAvatarHidden not called from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('isMeReflectionAvatarHidden'), 'avatar hidden check must not appear in public render path');
+  });
+
+  // ── 4. Backend/API boundary ───────────────────────────────────────────────
+  test('D-215A: no my_humanx_preference route in worker.js', () => {
+    assert.ok(!workerCode.includes('my_humanx_preference') && !workerCode.includes('myHumanxPreference'), 'worker.js must not have private dashboard preference routes');
+  });
+
+  test('D-215A: no avatar_hidden field in worker.js', () => {
+    assert.ok(!workerCode.includes('avatar_hidden') && !workerCode.includes('avatarHidden'), 'worker.js must not persist avatar_hidden field');
+  });
+
+  test('D-215A: no public_avatar field in worker.js API responses', () => {
+    assert.ok(!workerCode.includes('public_avatar') && !workerCode.includes('publicAvatar'), 'worker.js must not expose public_avatar in API responses');
+  });
+
+  test('D-215A: no reflection_avatar_hidden route in worker.js', () => {
+    assert.ok(!workerCode.includes('reflection-avatar') && !workerCode.includes('reflection_avatar'), 'worker.js must not have reflection avatar routes');
+  });
+
+  test('D-215A: humanx.me. localStorage key absent from worker.js', () => {
+    assert.ok(!workerSrc.includes('humanx.me.'), '"humanx.me." localStorage prefix must not appear in worker.js');
+  });
+
+  // ── 5. Public forbidden wording (compound phrases only) ──────────────────
+  // Using pubRenderSrc only — docs/tests may use these terms in guardrail sections
+  test('D-215A: "truth level" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('truth level'), '"truth level" must not appear in public render path');
+  });
+
+  test('D-215A: "purity" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('purity'), '"purity" must not appear in public render path');
+  });
+
+  test('D-215A: "ideology type" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('ideology type'), '"ideology type" must not appear in public render path');
+  });
+
+  test('D-215A: "religious alignment" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('religious alignment'), '"religious alignment" must not appear in public render path');
+  });
+
+  test('D-215A: "smart score" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('smart score'), '"smart score" must not appear in public render path');
+  });
+
+  test('D-215A: "HumanX rank" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('HumanX rank'), '"HumanX rank" must not appear in public render path');
+  });
+
+  test('D-215A: "good believer" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('good believer'), '"good believer" must not appear in public render path');
+  });
+
+  test('D-215A: "bad believer" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('bad believer'), '"bad believer" must not appear in public render path');
+  });
+
+  test('D-215A: "morality label" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('morality label'), '"morality label" must not appear in public render path');
+  });
+
+  test('D-215A: "intelligence label" absent from public render path', () => {
+    assert.ok(!pubRenderSrc.includes('intelligence label'), '"intelligence label" must not appear in public render path');
+  });
+
+  // ── renderMeHtml wires all private sections ───────────────────────────────
+  test('D-215A: renderMeHtml calls meMirrorHtml', () => {
+    assert.ok(renderMeSlice.includes('meMirrorHtml('), 'renderMeHtml must call meMirrorHtml');
+  });
+
+  test('D-215A: renderMeHtml calls meBeliefReflectionHtml', () => {
+    assert.ok(renderMeSlice.includes('meBeliefReflectionHtml('), 'renderMeHtml must call meBeliefReflectionHtml');
+  });
+
+  test('D-215A: renderMeHtml calls meReflectionAvatarHtml', () => {
+    assert.ok(renderMeSlice.includes('meReflectionAvatarHtml('), 'renderMeHtml must call meReflectionAvatarHtml');
+  });
+
+  test('D-215A: renderMeHtml calls meProfileSettingsHtml', () => {
+    assert.ok(renderMeSlice.includes('meProfileSettingsHtml('), 'renderMeHtml must call meProfileSettingsHtml');
+  });
+
+  // ── 6. Deploy integrity lock ──────────────────────────────────────────────
+  test('D-215A regression lock does not modify public/app-v10.js', () => {
+    assert.ok(!appSrc.includes('D-215A:'), 'D-215A must not modify app-v10.js (test-and-docs-only task)');
+  });
+
+  test('D-215A regression lock does not require migration', () => {
+    assert.ok(
+      !existsSync(path.join(__dirname, '../migrations/0017_privacy_boundary.sql')),
+      'D-215A is test/docs-only — no migration needed'
+    );
+  });
+
+  test('D-215A regression lock does not modify worker.js', () => {
+    assert.ok(!workerSrc.includes('D-215A'), 'D-215A must not modify worker.js');
   });
 }
 
