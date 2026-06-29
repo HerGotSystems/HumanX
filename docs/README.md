@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-219A (2026-06-29). Covers full D-210→D-218 hardening arc, current baseline, privacy boundary state, deployment state, safe next-work rules.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D225A_PUBLIC_PROFILE_POLISH_REGRESSION_LOCK.md` ⭐ CURRENT — D-225A PUBLIC PROFILE POLISH REGRESSION LOCK
+### `D226A_PUBLIC_PROFILE_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-226A PUBLIC PROFILE MILESTONE CHECKPOINT
+
+Docs only. No app UI, CSS, or worker changes. Deploy not needed. Updates `docs/PROJECT_STATE.md` as authoritative project reference after the completed D-220→D-225 public profile polish arc. Records current baseline (2290/0/24/57), full arc summary, deployment state (5 owner live deploys, D-225A tests/docs only), public profile current behavior table, privacy guarantees (no new public data fields; no private/avatar exposure; D-214A/D-215A/D-216A/D-225A locks active), future rules, and suggested next lanes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D225A_PUBLIC_PROFILE_POLISH_REGRESSION_LOCK.md` — D-225A PUBLIC PROFILE POLISH REGRESSION LOCK
 
 Tests + docs only. No app UI, no CSS, no worker changes. Deploy not needed. Seals the D-220→D-224 public profile polish arc with cross-arc regression tests: (1) page structure order — counts before sectionNav before snapshot before claims; (2) all D-220→D-224 CSS classes present; (3) D-222 copy-link helper integrity — `window.location.href`, `Link copied`, failure copy, no localStorage/fetch; (4) D-223 section nav — all four anchors always present, pure HTML; (5) D-224 empty-state — snapshot id always emitted, claims/truths use `pp-empty-card`; (6) D-216A allowlist contains all arc markers; (7) privacy boundary — no private markers in entire public render path; (8) forbidden wording absent from all public render functions; (9) D-221 accessibility — focus-visible rings and mobile touch targets for all public interactive elements; (10) D-225A deploy integrity — arc tags absent from worker.js; (11) empty-state copy public-safe; (12) copy-link button present in header; (13) README references all arc docs D220A→D225A. 13 new D-225A tests. Baseline 2290/24/57. No privacy boundary change. D-214A/D-215A/D-216A locks active. Future rule: any public profile polish change must preserve D-220→D-224 behavior or explicitly update this regression lock with owner approval.
 
