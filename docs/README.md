@@ -51,7 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-### `D176D_ERROR_RESPONSE_HYGIENE_LIVE_VERIFY.md` — D-176B/D LIVE VERIFIED
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-219A (2026-06-29). Covers full D-210→D-218 hardening arc, current baseline, privacy boundary state, deployment state, safe next-work rules.
+
+### `D219A_POST_HARDENING_CHECKPOINT.md` ⭐ CURRENT — D-219A POST-HARDENING CHECKPOINT
+
+Docs only. No app UI changes, no CSS changes, no worker changes, no deploy needed. Closes the D-210→D-218 hardening arc with a single reliable baseline reference. Updates `docs/PROJECT_STATE.md` (full rewrite — current HEAD, baseline 2186/24/57, arc summary, privacy boundary state per surface, deployment state, worker warning state, 6 safe next-work rules, 5 suggested feature lanes, D/A backend safety rules, full batch history A-2→D-219A). Creates `docs/D219A_POST_HARDENING_CHECKPOINT.md` (arc summary, active privacy locks table, baseline confirmation). Baseline unchanged: 2186/0/24/57. No backend, no API, no migration, no schema, no CSP, no external asset, no app UI, no CSS, no worker changes.
+
+### `D218A_WORKER_ROUTE_WARNING_AUDIT.md` — D-218A WORKER ROUTE WARNING AUDIT
 ### `D177A_FRONTEND_HTML_ESCAPING_XSS_AUDIT.md` — D-177A FRONTEND XSS AUDIT
 ### `D177B_FRONTEND_MODAL_HTML_CONTRACT_PATCH.md` — D-177B FRONTEND MODAL CONTRACT
 ### `D177D_FRONTEND_MODAL_HTML_CONTRACT_LIVE_VERIFY.md` — D-177B/D LIVE VERIFIED
