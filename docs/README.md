@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2186 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2209 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-219A (2026-06-29). Covers full D-210→D-218 hardening arc, current baseline, privacy boundary state, deployment state, safe next-work rules.
 
-### `D219A_POST_HARDENING_CHECKPOINT.md` ⭐ CURRENT — D-219A POST-HARDENING CHECKPOINT
+### `D220A_PUBLIC_PROFILE_VISUAL_POLISH.md` ⭐ CURRENT — D-220A PUBLIC PROFILE VISUAL POLISH (PENDING DEPLOY)
+
+Frontend/CSS + tests + docs. **Deploy needed: yes** (app-v10.js and styles.css changed). No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Visual polish within the D-216A public profile allowlist contract: (1) counts card moved to top (activity at a glance before snapshot and claims); (2) context/vocabulary block collapsed into native `<details class="pp-vocab-details"><summary>About this profile page</summary>` — reduces vertical clutter, user can expand; (3) claim action buttons wrapped in `pp-item-actions` div for cleaner responsive layout; (4) `renderPublicProfileTruthsHtml` now returns an empty-state `pp-empty` message instead of empty string — truths section always renders consistently with claims section. `PUBLIC_PROFILE_ALLOWED_MARKERS` updated: +7 entries (`pp-vocab-details`, `pp-vocab-summary`, `pp-item-actions`, `About this profile page`, `Public truths`, `No public claims yet`, `No public truths`). D-158B ordering/truths tests updated to reflect D-220A intentional changes. 22 new D-220A tests. Baseline 2208/24/57. Owner deploy needed before live closeout (D-220B).
+
+### `D219A_POST_HARDENING_CHECKPOINT.md` — D-219A POST-HARDENING CHECKPOINT
 
 Docs only. No app UI changes, no CSS changes, no worker changes, no deploy needed. Closes the D-210→D-218 hardening arc with a single reliable baseline reference. Updates `docs/PROJECT_STATE.md` (full rewrite — current HEAD, baseline 2186/24/57, arc summary, privacy boundary state per surface, deployment state, worker warning state, 6 safe next-work rules, 5 suggested feature lanes, D/A backend safety rules, full batch history A-2→D-219A). Creates `docs/D219A_POST_HARDENING_CHECKPOINT.md` (arc summary, active privacy locks table, baseline confirmation). Baseline unchanged: 2186/0/24/57. No backend, no API, no migration, no schema, no CSP, no external asset, no app UI, no CSS, no worker changes.
 

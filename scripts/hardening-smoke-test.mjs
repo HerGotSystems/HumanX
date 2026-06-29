@@ -832,7 +832,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2216,7 +2216,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -7577,8 +7577,9 @@ test('D-141B/D-158B: claims empty state uses pp-empty class; secondary section f
   const claimsIdx = appSrc.indexOf('function renderPublicProfileClaimsHtml');
   const claimsSlice = appSrc.slice(claimsIdx, claimsIdx + 200);
   assert.ok(claimsSlice.includes('class="small pp-empty"'), 'renderPublicProfileClaimsHtml must render its empty state with the pp-empty class');
-  // D-158B: truths/evidence/pressure suppress the whole section when empty (return '')
-  for (const fn of ['renderPublicProfileTruthsHtml', 'renderPublicProfileEvidenceHtml', 'renderPublicProfilePressureHtml']) {
+  // D-158B: evidence/pressure suppress the whole section when empty (return '')
+  // D-220A: renderPublicProfileTruthsHtml now returns an empty-state message instead of '' (always renders section)
+  for (const fn of ['renderPublicProfileEvidenceHtml', 'renderPublicProfilePressureHtml']) {
     const idx = appSrc.indexOf(`function ${fn}`);
     const slice = appSrc.slice(idx, idx + 100);
     assert.ok(slice.includes("return''"), `${fn} must return empty string for empty rows (D-158B section suppression)`);
@@ -7879,16 +7880,17 @@ test('D-142B/D-142C/D-154B→D-208B: public profile snapshot card uses third-per
   );
 });
 
-test('D-142B/D-158B: public profile snapshot renders before claims; claims render before counts in return template (D-158B reorder)', () => {
+test('D-142B/D-158B/D-220A: public profile order — counts before snapshot, snapshot before claims in return template', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
   const slice = appSrc.slice(idx, idx + 3500);
-  // Use return-template interpolation references (not const definitions) for positional checks
-  const snapshotAt = slice.indexOf('renderPublicProfileSnapshotHtml(sn)');
-  const claimsAt = slice.indexOf('<h3>Claims being tested</h3>');
-  const countsAt = slice.indexOf('${countsCard}');
+  const returnStr = slice.slice(slice.indexOf('return`'));
+  // D-220A reorder: counts card moved to top (at-a-glance), then snapshot, then claims
+  const countsAt = returnStr.indexOf('${countsCard}');
+  const snapshotAt = returnStr.indexOf('renderPublicProfileSnapshotHtml(sn)');
+  const claimsAt = returnStr.indexOf('<h3>Claims being tested</h3>');
   assert.ok(
-    snapshotAt !== -1 && claimsAt !== -1 && countsAt !== -1 && snapshotAt < claimsAt && claimsAt < countsAt,
-    'D-158B reorder: snapshot renders before claims, claims before counts (countsCard reference in return template)'
+    countsAt !== -1 && snapshotAt !== -1 && claimsAt !== -1 && countsAt < snapshotAt && snapshotAt < claimsAt,
+    'D-220A reorder: counts appears before snapshot, snapshot before claims in return template'
   );
 });
 
@@ -10252,24 +10254,28 @@ test('D-158B: claims section renders before public truths in output order', () =
   );
 });
 
-test('D-158B: counts card renders after truths and before evidence in return template', () => {
+test('D-158B/D-220A: counts card position — before snapshot, not between truths and evidence', () => {
   const idx = appSrc.indexOf('function renderPublicProfileHtml');
   const slice = appSrc.slice(idx, idx + 3500);
-  // <h3> strings only appear in the return template; ${countsCard} is the return interpolation
-  const truthsAt = slice.indexOf('<h3>Public truths</h3>');
-  const countsAt = slice.indexOf('${countsCard}');
-  const evidenceAt = slice.indexOf('<h3>Supporting evidence</h3>');
-  assert.ok(
-    truthsAt !== -1 && countsAt !== -1 && evidenceAt !== -1 && truthsAt < countsAt && countsAt < evidenceAt,
-    'D-158B: truths section must appear before ${countsCard} interpolation, which must appear before evidence section'
-  );
+  const returnStr = slice.slice(slice.indexOf('return`'));
+  // D-220A: counts card moved to top (before snapshot), not between truths and evidence
+  const countsAt = returnStr.indexOf('${countsCard}');
+  const snapshotAt = returnStr.indexOf('renderPublicProfileSnapshotHtml(sn)');
+  const evidenceAt = returnStr.indexOf('<h3>Supporting evidence</h3>');
+  assert.ok(countsAt !== -1 && snapshotAt !== -1, 'countsCard and snapshot must be in return template');
+  assert.ok(countsAt < snapshotAt, 'D-220A: countsCard must appear before snapshot (moved to top)');
+  // countsCard should NOT be between truths and evidence (old position removed)
+  const truthsAt = returnStr.indexOf('<h3>Public truths</h3>');
+  assert.ok(truthsAt === -1 || evidenceAt === -1 || countsAt < truthsAt, 'D-220A: countsCard must not appear between truths and evidence sections');
 });
 
-test('D-158B: renderPublicProfileTruthsHtml returns empty string for empty rows (section suppressed)', () => {
+test('D-158B/D-220A: renderPublicProfileTruthsHtml — D-220A changed: returns empty-state message not empty string', () => {
   const fn = appSrc.match(/function renderPublicProfileTruthsHtml[\s\S]*?^function /m)?.[0] || '';
+  // D-220A intentionally changed renderPublicProfileTruthsHtml to return an empty-state p.pp-empty
+  // instead of '' — the truths section now always renders (consistent with claims section behaviour)
   assert.ok(
-    fn.includes("if(!rows||!rows.length)return''"),
-    'renderPublicProfileTruthsHtml must return empty string (not an empty-state paragraph) so empty truths section is suppressed'
+    fn.includes('pp-empty') && fn.includes('No public truths'),
+    'D-220A: renderPublicProfileTruthsHtml must return a pp-empty paragraph for empty rows, not empty string'
   );
 });
 
@@ -16148,8 +16154,14 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     'pp-counts-card', 'pp-section', 'pp-item-list', 'pp-item-row',
     'pp-disclaimer', 'pp-display-name', 'pp-slug', 'pp-counts-note',
     'pp-footer-actions', 'section-head',
+    // D-220A: new classes added in visual polish slice
+    'pp-vocab-details', 'pp-vocab-summary', 'pp-item-actions',
     // Intentional public heading copy
     'Public Profile', 'Shared Belief Snapshot', 'Claims being tested', 'Public Activity',
+    // D-220A: additional public copy now explicitly documented
+    'Public truths', 'No public claims yet', 'No public truths',
+    // D-220A: collapsible context block summary text
+    'About this profile page',
     // Public profile navigation
     'Back to Home', 'Browse all claims',
   ];
@@ -16430,6 +16442,110 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
   test('D-218A: D-217A smoke index still present', () => {
     const smokeSrc = readFileSync(path.join(__dirname, '../scripts/hardening-smoke-test.mjs'), 'utf8');
     assert.ok(smokeSrc.includes('D-217A SMOKE TEST INDEX'), 'D-217A smoke test index must still be present');
+  });
+}
+
+// ── D-220A: Public Profile visual polish ──────────────────────────────────────
+{
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+  const cssSrc = readFileSync(path.join(__dirname, '../public/styles.css'), 'utf8');
+  const readmeSrc = readFileSync(path.join(__dirname, '../docs/README.md'), 'utf8');
+
+  const pubRenderStart = appSrc.indexOf('function renderPublicProfileClaimsHtml(');
+  const pubRenderEnd = appSrc.indexOf('\nasync function renderMe(');
+  const pubProfileSrc = appSrc.slice(pubRenderStart, pubRenderEnd > -1 ? pubRenderEnd : pubRenderStart + 12000);
+
+  const claimsFnEnd = appSrc.indexOf('\nfunction renderPublicProfileTruthsHtml(');
+  const claimsFnSrc = appSrc.slice(pubRenderStart, claimsFnEnd > -1 ? claimsFnEnd : pubRenderStart + 1000);
+
+  const truthsFnStart = appSrc.indexOf('function renderPublicProfileTruthsHtml(');
+  const truthsFnEnd = appSrc.indexOf('\nfunction renderPublicProfileEvidenceHtml(');
+  const truthsFnSrc = appSrc.slice(truthsFnStart, truthsFnEnd > -1 ? truthsFnEnd : truthsFnStart + 500);
+
+  const orchStart = appSrc.indexOf('function renderPublicProfileHtml(');
+  const orchEnd = appSrc.indexOf('\nasync function renderPublicProfile(', orchStart);
+  const orchSrc = appSrc.slice(orchStart, orchEnd > -1 ? orchEnd : orchStart + 4000);
+
+  test('D-220A: pp-vocab-details class present in public profile render path', () => {
+    assert.ok(pubProfileSrc.includes('pp-vocab-details'), 'pp-vocab-details must be used in public profile render path');
+  });
+
+  test('D-220A: pp-vocab-summary class present in public profile render path', () => {
+    assert.ok(pubProfileSrc.includes('pp-vocab-summary'), 'pp-vocab-summary must be used in public profile render path');
+  });
+
+  test('D-220A: context block uses <details> element not bare <div>', () => {
+    assert.ok(orchSrc.includes('pp-vocab-details'), 'contextBlock must include pp-vocab-details class');
+    assert.ok(!orchSrc.includes('<div class="panel pp-card pp-context-block">'), 'contextBlock must not use the old bare div — it is now a details element');
+  });
+
+  test('D-220A: "About this profile page" summary text present in orchestrator', () => {
+    assert.ok(orchSrc.includes('About this profile page'), '"About this profile page" must be the summary text of the collapsible context block');
+  });
+
+  test('D-220A: pp-item-actions wrapper present in renderPublicProfileClaimsHtml', () => {
+    assert.ok(claimsFnSrc.includes('pp-item-actions'), 'renderPublicProfileClaimsHtml must wrap action buttons in pp-item-actions div');
+  });
+
+  test('D-220A: claim action buttons still present within pp-item-actions', () => {
+    assert.ok(claimsFnSrc.includes('openPublicProfileClaimStudy'), 'View in HumanX button must still exist in claims function');
+    assert.ok(claimsFnSrc.includes('copyClaimLink'), 'Copy link button must still exist in claims function');
+  });
+
+  test('D-220A: renderPublicProfileTruthsHtml has non-empty empty state (always renders content)', () => {
+    assert.ok(truthsFnSrc.includes('No public truths'), 'renderPublicProfileTruthsHtml must provide a "No public truths" empty state message');
+  });
+
+  test('D-220A: renderPublicProfileTruthsHtml does not return empty string for empty rows', () => {
+    assert.ok(!truthsFnSrc.includes("return''"), 'renderPublicProfileTruthsHtml must not return empty string — it must return the empty-state message');
+  });
+
+  test('D-220A: countsCard appears before snapshot in orchestrator return template', () => {
+    const returnStart = orchSrc.indexOf('return`');
+    const returnStr = orchSrc.slice(returnStart);
+    const countsPos = returnStr.indexOf('${countsCard}');
+    const snapshotPos = returnStr.indexOf('renderPublicProfileSnapshotHtml(');
+    assert.ok(countsPos > -1, 'countsCard must appear in the return template');
+    assert.ok(countsPos < snapshotPos, 'countsCard must appear before renderPublicProfileSnapshotHtml in the return template (activity counts at a glance before snapshot)');
+  });
+
+  test('D-220A: CSS defines .pp-vocab-details', () => {
+    assert.ok(cssSrc.includes('.pp-vocab-details'), 'styles.css must define .pp-vocab-details');
+  });
+
+  test('D-220A: CSS defines .pp-vocab-summary', () => {
+    assert.ok(cssSrc.includes('.pp-vocab-summary'), 'styles.css must define .pp-vocab-summary');
+  });
+
+  test('D-220A: CSS defines .pp-item-actions', () => {
+    assert.ok(cssSrc.includes('.pp-item-actions'), 'styles.css must define .pp-item-actions');
+  });
+
+  test('D-220A: no private markers introduced by D-220A into public content helpers', () => {
+    // Use tight content-helper slice (excludes orchestrator and all private functions)
+    const ppContentEnd = appSrc.indexOf('\nfunction renderPublicProfileHtml(');
+    const ppContentSrc = appSrc.slice(pubRenderStart, ppContentEnd > -1 ? ppContentEnd : pubRenderStart + 3000);
+    assert.ok(!ppContentSrc.includes('meReflectionAvatarHtml'), 'D-220A must not add meReflectionAvatarHtml to public content helpers');
+    assert.ok(!ppContentSrc.includes('localStorage'), 'D-220A must not add localStorage to public content helpers');
+    assert.ok(!ppContentSrc.includes('humanx.me.'), 'D-220A must not add humanx.me. prefix to public content helpers');
+    // Also check orchestrator does not reference private state (D-215A already covers this, but double-check)
+    assert.ok(!orchSrc.includes('localStorage'), 'D-220A must not add localStorage to the orchestrator');
+    assert.ok(!orchSrc.includes('meReflectionAvatarHtml'), 'D-220A must not reference avatar in orchestrator');
+  });
+
+  test('D-220A: no new data fields introduced by D-220A (presentation-only change)', () => {
+    assert.ok(!pubProfileSrc.includes('.ideologyType'), 'D-220A must not add ideology field reads');
+    assert.ok(!pubProfileSrc.includes('.alignmentLabel'), 'D-220A must not add alignment label field reads');
+    assert.ok(!pubProfileSrc.includes('alignment_labels'), 'D-220A must not reference alignment_labels in public render path');
+  });
+
+  test('D-220A: deploy integrity — D-220A comment absent from worker.js', () => {
+    assert.ok(!workerSrc.includes('D-220A'), 'D-220A must not modify worker.js');
+  });
+
+  test('D-220A: README references D220A', () => {
+    assert.ok(readmeSrc.includes('D220A'), 'README must reference D-220A public profile visual polish');
   });
 }
 

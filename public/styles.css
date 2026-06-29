@@ -777,6 +777,15 @@ details[open].me-avatar-why .me-avatar-why-summary::before{content:'▾ '}
 .pp-snapshot-label{margin:2px 0;font-weight:700;color:var(--text)}
 .pp-snapshot-pattern-label{margin:8px 0 2px;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.04em}
 .pp-snapshot-date{margin:8px 0 0;color:var(--muted)}
+/* D-220A: collapsible "About this profile page" context block */
+.pp-vocab-details{cursor:default}
+.pp-vocab-summary{list-style:none;padding:2px 0;min-height:32px;display:inline-flex;align-items:center;font-size:12px;color:var(--muted);cursor:pointer;user-select:none;margin-bottom:4px}
+.pp-vocab-summary::-webkit-details-marker{display:none}
+.pp-vocab-summary::before{content:'▸ ';flex-shrink:0}
+.pp-vocab-details[open] .pp-vocab-summary::before{content:'▾ '}
+.pp-vocab-summary:focus-visible{outline:2px solid var(--blue,#57b8ff);outline-offset:2px;border-radius:2px}
+/* D-220A: action buttons row inside public-profile claim item rows */
+.pp-item-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line);width:100%}
 /* D-185B mobile quick fixes */
 @media(max-width:500px){.verdict-qualifier{display:none}.me-profile-actions{flex-direction:column}}
 @media(max-width:400px){.account-panel-popover{max-width:calc(100vw - 16px)}}
