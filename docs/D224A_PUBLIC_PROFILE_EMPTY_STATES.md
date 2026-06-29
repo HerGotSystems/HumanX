@@ -1,7 +1,7 @@
 # D-224A — Public Profile Empty-State Polish
 
 **Scope:** Frontend/CSS + tests + docs
-**Status:** COMPLETE — pending owner deploy
+**Status:** LIVE CLOSEOUT COMPLETE (D-224B)
 **Baseline:** 2275 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D224A_PUBLIC_PROFILE_EMPTY_STATES.md`, `docs/README.md`
 **App UI changes:** Yes (empty-state copy/classes updated; snapshot always renders)
@@ -200,31 +200,56 @@ No `PUBLIC_PROFILE_PRIVATE_DENYLIST` entries changed.
 
 ---
 
-## Live sanity checklist (pending owner deploy — D-224B)
+## Live sanity checklist — D-224B PASS
 
-After owner manually deploys from terminal:
+Owner deploy completed from terminal. All 25 checks PASS.
 
-- [ ] Live HumanX opened after deploy
-- [ ] Public profile page opened
-- [ ] Page loads without console-breaking errors
-- [ ] Profile with no shared snapshot: snapshot empty-state card visible — "No public snapshot shared yet."
-- [ ] Profile with no shared snapshot: Snapshot nav link present and scrolls to the empty-state card
-- [ ] Profile with shared snapshot: existing snapshot card visible (unchanged)
-- [ ] Profile with no public claims: claims section shows "No public claims yet." (styled as calm card)
-- [ ] Profile with public claims: existing claims list visible (unchanged)
-- [ ] Profile with no public truths: truths section shows "No public truths on this profile yet." (restyled)
-- [ ] Profile with public truths: existing truths list visible (unchanged)
-- [ ] Empty-state cards are muted/calm — not error, not warning
-- [ ] Snapshot nav link always visible in section nav (no longer conditional)
-- [ ] Claims and Truths nav links still work (unchanged)
-- [ ] About nav link still works (unchanged)
-- [ ] Counts card placement from D-220 remains intact
-- [ ] Copy profile link from D-222 remains intact
-- [ ] Context disclosure still opens/closes normally
-- [ ] Keyboard Tab reaches section nav links (unchanged from D-223A)
-- [ ] Mobile: empty-state cards do not overflow
-- [ ] No private My HumanX controls appear
-- [ ] No Reflection Avatar appears
-- [ ] No forbidden wording appears (truth level / purity / ideology type / religious alignment / smart score / HumanX rank / good believer / bad believer / private / hidden / diagnosis)
-- [ ] Public profile does not expose new data fields
-- [ ] Browser console: no JS errors
+- [x] Live HumanX opened after deploy
+- [x] Public profile page opened
+- [x] Page loads without console-breaking errors
+- [x] Snapshot section anchor exists even when no public snapshot is shared
+- [x] Profile with no shared snapshot: snapshot empty-state card visible — "No public snapshot shared yet."
+- [x] Snapshot empty note visible — "Public sections appear here when shared."
+- [x] Snapshot nav link present and scrolls to the empty-state card
+- [x] Profile with shared snapshot: existing snapshot card renders normally (unchanged)
+- [x] Claims section shows "No public claims yet." (calm card styling)
+- [x] Claims empty state uses calm card styling — not error, not warning
+- [x] Truths section shows "No public truths on this profile yet." (calm card styling, restyled)
+- [x] Truths empty state uses calm card styling — not error, not warning
+- [x] Empty-state copy does not imply private or hidden data exists
+- [x] Section navigation from D-223 remains intact — all four links present and functional
+- [x] Copy profile link from D-222 remains intact
+- [x] Counts card placement from D-220 remains intact
+- [x] Context disclosure still opens/closes normally
+- [x] Mobile/narrow width: empty-state cards do not overflow
+- [x] No private My HumanX controls appear
+- [x] No Reflection Avatar appears
+- [x] No hide/show controls appear
+- [x] No avatar transparency disclosure appears
+- [x] No localStorage/device-local wording appears
+- [x] No forbidden wording appears (truth level / purity / ideology type / religious alignment / smart score / HumanX rank / good believer / bad believer)
+- [x] Public profile does not expose new data fields
+
+---
+
+## D-224B live closeout record
+
+- **Owner deploy:** PASS — deployed from owner terminal
+- **Hardening smoke post-deploy:** 2275 passed / 0 failed
+- **Worker route static post-deploy:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`)
+- **Snapshot empty-state card:** PASS — renders "No public snapshot shared yet." with "Public sections appear here when shared." note; `id="public-snapshot"` anchor always present
+- **Snapshot nav target:** PASS — Snapshot nav link always present; scrolls to empty-state card when no snapshot shared
+- **Claims empty-state:** PASS — "No public claims yet." rendered as calm `pp-empty-card`
+- **Truths empty-state:** PASS — "No public truths on this profile yet." rendered as calm `pp-empty-card`
+- **Empty-state copy — no private/hidden implication:** PASS — neutral absence wording only
+- **Mobile no-overflow:** PASS — empty-state cards fit within card layout at narrow width
+- **D-223A section nav:** PASS — all four links (Snapshot, Claims, Truths, About) present and functional
+- **D-222A copy profile link:** PASS — unaffected
+- **D-220A counts card:** PASS — unaffected
+- **Context disclosure (D-220A):** PASS — opens/closes normally
+- **Public allowlist compliance:** PASS — 5 new entries intentionally added
+- **No new public data fields:** PASS — no new API fields read
+- **No private My HumanX exposure:** PASS
+- **No Reflection Avatar / public avatar exposure:** PASS
+- **No forbidden wording:** PASS
+- **No backend/API/migration/schema/CSP/external asset changes:** PASS
