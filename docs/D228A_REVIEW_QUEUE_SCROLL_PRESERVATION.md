@@ -1,7 +1,7 @@
 # D-228A — Review Queue Scroll Preservation
 
 **Scope:** App + tests + docs (no CSS change)
-**Status:** COMPLETE — owner deploy needed
+**Status:** COMPLETE — live PASS (D-228B)
 **Baseline:** 2327 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `scripts/hardening-smoke-test.mjs`, `docs/D228A_REVIEW_QUEUE_SCROLL_PRESERVATION.md`, `docs/README.md`
 **App UI changes:** Yes — scroll helper + 9 re-render call sites
@@ -109,29 +109,38 @@ Confirmed. This change is frontend JS only.
 
 ---
 
-## Live sanity checklist — pending owner deploy
+## Live sanity checklist — D-228B PASS (2026-06-29)
 
-Owner deploy required before marking live PASS (D-228B).
+Owner deploy completed from terminal. All 25 live sanity items confirmed PASS.
 
-- [ ] Deploy via `wrangler deploy` from owner terminal
-- [ ] Open Review tab with admin token
-- [ ] Scroll mid-way down a long queue
-- [ ] Click a filter chip — confirm scroll position is preserved
-- [ ] Change sort — confirm scroll position is preserved
-- [ ] Click Reject on a card — confirm confirm-step appears at same scroll position
-- [ ] Click Cancel on reject confirm — confirm scroll position is preserved
-- [ ] Click Approve on a card — confirm confirm-step appears at same scroll position
-- [ ] Click Cancel on approve confirm — confirm scroll position is preserved
-- [ ] Expand/collapse Audit Summary — confirm scroll position is preserved
-- [ ] Click Inspect on a card — confirm panel scrolls to top AND selected card scrolls into view (D-227B behavior intact)
-- [ ] Confirm approve (keyboard A→A) — confirm decision completes, queue re-renders, `scrollToReviewAnchor` fires
-- [ ] Confirm reject (keyboard R→R) — confirm decision completes as before
-- [ ] Keep Pending (keyboard K) — confirm as before
-- [ ] Keyboard [ ] prev/next — confirm navigation works
-- [ ] Filters/sort values unchanged after interactions
-- [ ] Public profile page unchanged — no scroll-helper references
-- [ ] No backend/API behavior changed
-- [ ] No console errors
+- [x] Deploy via `wrangler deploy` from owner terminal — PASS
+- [x] Open Review tab with admin token — PASS
+- [x] Queue loads without console-breaking errors — PASS
+- [x] Scroll down the review queue — PASS
+- [x] Changing filter preserves approximate scroll position — PASS
+- [x] Changing sort preserves approximate scroll position — PASS
+- [x] Arming Reject preserves approximate scroll position — PASS
+- [x] Cancelling Reject preserves approximate scroll position — PASS
+- [x] Arming Approve preserves approximate scroll position — PASS
+- [x] Cancelling Approve preserves approximate scroll position — PASS
+- [x] Arming cleanup/keep action preserves approximate scroll position — PASS
+- [x] Cancelling cleanup/keep action preserves approximate scroll position — PASS
+- [x] Toggling audit summary preserves approximate scroll position — PASS
+- [x] Inspect still uses D-227B selected-card anchor behavior — PASS
+- [x] Inspect still visually marks selected card — PASS
+- [x] Inspect selected-card scroll is not broken/fought by scroll preservation — PASS
+- [x] Approve behavior unchanged — PASS
+- [x] Keep/Cleanup behavior unchanged — PASS
+- [x] Reject behavior unchanged — PASS
+- [x] Two-step confirm behavior unchanged — PASS
+- [x] Keyboard shortcuts unchanged — PASS
+- [x] Filters/sort values unchanged — PASS
+- [x] Public profile pages do not contain review scroll helper or markers — PASS
+- [x] No backend/API behavior changed — PASS
+- [x] No console errors from scroll helper if window APIs absent — PASS
+
+**Hardening smoke (post-deploy):** 2327 passed / 0 failed
+**Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug`)
 
 ---
 
@@ -142,4 +151,6 @@ Owner deploy required before marking live PASS (D-228B).
 - **No Reflection Avatar / public avatar exposure:** Confirmed
 - **No backend/API/migration/schema/CSP/external asset changes:** Confirmed
 - **No moderation semantics change:** Confirmed
-- **Deploy needed:** Yes — owner deploy + browser sanity before marking live PASS
+- **Nine wrapped interactions preserve scroll:** filter, sort, reject arm/cancel, approve arm/cancel, cleanup arm/cancel, audit toggle — all PASS live
+- **Inspect selected-card anchor (D-227B) intact and wins:** Confirmed
+- **Deploy needed:** No — deploy complete, live PASS recorded

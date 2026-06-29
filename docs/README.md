@@ -53,9 +53,9 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D228A_REVIEW_QUEUE_SCROLL_PRESERVATION.md` ⭐ CURRENT — D-228A REVIEW QUEUE SCROLL PRESERVATION (DEPLOY NEEDED)
+### `D228A_REVIEW_QUEUE_SCROLL_PRESERVATION.md` ⭐ CURRENT — D-228A/B REVIEW QUEUE SCROLL PRESERVATION — LIVE PASS
 
-App + tests + docs. No CSS changes. **Owner deploy needed.** Baseline: 2327/0/24/57. Adds `withReviewScrollPreserved(fn)` helper that captures `window.scrollY`, runs the render, then restores scroll via `requestAnimationFrame`; wraps 9 pure local re-renders (filter, sort, confirm-step toggles, audit toggle) to preserve scroll; `inspectReviewItem` intentionally excluded so D-227B selected-card scroll wins; `reviewDecisionUI` excluded so `scrollToReviewAnchor` handles post-decision; 19 new lock tests. No moderation semantics change. No backend/API/migration/schema/CSP/external asset changes.
+App + tests + docs. No CSS changes. Owner deploy complete (D-228B live sanity 25/25 PASS, 2026-06-29). Baseline: 2327/0/24/57. Adds `withReviewScrollPreserved(fn)` helper that captures `window.scrollY`, runs the render, then restores scroll via `requestAnimationFrame`; wraps 9 pure local re-renders (filter, sort, confirm-step toggles, audit toggle) to preserve scroll; `inspectReviewItem` intentionally excluded so D-227B selected-card scroll wins; `reviewDecisionUI` excluded so `scrollToReviewAnchor` handles post-decision; 19 new lock tests. No moderation semantics change. No backend/API/migration/schema/CSP/external asset changes.
 
 ### `D227B_REVIEW_QUEUE_SELECTED_CARD_ANCHOR.md` — D-227B/C REVIEW QUEUE SELECTED-CARD ANCHOR — LIVE PASS
 
