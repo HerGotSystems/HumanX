@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2526 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2543 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-238A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc, current baseline 2526/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D239A_REVIEW_TO_STUDY_NAVIGATION_AUDIT.md` ⭐ CURRENT — D-239A REVIEW-TO-STUDY NAVIGATION AUDIT
+### `D239B_BACK_TO_REVIEW_SCROLL_RESTORE.md` ⭐ CURRENT — D-239B BACK TO REVIEW SCROLL RESTORE (DEPLOY NEEDED)
+
+App + tests + docs. Deploy needed: yes. Baseline: 2543/0/24/57. Addresses D-239A F-1: `backToArena()` now calls `scrollToReviewAnchor(_savedId)` via `requestAnimationFrame` after restoring `inspectedReviewItem` and calling `setMode('review')`. One line added. No queue reload. Non-review origins (vault/truths/me/arena) unchanged. No browser `pushState`. Null-safe guard: scroll only fires when `_savedId` is non-null. D-227B/D-228A/D-233B behavior all confirmed intact. 17 new smoke tests. No CSS/worker/backend/API/migration/schema/CSP/external asset changes. Live sanity checklist pending owner deploy.
+
+### `D239A_REVIEW_TO_STUDY_NAVIGATION_AUDIT.md` — D-239A REVIEW-TO-STUDY NAVIGATION AUDIT
 
 Docs only. Deploy not needed. Baseline: 2526/0/24/57. App/CSS/worker unchanged. Audits the moderator navigation path from Review queue / inspect panel into Study View and back. Key findings: "← Back to Review" button and `lastModeBeforeStudy`/`lastInspectedReviewItemId` context-save mechanism exist and work correctly; `backToArena()` restores `inspectedReviewItem` on return. Gap: `backToArena()` does not scroll to the restored card (`scrollToReviewAnchor`/`scrollSelectedReviewCardIntoView` not called on return). 5 findings (F-1: scroll gap medium, F-2: button prominence low, F-3: no browser-back low, F-4: button style inconsistency low, F-5: similar-advisory ↗ Study return friction medium). Recommended next code slice: D-239B — scroll to selected card after returning from Study to Review. No backend/API/migration/schema/CSP/external asset changes.
 
