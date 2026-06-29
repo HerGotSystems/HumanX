@@ -1,7 +1,7 @@
 # D-222A — Public Profile Copy Link Affordance
 
 **Scope:** Frontend/CSS + tests + docs
-**Status:** COMPLETE — pending owner deploy
+**Status:** LIVE CLOSEOUT COMPLETE (D-222B)
 **Baseline:** 2237 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D222A_PUBLIC_PROFILE_COPY_LINK.md`, `docs/README.md`
 **App UI changes:** Yes (copy button added to profile header; helper updated)
@@ -137,24 +137,54 @@ D-156A had a test checking `'Copied!'` in `copyPublicProfileLink`. D-222A intent
 
 ---
 
-## Live sanity checklist (pending owner deploy — D-222B)
+## Live sanity checklist — D-222B PASS
 
-After owner manually deploys from terminal:
+Owner deploy completed from terminal. All checks PASS.
 
-- [ ] Public profile loads without errors
-- [ ] "Copy profile link" button visible in the profile header card (below name/slug/bio)
-- [ ] Button is present for both owner and non-owner viewing the profile
-- [ ] Clicking "Copy profile link" — button briefly shows "Link copied" then resets
-- [ ] Pasting elsewhere confirms the URL was the current page URL
-- [ ] Keyboard Tab reaches the "Copy profile link" button
-- [ ] Focus ring visible when tabbed to button
-- [ ] On mobile/narrow width, button tap area is comfortably large
-- [ ] If clipboard is blocked: button shows "Copy failed — use browser address bar" and re-enables
-- [ ] Non-owner footer "Copy profile link" still works
-- [ ] Context disclosure "About this profile page" unaffected by D-222A
-- [ ] Counts card placement (D-220A) remains intact
-- [ ] No Reflection Avatar content visible on public profile
-- [ ] No private My HumanX sections visible
-- [ ] No forbidden wording visible
-- [ ] No new public data fields exposed
-- [ ] Browser console: no JS errors
+- [x] Live HumanX opened after deploy
+- [x] Public profile page opened
+- [x] Page loads without console-breaking errors
+- [x] Header "Copy profile link" button is visible (below name/slug/bio)
+- [x] Header copy button is keyboard reachable
+- [x] Header copy button has visible focus ring on keyboard focus
+- [x] Header copy button does not show noisy focus ring on mouse click
+- [x] Clicking header copy button copies the current public profile URL
+- [x] Success message shows: "Link copied"
+- [x] Clipboard failure path is safe if clipboard is blocked: "Copy failed — use browser address bar"
+- [x] Footer copy button still exists and still works
+- [x] Footer copy button has `type="button"` behavior, no accidental form submit
+- [x] Mobile/narrow width: copy button has comfortable touch target
+- [x] Mobile/narrow width: copy button does not overflow header card
+- [x] Public page uses current URL (`window.location.href`), not any private/user account URL
+- [x] No backend/network request is made by copy action
+- [x] No localStorage is used by copy action
+- [x] No private My HumanX controls appear
+- [x] No Reflection Avatar appears
+- [x] No hide/show controls appear
+- [x] No transparency disclosure from avatar appears
+- [x] No forbidden public wording appears (truth level / purity / ideology type / religious alignment / smart score / HumanX rank / good believer / bad believer)
+- [x] Public profile does not expose new data fields
+
+---
+
+## D-222B live closeout record
+
+- **Owner deploy:** PASS — deployed from owner terminal
+- **Hardening smoke post-deploy:** 2237 passed / 0 failed
+- **Worker route static post-deploy:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`)
+- **Header "Copy profile link" button visible:** PASS — present below name/slug/bio in header card
+- **Success feedback "Link copied":** PASS — shown on successful clipboard write, button resets after 1.5s
+- **Failure feedback "Copy failed — use browser address bar":** PASS — shown when clipboard blocked, button re-enables after 2.5s
+- **Keyboard focus ring on copy button:** PASS — visible on Tab, not triggered by mouse
+- **Mobile touch target:** PASS — `min-height:44px` at ≤640px; no overflow
+- **No backend/network request from copy action:** PASS — confirmed, uses Clipboard API only
+- **No localStorage use:** PASS — confirmed
+- **Footer copy button (non-owner):** PASS — still present and functional
+- **Context disclosure (D-220A):** PASS — unaffected
+- **Counts card placement (D-220A):** PASS — unaffected
+- **Public allowlist compliance:** PASS — `pp-copy-link`, `Copy profile link`, `Link copied` intentionally added
+- **No new public data fields:** PASS — no new API fields read
+- **No private My HumanX exposure:** PASS
+- **No Reflection Avatar / public avatar exposure:** PASS
+- **No forbidden wording:** PASS
+- **No backend/API/migration/schema/CSP/external asset changes:** PASS
