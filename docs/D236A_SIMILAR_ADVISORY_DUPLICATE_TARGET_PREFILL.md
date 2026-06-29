@@ -1,7 +1,7 @@
 # D-236A — Similar Advisory Duplicate-Target Prefill
 
 **Scope:** App + CSS + tests + docs
-**Status:** COMPLETE — deploy needed
+**Status:** COMPLETE — D-236B live sanity PASS
 **Baseline:** 2485 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D236A_SIMILAR_ADVISORY_DUPLICATE_TARGET_PREFILL.md`, `docs/README.md`
 **App UI changes:** Yes — "Use as duplicate target" button in inspect panel; `markDuplicateUI` optional prefill param
@@ -11,7 +11,8 @@
 **Schema change:** None
 **Backend/API change:** None
 **New public data fields:** None
-**Deploy needed:** Yes
+**Deploy needed:** Yes — owner deploy complete (D-236B)
+**Implementation HEAD:** 3136539
 
 ---
 
@@ -183,24 +184,26 @@ D-236A added content to the `renderReviewInspectPanel` Similar claim field and t
 
 ---
 
-## Live sanity checklist (pending owner deploy)
+## Live sanity checklist — D-236B PASS
 
-- [ ] Deploy to production via owner terminal
-- [ ] Open Review queue — find a claim with `~similar` badge
-- [ ] Inspect the claim — similar advisory field shows: `clm_abc123` code, `↗ Study`, `[Copy ID]`, `[Use as duplicate target]`
-- [ ] "Use as duplicate target" button opens mark-duplicate modal
-- [ ] Modal shows "Pre-filled from similar-claim advisory — confirm the ID below before marking."
-- [ ] Canonical target claim ID field is pre-filled with the `near_duplicate_of` ID
-- [ ] Moderator can edit or clear the prefilled ID before confirming
-- [ ] Clicking "Mark Duplicate" completes the flow with explicit confirmation (API call fires)
-- [ ] Clicking "Cancel" closes without any action — no duplicate marked
-- [ ] Existing "Mark Duplicate..." button in dupSection still opens modal with empty input (no prefill)
-- [ ] Copy ID button still works (toast "ID copied")
-- [ ] Raw `clm_...` code element still single-click selectable
-- [ ] Dismiss ~Similar still works and scrolls to anchor (D-233B parity)
-- [ ] Similar advisory display clarity from D-234A intact
-- [ ] Normal Approve/Keep/Reject actions unchanged
-- [ ] No console errors
+- [x] Deploy to production via owner terminal
+- [x] Open Review queue — find a claim with `~similar` badge
+- [x] Inspect the claim — similar advisory field shows: `clm_abc123` code, `↗ Study`, `[Copy ID]`, `[Use as duplicate target]`
+- [x] "Use as duplicate target" button opens mark-duplicate modal
+- [x] Modal shows "Pre-filled from similar-claim advisory — confirm the ID below before marking."
+- [x] Canonical target claim ID field is pre-filled with the `near_duplicate_of` ID
+- [x] Moderator can edit or clear the prefilled ID before confirming
+- [x] Clicking "Mark Duplicate" completes the flow with explicit confirmation (API call fires)
+- [x] Clicking "Cancel" closes without any action — no duplicate marked
+- [x] Existing "Mark Duplicate..." button in dupSection still opens modal with empty input (no prefill)
+- [x] Copy ID button still works (toast "ID copied")
+- [x] Raw `clm_...` code element still single-click selectable
+- [x] Dismiss ~Similar still works and scrolls to anchor (D-233B parity)
+- [x] Similar advisory display clarity from D-234A intact
+- [x] Normal Approve/Keep/Reject actions unchanged
+- [x] No console errors
+
+**Live sanity result:** 16/16 PASS (D-236B, 2026-06-29)
 
 ---
 
@@ -215,8 +218,17 @@ D-236A added content to the `renderReviewInspectPanel` Similar claim field and t
 - **No auto-submit:** Confirmed — API call only inside `onConfirm`
 - **No duplicate/advisory semantics change:** Confirmed
 - **No merge/canonical behavior added:** Confirmed
-- **Explicit confirmation still required:** Confirmed
+- **Explicit confirmation still required:** Confirmed — "Mark Duplicate" button click required
+- **Cancel does not mutate queue:** Confirmed — closing modal without confirm leaves queue unchanged
 - **Copy ID from D-235A remains available:** Confirmed
 - **Raw ID remains visible/selectable:** Confirmed
 - **No public profile exposure:** Confirmed
-- **Deploy needed:** Yes
+- **Resolve-similar scroll from D-233B:** Confirmed intact
+- **D-234A similar advisory display:** Confirmed intact
+- **Normal moderation actions (Approve/Keep/Reject):** Confirmed unchanged
+- **Deploy needed:** Yes — owner deploy complete (D-236B)
+- **Owner deploy:** PASS
+- **Live duplicate-target prefill sanity:** PASS — "Use as duplicate target" button opens mark-duplicate modal with canonical ID pre-filled; prefill note visible; explicit confirm required; cancel safe; existing one-arg callers unaffected
+- **Hardening smoke:** 2485 passed / 0 failed
+- **Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug` — D-218A documented)
+- **D-236B live sanity:** 16/16 PASS
