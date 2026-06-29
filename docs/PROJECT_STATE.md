@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-29 after D-238A duplicate advisory milestone checkpoint.
-Previous checkpoint: 2026-06-29 after D-232A review ergonomics milestone checkpoint.
+Last updated: 2026-06-29 after D-241A review-to-study navigation milestone checkpoint.
+Previous checkpoint: 2026-06-29 after D-238A duplicate advisory milestone checkpoint.
 
 ---
 
@@ -23,11 +23,12 @@ Previous checkpoint: 2026-06-29 after D-232A review ergonomics milestone checkpo
 |------|-------|
 | **Pre-D-227 stable HEAD** | `f286300` (D-226A public profile milestone checkpoint) |
 | **D-232A checkpoint HEAD** | see `docs/README.md` — D-232A review ergonomics milestone |
-| **D-238A checkpoint HEAD** | see `docs/README.md` after commit (D-238A duplicate advisory milestone) |
+| **D-238A checkpoint HEAD** | see `docs/README.md` — D-238A duplicate advisory milestone |
+| **D-241A checkpoint HEAD** | see `docs/README.md` after commit (D-241A review-to-study navigation milestone) |
 
 ---
 
-## Current baseline (as of D-238A)
+## Current baseline (as of D-241A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -41,7 +42,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2526 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2573 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -156,6 +157,37 @@ This arc delivered UX improvements to the duplicate/similar-claim advisory workf
 
 ---
 
+## D-239 → D-240 review-to-study navigation mini-arc summary
+
+This arc audited and improved the moderator navigation path from Review queue into Study View and back. The core fix closes D-239A F-1: `backToArena()` now scrolls to the restored review card after returning from Study. One line of code added, locked by 47 new smoke tests (17 in D-239B + 30 in D-240A).
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-239A | `23b6a39` | Audit | Review-to-study navigation audit — 5 findings; identified F-1 scroll gap; docs only |
+| D-239B | `5c12a10` | Feature | Back-to-Review scroll restore — `if (_savedId) requestAnimationFrame(() => scrollToReviewAnchor(_savedId))` added to `backToArena()` review branch; 17 tests |
+| D-239C | `725f486` | Live closeout | D-239B confirmed live; 13/13 PASS |
+| D-240A | `cab9952` | Regression lock | 30 tests across 7 categories — review-origin capture, Study header, item restore, RAF scroll, compat (D-227/228/229/230/233/236), public exposure, deploy integrity |
+
+**Tests added in arc:** 17 + 30 = **47 new tests** (2573 total after D-240A).
+**Deploys required in arc:** 1 (D-239C — owner manual terminal deploy).
+**D-239A and D-240A:** Docs / tests only — no deploy needed.
+
+---
+
+## Review-to-Study navigation current behavior (post D-239→D-240)
+
+| Feature | Behavior |
+|---------|---------|
+| Study entry from Review | All five inspect-panel Study buttons call `openReviewClaimStudy(id)` → sets `lastModeBeforeStudy='review'` + saves `lastInspectedReviewItemId`; navigates to Study View |
+| Study header back button | `'← Back to Review'` rendered when `lastModeBeforeStudy === 'review'`; `data-action="backToArena"` |
+| Back-to-Review item restore | `backToArena()` review branch: restores `inspectedReviewItem` from saved `lastInspectedReviewItemId`; calls `setMode('review')` → re-renders review page with inspect panel |
+| Post-render scroll (D-239B) | `if (_savedId) requestAnimationFrame(() => scrollToReviewAnchor(_savedId))` — deferred until after DOM write; null-safe guard |
+| No queue reload | `loadReviewQueue()` NOT called on return — cached `reviewQueue.review` array used |
+| Non-review origins | vault / truths / me / arena branches in `backToArena()` unchanged |
+| Browser history | No `pushState` / `replaceState` — no history changes |
+
+---
+
 ## Duplicate advisory current behavior (post D-233→D-237)
 
 | Feature | Behavior |
@@ -223,6 +255,8 @@ This arc delivered UX improvements to the duplicate/similar-claim advisory workf
 | No new public data fields in D-227→D-231 | **Confirmed** — zero new API/schema fields | D-231A |
 | Duplicate advisory markers in public profile | **Blocked** — `copySimilarClaimId`, `markDuplicateUI`, `resolveSimilarUI`, "Similar claim advisory", "Use as duplicate target", prefill CSS classes, and all review advisory internals confirmed absent from `renderPublicProfileHtml` | D-237A |
 | No new public data fields in D-233→D-237 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-237A |
+| Review-to-Study internals in public profile | **Blocked** — `openReviewClaimStudy`, `backToArena`, `lastModeBeforeStudy`, `lastInspectedReviewItemId`, and "← Back to Review" confirmed absent from `renderPublicProfileHtml` | D-240A |
+| No new public data fields in D-239→D-240 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-240A |
 
 ---
 
@@ -250,7 +284,11 @@ This arc delivered UX improvements to the duplicate/similar-claim advisory workf
 | D-235A | Owner deploy PASS — D-235B confirmed live (14/14) |
 | D-236A | Owner deploy PASS — D-236B confirmed live (16/16) |
 | D-237A | Tests / docs only — no deploy needed |
-| D-238A (this task) | Docs only — **no deploy needed** |
+| D-238A | Docs only — no deploy needed |
+| D-239A | Audit / docs only — no deploy needed |
+| D-239B | Owner deploy PASS — D-239C confirmed live (13/13) |
+| D-240A | Tests / docs only — no deploy needed |
+| D-241A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -300,6 +338,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 16. **New worker-route warnings** — do not hide new worker-route warnings behind the known `/api/u/:slug` warning. Any new WARN text not matching the exact known-warn string must be investigated immediately before being added to `KNOWN_PARAM_ROUTES`.
 
+17. **D-240A review-to-study navigation lock** — any change to `openReviewClaimStudy`, `backToArena`, Study view rendering, or `lastModeBeforeStudy`/`lastInspectedReviewItemId` state must either pass all D-240A regression tests unchanged, or update the D-240A lock with explicit owner approval before merging.
+
+18. **No browser history rewriting without spec** — do not add `pushState`, `replaceState`, or `hashchange`-based navigation to the Review/Study flow without a separate navigation spec document reviewed by the owner.
+
+19. **No queue reload on Back-to-Review** — do not add `loadReviewQueue()` to the `backToArena()` return path without a deliberate spec. Stale-queue behavior on return is correct and expected.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -320,7 +364,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| Open related claim navigation audit | After "↗ Study" or "Use as duplicate target", no explicit back-to-review flow — could be improved |
+| Review queue next-item flow audit | After a decision, auto-advance to next pending item — natural follow-on to D-239 navigation work |
+| Open related claim / Study navigation follow-up | D-239A F-2–F-5 remaining: button prominence, browser-back support, Study entry button style consistency |
 | Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 | Review queue next-item flow | After a decision, auto-advance to next pending item in queue |
 | Compact review card metadata/status chips | Denser card for long queues — better scan without opening inspect |
@@ -343,7 +388,7 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 ---
 
-## Full batch history (A-2 → D-232A)
+## Full batch history (A-2 → D-241A)
 
 | Batch | Commit | Change |
 |-------|--------|--------|
@@ -456,4 +501,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-236A | `3136539` | Duplicate-target prefill — "Use as duplicate target" button; `markDuplicateUI(claimId, suggestedCanonicalId='')` optional param; prefill-only; 18 tests + 6 window fixes |
 | D-236B | `f6c48ae` | D-236A confirmed live; 16/16 PASS |
 | D-237A | `959b343` | Duplicate advisory workflow regression lock — 41 tests across 7 categories |
-| D-238A | TBD | **[Current]** Duplicate advisory milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-238A | TBD | Duplicate advisory milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-239A | `23b6a39` | **[Arc start]** Review-to-study navigation audit — 5 findings; F-1 scroll gap identified; docs only |
+| D-239B | `5c12a10` | Back-to-Review scroll restore — `requestAnimationFrame(scrollToReviewAnchor(_savedId))` in `backToArena()`; 17 tests |
+| D-239C | `725f486` | D-239B confirmed live; 13/13 PASS |
+| D-240A | `cab9952` | Review-to-study navigation regression lock — 30 tests across 7 categories |
+| D-241A | TBD | **[Current]** Review-to-study navigation milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |

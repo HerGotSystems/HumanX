@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-238A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc, current baseline 2526/0/24/57, privacy boundary state, deployment state, safe next-work rules.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-241A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc, current baseline 2573/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D240A_REVIEW_TO_STUDY_NAVIGATION_REGRESSION_LOCK.md` ⭐ CURRENT — D-240A REVIEW-TO-STUDY NAVIGATION REGRESSION LOCK
+### `D241A_REVIEW_TO_STUDY_NAVIGATION_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-241A REVIEW-TO-STUDY NAVIGATION MILESTONE CHECKPOINT
+
+Docs only. Deploy not needed. Baseline: 2573/0/24/57. Closes the D-239→D-240 review-to-study navigation mini-arc: 47 new tests total (17+30), 1 owner deploy (D-239B/C). PROJECT_STATE.md updated with arc summary, review-to-study behavior table, privacy boundary entries, deployment state, and 3 new safe-next-work rules. Review-origin capture, Back-to-Review button, inspected item restore, post-render RAF scroll, no-queue-reload, no pushState, and public exposure isolation all confirmed and locked. No app/CSS/worker/backend/API/migration/schema/CSP/external asset changes.
+
+### `D240A_REVIEW_TO_STUDY_NAVIGATION_REGRESSION_LOCK.md` — D-240A REVIEW-TO-STUDY NAVIGATION REGRESSION LOCK
 
 Tests + docs only. Deploy not needed. Baseline: 2573/0/24/57. Locks D-239A/D-239B behavior: 30 new regression tests covering review-origin capture (openReviewClaimStudy sets lastModeBeforeStudy + lastInspectedReviewItemId), Study header "← Back to Review" wiring, backToArena() item restore + setMode("review"), post-render RAF scroll (scrollToReviewAnchor(_savedId) guarded by _savedId), no-queue-reload guarantee, no pushState, D-227B/D-228A/D-229A/D-230A/D-233B/D-236A compat, public exposure isolation (5 checks), and deploy integrity. App/CSS/worker unchanged. No backend/API/migration/schema/CSP/external asset changes. Future rule: any Review/Study navigation change must preserve this lock or update it with owner approval.
 
