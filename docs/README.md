@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1914 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1933 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D210_REFLECTION_AVATAR_CLOSEOUT.md` ⭐ CURRENT — D-210C REFLECTION AVATAR CLOSEOUT
+### `D211A_REFLECTION_AVATAR_TRANSPARENCY.md` ⭐ CURRENT — D-211A REFLECTION AVATAR TRANSPARENCY
+
+Frontend-only. Adds a native `<details>`/`<summary>` "How this is formed" disclosure block inside the existing private `meReflectionAvatarHtml(data)` card. Present in both populated and empty states. Explains data source (private activity only), lists three source signals with live counts (Evidence added, Pressure checks, Tests created), and states the non-ranking disclaimer ("not a score, rank, diagnosis, ideology, morality label, intelligence label, or truth rating"). No new JS state, no new fetch, no backend change, no migration, no public profile change. New CSS: `.me-avatar-why`, `.me-avatar-why-summary`, `.me-avatar-why-body`, `.me-avatar-why-list`. 19 new D-211A smoke tests. Baseline 1933/24/57. ⚠ PENDING OWNER DEPLOY + LIVE SANITY.
+
+### `D210_REFLECTION_AVATAR_CLOSEOUT.md` — D-210C REFLECTION AVATAR CLOSEOUT
 
 D-210A/B/C arc closeout. D-210A: guardrail spec (forbidden dimensions, safe metaphors, privacy model, required copy). D-210B: private static Reflection Avatar concept card in My HumanX — `meReflectionAvatarHtml(data)`, frontend-only (app-v10.js + styles.css), derives 2–4 safe habit chips from private payload, guardrail copy and private notice hardcoded, not called from public profile render, no backend, no migration. 28 D-210B smoke tests. Baseline 1914/24/57. Live sanity PASS — owner manual deploy (CC Wrangler had certificate/proxy/VPN issue); card appeared after Belief reflection, before Recent Truths; neutral habit chips only; guardrail and private-notice copy confirmed; no public avatar exposure; no forbidden wording on public profile.
 

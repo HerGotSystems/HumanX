@@ -722,6 +722,14 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .me-avatar-chip-row{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 8px}
 .me-avatar-chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;background:var(--panel2,rgba(87,184,255,.1));color:var(--muted);border:1px solid var(--line)}
 .me-avatar-note{margin:6px 0 0;font-size:11px;color:var(--muted);font-style:italic}
+.me-avatar-why{margin:8px 0 4px;border-top:1px solid var(--line);padding-top:6px}
+.me-avatar-why-summary{font-size:11px;color:var(--muted);cursor:pointer;user-select:none;list-style:none}
+.me-avatar-why-summary::-webkit-details-marker{display:none}
+.me-avatar-why-summary::before{content:'▸ '}
+details[open].me-avatar-why .me-avatar-why-summary::before{content:'▾ '}
+.me-avatar-why-body{margin-top:6px}
+.me-avatar-why-body p{margin:0 0 4px;font-size:11px;color:var(--muted)}
+.me-avatar-why-list{margin:2px 0 4px 14px;padding:0;font-size:11px;color:var(--muted)}
 .me-profile-settings label{display:block;font-size:11px;color:var(--muted);margin:8px 0 3px}
 .me-profile-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);margin-top:4px}
 .me-profile-toggle input{width:auto}
