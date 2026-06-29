@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2257 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2275 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-219A (2026-06-29). Covers full D-210→D-218 hardening arc, current baseline, privacy boundary state, deployment state, safe next-work rules.
 
-### `D223A_PUBLIC_PROFILE_SECTION_NAV.md` ⭐ CURRENT — D-223A/D-223B PUBLIC PROFILE SECTION NAVIGATION LIVE PASS
+### `D224A_PUBLIC_PROFILE_EMPTY_STATES.md` ⭐ CURRENT — D-224A PUBLIC PROFILE EMPTY-STATE POLISH (PENDING DEPLOY)
+
+Frontend/CSS + tests + docs. **Deploy needed: yes** (app-v10.js and styles.css changed). No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Polishes empty states for snapshot/claims/truths: snapshot renders styled `pp-empty-card` with `id="public-snapshot"` always (no longer returns empty string — `id` target always present); claims and truths empty states changed from `p.pp-empty` to `div.pp-empty-card + p.pp-empty-title`. Snapshot nav link in section nav now always rendered (no longer conditional on `sn`). New CSS: `.pp-empty-card`, `.pp-empty-title`, `.pp-empty-note`. D-216A allowlist +5 entries. D-142C/D-154B/D-208B window extended for longer function. D-223A snapshot conditional test updated (D-224A: now always present). 13 new D-224A tests (+5 allowlist forEach). Baseline 2275/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
+
+### `D223A_PUBLIC_PROFILE_SECTION_NAV.md` — D-223A/D-223B PUBLIC PROFILE SECTION NAVIGATION LIVE PASS
 
 Frontend/CSS + tests + docs. **Deploy: LIVE** — owner deployed from terminal; D-223B live sanity all PASS. No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Adds `<nav aria-label="Public profile sections">` row with anchor links to Snapshot (conditional on sn), Claims, Truths, and About sections; adds matching `id` attributes to existing section elements (`public-claims`, `public-truths`, `public-about` in orchestrator; `public-snapshot` in `renderPublicProfileSnapshotHtml`). Pure HTML anchors — no JS. `.pp-section-nav` / `.pp-nav-link` CSS classes with hover, focus-visible, and mobile flex-wrap. D-216A allowlist updated: +7 entries. D-141B test window extended for longer function. 13 new D-223A tests (+7 allowlist forEach). Baseline 2257/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
 

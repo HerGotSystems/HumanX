@@ -832,7 +832,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2216,7 +2216,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -7573,11 +7573,11 @@ test('D-141B/D-223A: public profile recent sections use a dedicated card/section
   assert.ok(sectionCount === 4, 'all four recent-activity sections (claims/truths/evidence/pressure) must use the pp-section class');
 });
 
-test('D-141B/D-158B: claims empty state uses pp-empty class; secondary section functions suppress when empty (D-158B)', () => {
+test('D-141B/D-158B/D-224A: claims empty state uses pp-empty-card class; secondary section functions suppress when empty (D-158B, D-224A: restyled from pp-empty)', () => {
   // Claims always shows its empty state (informative absence)
   const claimsIdx = appSrc.indexOf('function renderPublicProfileClaimsHtml');
   const claimsSlice = appSrc.slice(claimsIdx, claimsIdx + 200);
-  assert.ok(claimsSlice.includes('class="small pp-empty"'), 'renderPublicProfileClaimsHtml must render its empty state with the pp-empty class');
+  assert.ok(claimsSlice.includes('pp-empty-card'), 'renderPublicProfileClaimsHtml must render its empty state with the pp-empty-card class (D-224A)');
   // D-158B: evidence/pressure suppress the whole section when empty (return '')
   // D-220A: renderPublicProfileTruthsHtml now returns an empty-state message instead of '' (always renders section)
   for (const fn of ['renderPublicProfileEvidenceHtml', 'renderPublicProfilePressureHtml']) {
@@ -7868,9 +7868,9 @@ test('D-142B→D-209B: Me preview required wording exists (guardrail disclaimers
   );
 });
 
-test('D-142B/D-142C/D-154B→D-208B: public profile snapshot card uses third-person wording and privacy-safe field set (dominantPattern and topAlignmentName removed in D-208B)', () => {
+test('D-142B/D-142C/D-154B→D-208B/D-224A: public profile snapshot card uses third-person wording and privacy-safe field set (D-224A: window extended for empty-state return)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 1200);
+  const slice = appSrc.slice(idx, idx + 1700);
   assert.ok(
     slice.includes('not their complete profile') &&
     slice.includes('from their own self-submitted answers, not a diagnosis or personality test') &&
@@ -8016,20 +8016,20 @@ test('D-142C: public shared snapshot card title is "Shared Belief Snapshot"', ()
   assert.ok(slice.includes('<h3>Shared Belief Snapshot</h3>'), 'renderPublicProfileSnapshotHtml must title the card "Shared Belief Snapshot"');
 });
 
-test('D-142C/D-154B: public card disclaimer contains required wording (consolidated in D-154B)', () => {
-  // D-209H: function grew; use larger slice
+test('D-142C/D-154B/D-224A: public card disclaimer contains required wording (D-224A: window extended for empty-state return)', () => {
+  // D-209H: function grew; use larger slice; D-224A: extended further for empty-state prefix
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 1000);
+  const slice = appSrc.slice(idx, idx + 1300);
   assert.ok(
     slice.includes('A snapshot this person chose to share — pattern observations from their own self-submitted answers, not a diagnosis or personality test.'),
     'renderPublicProfileSnapshotHtml must retain the required disclaimer wording'
   );
 });
 
-test('D-142C/D-154B: public card contains "One snapshot, shared by choice" (consolidated in D-154B)', () => {
-  // D-209H: function grew; use larger slice
+test('D-142C/D-154B/D-224A: public card contains "One snapshot, shared by choice" (D-224A: window extended for empty-state return)', () => {
+  // D-209H: function grew; use larger slice; D-224A: extended further for empty-state prefix
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 1000);
+  const slice = appSrc.slice(idx, idx + 1300);
   assert.ok(slice.includes('One snapshot, shared by choice — not their complete profile.'), 'renderPublicProfileSnapshotHtml must retain the required "one snapshot" wording');
 });
 
@@ -8043,9 +8043,9 @@ test('D-142C→D-208B: dominantPattern not rendered on public card (removed in D
   );
 });
 
-test('D-142C→D-208B: public card shows contradictionCount and createdAt but never raw fields or identity labels', () => {
+test('D-142C→D-208B/D-224A: public card shows contradictionCount and createdAt but never raw fields or identity labels (D-224A: window extended)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 1200);
+  const slice = appSrc.slice(idx, idx + 1700);
   assert.ok(
     slice.includes('s.contradictionCount') &&
     slice.includes('s.createdAt') &&
@@ -8056,10 +8056,12 @@ test('D-142C→D-208B: public card shows contradictionCount and createdAt but ne
   );
 });
 
-test('D-142C: public card renders nothing when no sharedSnapshot exists', () => {
+test('D-142C/D-224A: public card renders snapshot empty-state when no sharedSnapshot exists (D-224A: changed from return empty string to styled empty-state card)', () => {
   const idx = appSrc.indexOf('function renderPublicProfileSnapshotHtml');
-  const slice = appSrc.slice(idx, idx + 100);
-  assert.ok(slice.includes("if(!s)return''"), 'renderPublicProfileSnapshotHtml must return an empty string (no placeholder) when s is falsy');
+  const slice = appSrc.slice(idx, idx + 300);
+  // D-224A intentionally changed from if(!s)return'' to return a styled empty-state card
+  assert.ok(!slice.includes("if(!s)return''"), 'D-224A: renderPublicProfileSnapshotHtml must no longer return empty string — it returns an empty-state card');
+  assert.ok(slice.includes('pp-empty-card'), 'D-224A: renderPublicProfileSnapshotHtml must return pp-empty-card when no snapshot exists');
 });
 
 test('D-142C: no raw_json/stress_points_json/dimensions_json/contradictions_json exposure anywhere in the snapshot UI', () => {
@@ -10270,13 +10272,13 @@ test('D-158B/D-220A: counts card position — before snapshot, not between truth
   assert.ok(truthsAt === -1 || evidenceAt === -1 || countsAt < truthsAt, 'D-220A: countsCard must not appear between truths and evidence sections');
 });
 
-test('D-158B/D-220A: renderPublicProfileTruthsHtml — D-220A changed: returns empty-state message not empty string', () => {
+test('D-158B/D-220A/D-224A: renderPublicProfileTruthsHtml — D-224A changed: returns pp-empty-card styled div', () => {
   const fn = appSrc.match(/function renderPublicProfileTruthsHtml[\s\S]*?^function /m)?.[0] || '';
-  // D-220A intentionally changed renderPublicProfileTruthsHtml to return an empty-state p.pp-empty
-  // instead of '' — the truths section now always renders (consistent with claims section behaviour)
+  // D-220A: changed to return empty-state message instead of ''
+  // D-224A: restyled from p.pp-empty to div.pp-empty-card
   assert.ok(
-    fn.includes('pp-empty') && fn.includes('No public truths'),
-    'D-220A: renderPublicProfileTruthsHtml must return a pp-empty paragraph for empty rows, not empty string'
+    fn.includes('pp-empty-card') && fn.includes('No public truths'),
+    'D-224A: renderPublicProfileTruthsHtml must return a pp-empty-card div for empty rows (restyled from pp-empty)'
   );
 });
 
@@ -10296,11 +10298,11 @@ test('D-158B: renderPublicProfilePressureHtml returns empty string for empty row
   );
 });
 
-test('D-158B: renderPublicProfileClaimsHtml retains empty-state paragraph (claims always shown)', () => {
+test('D-158B/D-224A: renderPublicProfileClaimsHtml retains empty-state (D-224A: restyled to pp-empty-card)', () => {
   const fn = appSrc.match(/function renderPublicProfileClaimsHtml[\s\S]*?^function /m)?.[0] || '';
   assert.ok(
-    fn.includes('pp-empty') && fn.includes('No public claims yet'),
-    'renderPublicProfileClaimsHtml must keep its empty-state paragraph — claims absence is informative'
+    fn.includes('pp-empty-card') && fn.includes('No public claims yet'),
+    'renderPublicProfileClaimsHtml must keep its empty-state — D-224A restyled to pp-empty-card'
   );
 });
 
@@ -16171,6 +16173,9 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     'pp-section-nav', 'pp-nav-link',
     'public-snapshot', 'public-claims', 'public-truths', 'public-about',
     'Public profile sections',
+    // D-224A: empty-state classes and public-safe copy
+    'pp-empty-card', 'pp-empty-title', 'pp-empty-note',
+    'No public snapshot shared yet.', 'Public sections appear here when shared.',
   ];
 
   // What must NEVER appear in the public render content helpers
@@ -16709,8 +16714,9 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
     assert.ok(d223OrchSrc.includes('href="#public-about"'), 'section nav must link to #public-about');
   });
 
-  test('D-223A: snapshot nav link is conditional on sn (absent when no snapshot)', () => {
-    assert.ok(d223OrchSrc.includes('sn?') && d223OrchSrc.includes('href="#public-snapshot"'), 'snapshot nav link must be gated by sn');
+  test('D-223A/D-224A: snapshot nav link always present in section nav (D-224A: removed conditional — snapshot always has anchor target)', () => {
+    assert.ok(d223OrchSrc.includes('href="#public-snapshot"'), 'snapshot nav link must link to #public-snapshot');
+    assert.ok(!d223OrchSrc.includes("sn?'<a href=\"#public-snapshot\""), 'D-224A: snapshot nav link must not be conditional on sn — always rendered');
   });
 
   test('D-223A: id="public-claims" present on claims section', () => {
@@ -16753,6 +16759,91 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
 
   test('D-223A: README references D223A', () => {
     assert.ok(readmeSrc.includes('D223A'), 'README must reference D-223A section navigation');
+  });
+}
+
+// ── D-224A: Public Profile empty-state polish ─────────────────────────────────
+{
+  const d224SnapStart = appSrc.indexOf('function renderPublicProfileSnapshotHtml(');
+  const d224SnapEnd = appSrc.indexOf('\nfunction copyPublicProfileLink(');
+  const d224SnapSrc = appSrc.slice(d224SnapStart, d224SnapEnd > -1 ? d224SnapEnd : d224SnapStart + 1200);
+
+  const d224ClaimsStart = appSrc.indexOf('function renderPublicProfileClaimsHtml');
+  const d224ClaimsSrc = appSrc.slice(d224ClaimsStart, d224ClaimsStart + 250);
+
+  const d224TruthsStart = appSrc.indexOf('function renderPublicProfileTruthsHtml');
+  const d224TruthsSrc = appSrc.slice(d224TruthsStart, d224TruthsStart + 200);
+
+  const d224OrchStart = appSrc.indexOf('\nfunction renderPublicProfileHtml(');
+  const d224OrchEnd = appSrc.indexOf('\nasync function renderPublicProfile(');
+  const d224OrchSrc = appSrc.slice(d224OrchStart, d224OrchEnd > -1 ? d224OrchEnd : d224OrchStart + 5000);
+
+  test('D-224A: snapshot empty-state renders id="public-snapshot" when no snapshot', () => {
+    assert.ok(d224SnapSrc.includes('id="public-snapshot"'), 'renderPublicProfileSnapshotHtml must always emit id="public-snapshot" (both empty and real states)');
+    const emptyReturn = d224SnapSrc.match(/if\(!s\)return'([^']+)'/)?.[1] || '';
+    assert.ok(emptyReturn.includes('id="public-snapshot"'), 'renderPublicProfileSnapshotHtml empty-state return must include id="public-snapshot"');
+  });
+
+  test('D-224A: snapshot empty-state uses pp-empty-card class', () => {
+    const emptyReturn = d224SnapSrc.match(/if\(!s\)return'([^']+)'/)?.[1] || '';
+    assert.ok(emptyReturn.includes('pp-empty-card'), 'snapshot empty-state must use pp-empty-card class');
+  });
+
+  test('D-224A: snapshot empty-state copy is public-safe — "No public snapshot shared yet."', () => {
+    const emptyReturn = d224SnapSrc.match(/if\(!s\)return'([^']+)'/)?.[1] || '';
+    assert.ok(emptyReturn.includes('No public snapshot shared yet.'), 'snapshot empty state must say "No public snapshot shared yet."');
+    assert.ok(!emptyReturn.includes('private') && !emptyReturn.includes('hidden'), 'snapshot empty state must not imply private or hidden data');
+  });
+
+  test('D-224A: snapshot empty-state secondary note uses pp-empty-note and public-safe copy', () => {
+    const emptyReturn = d224SnapSrc.match(/if\(!s\)return'([^']+)'/)?.[1] || '';
+    assert.ok(emptyReturn.includes('pp-empty-note'), 'snapshot empty-state must include pp-empty-note element');
+    assert.ok(emptyReturn.includes('Public sections appear here when shared.'), 'snapshot empty-state note must say "Public sections appear here when shared."');
+  });
+
+  test('D-224A: claims empty-state uses pp-empty-card class', () => {
+    assert.ok(d224ClaimsSrc.includes('pp-empty-card'), 'renderPublicProfileClaimsHtml empty state must use pp-empty-card class');
+  });
+
+  test('D-224A: claims empty-state copy is public-safe — "No public claims yet."', () => {
+    assert.ok(d224ClaimsSrc.includes('No public claims yet.'), 'claims empty state must say "No public claims yet."');
+    assert.ok(!d224ClaimsSrc.includes('private') && !d224ClaimsSrc.includes('hidden'), 'claims empty state must not imply private or hidden data');
+  });
+
+  test('D-224A: truths empty-state uses pp-empty-card class', () => {
+    assert.ok(d224TruthsSrc.includes('pp-empty-card'), 'renderPublicProfileTruthsHtml empty state must use pp-empty-card class');
+  });
+
+  test('D-224A: truths empty-state copy is public-safe — "No public truths on this profile yet."', () => {
+    assert.ok(d224TruthsSrc.includes('No public truths on this profile yet.'), 'truths empty state must say "No public truths on this profile yet."');
+    assert.ok(!d224TruthsSrc.includes('private') && !d224TruthsSrc.includes('hidden'), 'truths empty state must not imply private or hidden data');
+  });
+
+  test('D-224A: empty states do not contain forbidden wording', () => {
+    const allEmpty = d224SnapSrc + d224ClaimsSrc + d224TruthsSrc;
+    const forbidden = ['truth level', 'purity', 'ideology', 'smart score', 'HumanX rank', 'good believer', 'bad believer', 'diagnosis', 'localStorage', 'My HumanX'];
+    for (const word of forbidden) {
+      assert.ok(!allEmpty.slice(0, 600).includes(word), `empty states must not contain forbidden wording: "${word}"`);
+    }
+  });
+
+  test('D-224A: snapshot section nav link is always present (not conditional on sn)', () => {
+    assert.ok(d224OrchSrc.includes('href="#public-snapshot"'), 'section nav must always link to #public-snapshot');
+    assert.ok(!d224OrchSrc.includes("sn?'<a href=\"#public-snapshot\""), 'D-224A: snapshot nav link must not be conditional on sn');
+  });
+
+  test('D-224A: pp-empty-card CSS defined', () => {
+    assert.ok(cssSrc.includes('.pp-empty-card'), 'CSS must define .pp-empty-card');
+    assert.ok(cssSrc.includes('text-align:center'), 'pp-empty-card must include text-align:center for calm presentation');
+  });
+
+  test('D-224A: pp-empty-title and pp-empty-note CSS defined', () => {
+    assert.ok(cssSrc.includes('.pp-empty-title'), 'CSS must define .pp-empty-title');
+    assert.ok(cssSrc.includes('.pp-empty-note'), 'CSS must define .pp-empty-note');
+  });
+
+  test('D-224A: deploy integrity — D-224A absent from worker.js', () => {
+    assert.ok(!workerSrc.includes('D-224A'), 'D-224A must not modify worker.js');
   });
 }
 

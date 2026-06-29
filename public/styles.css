@@ -799,6 +799,10 @@ details[open].me-avatar-why .me-avatar-why-summary::before{content:'▾ '}
 .pp-copy-link{margin-top:6px;align-self:flex-start}
 .pp-copy-link:focus-visible{outline:2px solid var(--blue,#57b8ff);outline-offset:2px;border-radius:2px}
 @media(max-width:640px){.pp-copy-link{min-height:44px;padding:10px 12px;align-self:stretch}}
+/* D-224A: public profile empty-state styling */
+.pp-empty-card{padding:16px 0 8px;text-align:center}
+.pp-empty-title{color:var(--muted,#8892a4);font-size:13px;margin:0 0 4px}
+.pp-empty-note{color:var(--muted,#8892a4);font-size:12px;margin:0}
 /* D-185B mobile quick fixes */
 @media(max-width:500px){.verdict-qualifier{display:none}.me-profile-actions{flex-direction:column}}
 @media(max-width:400px){.account-panel-popover{max-width:calc(100vw - 16px)}}
