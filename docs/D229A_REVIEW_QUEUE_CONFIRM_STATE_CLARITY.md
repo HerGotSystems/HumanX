@@ -1,7 +1,7 @@
 # D-229A — Review Queue Confirm-State Clarity
 
 **Scope:** App + CSS + tests + docs
-**Status:** COMPLETE — owner deploy needed
+**Status:** COMPLETE — live PASS (D-229B)
 **Baseline:** 2347 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D229A_REVIEW_QUEUE_CONFIRM_STATE_CLARITY.md`, `docs/README.md`
 **App UI changes:** Yes — `reviewCard` and `renderReviewInspectPanel`
@@ -130,34 +130,36 @@ Confirmed. All changes are frontend HTML attributes, CSS classes, and copy only.
 
 ---
 
-## Live sanity checklist — pending owner deploy
+## Live sanity checklist — D-229B PASS (2026-06-29)
 
-Owner deploy required before marking live PASS (D-229B).
+Owner deploy completed from terminal. All 23 live sanity items confirmed PASS.
 
-- [ ] Deploy via `wrangler deploy` from owner terminal
-- [ ] Open Review tab with admin token
-- [ ] Click Reject on a card — confirm card border turns red + `review-confirm-armed` outline appears on actions
-- [ ] Confirm `data-review-confirming="reject"` on the card article in DevTools
-- [ ] Click Cancel — confirm armed styling clears
-- [ ] Click Approve on a card — confirm card border turns green + `review-confirm-armed` appears
-- [ ] Confirm `data-review-confirming="approve"` on the card article in DevTools
-- [ ] Click Cancel — confirm armed styling clears
-- [ ] Inspect a card, then arm Reject in the panel — confirm inspect actions show `review-confirm-armed`
-- [ ] Confirm `data-review-confirming="reject"` on inspect actions div in DevTools
-- [ ] Inspect a card, then arm Approve in the panel — confirm approve confirm button appears
-- [ ] Confirm `data-review-confirming="approve"` on inspect actions div in DevTools
-- [ ] If a rejected test artefact is present: arm Archive — confirm amber msg and amber confirm button
-- [ ] Confirm Archive uses `btn-cleanup-confirm` (amber) not red button
-- [ ] Complete Approve — confirm decision completes, toast appears, queue re-renders
-- [ ] Complete Reject — confirm decision completes as before
-- [ ] Keep Pending — confirm as before
-- [ ] Keyboard A arm → A confirm — confirm decision completes correctly
-- [ ] Keyboard R arm → R reject — confirm decision completes correctly
-- [ ] D-227B: Inspect still marks selected card and scrolls it into view
-- [ ] D-228A: Filter/sort still preserve scroll position
-- [ ] Public profile page unchanged — no confirm-state classes
-- [ ] No console errors
-- [ ] No backend/API behavior changed
+- [x] Deploy via `wrangler deploy` from owner terminal — PASS
+- [x] Open Review tab with admin token — PASS
+- [x] Queue loads without console-breaking errors — PASS
+- [x] Arming Reject clearly shows reject confirm state — PASS
+- [x] Reject armed card/panel has `data-review-confirming="reject"` — PASS
+- [x] Reject armed actions have `review-confirm-armed` — PASS
+- [x] Reject confirm/cancel still work — PASS
+- [x] Arming Approve clearly shows approve confirm state — PASS
+- [x] Approve armed card/panel has `data-review-confirming="approve"` — PASS
+- [x] Approve armed card has `review-card-approve-pending` (green border) — PASS
+- [x] Approve confirm/cancel still work — PASS
+- [x] Arming Keep/Cleanup clearly shows neutral cleanup/keep confirm state — PASS
+- [x] Cleanup armed panel has `data-review-confirming="cleanup"` — PASS
+- [x] Cleanup confirm/cancel still work — PASS (amber button, not red)
+- [x] Confirm copy is understandable and not scary/overstated — PASS
+- [x] Two-step confirm behavior unchanged — PASS
+- [x] Keyboard shortcuts unchanged — PASS
+- [x] Filters/sort unchanged — PASS
+- [x] D-227B selected-card marker still works — PASS
+- [x] D-228A scroll preservation still works for confirm arm/cancel — PASS
+- [x] Public profile pages do not contain review confirm classes/copy — PASS
+- [x] No backend/API behavior changed — PASS
+- [x] No console errors — PASS
+
+**Hardening smoke (post-deploy):** 2347 passed / 0 failed
+**Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug`)
 
 ---
 
@@ -168,4 +170,4 @@ Owner deploy required before marking live PASS (D-229B).
 - **No Reflection Avatar / public avatar exposure:** Confirmed
 - **No backend/API/migration/schema/CSP/external asset changes:** Confirmed
 - **No moderation semantics change:** Confirmed
-- **Deploy needed:** Yes — owner deploy + browser sanity before marking live PASS
+- **Deploy needed:** No — deploy complete, live PASS recorded (D-229B)
