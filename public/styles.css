@@ -786,6 +786,9 @@ details[open].me-avatar-why .me-avatar-why-summary::before{content:'▾ '}
 .pp-vocab-summary:focus-visible{outline:2px solid var(--blue,#57b8ff);outline-offset:2px;border-radius:2px}
 /* D-220A: action buttons row inside public-profile claim item rows */
 .pp-item-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line);width:100%}
+/* D-221A: focus-visible and mobile touch for public profile action buttons */
+.pp-item-actions .btn-mini:focus-visible{outline:2px solid var(--blue,#57b8ff);outline-offset:2px;border-radius:2px}
+@media(max-width:640px){.pp-item-actions .btn-mini{min-height:44px;padding:10px 12px}}
 /* D-185B mobile quick fixes */
 @media(max-width:500px){.verdict-qualifier{display:none}.me-profile-actions{flex-direction:column}}
 @media(max-width:400px){.account-panel-popover{max-width:calc(100vw - 16px)}}

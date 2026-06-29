@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2209 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2221 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-219A (2026-06-29). Covers full D-210→D-218 hardening arc, current baseline, privacy boundary state, deployment state, safe next-work rules.
 
-### `D220A_PUBLIC_PROFILE_VISUAL_POLISH.md` ⭐ CURRENT — D-220A/D-220B PUBLIC PROFILE VISUAL POLISH LIVE PASS
+### `D221A_PUBLIC_PROFILE_ACCESSIBILITY.md` ⭐ CURRENT — D-221A PUBLIC PROFILE ACCESSIBILITY POLISH (PENDING DEPLOY)
+
+CSS + tests + docs. **Deploy needed: yes** (styles.css changed). No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Keyboard / screen-reader / mobile-touch improvements within the D-216A public profile allowlist: (1) `.pp-item-actions .btn-mini:focus-visible` — scoped focus ring for public profile claim action buttons (previously no pp-scoped focus style); (2) mobile touch target — `@media(max-width:640px)` sets `min-height:44px; padding:10px 12px` on `.pp-item-actions .btn-mini` (previously `min-height:36px` only); no new public classes or copy introduced; no allowlist update needed. 12 new D-221A tests. Baseline 2221/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
+
+### `D220A_PUBLIC_PROFILE_VISUAL_POLISH.md` — D-220A/D-220B PUBLIC PROFILE VISUAL POLISH LIVE PASS
 
 Frontend/CSS + tests + docs. **Deploy: LIVE** — owner deployed from terminal; D-220B live sanity all PASS. No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Visual polish within the D-216A public profile allowlist contract: (1) counts card moved to top (activity at a glance before snapshot and claims); (2) context/vocabulary block collapsed into native `<details class="pp-vocab-details"><summary>About this profile page</summary>` — reduces vertical clutter, user can expand; (3) claim action buttons wrapped in `pp-item-actions` div for cleaner responsive layout; (4) `renderPublicProfileTruthsHtml` now returns empty-state `pp-empty` message instead of empty string — truths section always renders consistently with claims section. `PUBLIC_PROFILE_ALLOWED_MARKERS` updated: +7 entries. D-158B ordering/truths tests updated. 22 new D-220A tests. Baseline 2209/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
 
