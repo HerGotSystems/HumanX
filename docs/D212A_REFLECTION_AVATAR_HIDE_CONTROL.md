@@ -1,7 +1,7 @@
 # D-212A — Reflection Avatar Private Hide/Show Control
 
 **Scope:** Frontend only
-**Status:** SOURCE/STATIC COMPLETE — PENDING OWNER DEPLOY + LIVE SANITY
+**Status:** LIVE CLOSEOUT COMPLETE
 **Baseline:** 1957 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 warn pre-existing)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/README.md`
 **Backend changes:** None
@@ -135,22 +135,45 @@ The full card (populated and empty states) gains a "Hide this" control at the bo
 
 ---
 
-## Deploy required
+## Deploy
 
-`public/app-v10.js` and `public/styles.css` changed. Owner must run `npx wrangler deploy` from local terminal. No migration required.
+Owner deployed manually from local terminal after commit `5da4699`. No migration required.
 
-### Live sanity checklist
+### Live sanity checklist — D-212B — ALL PASS
 
 | Check | Expected | Actual |
 |---|---|---|
-| "Hide this" link visible at bottom of Reflection avatar card | Present | — |
-| Clicking "Hide this" collapses card to hidden placeholder | Immediate, no page reload | — |
-| Hidden placeholder shows "Reflection avatar hidden on this device." | Present | — |
-| Hidden placeholder shows "This only changes your private My HumanX view." | Present | — |
-| "Show again" button visible in hidden placeholder | Present | — |
-| Clicking "Show again" restores full card | Immediate, no page reload | — |
-| Reload after hiding — card stays hidden | Persists | — |
-| Reload after showing — card stays visible | Persists | — |
-| Reflection avatar absent from public profile | Absent | — |
-| "Hide this" / "Show again" absent from public profile | Absent | — |
-| No forbidden wording on public profile | All absent | — |
+| "Hide this" link visible at bottom of Reflection avatar card | Present | PASS |
+| Clicking "Hide this" collapses card to hidden placeholder | Immediate, no page reload | PASS |
+| Hidden placeholder shows "Reflection avatar hidden on this device." | Present | PASS |
+| Hidden placeholder shows "This only changes your private My HumanX view." | Present | PASS |
+| "Show again" button visible in hidden placeholder | Present | PASS |
+| Clicking "Show again" restores full card | Immediate, no page reload | PASS |
+| Reload after hiding — card stays hidden | Persists | PASS |
+| Reload after showing — card stays visible | Persists | PASS |
+| Transparency disclosure still works after restore | Works | PASS |
+| Guardrail copy visible after restore | Present | PASS |
+| Private notice visible after restore | Present | PASS |
+| Reflection avatar absent from public profile | Absent | PASS |
+| "Hide this" / "Show again" absent from public profile | Absent | PASS |
+| Hidden placeholder absent from public profile | Absent | PASS |
+| No forbidden wording on public profile | All absent | PASS |
+
+### Confirmations
+
+- **Owner deploy:** PASS (manual `wrangler deploy` from owner terminal)
+- **localStorage-only:** PASS — hidden state stored in `humanx.me.reflectionAvatar.hidden`; nothing sent to backend
+- **Device-local only:** PASS — no cross-device sync; different browser/device shows card normally
+- **Fail-open:** PASS — if localStorage is blocked, card shows normally (try/catch on all reads/writes)
+- **No public profile/avatar exposure:** PASS — `meReflectionAvatarHtml` not called from `renderPublicProfileHtml`; hide/show controls absent from public render path; confirmed by 4 D-212A smoke tests
+- **No backend changes:** PASS
+- **No API changes:** PASS
+- **No migration:** PASS
+- **No schema changes:** PASS
+- **No CSP changes:** PASS
+- **No external asset changes:** PASS
+
+### Final baselines
+
+- **Hardening smoke:** 1957 passed / 0 failed
+- **Worker route static:** 57 passed / 0 failed / 1 warn (pre-existing, non-blocking)
