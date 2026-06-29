@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2403 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2418 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D232A_REVIEW_ERGONOMICS_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-232A REVIEW ERGONOMICS MILESTONE CHECKPOINT
+### `D233A_DUPLICATE_REVIEW_UX_AUDIT.md` ⭐ CURRENT — D-233A DUPLICATE REVIEW UX AUDIT
+
+Docs + tiny smoke tests. No app/CSS/worker changes. No deploy needed. Baseline: 2418/0/24/57. Audits the current duplicate/near-duplicate handling in the review queue: two-concept data surface (`near_duplicate_of` advisory vs `duplicate_of` explicit), card/inspect/audit-summary UI display, all available actions (`markDuplicateUI`, `resolveSimilarUI`, `openReviewClaimStudy`), 7 concrete friction findings (F-1: manual ID entry in mark-duplicate modal; F-2: similar field shows ID not text; F-3: openReviewClaimStudy navigates away; F-4: resolveSimilarUI modal shows ID not text; F-5: Dupes filter conflates advisory+explicit; F-6: resolveSimilarUI missing scroll anchor; F-7: no similarity confidence signal). 4 safe next slices proposed (D-233B scroll fix, D-234A similar text display, D-235A pre-populate modal, D-236A regression lock). 15 new guard tests confirming existing hooks + public profile exclusion. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D232A_REVIEW_ERGONOMICS_MILESTONE_CHECKPOINT.md` — D-232A REVIEW ERGONOMICS MILESTONE CHECKPOINT
 
 Docs only. No app/CSS/worker changes. No deploy needed. Baseline: 2403/0/24/57. Updates `PROJECT_STATE.md` as the authoritative checkpoint after the D-227→D-231 review queue ergonomics arc: arc summary (10 tasks, 113 new tests, 4 owner deploys + live closeouts), review queue current behavior, privacy/public boundary update (D-231A review markers confirmed absent from public profile), deployment history, safe-next-work rules including D-231A regression lock rule and moderation route/action-name freeze. No backend/API/migration/schema/CSP/external asset changes.
 
