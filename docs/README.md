@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-238A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc, current baseline 2526/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D238A_DUPLICATE_ADVISORY_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-238A DUPLICATE ADVISORY MILESTONE CHECKPOINT
+### `D239A_REVIEW_TO_STUDY_NAVIGATION_AUDIT.md` ⭐ CURRENT — D-239A REVIEW-TO-STUDY NAVIGATION AUDIT
+
+Docs only. Deploy not needed. Baseline: 2526/0/24/57. App/CSS/worker unchanged. Audits the moderator navigation path from Review queue / inspect panel into Study View and back. Key findings: "← Back to Review" button and `lastModeBeforeStudy`/`lastInspectedReviewItemId` context-save mechanism exist and work correctly; `backToArena()` restores `inspectedReviewItem` on return. Gap: `backToArena()` does not scroll to the restored card (`scrollToReviewAnchor`/`scrollSelectedReviewCardIntoView` not called on return). 5 findings (F-1: scroll gap medium, F-2: button prominence low, F-3: no browser-back low, F-4: button style inconsistency low, F-5: similar-advisory ↗ Study return friction medium). Recommended next code slice: D-239B — scroll to selected card after returning from Study to Review. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D238A_DUPLICATE_ADVISORY_MILESTONE_CHECKPOINT.md` — D-238A DUPLICATE ADVISORY MILESTONE CHECKPOINT
 
 Docs only. Deploy not needed. Baseline: 2526/0/24/57. Closes the D-233→D-237 duplicate advisory UX mini-arc: 123 new tests total (15+11+19+19+18+41), 4 owner deploys (D-233B/C, D-234A/B, D-235A/B, D-236A/B). PROJECT_STATE.md updated with arc summary, duplicate advisory behavior table, privacy boundary entries, deployment state, and 5 new safe-next-work rules. Advisory-only semantics, Copy ID guarantee, prefill-only guarantee, explicit confirmation requirement, scroll parity, and public exposure isolation all confirmed and locked. No app/CSS/worker/backend/API/migration/schema/CSP/external asset changes.
 
