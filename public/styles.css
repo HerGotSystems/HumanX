@@ -789,6 +789,12 @@ details[open].me-avatar-why .me-avatar-why-summary::before{content:'▾ '}
 /* D-221A: focus-visible and mobile touch for public profile action buttons */
 .pp-item-actions .btn-mini:focus-visible{outline:2px solid var(--blue,#57b8ff);outline-offset:2px;border-radius:2px}
 @media(max-width:640px){.pp-item-actions .btn-mini{min-height:44px;padding:10px 12px}}
+/* D-223A: public profile section navigation */
+.pp-section-nav{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;margin-bottom:4px}
+.pp-nav-link{font-size:11px;color:var(--blue);text-decoration:none;padding:4px 10px;border:1px solid var(--line);border-radius:999px;white-space:nowrap;background:#080b12}
+.pp-nav-link:hover{border-color:var(--blue)}
+.pp-nav-link:focus-visible{outline:2px solid var(--blue,#57b8ff);outline-offset:2px;border-radius:999px}
+@media(max-width:640px){.pp-section-nav{gap:4px}.pp-nav-link{padding:6px 10px;min-height:36px;display:inline-flex;align-items:center}}
 /* D-222A: copy profile link button in public profile header */
 .pp-copy-link{margin-top:6px;align-self:flex-start}
 .pp-copy-link:focus-visible{outline:2px solid var(--blue,#57b8ff);outline-offset:2px;border-radius:2px}

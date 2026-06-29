@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2237 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2257 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-219A (2026-06-29). Covers full D-210→D-218 hardening arc, current baseline, privacy boundary state, deployment state, safe next-work rules.
 
-### `D222A_PUBLIC_PROFILE_COPY_LINK.md` ⭐ CURRENT — D-222A/D-222B PUBLIC PROFILE COPY LINK LIVE PASS
+### `D223A_PUBLIC_PROFILE_SECTION_NAV.md` ⭐ CURRENT — D-223A PUBLIC PROFILE SECTION NAVIGATION (PENDING DEPLOY)
+
+Frontend/CSS + tests + docs. **Deploy needed: yes** (app-v10.js and styles.css changed). No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Adds `<nav aria-label="Public profile sections">` row with anchor links to Snapshot (conditional on sn), Claims, Truths, and About sections; adds matching `id` attributes to existing section elements (`public-claims`, `public-truths`, `public-about` in orchestrator; `public-snapshot` in `renderPublicProfileSnapshotHtml`). Pure HTML anchors — no JS. `.pp-section-nav` / `.pp-nav-link` CSS classes with hover, focus-visible, and mobile flex-wrap. D-216A allowlist updated: +7 entries. D-141B test window extended for longer function. 13 new D-223A tests (+7 allowlist forEach). Baseline 2257/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
+
+### `D222A_PUBLIC_PROFILE_COPY_LINK.md` — D-222A/D-222B PUBLIC PROFILE COPY LINK LIVE PASS
 
 Frontend/CSS + tests + docs. **Deploy: LIVE** — owner deployed from terminal; D-222B live sanity all PASS. No backend, no API, no migration, no schema, no CSP, no external asset changes. No new public data fields. No Reflection Avatar / private My HumanX exposure. Adds "Copy profile link" button to the public profile header card for both owners and non-owners: uses `window.location.href`, shows "Link copied" on success, shows "Copy failed — use browser address bar" on clipboard failure, falls back to `execCommand` when Clipboard API unavailable, `try/catch` throughout. Button has `type="button"`, `.pp-copy-link` class, focus-visible CSS, mobile `min-height:44px`. D-216A allowlist updated: +3 entries (`pp-copy-link`, `Copy profile link`, `Link copied`). D-156A test updated: "Copied!" → "Link copied" (intentional). 13 new D-222A tests (+3 allowlist). Baseline 2237/24/57. No privacy boundary change. D-214A/D-215A/D-216A privacy locks active.
 
