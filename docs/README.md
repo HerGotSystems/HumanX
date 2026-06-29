@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2347 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2366 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D229A_REVIEW_QUEUE_CONFIRM_STATE_CLARITY.md` ⭐ CURRENT — D-229A/B REVIEW QUEUE CONFIRM-STATE CLARITY — LIVE PASS
+### `D230A_REVIEW_QUEUE_DECISION_FEEDBACK.md` ⭐ CURRENT — D-230A REVIEW QUEUE DECISION FEEDBACK (DEPLOY NEEDED)
+
+App + CSS + tests + docs. **Owner deploy needed.** Baseline: 2366/0/24/57. Adds `reviewDecisionFeedback` state, `clearReviewDecisionFeedback()` helper, and a `role="status" aria-live="polite"` feedback banner in `renderReviewList` showing "Approved review item.", "Kept review item.", or "Rejected review item." after a successful decision. Banner includes a Dismiss button (`type="button"`). Feedback is set in `reviewDecisionUI` after API success, rendered above the inspect panel, cleared on dismiss. 19 new tests + 4 D-129C/D/E window fixes (1200→1500). No moderation semantics change. D-227B/D-228A/D-229A behavior intact. No backend/API/migration/schema/CSP/external asset changes. No public profile exposure.
+
+### `D229A_REVIEW_QUEUE_CONFIRM_STATE_CLARITY.md` — D-229A/B REVIEW QUEUE CONFIRM-STATE CLARITY — LIVE PASS
 
 App + CSS + tests + docs. Owner deploy complete (D-229B live sanity 23/23 PASS, 2026-06-29). Baseline: 2347/0/24/57. Adds `data-review-confirming="reject|approve|cleanup"` attribute to card article and inspect actions div when armed; adds `review-confirm-armed` class to card actions and inspect actions divs when armed; adds `review-card-approve-pending` card-level highlight when approve is armed (mirrors `review-card-reject-pending`); fixes cleanup section in inspect panel to use neutral amber `review-cleanup-confirm-msg`/`btn-cleanup-confirm`/`btn-cleanup-cancel` classes instead of reusing reject red classes; 20 new tests + 3 D-129B window fixes; no moderation semantics change; D-227B/D-228A behavior intact. No backend/API/migration/schema/CSP/external asset changes.
 

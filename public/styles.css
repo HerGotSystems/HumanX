@@ -251,6 +251,11 @@
 .btn-cleanup-confirm{background:linear-gradient(135deg,#3d2b00,#1e1500);border:1px solid #ffd16688!important;color:#ffd166;font-weight:700}
 .btn-cleanup-confirm:hover{background:linear-gradient(135deg,#5c4000,#3d2b00)}
 .btn-cleanup-cancel{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
+/* D-230A: review decision feedback banner */
+.review-decision-feedback{display:flex;align-items:center;gap:8px;background:rgba(47,191,113,.08);border:1px solid rgba(47,191,113,.25);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--fg);grid-column:1/-1}
+.review-feedback-msg{flex:1}
+.review-feedback-dismiss{background:transparent;border:1px solid var(--line);color:var(--muted);font-size:11px;padding:2px 8px;border-radius:4px;cursor:pointer}
+.review-feedback-dismiss:hover{color:var(--fg);border-color:var(--fg)}
 .review-reason-tag{font-size:11px;color:var(--muted);margin:0 0 5px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 /* Submit Claim writing guide */
 .claim-guide{border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin-bottom:6px;background:rgba(8,11,18,.5)}
