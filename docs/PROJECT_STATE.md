@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-29 after D-232A review ergonomics milestone checkpoint.
-Previous checkpoint: 2026-06-29 after D-226A public profile milestone checkpoint.
+Last updated: 2026-06-29 after D-238A duplicate advisory milestone checkpoint.
+Previous checkpoint: 2026-06-29 after D-232A review ergonomics milestone checkpoint.
 
 ---
 
@@ -22,11 +22,12 @@ Previous checkpoint: 2026-06-29 after D-226A public profile milestone checkpoint
 | Item | Value |
 |------|-------|
 | **Pre-D-227 stable HEAD** | `f286300` (D-226A public profile milestone checkpoint) |
-| **D-232A checkpoint HEAD** | see `docs/README.md` after commit |
+| **D-232A checkpoint HEAD** | see `docs/README.md` — D-232A review ergonomics milestone |
+| **D-238A checkpoint HEAD** | see `docs/README.md` after commit (D-238A duplicate advisory milestone) |
 
 ---
 
-## Current baseline (as of D-232A)
+## Current baseline (as of D-238A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -40,7 +41,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2403 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2526 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -132,6 +133,45 @@ This arc delivered four ergonomics improvements to the admin-only review/moderat
 
 ---
 
+## D-233 → D-237 duplicate advisory UX mini-arc summary
+
+This arc delivered UX improvements to the duplicate/similar-claim advisory workflow in the admin-only review queue, then locked them with a regression fence. All changes are confined to the review queue render surface and admin-only interactions; no public profile exposure, no backend/API/schema changes, no moderation semantic changes.
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-233A | `cb3069d` | Audit | Duplicate review UX audit — 4 findings (F-1→F-4); 15 guard tests; baseline 2403→2418; docs only |
+| D-233B | `27df1c7` | Feature | Resolve-similar scroll anchor parity — `scrollToReviewAnchor(claimId)` added to `resolveSimilarUI` success path; 11 tests |
+| D-233C | `cb3069d` | Live closeout | D-233B confirmed live; 11/11 PASS |
+| D-234A | `df6b524` | Feature | Similar advisory display clarity — structured `review-similar-note` banner; "Possible related claim:" field prefix; "does not approve, reject, or merge" dismiss modal copy; 5 new CSS sub-classes; 19 tests |
+| D-234B | `b73a4c5` | Live closeout | D-234A confirmed live; 15/15 PASS |
+| D-235A | `d30646a` | Feature | Similar advisory Copy ID — `copySimilarClaimId(id)` helper; Copy ID button; `<code user-select:all>` display element; 19 tests |
+| D-235B | `2564d8f` | Live closeout | D-235A confirmed live; 14/14 PASS |
+| D-236A | `3136539` | Feature | Duplicate-target prefill — "Use as duplicate target" button in inspect panel; `markDuplicateUI(claimId, suggestedCanonicalId='')` optional param; prefill-only (no auto-submit); 18 tests + 6 window fixes |
+| D-236B | `f6c48ae` | Live closeout | D-236A confirmed live; 16/16 PASS |
+| D-237A | `959b343` | Regression lock | 41 tests across 7 categories — D-233B scroll lock; D-234A clarity lock; D-235A Copy ID lock; D-236A prefill lock; semantics lock; public exposure lock; deploy integrity lock |
+
+**Tests added in arc:** 15 + 11 + 19 + 19 + 18 + 41 = **123 new tests** (2526 total after D-237A).
+**Deploys required in arc:** 4 (D-233C, D-234B, D-235B, D-236B — owner manual terminal deploy).
+**D-233A, D-237A:** Audit / tests / docs only — no deploy needed.
+
+---
+
+## Duplicate advisory current behavior (post D-233→D-237)
+
+| Feature | Behavior |
+|---------|---------|
+| `near_duplicate_of` advisory | Advisory only — computed by backend; no automatic merge, no auto-submit; `duplicate_of` (explicit) and `near_duplicate_of` (advisory) remain separate concepts |
+| Advisory banner | `<div class="review-similar-note">` with structured head row ("Similar claim advisory" label) + body ("Review manually before deciding — normal moderation actions still apply.") |
+| Similar claim field | "Possible related claim: `clm_...`" — raw ID in `<code class="review-similar-id-code">` with `user-select:all` |
+| Copy ID | `copySimilarClaimId(id)` — copies only raw claim ID via `navigator.clipboard?.writeText`; no backend, no `fetch`, no `localStorage`; toast "ID copied" / "Copy failed — select the ID manually" |
+| Study link | `↗ Study` button opens the advisory claim in Study View (unchanged from D-11) |
+| Use as duplicate target | Button calls `markDuplicateUI(claimId, nearDupId)` — opens existing mark-duplicate modal with canonical target field pre-filled; prefill note: "Prefills the duplicate form — does not mark anything by itself." |
+| Explicit confirm | Mark-duplicate API call (`POST /api/review/mark-duplicate`) fires only inside `onConfirm`; moderator must click "Mark Duplicate"; cancel leaves queue unchanged |
+| Dismiss advisory | `resolveSimilarUI` — `POST /api/review/resolve-similar`; does not approve/reject/merge; scrolls back to review item via `scrollToReviewAnchor(claimId)` after reload |
+| Backward compat | Existing `Mark Duplicate...` button (one-arg caller) still works unchanged |
+
+---
+
 ## Public profile current behavior (post D-220→D-225)
 
 | Feature | Behavior |
@@ -181,6 +221,8 @@ This arc delivered four ergonomics improvements to the admin-only review/moderat
 | No new public data fields in D-220→D-225 | **Confirmed** — zero new API fields | D-225A |
 | Review queue markers in public profile | **Blocked** — `data-review-selected`, `withReviewScrollPreserved`, `review-confirm-armed`, `data-review-confirming`, decision-feedback copy/classes, and all review moderation controls confirmed absent from `renderPublicProfileHtml` | D-231A |
 | No new public data fields in D-227→D-231 | **Confirmed** — zero new API/schema fields | D-231A |
+| Duplicate advisory markers in public profile | **Blocked** — `copySimilarClaimId`, `markDuplicateUI`, `resolveSimilarUI`, "Similar claim advisory", "Use as duplicate target", prefill CSS classes, and all review advisory internals confirmed absent from `renderPublicProfileHtml` | D-237A |
+| No new public data fields in D-233→D-237 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-237A |
 
 ---
 
@@ -201,7 +243,14 @@ This arc delivered four ergonomics improvements to the admin-only review/moderat
 | D-229A | Owner deploy PASS — D-229B confirmed live (23/23) |
 | D-230A | Owner deploy PASS — D-230B confirmed live (24/24) |
 | D-231A | Tests / docs only — no deploy needed |
-| D-232A (this task) | Docs only — **no deploy needed** |
+| D-232A | Docs only — no deploy needed |
+| D-233A | Audit / tests / docs only — no deploy needed |
+| D-233B | Owner deploy PASS — D-233C confirmed live (11/11) |
+| D-234A | Owner deploy PASS — D-234B confirmed live (15/15) |
+| D-235A | Owner deploy PASS — D-235B confirmed live (14/14) |
+| D-236A | Owner deploy PASS — D-236B confirmed live (16/16) |
+| D-237A | Tests / docs only — no deploy needed |
+| D-238A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -241,6 +290,16 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 10. **No bulk review actions** — do not add bulk moderation actions without a separate spec and explicit owner approval.
 
+12. **D-237A duplicate advisory regression lock** — any task touching duplicate/canonical/merge UX (new merge actions, canonical lookup, advisory UI changes, resolve-similar route changes) must either pass all D-237A tests unchanged, or update the D-237A lock with explicit owner approval before merging. Do not silently remove or weaken lock tests.
+
+13. **`near_duplicate_of` advisory-only semantics** — do not treat `near_duplicate_of` as a proven canonical relationship without a separate spec. Do not auto-merge, auto-submit, or take any automatic action based solely on this field.
+
+14. **No merge/canonical route without spec** — do not add `/api/review/merge`, `mergeClaimUI`, `canonicalResolution`, or equivalent behavior without a backend/API spec reviewed by the owner.
+
+15. **No backend lookup for similar claim text** — do not add any `fetch`/`api()` call to `copySimilarClaimId` or the similar advisory field without a separate route/data-shape spec.
+
+16. **New worker-route warnings** — do not hide new worker-route warnings behind the known `/api/u/:slug` warning. Any new WARN text not matching the exact known-warn string must be investigated immediately before being added to `KNOWN_PARAM_ROUTES`.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -261,9 +320,10 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| Duplicate/near-duplicate review UX | Follow-on to D-227A F-5 — duplicate resolution flow audit, advisory-to-action upgrade |
-| Compact review card metadata/status chips | Denser card for long queues — better scan without opening inspect |
+| Open related claim navigation audit | After "↗ Study" or "Use as duplicate target", no explicit back-to-review flow — could be improved |
+| Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 | Review queue next-item flow | After a decision, auto-advance to next pending item in queue |
+| Compact review card metadata/status chips | Denser card for long queues — better scan without opening inspect |
 | Review search/filter clarity | Filter chip accessibility; filter counts; empty-state copy per-filter |
 | Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
 
@@ -385,4 +445,15 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-230A | `9c6f5f1` | Review queue decision feedback |
 | D-230B | `0a7863d` | D-230A live closeout — 24-item sanity PASS |
 | D-231A | `9443ea6` | Review queue ergonomics regression lock (37 tests) |
-| D-232A | TBD | **[Current]** Review ergonomics milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-232A | TBD | Review ergonomics milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-233A | `cb3069d` | **[Arc start]** Duplicate review UX audit — 4 findings; 15 guard tests; docs only |
+| D-233B | `27df1c7` | Resolve-similar scroll anchor parity — `scrollToReviewAnchor(claimId)` in `resolveSimilarUI` success path; 11 tests |
+| D-233C | live closeout | D-233B confirmed live; 11/11 PASS |
+| D-234A | `df6b524` | Similar advisory display clarity — structured banner; "Possible related claim:"; dismiss modal copy; 5 CSS sub-classes; 19 tests |
+| D-234B | `b73a4c5` | D-234A confirmed live; 15/15 PASS |
+| D-235A | `d30646a` | Similar advisory Copy ID — `copySimilarClaimId(id)`; Copy ID button; `user-select:all` code element; 19 tests |
+| D-235B | `2564d8f` | D-235A confirmed live; 14/14 PASS |
+| D-236A | `3136539` | Duplicate-target prefill — "Use as duplicate target" button; `markDuplicateUI(claimId, suggestedCanonicalId='')` optional param; prefill-only; 18 tests + 6 window fixes |
+| D-236B | `f6c48ae` | D-236A confirmed live; 16/16 PASS |
+| D-237A | `959b343` | Duplicate advisory workflow regression lock — 41 tests across 7 categories |
+| D-238A | TBD | **[Current]** Duplicate advisory milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |

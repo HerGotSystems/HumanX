@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-238A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc, current baseline 2526/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D237A_DUPLICATE_ADVISORY_WORKFLOW_REGRESSION_LOCK.md` ⭐ CURRENT — D-237A DUPLICATE ADVISORY WORKFLOW REGRESSION LOCK
+### `D238A_DUPLICATE_ADVISORY_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-238A DUPLICATE ADVISORY MILESTONE CHECKPOINT
+
+Docs only. Deploy not needed. Baseline: 2526/0/24/57. Closes the D-233→D-237 duplicate advisory UX mini-arc: 123 new tests total (15+11+19+19+18+41), 4 owner deploys (D-233B/C, D-234A/B, D-235A/B, D-236A/B). PROJECT_STATE.md updated with arc summary, duplicate advisory behavior table, privacy boundary entries, deployment state, and 5 new safe-next-work rules. Advisory-only semantics, Copy ID guarantee, prefill-only guarantee, explicit confirmation requirement, scroll parity, and public exposure isolation all confirmed and locked. No app/CSS/worker/backend/API/migration/schema/CSP/external asset changes.
+
+### `D237A_DUPLICATE_ADVISORY_WORKFLOW_REGRESSION_LOCK.md` — D-237A DUPLICATE ADVISORY WORKFLOW REGRESSION LOCK
 
 Tests + docs only. Deploy not needed. Baseline: 2526/0/24/57. Locks the D-233→D-236 duplicate advisory UX mini-arc: 41 new regression tests covering resolve-similar scroll parity (D-233B), advisory display clarity (D-234A), Copy ID guarantee (D-235A), prefill-only duplicate-target guarantee (D-236A), advisory-only semantics, public profile isolation, and deploy integrity. App/CSS/worker unchanged. No backend/API/migration/schema/CSP/external asset changes. Future rule: any duplicate/canonical/merge work must preserve this lock or update it with owner approval. Worker route static: 57/0/1 known warn.
 
