@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1933 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `1957 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D211A_REFLECTION_AVATAR_TRANSPARENCY.md` ⭐ CURRENT — D-211A REFLECTION AVATAR TRANSPARENCY
+### `D212A_REFLECTION_AVATAR_HIDE_CONTROL.md` ⭐ CURRENT — D-212A REFLECTION AVATAR HIDE/SHOW CONTROL
+
+Frontend-only. Adds device-local hide/show control to the private Reflection Avatar card. Three localStorage helpers: `isMeReflectionAvatarHidden()`, `setMeReflectionAvatarHidden(hidden)`, `toggleMeReflectionAvatarHidden()`. Key: `humanx.me.reflectionAvatar.hidden`. Fail-open (card shown if localStorage blocked). "Hide this" link at card bottom; hidden placeholder with "Show again" and device-local note; `meRerender()` fires on toggle for immediate re-render. Registered in `_D181B_ZERO_PARAM_ACTIONS`. No backend, no migration, no public profile change. CSS: `.me-avatar-hide-row`, `.me-avatar-hide-btn`, `.me-avatar-hidden`. 24 new D-212A smoke tests. Baseline 1957/24/57. Worker route static 57/0/1 warn (pre-existing). ⚠ PENDING OWNER DEPLOY + LIVE SANITY.
+
+### `D211A_REFLECTION_AVATAR_TRANSPARENCY.md` — D-211A REFLECTION AVATAR TRANSPARENCY
 
 Frontend-only. Adds a native `<details>`/`<summary>` "How this is formed" disclosure block inside the existing private `meReflectionAvatarHtml(data)` card. Present in both populated and empty states. Explains data source (private activity only), lists three source signals with live counts (Evidence added, Pressure checks, Tests created), and states the non-ranking disclaimer ("not a score, rank, diagnosis, ideology, morality label, intelligence label, or truth rating"). No new JS state, no new fetch, no backend change, no migration, no public profile change. New CSS: `.me-avatar-why`, `.me-avatar-why-summary`, `.me-avatar-why-body`, `.me-avatar-why-list`. 19 new D-211A smoke tests. Baseline 1933/24/57. Worker route static 57/0/1 warn (pre-existing). Live sanity PASS — owner manual deploy (CC Wrangler VPN issue); disclosure opens/closes, counts correct, non-ranking disclaimer and private notice visible; no public avatar or disclosure exposure; no forbidden wording on public profile.
 
