@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2485 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2526 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D236A_SIMILAR_ADVISORY_DUPLICATE_TARGET_PREFILL.md` ⭐ CURRENT — D-236A/B SIMILAR ADVISORY DUPLICATE-TARGET PREFILL — LIVE PASS
+### `D237A_DUPLICATE_ADVISORY_WORKFLOW_REGRESSION_LOCK.md` ⭐ CURRENT — D-237A DUPLICATE ADVISORY WORKFLOW REGRESSION LOCK
+
+Tests + docs only. Deploy not needed. Baseline: 2526/0/24/57. Locks the D-233→D-236 duplicate advisory UX mini-arc: 41 new regression tests covering resolve-similar scroll parity (D-233B), advisory display clarity (D-234A), Copy ID guarantee (D-235A), prefill-only duplicate-target guarantee (D-236A), advisory-only semantics, public profile isolation, and deploy integrity. App/CSS/worker unchanged. No backend/API/migration/schema/CSP/external asset changes. Future rule: any duplicate/canonical/merge work must preserve this lock or update it with owner approval. Worker route static: 57/0/1 known warn.
+
+### `D236A_SIMILAR_ADVISORY_DUPLICATE_TARGET_PREFILL.md` — D-236A/B SIMILAR ADVISORY DUPLICATE-TARGET PREFILL — LIVE PASS
 
 App + CSS + tests + docs. Deploy complete (D-236B). Baseline: 2485/0/24/57. HEAD: 3136539. Completes D-233A F-1 friction reduction arc: "Use as duplicate target" button in inspect panel Similar claim advisory field calls `markDuplicateUI(claimId, nearDupId)` — opens the existing mark-duplicate modal with canonical target field pre-filled with the `near_duplicate_of` ID. `markDuplicateUI` signature: `(claimId, suggestedCanonicalId='')` — existing one-arg callers unchanged. When prefilled: modal shows "Pre-filled from similar-claim advisory — confirm the ID below before marking." note + pre-filled input. Moderator can still edit or cancel — API call still gated inside `onConfirm`. No auto-submit. Cancel does not mutate queue. Copy ID from D-235A and raw ID display from D-234A both remain intact. 4 new CSS classes. 18 new smoke tests + 6 window-slice fixes (D-129A: 1600→1800, 13000→14000; D-129B/C: 13500→14000 ×4). No `near_duplicate_of` semantics change. No backend/API/migration/schema/CSP/external asset changes. D-236B live sanity: 16/16 PASS (2026-06-29).
 

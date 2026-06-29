@@ -832,7 +832,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2216,7 +2216,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -18296,6 +18296,259 @@ console.log('\nD-236A: Similar advisory duplicate-target prefill');
 
   test('D-236A: deploy integrity — worker.js unchanged', () => {
     assert.ok(!workerSrc.includes('D-236A'), 'D-236A is a frontend/CSS task — worker.js must not be modified');
+  });
+}
+
+// ── D-237A: Duplicate advisory workflow regression lock ────────────────────────
+//
+// Locks the D-233→D-236 mini-arc. Any future duplicate/canonical/merge work
+// that removes advisory-only behavior, Copy ID, scroll parity, display clarity,
+// or prefill-only guarantees must update this block with owner approval first.
+
+console.log('\nD-237A: Duplicate advisory workflow regression lock');
+
+{
+  const resolveFnStart = appSrc.indexOf('async function resolveSimilarUI(');
+  const resolveFnEnd   = appSrc.indexOf('\nasync function ', resolveFnStart + 1);
+  const resolveSrc     = resolveFnEnd > resolveFnStart ? appSrc.slice(resolveFnStart, resolveFnEnd) : appSrc.slice(resolveFnStart, resolveFnStart + 900);
+
+  const markFnStart = appSrc.indexOf('async function markDuplicateUI(');
+  const markFnEnd   = appSrc.indexOf('\nasync function ', markFnStart + 1);
+  const markSrc     = markFnEnd > markFnStart ? appSrc.slice(markFnStart, markFnEnd) : appSrc.slice(markFnStart, markFnStart + 1900);
+
+  const copyFnStart = appSrc.indexOf('function copySimilarClaimId(');
+  const copyFnEnd   = appSrc.indexOf('\n', appSrc.indexOf('}', copyFnStart));
+  const copySrc     = appSrc.slice(copyFnStart, copyFnEnd);
+
+  const panelStart = appSrc.indexOf('function renderReviewInspectPanel(');
+  const panelEnd   = appSrc.indexOf('\nfunction ', panelStart + 1);
+  const panelSrc   = panelEnd > panelStart ? appSrc.slice(panelStart, panelEnd) : appSrc.slice(panelStart, panelStart + 15000);
+
+  const ppStart = appSrc.indexOf('function renderPublicProfileHtml(');
+  const ppEnd   = appSrc.indexOf('\nfunction ', ppStart + 1);
+  const ppSrc   = ppEnd > ppStart ? appSrc.slice(ppStart, ppEnd) : appSrc.slice(ppStart, ppStart + 8000);
+
+  // ── 1. D-233B resolve-similar scroll lock ────────────────────────────────
+
+  test('D-237A [D-233B lock]: resolveSimilarUI still calls renderReviewList()', () => {
+    assert.ok(resolveSrc.includes('renderReviewList()'), 'resolveSimilarUI must still call renderReviewList()');
+  });
+
+  test('D-237A [D-233B lock]: resolveSimilarUI still calls scrollToReviewAnchor(claimId) after resolve', () => {
+    assert.ok(resolveSrc.includes('scrollToReviewAnchor(claimId)'), 'resolveSimilarUI must still call scrollToReviewAnchor(claimId)');
+  });
+
+  test('D-237A [D-233B lock]: resolveSimilarUI scroll comes after renderReviewList (order preserved)', () => {
+    const renderIdx = resolveSrc.indexOf('renderReviewList()');
+    const scrollIdx = resolveSrc.indexOf('scrollToReviewAnchor(claimId)');
+    assert.ok(renderIdx > -1 && scrollIdx > renderIdx, 'scrollToReviewAnchor must come after renderReviewList in resolveSimilarUI');
+  });
+
+  test('D-237A [D-233B lock]: markDuplicateUI still has scroll-anchor parity (scrollToReviewAnchor)', () => {
+    assert.ok(markSrc.includes('scrollToReviewAnchor(claimId)'), 'markDuplicateUI must still call scrollToReviewAnchor(claimId) for parity with D-233B');
+  });
+
+  test('D-237A [D-233B lock]: resolve-similar posts to /api/review/resolve-similar (route unchanged)', () => {
+    assert.ok(resolveSrc.includes("'/api/review/resolve-similar'"), 'resolveSimilarUI must still POST to /api/review/resolve-similar');
+  });
+
+  // ── 2. D-234A similar advisory clarity lock ──────────────────────────────
+
+  test('D-237A [D-234A lock]: inspect panel still renders "Similar claim advisory" label', () => {
+    assert.ok(panelSrc.includes('Similar claim advisory'), 'inspect panel must still render "Similar claim advisory" label');
+  });
+
+  test('D-237A [D-234A lock]: inspect panel advisory banner still says "Review manually before deciding"', () => {
+    assert.ok(panelSrc.includes('Review manually before deciding'), 'advisory banner must still say "Review manually before deciding"');
+  });
+
+  test('D-237A [D-234A lock]: inspect panel similar field still prefixes with "Possible related claim:"', () => {
+    assert.ok(panelSrc.includes('Possible related claim:'), 'Similar claim field must still prefix with "Possible related claim:"');
+  });
+
+  test('D-237A [D-234A lock]: raw similar ID still visible in inspect panel similar field', () => {
+    assert.ok(panelSrc.includes('review-similar-id-code'), 'raw similar ID must still appear in review-similar-id-code element');
+  });
+
+  test('D-237A [D-234A lock]: resolveSimilarUI modal still says "does not approve, reject, or merge"', () => {
+    assert.ok(resolveSrc.includes('does not approve, reject, or merge'), 'resolve-similar modal must still say "does not approve, reject, or merge"');
+  });
+
+  test('D-237A [D-234A lock]: no merge/canonical behavior copy added to inspect panel', () => {
+    assert.ok(
+      !panelSrc.includes('merge claim') && !panelSrc.includes('canonical resolution') && !panelSrc.includes('auto-merge'),
+      'inspect panel must not contain merge/canonical behavior language'
+    );
+  });
+
+  // ── 3. D-235A Copy ID lock ────────────────────────────────────────────────
+
+  test('D-237A [D-235A lock]: copySimilarClaimId function still exists', () => {
+    assert.ok(appSrc.includes('function copySimilarClaimId('), 'copySimilarClaimId helper must still exist');
+  });
+
+  test('D-237A [D-235A lock]: copySimilarClaimId uses navigator.clipboard?.writeText', () => {
+    assert.ok(copySrc.includes('navigator.clipboard?.writeText'), 'copySimilarClaimId must use navigator.clipboard?.writeText');
+  });
+
+  test('D-237A [D-235A lock]: copySimilarClaimId copies id argument (not location.href or page text)', () => {
+    assert.ok(
+      copySrc.includes('writeText(id)') && !copySrc.includes('location.href'),
+      'copySimilarClaimId must copy the id argument only, not location.href or other page text'
+    );
+  });
+
+  test('D-237A [D-235A lock]: copySimilarClaimId does not call fetch, api, or localStorage', () => {
+    assert.ok(
+      !copySrc.includes('fetch(') && !copySrc.includes('api(') && !copySrc.includes('localStorage'),
+      'copySimilarClaimId must not call fetch, api(), or localStorage'
+    );
+  });
+
+  test('D-237A [D-235A lock]: copySimilarClaimId success toast is "ID copied"', () => {
+    assert.ok(copySrc.includes("toast('ID copied')"), 'copySimilarClaimId success toast must remain "ID copied"');
+  });
+
+  test('D-237A [D-235A lock]: copySimilarClaimId failure toast is "Copy failed — select the ID manually"', () => {
+    assert.ok(
+      copySrc.includes("toast('Copy failed — select the ID manually')"),
+      'copySimilarClaimId failure toast must remain "Copy failed — select the ID manually"'
+    );
+  });
+
+  test('D-237A [D-235A lock]: "Copy ID" button still present in inspect panel similar advisory field', () => {
+    assert.ok(panelSrc.includes('review-similar-copy-btn') && panelSrc.includes('Copy ID'), '"Copy ID" button must still appear in inspect panel similar advisory field');
+  });
+
+  test('D-237A [D-235A lock]: raw similar ID still in selectable code element (review-similar-id-code)', () => {
+    assert.ok(panelSrc.includes('review-similar-id-code'), 'raw similar ID must still be in review-similar-id-code code element (user-select:all)');
+  });
+
+  // ── 4. D-236A duplicate-target prefill lock ───────────────────────────────
+
+  test('D-237A [D-236A lock]: markDuplicateUI still accepts optional suggestedCanonicalId (backward compatible)', () => {
+    assert.ok(
+      markSrc.includes("suggestedCanonicalId=''") || markSrc.includes('suggestedCanonicalId=""'),
+      'markDuplicateUI must still accept optional suggestedCanonicalId defaulting to empty string'
+    );
+  });
+
+  test('D-237A [D-236A lock]: existing one-arg markDuplicateUI callers still work (dupSection call)', () => {
+    assert.ok(
+      panelSrc.includes("markDuplicateUI('${esc(id)}')" ),
+      'existing one-arg markDuplicateUI caller in dupSection must still be present'
+    );
+  });
+
+  test('D-237A [D-236A lock]: inspect panel still renders "Use as duplicate target" button', () => {
+    assert.ok(panelSrc.includes('Use as duplicate target'), 'inspect panel must still render "Use as duplicate target" button');
+  });
+
+  test('D-237A [D-236A lock]: "Use as duplicate target" button calls markDuplicateUI with two args', () => {
+    assert.ok(
+      panelSrc.includes("markDuplicateUI('${esc(id)}','${esc(nearDup)}')"),
+      '"Use as duplicate target" button must still call markDuplicateUI with both claimId and nearDup'
+    );
+  });
+
+  test('D-237A [D-236A lock]: prefill note still present ("does not mark anything by itself")', () => {
+    assert.ok(
+      panelSrc.includes('does not mark anything by itself') || panelSrc.includes('Prefills the duplicate form'),
+      'prefill note must still state it does not mark anything by itself'
+    );
+  });
+
+  test('D-237A [D-236A lock]: mark-duplicate API call still gated inside onConfirm (no auto-submit)', () => {
+    const confirmIdx = markSrc.indexOf('onConfirm:');
+    const apiIdx     = markSrc.indexOf("'/api/review/mark-duplicate'");
+    assert.ok(confirmIdx > -1 && apiIdx > confirmIdx, 'mark-duplicate API call must remain gated inside onConfirm — no auto-submit');
+  });
+
+  test('D-237A [D-236A lock]: Copy ID button still available alongside "Use as duplicate target"', () => {
+    assert.ok(
+      panelSrc.includes('review-similar-copy-btn') && panelSrc.includes('review-similar-use-dup-btn'),
+      'Copy ID button and Use as duplicate target button must both be present in inspect panel'
+    );
+  });
+
+  // ── 5. Semantics lock ─────────────────────────────────────────────────────
+
+  test('D-237A [semantics lock]: near_duplicate_of remains advisory only (applyReviewFilter uses it as filter, not decision)', () => {
+    assert.ok(appSrc.includes('near_duplicate_of'), 'near_duplicate_of must still exist as advisory field reference');
+    assert.ok(!appSrc.includes('autoMergeDuplicate') && !appSrc.includes('auto_merge'), 'no auto-merge behavior must exist');
+  });
+
+  test('D-237A [semantics lock]: resolve-similar route unchanged (/api/review/resolve-similar)', () => {
+    assert.ok(resolveSrc.includes("'/api/review/resolve-similar'"), 'resolve-similar route must remain /api/review/resolve-similar');
+  });
+
+  test('D-237A [semantics lock]: mark-duplicate route unchanged (/api/review/mark-duplicate)', () => {
+    assert.ok(markSrc.includes("'/api/review/mark-duplicate'"), 'mark-duplicate route must remain /api/review/mark-duplicate');
+  });
+
+  test('D-237A [semantics lock]: no new merge action in app source', () => {
+    assert.ok(
+      !appSrc.includes('function mergeClaimUI(') && !appSrc.includes('mergeClaims(') && !appSrc.includes('/api/review/merge'),
+      'no merge claim UI or API route must exist'
+    );
+  });
+
+  test('D-237A [semantics lock]: no canonical resolution behavior in app source', () => {
+    assert.ok(
+      !appSrc.includes('canonicalResolution') && !appSrc.includes('resolveCanonical('),
+      'no canonical resolution function must exist'
+    );
+  });
+
+  test('D-237A [semantics lock]: no backend lookup for similar claim text in copySimilarClaimId', () => {
+    assert.ok(
+      !copySrc.includes('fetch(') && !copySrc.includes('/api/'),
+      'copySimilarClaimId must not perform any backend lookup'
+    );
+  });
+
+  // ── 6. Public exposure lock ───────────────────────────────────────────────
+
+  test('D-237A [public lock]: renderPublicProfileHtml does not contain copySimilarClaimId', () => {
+    assert.ok(!ppSrc.includes('copySimilarClaimId'), 'renderPublicProfileHtml must not expose copySimilarClaimId');
+  });
+
+  test('D-237A [public lock]: renderPublicProfileHtml does not contain markDuplicateUI', () => {
+    assert.ok(!ppSrc.includes('markDuplicateUI'), 'renderPublicProfileHtml must not expose markDuplicateUI');
+  });
+
+  test('D-237A [public lock]: renderPublicProfileHtml does not contain resolveSimilarUI', () => {
+    assert.ok(!ppSrc.includes('resolveSimilarUI'), 'renderPublicProfileHtml must not expose resolveSimilarUI');
+  });
+
+  test('D-237A [public lock]: renderPublicProfileHtml does not contain "Similar claim advisory"', () => {
+    assert.ok(!ppSrc.includes('Similar claim advisory'), 'renderPublicProfileHtml must not contain "Similar claim advisory"');
+  });
+
+  test('D-237A [public lock]: renderPublicProfileHtml does not contain "Use as duplicate target"', () => {
+    assert.ok(!ppSrc.includes('Use as duplicate target'), 'renderPublicProfileHtml must not contain "Use as duplicate target"');
+  });
+
+  test('D-237A [public lock]: renderPublicProfileHtml does not contain duplicate-target prefill classes', () => {
+    assert.ok(
+      !ppSrc.includes('review-similar-use-dup') && !ppSrc.includes('review-dup-prefill-note'),
+      'renderPublicProfileHtml must not contain duplicate-target prefill CSS classes'
+    );
+  });
+
+  test('D-237A [public lock]: renderPublicProfileHtml does not contain review advisory internals (review-similar-note)', () => {
+    assert.ok(!ppSrc.includes('review-similar-note'), 'renderPublicProfileHtml must not contain review-similar-note advisory internals');
+  });
+
+  // ── 7. Deploy integrity lock ──────────────────────────────────────────────
+
+  test('D-237A [deploy lock]: D-237A does not modify public/app-v10.js (tests + docs only)', () => {
+    // Confirmed: no app-v10.js edits in this task. Presence of D-237A marker in app source = violation.
+    assert.ok(!appSrc.includes('D-237A'), 'D-237A is tests+docs only — app-v10.js must not be modified');
+  });
+
+  test('D-237A [deploy lock]: D-237A does not modify src/worker.js', () => {
+    assert.ok(!workerSrc.includes('D-237A'), 'D-237A is tests+docs only — worker.js must not be modified');
   });
 }
 
