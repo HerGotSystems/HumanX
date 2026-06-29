@@ -426,6 +426,12 @@
 .review-similar-copy-btn{background:transparent;border:1px solid var(--line);color:var(--muted);font-size:11px;padding:2px 6px;border-radius:4px;cursor:pointer;line-height:1.3}
 .review-similar-copy-btn:hover{color:var(--fg);border-color:var(--fg)}
 .review-similar-dismiss-note{color:var(--muted)}
+/* D-236A: similar advisory duplicate-target prefill */
+.review-similar-use-dup{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}
+.review-similar-use-dup-btn{background:transparent;border:1px solid var(--line);color:var(--muted);font-size:11px;padding:2px 6px;border-radius:4px;cursor:pointer;line-height:1.3}
+.review-similar-use-dup-btn:hover{color:var(--fg);border-color:var(--fg)}
+.review-similar-use-dup-note{font-size:10px;color:var(--muted)}
+.review-dup-prefill-note{color:var(--muted)}
 @media(max-width:600px){.review-audit-stats{gap:4px}.review-audit-stat{min-width:48px;padding:4px 6px}.review-audit-n{font-size:13px}}
 /* Review desktop density — desktop only, mobile unaffected */
 @media(min-width:601px){
