@@ -1,7 +1,7 @@
 # D-239B — Back to Review Scroll Restore
 
 **Scope:** App + tests + docs
-**Status:** COMPLETE — deploy needed
+**Status:** COMPLETE — D-239C live sanity PASS
 **Baseline:** 2543 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `scripts/hardening-smoke-test.mjs`, `docs/D239B_BACK_TO_REVIEW_SCROLL_RESTORE.md`, `docs/README.md`
 **App UI changes:** Yes — `backToArena()` now scrolls to the restored review item after returning from Study
@@ -11,7 +11,8 @@
 **Schema change:** None
 **Backend/API change:** None
 **New public data fields:** None
-**Deploy needed:** Yes
+**Deploy needed:** Yes — owner deploy complete (D-239C)
+**Implementation HEAD:** 5c12a10
 
 ---
 
@@ -124,31 +125,42 @@ This pattern is already used in `inspectReviewItem` (D-227B) for `scrollSelected
 
 ---
 
-## Live Sanity Checklist (Pending Owner Deploy)
+## Live Sanity Checklist — D-239C PASS
 
-- [ ] Deploy to production via owner terminal
-- [ ] Open Review queue, scroll down so at least one review item is off the initial viewport
-- [ ] Inspect a review item near the bottom of the queue — inspect panel opens
-- [ ] Click "Open Study View ↗" (or any ↗ Study button) — Study View opens
-- [ ] Study View shows "← Back to Review" button
-- [ ] Click "← Back to Review"
-- [ ] Review queue renders — inspect panel re-opens for the original item
-- [ ] Page scrolls automatically to the restored review card
-- [ ] "← Back to Vault" still works from Evidence Vault → Study
-- [ ] "← Back to Truths" still works from Truths → Study
-- [ ] Normal Approve/Keep/Reject actions unchanged in Review
-- [ ] Resolve/dismiss similar advisory scroll still works (D-233B parity)
-- [ ] No console errors
+- [x] Deploy to production via owner terminal
+- [x] Open Review queue, scroll down so at least one review item is off the initial viewport
+- [x] Inspect a review item near the bottom of the queue — inspect panel opens
+- [x] Click "Open Study View ↗" (or any ↗ Study button) — Study View opens
+- [x] Study View shows "← Back to Review" button
+- [x] Click "← Back to Review"
+- [x] Review queue renders — inspect panel re-opens for the original item
+- [x] Page scrolls automatically to the restored review card
+- [x] "← Back to Vault" still works from Evidence Vault → Study
+- [x] "← Back to Truths" still works from Truths → Study
+- [x] Normal Approve/Keep/Reject actions unchanged in Review
+- [x] Resolve/dismiss similar advisory scroll still works (D-233B parity)
+- [x] No console errors
+
+**Live sanity result:** 13/13 PASS (D-239C, 2026-06-29)
 
 ---
 
 ## Confirmations
 
 - **Back to Review now scrolls to restored card:** Yes — `scrollToReviewAnchor(_savedId)` via RAF
+- **Inspect panel remains visible for restored item:** Confirmed
 - **No queue reload added:** Confirmed
 - **Non-review Study entry unchanged:** Confirmed — vault/truths/me/arena branches untouched
+- **Browser history behavior unchanged:** Confirmed — no `pushState`, no `replaceState`
 - **Moderation actions unchanged:** Confirmed
 - **Duplicate/advisory semantics unchanged:** Confirmed
+- **D-227B/D-228A/D-229A/D-230A behavior intact:** Confirmed
+- **D-233B/D-234A/D-235A/D-236A behavior intact:** Confirmed
 - **No public profile exposure:** Confirmed
 - **No backend/API/migration/schema/CSP/external asset changes:** Confirmed
-- **Deploy needed:** Yes
+- **Deploy needed:** Yes — owner deploy complete (D-239C)
+- **Owner deploy:** PASS
+- **Live Back-to-Review scroll sanity:** PASS — "← Back to Review" restores inspected item and scrolls to card; inspect panel re-opens; queue not reloaded
+- **Hardening smoke:** 2543 passed / 0 failed
+- **Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug` — D-218A documented)
+- **D-239C live sanity:** 13/13 PASS
