@@ -1,7 +1,7 @@
 # D-223A — Public Profile Section Navigation
 
 **Scope:** Frontend/CSS + tests + docs
-**Status:** COMPLETE — pending owner deploy
+**Status:** LIVE CLOSEOUT COMPLETE (D-223B)
 **Baseline:** 2257 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D223A_PUBLIC_PROFILE_SECTION_NAV.md`, `docs/README.md`
 **App UI changes:** Yes (nav row added; section IDs added)
@@ -158,24 +158,56 @@ D-141B checked `class="panel pp-section"` count within a fixed 3000-char window 
 
 ---
 
-## Live sanity checklist (pending owner deploy — D-223B)
+## Live sanity checklist — D-223B PASS
 
-After owner manually deploys from terminal:
+Owner deploy completed from terminal. All checks PASS.
 
-- [ ] Public profile loads without errors
-- [ ] Section nav row visible below counts card
-- [ ] "Claims", "Truths", "About" links all present
-- [ ] "Snapshot" link present only when profile has a shared snapshot
-- [ ] Clicking "Claims" scrolls to claims section
-- [ ] Clicking "Truths" scrolls to truths section
-- [ ] Clicking "About" scrolls to "About this profile page" disclosure
-- [ ] Clicking "Snapshot" (if present) scrolls to snapshot card
-- [ ] Keyboard Tab reaches nav links
-- [ ] Focus ring visible on nav links when tabbed to
-- [ ] Mobile: nav links wrap cleanly, no overflow
-- [ ] No network requests triggered by clicking nav links
-- [ ] No private My HumanX controls visible
-- [ ] No Reflection Avatar visible
-- [ ] No forbidden wording visible
-- [ ] Context disclosure, counts card, copy button all still present (D-220A/D-221A/D-222A unaffected)
-- [ ] Browser console: no JS errors
+- [x] Live HumanX opened after deploy
+- [x] Public profile page opened
+- [x] Page loads without console-breaking errors
+- [x] Section navigation row appears near the top of the public profile (below counts card)
+- [x] Section navigation is labelled for public profile sections (`aria-label="Public profile sections"`)
+- [x] Snapshot link appears when a public snapshot exists
+- [x] Snapshot link jumps to the snapshot section
+- [x] Claims link jumps to the claims section
+- [x] Truths link jumps to the truths section
+- [x] About link jumps to the "About this profile page" disclosure section
+- [x] Links are normal anchors — no custom scroll JS
+- [x] Keyboard Tab reaches all section nav links
+- [x] Focus-visible ring appears on section nav links
+- [x] Mobile/narrow width: nav links wrap cleanly
+- [x] Mobile/narrow width: nav links have comfortable touch target height
+- [x] Counts card placement from D-220 remains intact
+- [x] Copy profile link from D-222 remains intact
+- [x] Context disclosure still opens/closes normally
+- [x] Public truths empty state remains intact: "No public truths on this profile yet."
+- [x] No private My HumanX controls appear
+- [x] No Reflection Avatar appears
+- [x] No hide/show controls appear
+- [x] No avatar transparency disclosure appears
+- [x] No localStorage/device-local wording appears
+- [x] No forbidden public wording appears (truth level / purity / ideology type / religious alignment / smart score / HumanX rank / good believer / bad believer)
+- [x] Public profile does not expose new data fields
+
+---
+
+## D-223B live closeout record
+
+- **Owner deploy:** PASS — deployed from owner terminal
+- **Hardening smoke post-deploy:** 2257 passed / 0 failed
+- **Worker route static post-deploy:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`)
+- **Section nav row placement:** PASS — visible below counts card, before snapshot/content
+- **Anchor jumps:** PASS — Claims, Truths, About (and Snapshot when present) all jump correctly
+- **No custom JS/localStorage/backend/fetch for navigation:** PASS — confirmed pure HTML anchors
+- **Keyboard Tab / focus ring:** PASS — all links reachable; focus ring visible on keyboard, not mouse
+- **Mobile wrap:** PASS — links wrap cleanly at narrow width, no overflow
+- **D-220A counts card placement:** PASS — unaffected
+- **D-222A copy profile link:** PASS — unaffected
+- **Context disclosure (D-220A):** PASS — opens/closes normally
+- **Public truths empty state (D-220A):** PASS — message still renders
+- **Public allowlist compliance:** PASS — 7 new entries intentionally added
+- **No new public data fields:** PASS — no new API fields read
+- **No private My HumanX exposure:** PASS
+- **No Reflection Avatar / public avatar exposure:** PASS
+- **No forbidden wording:** PASS
+- **No backend/API/migration/schema/CSP/external asset changes:** PASS
