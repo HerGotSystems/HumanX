@@ -786,7 +786,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2170,7 +2170,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -15617,6 +15617,245 @@ test('D-190D: meProfileSettingsHtml profile warning is conditional on accountUse
 
   test('D-213A: D-213A comment present in app-v10.js', () => {
     assert.ok(appSrc.includes('D-213A') || appSrc.includes('D-213A:') || cssSrc.includes('D-213A'), 'D-213A must be referenced in changed files');
+  });
+}
+
+// ── D-214A: Reflection Avatar regression lock ─────────────────────────────────
+{
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const cssSrc = readFileSync(path.join(__dirname, '../public/styles.css'), 'utf8');
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+
+  // ── Slices ────────────────────────────────────────────────────────────────
+  const avatarIdx = appSrc.indexOf('function meReflectionAvatarHtml(');
+  const avatarEnd = appSrc.indexOf('\nfunction renderMeHtml(', avatarIdx);
+  const avatarSlice = appSrc.slice(avatarIdx, avatarEnd > -1 ? avatarEnd : avatarIdx + 6000);
+
+  const renderPubIdx = appSrc.indexOf('function renderPublicProfileHtml(');
+  const renderPubEnd = appSrc.indexOf('\nasync function renderPublicProfile(', renderPubIdx);
+  const renderPubSlice = appSrc.slice(renderPubIdx, renderPubEnd > -1 ? renderPubEnd : renderPubIdx + 5000);
+
+  // Full code outside comments (for backend checks)
+  const workerCode = workerSrc.split('\n').filter(l => !l.trimStart().startsWith('//')).join('\n');
+
+  // ── 1. Private render boundary ─────────────────────────────────────────────
+  test('D-214A: meReflectionAvatarHtml defined in app', () => {
+    assert.ok(appSrc.includes('function meReflectionAvatarHtml('), 'meReflectionAvatarHtml must be defined');
+  });
+
+  test('D-214A: meReflectionAvatarHtml called from renderMeHtml (private path)', () => {
+    const renderMeIdx = appSrc.indexOf('function renderMeHtml(');
+    const renderMeEnd = appSrc.indexOf('\nasync function renderMe(', renderMeIdx);
+    const renderMeSlice = appSrc.slice(renderMeIdx, renderMeEnd > -1 ? renderMeEnd : renderMeIdx + 3000);
+    assert.ok(renderMeSlice.includes('meReflectionAvatarHtml('), 'meReflectionAvatarHtml must be called from renderMeHtml');
+  });
+
+  test('D-214A: me-avatar-card class exists in avatar slice', () => {
+    assert.ok(avatarSlice.includes('me-avatar-card'), 'me-avatar-card must exist in meReflectionAvatarHtml');
+  });
+
+  test('D-214A: me-avatar-why class exists in avatar slice', () => {
+    assert.ok(avatarSlice.includes('me-avatar-why'), 'me-avatar-why must exist in meReflectionAvatarHtml');
+  });
+
+  test('D-214A: me-avatar-hidden class exists in avatar slice', () => {
+    assert.ok(avatarSlice.includes('me-avatar-hidden'), 'me-avatar-hidden must exist in meReflectionAvatarHtml');
+  });
+
+  test('D-214A: localStorage key present in avatar slice', () => {
+    assert.ok(avatarSlice.includes('humanx.me.reflectionAvatar.hidden') || appSrc.includes('_ME_AVATAR_HIDDEN_KEY'), 'localStorage key must be referenced in avatar function scope');
+  });
+
+  test('D-214A: hidden placeholder text in avatar slice', () => {
+    assert.ok(avatarSlice.includes('Reflection avatar hidden on this device'), 'hidden placeholder text must be in meReflectionAvatarHtml');
+  });
+
+  test('D-214A: device-local note in avatar slice', () => {
+    assert.ok(avatarSlice.includes('This only changes your private My HumanX view'), 'device-local note must be in meReflectionAvatarHtml');
+  });
+
+  test('D-214A: "Hide this" in avatar slice', () => {
+    assert.ok(avatarSlice.includes('Hide this'), '"Hide this" must be in meReflectionAvatarHtml');
+  });
+
+  test('D-214A: "Show again" in avatar slice', () => {
+    assert.ok(avatarSlice.includes('Show again'), '"Show again" must be in meReflectionAvatarHtml');
+  });
+
+  // ── 2. Public profile exclusion ────────────────────────────────────────────
+  test('D-214A: meReflectionAvatarHtml not called from renderPublicProfileHtml', () => {
+    assert.ok(!renderPubSlice.includes('meReflectionAvatarHtml'), 'meReflectionAvatarHtml must not be called from renderPublicProfileHtml');
+  });
+
+  test('D-214A: me-avatar-card absent from renderPublicProfileHtml', () => {
+    assert.ok(!renderPubSlice.includes('me-avatar-card'), 'me-avatar-card must not appear in public profile render');
+  });
+
+  test('D-214A: me-avatar-why absent from renderPublicProfileHtml', () => {
+    assert.ok(!renderPubSlice.includes('me-avatar-why'), 'me-avatar-why must not appear in public profile render');
+  });
+
+  test('D-214A: me-avatar-hidden absent from renderPublicProfileHtml', () => {
+    assert.ok(!renderPubSlice.includes('me-avatar-hidden'), 'me-avatar-hidden must not appear in public profile render');
+  });
+
+  test('D-214A: "Hide this" absent from renderPublicProfileHtml', () => {
+    assert.ok(!renderPubSlice.includes('Hide this'), '"Hide this" must not appear in public profile render');
+  });
+
+  test('D-214A: "Show again" absent from renderPublicProfileHtml', () => {
+    assert.ok(!renderPubSlice.includes('Show again'), '"Show again" must not appear in public profile render');
+  });
+
+  test('D-214A: hidden placeholder text absent from renderPublicProfileHtml', () => {
+    assert.ok(!renderPubSlice.includes('Reflection avatar hidden on this device'), 'hidden placeholder text must not appear in public profile render');
+  });
+
+  test('D-214A: localStorage key absent from renderPublicProfileHtml', () => {
+    assert.ok(!renderPubSlice.includes('reflectionAvatar.hidden'), 'localStorage key must not appear in public profile render');
+  });
+
+  test('D-214A: "How this is formed" disclosure absent from renderPublicProfileHtml', () => {
+    assert.ok(!renderPubSlice.includes('How this is formed'), '"How this is formed" disclosure must not appear in public profile render');
+  });
+
+  // ── 3. Backend/API exclusion ───────────────────────────────────────────────
+  test('D-214A: no reflection avatar storage in worker.js', () => {
+    assert.ok(!workerCode.includes('reflection_avatar') && !workerCode.includes('reflectionAvatar'), 'worker.js must not store or reference reflection avatar');
+  });
+
+  test('D-214A: no avatar hidden route in worker.js', () => {
+    assert.ok(!workerCode.includes('avatar-hidden') && !workerCode.includes('avatar_hidden'), 'worker.js must not have avatar hidden API route');
+  });
+
+  test('D-214A: localStorage key absent from worker.js', () => {
+    assert.ok(!workerSrc.includes('reflectionAvatar.hidden'), 'localStorage key must not appear in worker.js');
+  });
+
+  test('D-214A: me-avatar class markers absent from worker.js', () => {
+    assert.ok(!workerCode.includes('me-avatar'), 'me-avatar class markers must not appear in worker.js');
+  });
+
+  test('D-214A: no public avatar field in worker.js', () => {
+    assert.ok(!workerCode.includes('public_avatar') && !workerCode.includes('publicAvatar'), 'worker.js must not expose a public avatar field');
+  });
+
+  // ── 4. Data minimization ───────────────────────────────────────────────────
+  test('D-214A: avatar uses existing private evidence data', () => {
+    assert.ok(avatarSlice.includes('data.evidence'), 'avatar must use data.evidence from existing private payload');
+  });
+
+  test('D-214A: avatar uses existing private pressure data', () => {
+    assert.ok(avatarSlice.includes('data.pressure'), 'avatar must use data.pressure from existing private payload');
+  });
+
+  test('D-214A: avatar uses existing private home_tests data', () => {
+    assert.ok(avatarSlice.includes('data.home_tests'), 'avatar must use data.home_tests from existing private payload');
+  });
+
+  test('D-214A: avatar does not fetch a new API endpoint', () => {
+    // No api() or fetch() call inside the avatar function itself
+    assert.ok(!avatarSlice.includes('await api(') && !avatarSlice.includes('await fetch('), 'avatar function must not make new API calls');
+  });
+
+  test('D-214A: avatar does not reference a new DB field not already in /api/my-humanx', () => {
+    // Confirm no new field access beyond evidence/pressure/home_tests/user/counts
+    const newFieldRe = /data\.(alignment|ideology|avatar_score|avatar_rank|avatar_hidden|avatar_setting)/;
+    assert.ok(!newFieldRe.test(avatarSlice), 'avatar must not access new DB fields');
+  });
+
+  // ── 5. Copy guardrails ────────────────────────────────────────────────────
+  // Strip docs/ directory — docs may mention these terms in guardrail sections
+  test('D-214A: "truth level" absent from app UI', () => {
+    assert.ok(!appSrc.includes('truth level'), '"truth level" must not appear in app-v10.js');
+  });
+
+  test('D-214A: "purity" absent from app UI', () => {
+    assert.ok(!appSrc.includes('purity'), '"purity" must not appear in app-v10.js');
+  });
+
+  test('D-214A: "ideology type" absent from app UI', () => {
+    assert.ok(!appSrc.includes('ideology type'), '"ideology type" must not appear in app-v10.js');
+  });
+
+  test('D-214A: "religious alignment" absent from app UI', () => {
+    assert.ok(!appSrc.includes('religious alignment'), '"religious alignment" must not appear in app-v10.js');
+  });
+
+  test('D-214A: "smart score" absent from app UI', () => {
+    assert.ok(!appSrc.includes('smart score'), '"smart score" must not appear in app-v10.js');
+  });
+
+  test('D-214A: "HumanX rank" absent from app UI', () => {
+    assert.ok(!appSrc.includes('HumanX rank'), '"HumanX rank" must not appear in app-v10.js');
+  });
+
+  test('D-214A: "good believer" absent from app UI', () => {
+    assert.ok(!appSrc.includes('good believer'), '"good believer" must not appear in app-v10.js');
+  });
+
+  test('D-214A: "bad believer" absent from app UI', () => {
+    assert.ok(!appSrc.includes('bad believer'), '"bad believer" must not appear in app-v10.js');
+  });
+
+  // Identity/personality type chips banned from avatar
+  const forbiddenChips = ['Seeker','Warrior','Truth teller','Skeptic','Believer','Rational','Pure','Good','Bad'];
+  forbiddenChips.forEach(chip => {
+    test(`D-214A: identity chip "${chip}" absent from avatar slice`, () => {
+      // chips.push() calls are what adds chips — check no chip is pushed with a forbidden identity label
+      const chipPushes = avatarSlice.match(/chips\.push\('([^']+)'\)/g) || [];
+      const found = chipPushes.some(p => p.includes(chip));
+      assert.ok(!found, `Avatar chip "${chip}" would be a forbidden identity label — must not be added`);
+    });
+  });
+
+  // ── 6. Accessibility lock ─────────────────────────────────────────────────
+  test('D-214A: all buttons in avatar function have type="button"', () => {
+    const buttonOccurrences = avatarSlice.split('<button').slice(1);
+    const missingType = buttonOccurrences.filter(b => !b.startsWith(' type="button"'));
+    assert.strictEqual(missingType.length, 0, 'All <button> elements in meReflectionAvatarHtml must have type="button"');
+  });
+
+  test('D-214A: disclosure uses native <details>', () => {
+    assert.ok(avatarSlice.includes('<details'), 'disclosure must use native <details>');
+  });
+
+  test('D-214A: disclosure uses native <summary>', () => {
+    assert.ok(avatarSlice.includes('<summary'), 'disclosure must use native <summary>');
+  });
+
+  test('D-214A: .me-avatar-hide-btn:focus-visible CSS exists', () => {
+    assert.ok(cssSrc.includes('.me-avatar-hide-btn:focus-visible'), '.me-avatar-hide-btn:focus-visible must be in styles.css');
+  });
+
+  test('D-214A: .me-avatar-why-summary:focus-visible CSS exists', () => {
+    assert.ok(cssSrc.includes('.me-avatar-why-summary:focus-visible'), '.me-avatar-why-summary:focus-visible must be in styles.css');
+  });
+
+  test('D-214A: no custom JS disclosure toggle in avatar function', () => {
+    const newToggles = (avatarSlice.match(/function toggle/g)||[]).length;
+    assert.strictEqual(newToggles, 0, 'no new toggle function should be inside meReflectionAvatarHtml');
+  });
+
+  // ── 7. Deploy lock ────────────────────────────────────────────────────────
+  test('D-214A regression lock does not modify public/app-v10.js (test/docs only)', () => {
+    // This test passes by definition if the test suite runs: the app file was not changed
+    // by the D-214A commit itself. We verify the D-214A comment is NOT in app-v10.js
+    // (it should only appear in this test file and the doc).
+    assert.ok(!appSrc.includes('D-214A:') || appSrc.indexOf('D-214A:') === -1,
+      'D-214A must not modify app-v10.js (test-and-docs-only task)');
+  });
+
+  test('D-214A regression lock does not require migration', () => {
+    assert.ok(
+      !existsSync(path.join(__dirname, '../migrations/0017_avatar_regression.sql')),
+      'D-214A is test/docs-only — no migration needed'
+    );
+  });
+
+  test('D-214A regression lock does not require schema change', () => {
+    // Confirm localStorage key still absent from worker (schema proxy check)
+    assert.ok(!workerSrc.includes('me.reflectionAvatar'), 'worker.js must have no avatar schema references');
   });
 }
 

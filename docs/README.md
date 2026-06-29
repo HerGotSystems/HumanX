@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `1980 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2035 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -58,7 +58,11 @@ Read these first when starting a new session or returning after time away.
 ### `D178A_HTTP_HEADERS_CACHE_CORS_AUDIT.md` — D-178A HTTP HEADERS/CACHE/CORS AUDIT
 ### `D178B_HTTP_HEADERS_CACHE_NOSNIFF_PATCH.md` — D-178B HTTP CACHE/NOSNIFF PATCH
 ### `D178D_HTTP_HEADERS_CACHE_NOSNIFF_LIVE_VERIFY.md` — D-178B/D LIVE VERIFIED
-### `D213A_REFLECTION_AVATAR_ACCESSIBILITY.md` ⭐ CURRENT — D-213A/B REFLECTION AVATAR ACCESSIBILITY — LIVE PASS
+### `D214A_REFLECTION_AVATAR_REGRESSION_LOCK.md` ⭐ CURRENT — D-214A REFLECTION AVATAR REGRESSION LOCK
+
+Tests + docs only. No app UI changes, no CSS changes, no deploy needed. Adds 55 new D-214A regression tests locking the Reflection Avatar private render boundary (10 markers), public profile exclusion (9 checks), backend/API exclusion (5 checks), data minimization (5 checks), copy guardrails — forbidden wording + identity chip labels (17 checks), accessibility guarantees (6 checks), and deploy integrity (3 checks). Baseline 2035/0/24/57. Worker route static 57/0/1 warn (pre-existing, non-blocking). Future rule: any intentional public exposure of Reflection Avatar requires a new spec + explicit owner approval before regression tests may be updated. No backend, no API, no migration, no schema, no CSP, no external asset, no app UI changes.
+
+### `D213A_REFLECTION_AVATAR_ACCESSIBILITY.md` — D-213A/B REFLECTION AVATAR ACCESSIBILITY — LIVE PASS
 
 Frontend-only. Adds keyboard and screen reader polish to the private Reflection Avatar card. `type="button"` on all three button elements (Show again, Hide this ×2). `aria-label="Reflection avatar — private section"` on all three card wrapper divs (hidden, empty, populated). Native `<details>`/`<summary>` disclosure unchanged — built-in keyboard expand/collapse. `:focus-visible` rings added for `.me-avatar-hide-btn`, `.me-avatar-why-summary`, `.me-avatar-hidden .btn-mini`. Mobile touch targets: `min-height:32px` on hide button and disclosure summary. 23 new D-213A smoke tests. Baseline 1980/0/24/57. Worker route static 57/0/1 warn (pre-existing, non-blocking). Owner manual deploy (CC Wrangler VPN/proxy issue). Live sanity PASS (D-213B): keyboard Tab reaches all three interactive elements, Enter/Space activates each, focus-visible rings visible on keyboard focus only, mobile touch targets comfortable, no overflow, hide/show and transparency disclosure all functional, no public avatar/profile exposure, no forbidden wording on public profile. No backend, no API, no migration, no schema, no CSP, no external asset changes.
 
