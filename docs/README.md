@@ -53,9 +53,9 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D227B_REVIEW_QUEUE_SELECTED_CARD_ANCHOR.md` ⭐ CURRENT — D-227B REVIEW QUEUE SELECTED-CARD ANCHOR (DEPLOY NEEDED)
+### `D227B_REVIEW_QUEUE_SELECTED_CARD_ANCHOR.md` ⭐ CURRENT — D-227B/C REVIEW QUEUE SELECTED-CARD ANCHOR — LIVE PASS
 
-App + CSS + tests + docs. **Owner deploy needed.** Baseline: 2308/0/24/57. Adds `data-review-selected="true"` attribute to the selected review card article; adds `scrollSelectedReviewCardIntoView()` helper that uses `requestAnimationFrame` and optional chaining to scroll the selected card into view after inspect panel opens; enhances `.review-card-selected` CSS with 2px ring and background accent; 18 new lock tests. No moderation semantics change. No backend/API/migration/schema/CSP/external asset changes.
+App + CSS + tests + docs. Owner deploy complete (D-227C live sanity 20/20 PASS, 2026-06-29). Baseline: 2308/0/24/57. Adds `data-review-selected="true"` attribute to the selected review card article; adds `scrollSelectedReviewCardIntoView()` helper that uses `requestAnimationFrame` and optional chaining to scroll the selected card into view after inspect panel opens; enhances `.review-card-selected` CSS with 2px ring and background accent; 18 new lock tests. No moderation semantics change. No backend/API/migration/schema/CSP/external asset changes.
 
 ### `D227A_REVIEW_QUEUE_SCANABILITY_AUDIT.md` — D-227A REVIEW QUEUE SCANABILITY AUDIT
 

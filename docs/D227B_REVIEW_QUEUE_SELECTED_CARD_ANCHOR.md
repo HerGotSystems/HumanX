@@ -1,7 +1,7 @@
 # D-227B — Review Queue Selected-Card Anchor
 
 **Scope:** App + CSS + tests + docs
-**Status:** COMPLETE — owner deploy needed
+**Status:** COMPLETE — live PASS (D-227C)
 **Baseline:** 2308 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D227B_REVIEW_QUEUE_SELECTED_CARD_ANCHOR.md`, `docs/README.md`
 **App UI changes:** Yes — `reviewCard` and `inspectReviewItem`
@@ -126,25 +126,33 @@ Confirmed. This change is frontend HTML attribute + CSS only.
 
 ---
 
-## Live sanity checklist — pending owner deploy
+## Live sanity checklist — D-227C PASS (2026-06-29)
 
-Owner deploy required before marking live PASS (D-227C).
+Owner deploy completed from terminal. All 20 live sanity items confirmed PASS.
 
-- [ ] Deploy via `wrangler deploy` from owner terminal
-- [ ] Open Review tab with admin token
-- [ ] Click Inspect on a card mid-list — confirm panel opens at top AND selected card scrolls into view
-- [ ] Confirm selected card has blue ring + blue background tint
-- [ ] Confirm non-selected cards have no ring/tint
-- [ ] Click Inspect again on same card — confirm panel closes, card returns to normal
-- [ ] Click Inspect on a different card — confirm previous card loses marker, new card gains it
-- [ ] Approve an item — confirm decision works, queue re-renders, no error
-- [ ] Reject an item (two-step) — confirm confirm-step works as before
-- [ ] Keep Pending — confirm as before
-- [ ] Keyboard: A arm → A confirm — confirm advance works
-- [ ] Keyboard: [ ] prev/next — confirm navigation works
-- [ ] Filter change while inspecting — confirm no error
-- [ ] Mobile viewport: confirm selected ring visible at small screen width
-- [ ] Open public profile (`/u/:slug`) — confirm no review markers appear
+- [x] Deploy via `wrangler deploy` from owner terminal — PASS
+- [x] Open Review tab with admin token — PASS
+- [x] Queue loads without console-breaking errors — PASS
+- [x] Clicking Inspect opens the existing inspect panel as before — PASS
+- [x] The inspected card receives visible selected styling — PASS
+- [x] The inspected card has `data-review-selected="true"` in DOM — PASS
+- [x] Non-selected cards do not have `data-review-selected="true"` — PASS
+- [x] Inspecting another card moves selected styling/attribute to the new card — PASS
+- [x] `scrollSelectedReviewCardIntoView()` runs without errors — PASS
+- [x] If selected card exists, page scrolls enough to keep/find the selected card — PASS
+- [x] If selected card is absent, no error is thrown — PASS
+- [x] Approve behavior unchanged — PASS
+- [x] Keep behavior unchanged — PASS
+- [x] Reject behavior unchanged — PASS
+- [x] Two-step confirm behavior unchanged — PASS
+- [x] Filters/sort behavior unchanged — PASS
+- [x] Keyboard shortcuts remain unchanged — PASS
+- [x] Public profile pages do not contain review selected-card markers — PASS
+- [x] No backend/API behavior changed — PASS
+- [x] No forbidden public/privacy boundary issue appears — PASS
+
+**Hardening smoke (post-deploy):** 2308 passed / 0 failed
+**Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug`)
 
 ---
 
