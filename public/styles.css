@@ -264,8 +264,8 @@
 .btn-inspect{background:#0b0e16;border:1px solid #57b8ff44;color:var(--blue);flex-shrink:0}
 .btn-inspect:hover{border-color:var(--blue);background:#0e1520}
 .btn-inspect-active{background:rgba(87,184,255,.12);border-color:var(--blue);color:var(--blue)}
-/* Selected review card highlight */
-.review-card-selected{border-color:var(--blue)!important;box-shadow:0 0 0 1px #57b8ff33}
+/* D-227B: selected card — stronger ring + background so it stays findable below the inspect panel */
+.review-card-selected{border-color:var(--blue)!important;box-shadow:0 0 0 2px #57b8ff55;background:linear-gradient(180deg,rgba(87,184,255,.08),rgba(16,19,29,.86))}
 /* Review inspection panel */
 .review-inspect-panel{background:linear-gradient(135deg,rgba(87,184,255,.07),rgba(16,19,29,.97));border:1px solid #57b8ff55;border-radius:14px;padding:10px;margin-bottom:4px}
 .review-inspect-compact{padding:10px}

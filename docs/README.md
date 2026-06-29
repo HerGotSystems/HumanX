@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2290 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2308 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D227A_REVIEW_QUEUE_SCANABILITY_AUDIT.md` ⭐ CURRENT — D-227A REVIEW QUEUE SCANABILITY AUDIT
+### `D227B_REVIEW_QUEUE_SELECTED_CARD_ANCHOR.md` ⭐ CURRENT — D-227B REVIEW QUEUE SELECTED-CARD ANCHOR (DEPLOY NEEDED)
+
+App + CSS + tests + docs. **Owner deploy needed.** Baseline: 2308/0/24/57. Adds `data-review-selected="true"` attribute to the selected review card article; adds `scrollSelectedReviewCardIntoView()` helper that uses `requestAnimationFrame` and optional chaining to scroll the selected card into view after inspect panel opens; enhances `.review-card-selected` CSS with 2px ring and background accent; 18 new lock tests. No moderation semantics change. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D227A_REVIEW_QUEUE_SCANABILITY_AUDIT.md` — D-227A REVIEW QUEUE SCANABILITY AUDIT
 
 Docs only. No app UI, CSS, or worker changes. Deploy not needed. Baseline unchanged: 2290/0/24/57. Audits the current Review/moderation UI: full UI structure (filter bar, overview strip, audit summary, inspect panel position, card anatomy, keyboard shortcuts), all 8 current moderation actions, 6 concrete friction points (inspect panel detached from card, full re-render on every action, action button duplication across card/panel, no selected-card anchor, keyboard hint clarity, no filtered-item count), 5 safe improvement slices (D-227B through D-231A), risk boundaries, and test recommendations. No backend/API/migration/schema/CSP/external asset changes.
 
