@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-226A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc, current baseline 2290/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D231A_REVIEW_QUEUE_ERGONOMICS_REGRESSION_LOCK.md` ⭐ CURRENT — D-231A REVIEW QUEUE ERGONOMICS REGRESSION LOCK
+### `D232A_REVIEW_ERGONOMICS_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-232A REVIEW ERGONOMICS MILESTONE CHECKPOINT
+
+Docs only. No app/CSS/worker changes. No deploy needed. Baseline: 2403/0/24/57. Updates `PROJECT_STATE.md` as the authoritative checkpoint after the D-227→D-231 review queue ergonomics arc: arc summary (10 tasks, 113 new tests, 4 owner deploys + live closeouts), review queue current behavior, privacy/public boundary update (D-231A review markers confirmed absent from public profile), deployment history, safe-next-work rules including D-231A regression lock rule and moderation route/action-name freeze. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D231A_REVIEW_QUEUE_ERGONOMICS_REGRESSION_LOCK.md` — D-231A REVIEW QUEUE ERGONOMICS REGRESSION LOCK
 
 Tests + docs only. No app/CSS/worker changes. No deploy needed. Baseline: 2403/0/24/57. Consolidated regression lock for the D-227→D-230 review queue ergonomics arc: 37 new tests across 7 categories — D-227 selected-card anchor lock (5), D-228 scroll preservation lock (7), D-229 confirm-state clarity lock (6), D-230 decision-feedback lock (7), moderation semantics lock (4), public profile exposure lock (5), deploy integrity lock (3). Any future review UI change breaking these tests requires updating this lock with explicit owner approval. No backend/API/migration/schema/CSP/external asset changes.
 

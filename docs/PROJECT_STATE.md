@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-29 after D-226A public profile milestone checkpoint.
-Previous checkpoint: 2026-06-29 after D-219A post-hardening checkpoint.
+Last updated: 2026-06-29 after D-232A review ergonomics milestone checkpoint.
+Previous checkpoint: 2026-06-29 after D-226A public profile milestone checkpoint.
 
 ---
 
@@ -21,12 +21,12 @@ Previous checkpoint: 2026-06-29 after D-219A post-hardening checkpoint.
 
 | Item | Value |
 |------|-------|
-| **Pre-D-226A stable HEAD** | `ad01e7d` (D-225A Public Profile polish regression lock) |
-| **D-226A commit** | see `docs/README.md` after commit |
+| **Pre-D-227 stable HEAD** | `f286300` (D-226A public profile milestone checkpoint) |
+| **D-232A checkpoint HEAD** | see `docs/README.md` after commit |
 
 ---
 
-## Current baseline (as of D-226A)
+## Current baseline (as of D-232A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -40,7 +40,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2290 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2403 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -109,6 +109,29 @@ This arc delivered visual, accessibility, and UX improvements to the public prof
 
 ---
 
+## D-227 → D-231 review queue ergonomics arc summary
+
+This arc delivered four ergonomics improvements to the admin-only review/moderation UI and locked them with a consolidated regression fence. All changes are confined to the review queue render surface and admin-only interactions; no public profile exposure, no backend/API/schema changes, no moderation semantics changes.
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-227A | `ad7680e` | Audit | Scanability audit — full UI structure, 8 actions, 6 friction points (F-1→F-6), 5 improvement slices; docs only |
+| D-227B | `ed31b9c` | Feature | Selected-card anchor — `data-review-selected="true"`; `scrollSelectedReviewCardIntoView()`; stronger `.review-card-selected` CSS |
+| D-227C | `958ece2` | Live closeout | D-227B confirmed live; 20-item sanity PASS |
+| D-228A | `c7d5fb0` | Feature | Scroll preservation — `withReviewScrollPreserved(fn)`; 9 pure local re-renders wrapped; `inspectReviewItem` excluded |
+| D-228B | `c2a2f22` | Live closeout | D-228A confirmed live; 25-item sanity PASS |
+| D-229A | `d7b7a88` | Feature | Confirm-state clarity — `data-review-confirming` attribute; `review-confirm-armed` class; `review-card-approve-pending`; neutral amber cleanup styling |
+| D-229B | `10aa7be` | Live closeout | D-229A confirmed live; 23-item sanity PASS |
+| D-230A | `9c6f5f1` | Feature | Decision feedback — `reviewDecisionFeedback` state; `clearReviewDecisionFeedback()`; `role="status" aria-live="polite"` banner; Dismiss button |
+| D-230B | `0a7863d` | Live closeout | D-230A confirmed live; 24-item sanity PASS |
+| D-231A | `9443ea6` | Regression lock | 37 tests across 7 categories — D-227/D-228/D-229/D-230 behavior locked; moderation semantics lock; public exposure lock; deploy integrity lock |
+
+**Tests added in arc:** 18 + 19 + 20 + 19 + 37 = **113 new tests** (2403 total after D-231A).
+**Deploys required in arc:** 4 (D-227C, D-228B, D-229B, D-230B — owner manual terminal deploy).
+**D-227A and D-231A:** Docs / tests only — no deploy needed.
+
+---
+
 ## Public profile current behavior (post D-220→D-225)
 
 | Feature | Behavior |
@@ -126,6 +149,22 @@ This arc delivered visual, accessibility, and UX improvements to the public prof
 
 ---
 
+## Review queue current behavior (post D-227→D-230)
+
+| Feature | Behavior |
+|---------|---------|
+| Selected-card anchor | `data-review-selected="true"` on inspected card; `scrollSelectedReviewCardIntoView()` fires via `requestAnimationFrame` after inspect panel scroll; stronger `.review-card-selected` ring + background |
+| Scroll preservation | `withReviewScrollPreserved(fn)` wraps 9 pure local re-renders (filter, sort, four arm/cancel pairs, audit toggle); captures `window.scrollY`, restores via RAF |
+| Inspect exclusion | `inspectReviewItem` excluded from `withReviewScrollPreserved` — D-227B card scroll wins |
+| Confirm-state clarity | `data-review-confirming="reject\|approve\|cleanup"` on card article and inspect actions div when armed; `review-confirm-armed` on actions containers; `review-card-approve-pending` for approve armed (green, mirrors reject red) |
+| Cleanup confirm styling | Neutral amber — `review-cleanup-confirm-msg`, `btn-cleanup-confirm` (not reusing reject-red classes) |
+| Decision feedback banner | `role="status" aria-live="polite"` banner after successful decision: "Approved review item." / "Kept review item." / "Rejected review item."; Dismiss button (`type="button"`); does not steal focus |
+| Moderation routes | `/api/review/decision` POST unchanged; approve → `'public'`, reject → `'rejected'`, keep → `'review'` |
+| Keyboard shortcuts | A / R / K / [] / Esc — unchanged |
+| Toast | Existing `toast()` still fires alongside banner |
+
+---
+
 ## Privacy / public boundary state
 
 | Surface | State | Locked by |
@@ -139,7 +178,9 @@ This arc delivered visual, accessibility, and UX improvements to the public prof
 | `top_beliefs_json` | **Permanently private** — never in any public API response | D-216A |
 | `alignment_labels` | **Permanently disabled** — never enabled in any UI | D-214A |
 | D-220→D-224 polish arc | **Locked** — cross-arc composite regression tests | D-225A |
-| No new public data fields | **Confirmed** — D-220→D-225 arc introduced zero new API fields | D-225A |
+| No new public data fields in D-220→D-225 | **Confirmed** — zero new API fields | D-225A |
+| Review queue markers in public profile | **Blocked** — `data-review-selected`, `withReviewScrollPreserved`, `review-confirm-armed`, `data-review-confirming`, decision-feedback copy/classes, and all review moderation controls confirmed absent from `renderPublicProfileHtml` | D-231A |
+| No new public data fields in D-227→D-231 | **Confirmed** — zero new API/schema fields | D-231A |
 
 ---
 
@@ -152,8 +193,15 @@ This arc delivered visual, accessibility, and UX improvements to the public prof
 | D-222A | Owner deploy PASS — D-222B confirmed live |
 | D-223A | Owner deploy PASS — D-223B confirmed live |
 | D-224A | Owner deploy PASS — D-224B confirmed live |
-| D-225A | Tests / docs only — **no deploy needed** |
-| D-226A (this task) | Docs only — **no deploy needed** |
+| D-225A | Tests / docs only — no deploy needed |
+| D-226A | Docs only — no deploy needed |
+| D-227A | Docs only — no deploy needed |
+| D-227B | Owner deploy PASS — D-227C confirmed live (20/20) |
+| D-228A | Owner deploy PASS — D-228B confirmed live (25/25) |
+| D-229A | Owner deploy PASS — D-229B confirmed live (23/23) |
+| D-230A | Owner deploy PASS — D-230B confirmed live (24/24) |
+| D-231A | Tests / docs only — no deploy needed |
+| D-232A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -187,17 +235,23 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 7. **D-216A public allowlist** — any new public profile class, text, or ID must be added to `PUBLIC_PROFILE_ALLOWED_MARKERS` with a comment and rationale before merge. Empty-state copy follows the same rule.
 
-8. **Hard security rules (permanent):**
-   - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
-   - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
-   - Do NOT touch belief engine file unless for copy-level safety fixes
-   - No CSP tightening
-   - No backend/auth/token changes beyond taxonomy work
-   - No wrangler.toml changes
-   - No Review/admin logic changes
-   - No public belief identity cards, no avatar generation, no ideology badges
-   - `alignment_labels` must never be enabled in any UI — permanently blocked
-   - `top_beliefs_json` must never be returned raw in any public API response
+8. **D-231A review ergonomics lock** — any review queue UI change that causes one or more D-231A tests to fail must either restore the original behavior or update the D-231A lock document with a new approved-deviation section, confirmed by the owner. Do not silently remove or weaken lock tests.
+
+9. **Review moderation action names/routes** — do not change `/api/review/decision` route, decision values (`'public'`/`'rejected'`/`'review'`), or payload field names (`targetType`, `targetId`, `decision`) without a separate backend/API spec.
+
+10. **No bulk review actions** — do not add bulk moderation actions without a separate spec and explicit owner approval.
+
+11. **Hard security rules (permanent):**
+    - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
+    - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
+    - Do NOT touch belief engine file unless for copy-level safety fixes
+    - No CSP tightening
+    - No backend/auth/token changes beyond taxonomy work
+    - No wrangler.toml changes
+    - No Review/admin logic changes
+    - No public belief identity cards, no avatar generation, no ideology badges
+    - `alignment_labels` must never be enabled in any UI — permanently blocked
+    - `top_beliefs_json` must never be returned raw in any public API response
 
 ---
 
@@ -207,11 +261,11 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| Review / moderation ergonomics | Queue scanability, bulk actions, duplicate resolution UX |
-| Claim / RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
-| My HumanX private dashboard usability | Filter ergonomics, activity counts, account card clarity |
-| Public profile microcopy polish | Small copy improvements within existing `PUBLIC_PROFILE_ALLOWED_MARKERS` contract |
-| Search / navigation cleanup | Cross-workspace nav, back-button context, mode-aware sidebar |
+| Duplicate/near-duplicate review UX | Follow-on to D-227A F-5 — duplicate resolution flow audit, advisory-to-action upgrade |
+| Compact review card metadata/status chips | Denser card for long queues — better scan without opening inspect |
+| Review queue next-item flow | After a decision, auto-advance to next pending item in queue |
+| Review search/filter clarity | Filter chip accessibility; filter counts; empty-state copy per-filter |
+| Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
 
 ---
 
@@ -229,7 +283,7 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 ---
 
-## Full batch history (A-2 → D-226A)
+## Full batch history (A-2 → D-232A)
 
 | Batch | Commit | Change |
 |-------|--------|--------|
@@ -320,4 +374,15 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-224A | `910b4db` | Public profile empty states — `pp-empty-card`; snapshot id always; Snapshot nav unconditional |
 | D-224B | `053cc67` | D-224A live closeout — 25-item sanity PASS |
 | D-225A | `ad01e7d` | Public profile polish regression lock — 13 cross-arc composite tests; no deploy |
-| D-226A | TBD | **[Current]** Public profile milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-226A | `f286300` | Public profile milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-227A | `ad7680e` | **[Arc start]** Review queue scanability audit — docs only |
+| D-227B | `ed31b9c` | Review queue selected-card anchor |
+| D-227C | `958ece2` | D-227B live closeout — 20-item sanity PASS |
+| D-228A | `c7d5fb0` | Review queue scroll preservation |
+| D-228B | `c2a2f22` | D-228A live closeout — 25-item sanity PASS |
+| D-229A | `d7b7a88` | Review queue confirm-state clarity |
+| D-229B | `10aa7be` | D-229A live closeout — 23-item sanity PASS |
+| D-230A | `9c6f5f1` | Review queue decision feedback |
+| D-230B | `0a7863d` | D-230A live closeout — 24-item sanity PASS |
+| D-231A | `9443ea6` | Review queue ergonomics regression lock (37 tests) |
+| D-232A | TBD | **[Current]** Review ergonomics milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
