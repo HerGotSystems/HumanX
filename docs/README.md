@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-257A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc + D-256 duplicate/similar label clarity addendum, current baseline 2959/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–48.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-260A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc + D-256 duplicate/similar label clarity addendum + D-258→D-259 Review mobile controls wrapping mini-arc, current baseline 2959/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–53.
 
-### `D259A_REVIEW_MOBILE_CONTROL_WRAPPING_REGRESSION_LOCK.md` ⭐ CURRENT — D-259A REVIEW MOBILE CONTROL WRAPPING REGRESSION LOCK — TESTS + DOCS
+### `D260A_REVIEW_MOBILE_CONTROLS_WRAPPING_CHECKPOINT.md` ⭐ CURRENT — D-260A REVIEW MOBILE CONTROLS WRAPPING CHECKPOINT — DOCS ONLY
+
+Docs only. No deploy needed. Baseline: 2959/0/24/57 (unchanged). Closes the D-258A→D-259A Review mobile controls/action wrapping mini-arc. `PROJECT_STATE.md` updated with arc summary (56 new tests total: +21 D-258B +35 D-259A), wrapping behavior table, privacy boundary entries (D-258→D-259 confirmed no public exposure), deployment state, and safe-next-work rules 49–53. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D259A_REVIEW_MOBILE_CONTROL_WRAPPING_REGRESSION_LOCK.md` — D-259A REVIEW MOBILE CONTROL WRAPPING REGRESSION LOCK — TESTS + DOCS
 
 Tests + docs only. No deploy needed. Baseline: 2959/0/24/57 (+35 D-259A tests). Locks the D-258B/C mobile wrapping polish: sort-bar CSS isolation/wrapping (`.review-sort-bar`, `.review-sort-label`, `.review-sort-select`), decision-feedback wrapping (`.review-decision-feedback` flex-wrap, button flex-shrink:0), empty-actions flex/stacking (`.review-empty-actions`), sort behavior (`setReviewSort`), search/filter/sort pipeline, inspect prev/next search-awareness, D-250→D-257 behavior guarantees, public profile boundary, Drift/Belief files unmodified. app-v10.js, styles.css, worker, Drift/Belief files all unchanged. No backend/API/migration/schema/CSP/external asset changes.
 

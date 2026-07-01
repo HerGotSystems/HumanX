@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-01 after D-257A Review duplicate/similar label clarity checkpoint addendum.
-Previous checkpoint: 2026-07-01 after D-255A Review search/filter clarity milestone checkpoint.
+Last updated: 2026-07-01 after D-260A Review mobile controls wrapping checkpoint.
+Previous checkpoint: 2026-07-01 after D-257A Review duplicate/similar label clarity checkpoint addendum.
 
 ---
 
@@ -29,10 +29,11 @@ Previous checkpoint: 2026-07-01 after D-255A Review search/filter clarity milest
 | **D-249A checkpoint HEAD** | see `docs/README.md` after commit (D-249A review card metadata density milestone) |
 | **D-255A checkpoint HEAD** | see `docs/README.md` after commit (D-255A Review search/filter clarity milestone) |
 | **D-257A checkpoint HEAD** | see `docs/README.md` after commit (D-257A duplicate/similar label clarity checkpoint addendum) |
+| **D-260A checkpoint HEAD** | see `docs/README.md` after commit (D-260A Review mobile controls wrapping checkpoint) |
 
 ---
 
-## Current baseline (as of D-257A)
+## Current baseline (as of D-260A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -46,7 +47,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2903 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2959 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -279,6 +280,33 @@ This addendum records the copy-only label clarification that followed the D-250�
 
 ---
 
+## D-258 → D-259 Review mobile controls wrapping mini-arc summary
+
+This mini-arc audited, fixed, and locked the wrapping/layout behavior of Review queue controls on narrow viewports. All changes are CSS-only; no copy, behavior, predicate, or moderation action was changed. All previous Review arc behavior guarantees remain intact.
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-258A | `5862e17` | Audit | Mobile controls/action wrapping audit — 7 risk findings: F-1 HIGH (`.review-sort-bar` no CSS), F-2 HIGH (`.review-decision-feedback` no flex-wrap), F-3 MEDIUM (inspect actions column), F-4 MEDIUM (`.review-empty-actions` not flex), F-5–F-7 LOW; 15-group control inventory; recommended D-258B slice; docs only |
+| D-258B | `f18db9c` | CSS polish | Sort bar isolation (`.review-sort-bar`, `.review-sort-label`, `.review-sort-select` rules added); decision feedback wrapping (`flex-wrap` + `flex-shrink:0` on buttons); empty-action spacing (`display:flex;flex-wrap:wrap;gap:6px` on `.review-empty-actions`); 21 new tests; 2924 total |
+| D-258C | `5b8d667` | Live closeout | D-258B owner deploy PASS; 39/39 live sanity PASS |
+| D-259A | `8e36fdc` | Regression lock | 35 tests across 7 categories — sort-bar render path, sort-bar CSS isolation, decision-feedback flex-wrap, button flex-shrink:0, empty-actions flex/wrap/gap, pipeline lock, public profile boundary |
+| D-260A | this commit | Docs | Mobile controls wrapping checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+
+**CSS changes in D-258B (public/styles.css only):**
+- Added `.review-sort-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:2px 0}`
+- Added `.review-sort-label{font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0}`
+- Added `.review-sort-select{...min-width:120px;max-width:180px;width:auto}`
+- Updated `.review-decision-feedback` to add `flex-wrap:wrap`
+- Updated `.review-feedback-dismiss` and `.review-feedback-next` to add `flex-shrink:0`
+- Updated `.review-feedback-msg` to add `min-width:0`
+- Updated `.review-empty-actions` to add `display:flex;flex-wrap:wrap;gap:6px;align-items:center`
+
+**Tests added in mini-arc:** 21 (D-258B) + 35 (D-259A) = **56 new tests** (2903 → 2959 total).
+**Deploys required:** 1 (D-258C — owner manual terminal deploy).
+**D-258A, D-259A, D-260A:** Audit / tests / docs only — no deploy needed.
+
+---
+
 ## Duplicate/similar filter current behavior (post D-256)
 
 | Feature | Behavior |
@@ -320,6 +348,31 @@ This addendum records the copy-only label clarification that followed the D-250�
 | Search-aware inspect nav | `renderReviewInspectPanel` prev/next also uses the search-aware pipeline |
 | No backend/API search | Search is 100% client-side — no route in `worker.js`; no `fetch`/`api()` call |
 | No localStorage | `reviewSearchQuery` is session-only — not persisted across reload |
+
+---
+
+## Review mobile/control wrapping behavior (post D-258→D-259)
+
+| Feature | Behavior |
+|---------|---------|
+| Sort bar isolation | `.review-sort-bar` has `display:flex;align-items:center;gap:6px;flex-wrap:wrap` — sort label + select form their own flex unit, separate from chip row |
+| Sort label | `.review-sort-label` has `white-space:nowrap;flex-shrink:0` — "Sort:" text never wraps or shrinks |
+| Sort select | `.review-sort-select` has `min-width:120px;max-width:180px;width:auto` — select cannot be crushed below 120px |
+| Decision feedback wrapping | `.review-decision-feedback` has `flex-wrap:wrap` — feedback message + buttons wrap to new lines on narrow viewports |
+| Feedback button protection | `.review-feedback-next` and `.review-feedback-dismiss` both have `flex-shrink:0` — buttons cannot be shrunk below text content; always remain readable/tappable |
+| Feedback message safety | `.review-feedback-msg` has `min-width:0` — message text wraps safely inside the flex container |
+| Empty-actions stacking | `.review-empty-actions` has `display:flex;flex-wrap:wrap;gap:6px;align-items:center` — "Clear search" and "Show all review items" buttons have consistent 6px gap and stack cleanly on narrow viewports |
+| Search row | Unchanged — `renderReviewSearchRow()` renders normally; search input not affected by D-258B |
+| Active summary | Unchanged — `renderReviewActiveSummary(list)` render path and copy preserved (D-250B lock) |
+| Filter helper copy | Unchanged — `renderReviewFilterHelper()` exact copy preserved (D-252A/D-256B lock) |
+| Empty-state copy/title | Unchanged — "No review items match this view." and all per-filter copy preserved (D-251A lock) |
+| `Dupes + Similar` label | Unchanged — chip label, helper copy, empty-state copy all preserved (D-256B lock) |
+| Review card head/meta/hints | Unchanged — all D-248A card metadata density behavior preserved |
+| Search/filter/sort behavior | Unchanged — `applyReviewFilter`, `applyReviewSearch`, `applyReviewSort`, all predicates and sort keys unchanged |
+| Next-item | Unchanged — `reviewDecisionFeedbackNextId` capture and display behavior unchanged (D-243A lock) |
+| Inspect prev/next | Unchanged — `renderReviewInspectPanel` nav uses full pipeline `applyReviewSort(applyReviewSearch(applyReviewFilter(...)))` |
+| Moderation actions | Unchanged — `reviewDecisionUI`, approve/keep/reject all unchanged; no auto-moderation |
+| Duplicate/advisory semantics | Unchanged — `near_duplicate_of`, `duplicate_of`, advisory banner, Copy ID, Use as dup, Dismiss all unchanged |
 
 ---
 
@@ -446,6 +499,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-250→D-254 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-254A |
 | Duplicate/similar label internals in public profile | **Blocked** — `Dupes + Similar` filter copy, `duplicate` filter key, duplicate/similar filter controls remain internal/admin Review UI only; confirmed absent from `renderPublicProfileHtml` | D-256B |
 | No new public data fields in D-256 | **Confirmed** — copy-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-256B |
+| Review mobile/wrapping CSS in public profile | **Blocked** — `.review-sort-bar`, `.review-decision-feedback`, `.review-empty-actions` and all D-258B CSS classes confirmed absent from `renderPublicProfileHtml`; Review mobile CSS remains internal/admin-only | D-259A |
+| No new public data fields in D-258→D-259 | **Confirmed** — CSS-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-259A |
 
 ---
 
@@ -498,7 +553,12 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-256A | Audit / docs only — no deploy needed |
 | D-256B | Owner deploy PASS — D-256C confirmed live (35/35) |
 | D-256C | Live closeout — no deploy needed (closeout of D-256B deploy) |
-| D-257A (this task) | Docs only — **no deploy needed** |
+| D-257A | Docs only — no deploy needed |
+| D-258A | Audit / docs only — no deploy needed |
+| D-258B | Owner deploy PASS — D-258C confirmed live (39/39) |
+| D-258C | Live closeout — no deploy needed (closeout of D-258B deploy) |
+| D-259A | Tests / docs only — no deploy needed |
+| D-260A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -612,6 +672,16 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 48. **Do not change duplicate/advisory action semantics under a label-only task** — `Mark Duplicate...`, `Dismiss ~Similar`, `Use as duplicate target`, `markDuplicateUI`, `resolveSimilarUI` actions must remain unchanged under any task scoped to copy, label, or display clarity.
 
+49. **Do not remove `.review-sort-bar` wrapping/isolation without owner approval** — `.review-sort-bar` flex/wrap/gap and `.review-sort-label`/`.review-sort-select` rules address a confirmed HIGH wrapping risk (D-258A F-1). Removing or weakening them requires a new D-259B (or higher) doc and explicit owner approval.
+
+50. **Do not remove `.review-decision-feedback` wrapping without owner approval** — `flex-wrap` on `.review-decision-feedback` and `flex-shrink:0` on feedback buttons address a confirmed HIGH wrapping risk (D-258A F-2). These properties must not be removed under any layout or CSS cleanup task.
+
+51. **Do not remove `.review-empty-actions` flex/wrapping without owner approval** — `display:flex;flex-wrap:wrap;gap:6px` on `.review-empty-actions` addresses D-258A F-4. Must not be regressed to the pre-D-258B `margin-top:10px` only rule.
+
+52. **Do not change Review mobile CSS under a behavior/copy-only task** — any task scoped to filter labels, helper copy, card copy, or moderation behavior must not alter the D-258B wrapping rules. CSS layout and copy/behavior tasks must be kept separate.
+
+53. **Do not treat mobile CSS polish as permission to change filter/search/sort behavior** — D-258B was CSS-only. Any task touching `applyReviewFilter`, `applyReviewSearch`, `applyReviewSort`, or the search pipeline while claiming CSS scope requires a separate explicit spec.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -632,11 +702,11 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| Review queue mobile controls/action wrapping polish | Filter bar and action buttons on narrow viewports |
 | Study entry button style consistency | D-239A F-2–F-4: button prominence, browser-back support, Study entry button style inconsistency |
 | Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
+| Review queue inspect panel action density audit | D-258A F-3 MEDIUM: 6-7 inspect action buttons stack as tall column on mobile; not addressed by D-258B |
 | D-245A F-4 pressure handle duplication | Separate spec — pressure cards show handle in both chips and meta |
 | Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 
@@ -803,4 +873,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-256A | `3a4805e` | **[Arc start]** Duplicate/similar filter label audit — inventory of all `Dupes`/`~Similar` controls, predicates, card badges, inspect panel, action buttons; predicate analysis; docs only |
 | D-256B | `f73a658` | Duplicate/similar label clarity — `Dupes` → `Dupes + Similar` copy rename in 6 locations; 26 new tests; 2877 → 2903 |
 | D-256C | `7615b04` | D-256B live closeout — owner deploy PASS; 35/35 live sanity PASS |
-| D-257A | TBD | **[Current]** Duplicate/similar label clarity checkpoint addendum — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-257A | `40a633b` | Duplicate/similar label clarity checkpoint addendum — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-258A | `5862e17` | **[Arc start]** Review mobile controls/action wrapping audit — 7 risk findings; 15-group control inventory; docs only |
+| D-258B | `f18db9c` | Review mobile control wrapping polish — sort bar isolation; decision feedback flex-wrap; empty-actions flex; 21 tests |
+| D-258C | `5b8d667` | D-258B live closeout — owner deploy PASS; 39/39 live sanity PASS |
+| D-259A | `8e36fdc` | Review mobile control wrapping regression lock — 35 tests across 7 categories |
+| D-260A | TBD | **[Current]** Review mobile controls wrapping checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
