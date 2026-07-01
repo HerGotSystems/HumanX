@@ -1,14 +1,14 @@
 # D-247A — Review Card Advisory Hint Grouping
 
 **Scope:** Frontend (app-v10.js, styles.css) + tests + docs
-**Status:** COMPLETE — pending owner deploy
+**Status:** COMPLETE — owner deploy PASS (D-247B live sanity PASS 2026-07-01)
 **Baseline:** 2681 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D247A_REVIEW_CARD_ADVISORY_HINT_GROUPING.md`, `docs/README.md`
 **App UI changes:** Yes — three advisory hints moved to a secondary `.review-card-hints` row
 **CSS changes:** Yes — `.review-card-hints` rule added
 **Worker changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes
+**Deploy needed:** No (deployed)
 
 ---
 
@@ -163,26 +163,28 @@ The badge copy was updated from `category-echo` (hyphenated) to `category echo` 
 
 ---
 
-## Live Sanity Checklist (pending owner deploy)
+## Live Sanity Checklist — D-247B PASS (2026-07-01, owner deploy)
 
-- [ ] Review queue loads without JS errors
-- [ ] Claim card head row shows max 6 badges (type · state · optional report · optional ~similar · optional truth-derived · optional Builder)
-- [ ] `? borderline origin` still visible on qualifying cards, but below the meta line in a quieter hints row
-- [ ] `needs sharpening` still visible on qualifying cards, in the hints row
-- [ ] `category echo` still visible on qualifying cards, in the hints row
-- [ ] Hints row is visually quieter than the head badge row (opacity .75)
-- [ ] No hints row renders on cards with no advisory hints
-- [ ] `~similar` advisory still visible in the primary head row
-- [ ] `truth-derived` badge still visible in the primary head row
-- [ ] D-245B inline date still in meta line (`Updated {age}`)
-- [ ] D-246A score labels in meta line (`Evidence N · Test N · Survive N`)
-- [ ] Category and status still visible in meta line
-- [ ] Quality hint badge content readable and not alarming in appearance
-- [ ] Inspect button / Approve / Keep Pending / Reject all functional
-- [ ] Selected card highlight and scroll intact
-- [ ] Confirm-state (approve/reject pending) UI intact
-- [ ] Decision feedback banner + "Open next item →" button intact
-- [ ] Review-to-Study navigation intact
-- [ ] Mobile layout: hints row wraps cleanly
-- [ ] No console errors
-- [ ] No review internals exposed on public profile page
+- [x] Review queue loads without JS errors
+- [x] Claim card head row shows max 6 badges (type · state · optional report · optional ~similar · optional truth-derived · optional Builder)
+- [x] `? borderline origin` still visible on qualifying cards, but below the meta line in a quieter hints row
+- [x] `needs sharpening` still visible on qualifying cards, in the hints row
+- [x] `category echo` still visible on qualifying cards, in the hints row
+- [x] Hints row is visually quieter than the head badge row (opacity .75)
+- [x] No hints row renders on cards with no advisory hints
+- [x] `~similar` advisory still visible in the primary head row
+- [x] `truth-derived` badge still visible in the primary head row
+- [x] D-245B inline date still in meta line (`Updated {age}`)
+- [x] D-246A score labels in meta line (`Evidence N · Test N · Survive N`)
+- [x] Category and status still visible in meta line
+- [x] Quality hint badge content readable and not alarming in appearance
+- [x] Inspect button / Approve / Keep Pending / Reject all functional
+- [x] Selected card highlight and scroll intact
+- [x] Confirm-state (approve/reject pending) UI intact
+- [x] Decision feedback banner + "Open next item →" button intact
+- [x] Review-to-Study navigation intact
+- [x] Mobile layout: hints row wraps cleanly
+- [x] No console errors
+- [x] No review internals exposed on public profile page
+
+**31/31 PASS** — owner live sanity complete 2026-07-01
