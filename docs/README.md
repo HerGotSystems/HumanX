@@ -53,9 +53,9 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-244A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc, current baseline 2638/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules.
 
-### `D245B_INLINE_REVIEW_CARD_DATE_METADATA.md` ⭐ CURRENT — D-245B INLINE REVIEW CARD DATE METADATA (PENDING DEPLOY)
+### `D245B_INLINE_REVIEW_CARD_DATE_METADATA.md` ⭐ CURRENT — D-245B INLINE REVIEW CARD DATE METADATA
 
-App/CSS change. Deploy needed. Baseline: 2652/0/24/57 (+14 tests). Moves "Updated {age}" from a standalone `<p class="review-card-date">` row into the existing `.review-card-meta` line for all card types. One visual row removed per card (~18–20px per card, ~400px per 20-item queue). Date information fully preserved. CSS `.review-card-date` rules removed; `.review-card-meta` margin updated to absorb spacing. No moderation semantics change. No duplicate/advisory/filter/sort/next-item/Study-nav change. No backend/API/migration/schema/CSP/external asset changes. Drift/Belief expansion files untouched. Worker unchanged.
+App/CSS change. Deploy complete. D-245C live sanity 24/24 PASS (2026-07-01). Baseline: 2652/0/24/57 (+14 tests). Moves "Updated {age}" from a standalone `<p class="review-card-date">` row into the existing `.review-card-meta` line for all card types. One visual row removed per card (~18–20px per card, ~400px per 20-item queue). Date information fully preserved. CSS `.review-card-date` rules removed; `.review-card-meta` margin updated to absorb spacing. No moderation semantics change. No duplicate/advisory/filter/sort/next-item/Study-nav change. No backend/API/migration/schema/CSP/external asset changes. Drift/Belief expansion files untouched. Worker unchanged.
 
 ### `D245A_REVIEW_CARD_METADATA_DENSITY_AUDIT.md` — D-245A REVIEW CARD METADATA DENSITY AUDIT
 

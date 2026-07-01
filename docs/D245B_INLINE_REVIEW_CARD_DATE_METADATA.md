@@ -1,14 +1,14 @@
 # D-245B — Inline Review Card Date Metadata
 
 **Scope:** Frontend (app-v10.js, styles.css) + tests + docs
-**Status:** COMPLETE — pending owner deploy
+**Status:** COMPLETE — owner deploy PASS (D-245C live sanity PASS 2026-07-01)
 **Baseline:** 2652 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D245B_INLINE_REVIEW_CARD_DATE_METADATA.md`, `docs/README.md`
 **App UI changes:** Yes — "Updated {age}" moved into meta row; standalone date row removed
 **CSS changes:** Yes — `.review-card-meta` bottom margin updated; `.review-card-date` rules removed
 **Worker changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes
+**Deploy needed:** No (deployed)
 
 ---
 
@@ -136,22 +136,24 @@ The `updated` declaration was moved before `metaParts` so it can be referenced i
 
 ---
 
-## Live Sanity Checklist (pending owner deploy)
+## Live Sanity Checklist — D-245C PASS (2026-07-01, owner deploy)
 
-- [ ] Review queue loads without JS errors
-- [ ] Review card date ("Updated N days/hours ago") visible in meta row
-- [ ] Meta row format: `{category} · {status} · {score} · Updated {age}` (or type-appropriate equivalent)
-- [ ] No standalone "Updated" line below the title on any card
-- [ ] Cards visibly more compact (one fewer text row per card)
-- [ ] Evidence card: `{stance} · {quality} · Updated {age}`
-- [ ] Pressure card: `severity N/5 · [by handle ·] Updated {age}`
-- [ ] Truth card: `{category} · {origin} · rep ×N · Updated {age}`
-- [ ] Quality hint badge ("needs sharpening") still appears in head row
-- [ ] Similar/duplicate advisory still visible (badge row + card border)
-- [ ] Inspect button / Approve / Keep Pending / Reject all functional
-- [ ] Selected card highlight and scroll intact
-- [ ] Confirm-state (approve/reject pending) UI intact
-- [ ] Decision feedback banner + "Open next item →" button intact
-- [ ] Review-to-Study navigation intact (Back to Review restores scroll)
-- [ ] Mobile layout: meta row wraps cleanly, date visible
-- [ ] No review internals exposed on public profile page
+- [x] Review queue loads without JS errors
+- [x] Review card date ("Updated N days/hours ago") visible in meta row
+- [x] Meta row format: `{category} · {status} · {score} · Updated {age}` (or type-appropriate equivalent)
+- [x] No standalone "Updated" line below the title on any card
+- [x] Cards visibly more compact (one fewer text row per card)
+- [x] Evidence card: `{stance} · {quality} · Updated {age}`
+- [x] Pressure card: `severity N/5 · [by handle ·] Updated {age}`
+- [x] Truth card: `{category} · {origin} · rep ×N · Updated {age}`
+- [x] Quality hint badge ("needs sharpening") still appears in head row
+- [x] Similar/duplicate advisory still visible (badge row + card border)
+- [x] Inspect button / Approve / Keep Pending / Reject all functional
+- [x] Selected card highlight and scroll intact
+- [x] Confirm-state (approve/reject pending) UI intact
+- [x] Decision feedback banner + "Open next item →" button intact
+- [x] Review-to-Study navigation intact (Back to Review restores scroll)
+- [x] Mobile layout: meta row wraps cleanly, date visible
+- [x] No review internals exposed on public profile page
+
+**24/24 PASS** — owner live sanity complete 2026-07-01
