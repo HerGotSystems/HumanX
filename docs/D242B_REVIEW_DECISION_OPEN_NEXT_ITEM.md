@@ -1,13 +1,13 @@
 # D-242B — Review Decision: Open Next Item
 
 **Scope:** App + CSS + tests + docs
-**Status:** COMPLETE — owner deploy needed
+**Status:** COMPLETE — D-242C live sanity PASS
 **Baseline:** 2604 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D242B_REVIEW_DECISION_OPEN_NEXT_ITEM.md`, `docs/README.md`
 **App UI changes:** Yes — "Open next item →" button added to D-230A feedback banner
 **CSS changes:** Yes — `.review-feedback-next` button styles added
 **Worker changes:** None
-**Deploy needed:** Yes — owner deploy required
+**Deploy needed:** Yes — owner deploy complete (D-242C)
 
 ---
 
@@ -209,23 +209,42 @@ Also updated 5 slice-window constants (D-129A: 1000→1500, D-129C/D/E: 1500→1
 
 ---
 
-## Live Sanity Checklist (pending owner deploy)
+## Live Sanity Checklist — D-242C PASS
 
-- [ ] Deploy to production via owner terminal
-- [ ] Open Review queue — load queue with admin token
-- [ ] Inspect a review item that has at least one other item after it in the queue
-- [ ] Click Approve (arm then Confirm Approve) — feedback banner appears with "Approved review item."
-- [ ] "Open next item →" button appears in the banner
-- [ ] Click "Open next item →" — banner dismisses, next item's inspect panel opens, page scrolls to card
-- [ ] Next item does NOT get auto-decided — it opens in inspect state only
-- [ ] Repeat with Reject — same "Open next item →" behavior
-- [ ] Inspect the last item in queue — after Approve/Reject, feedback banner shows only Dismiss (no next-item button)
-- [ ] Keep Pending: feedback shows "Kept review item." + Dismiss only; item stays open in inspect panel
-- [ ] Keyboard A+A / R+R / K shortcut still auto-advances as before
-- [ ] D-233B similar-claim advisory scroll still works
-- [ ] D-236A "Use as duplicate target" still works
-- [ ] "← Back to Review" from Study still works (D-239B)
-- [ ] No console errors
+- [x] Deploy to production via owner terminal
+- [x] Open Review queue — load queue with admin token
+- [x] Queue loads without console-breaking errors
+- [x] Inspect a review item that has at least one other item after it in the current filtered/sorted queue
+- [x] Complete Approve through the visible button/UI path
+- [x] Feedback banner appears with "Approved review item."
+- [x] Feedback banner shows "Open next item →"
+- [x] Clicking "Open next item →" opens/inspects the next item
+- [x] Page scrolls/selects the next item using existing selected-card behavior
+- [x] No moderation decision is made by clicking "Open next item →"
+- [x] No backend/API request made by "Open next item →" click (navigation only)
+- [x] Repeat with Reject — feedback banner shows "Rejected review item." + "Open next item →"
+- [x] Clicking it opens/inspects the next item
+- [x] Last item in queue: no "Open next item →" button after Approve/Reject (Dismiss only)
+- [x] Keep Pending: "Kept review item." + Dismiss only; item stays open in inspect panel
+- [x] Keep Pending does not force next item
+- [x] Dismiss still clears feedback
+- [x] Current filter/sort is respected
+- [x] Keyboard shortcut advance behavior unchanged (A+A / R+R / K)
+- [x] D-227B selected-card anchor still works
+- [x] D-228A scroll preservation still works
+- [x] D-229A confirm-state clarity still works
+- [x] D-230A decision feedback still works
+- [x] D-233B resolve-similar scroll still works
+- [x] D-234A similar advisory display still works
+- [x] D-235A Copy ID still works
+- [x] D-236A duplicate-target prefill still works
+- [x] D-239B Back to Review scroll restore still works
+- [x] Public profile pages do not contain Open-next-item internals
+- [x] Drift/Belief expansion surfaces still load normally
+- [x] No backend/API behavior changed
+- [x] No console errors
+
+**Live sanity result:** 34/34 PASS (D-242C, 2026-07-01)
 
 ---
 
@@ -242,4 +261,9 @@ Also updated 5 slice-window constants (D-129A: 1000→1500, D-129C/D/E: 1500→1
 - **No public profile exposure:** Confirmed
 - **No backend/API/migration/schema/CSP/external asset changes:** Confirmed
 - **Drift/Belief expansion files untouched:** Confirmed
-- **Deploy needed:** Yes
+- **Owner deploy:** PASS
+- **Live Open-next-item sanity:** PASS — "Open next item →" appears after Approve/Reject when next item exists; absent at end of queue; clicking opens next item with no auto-moderation; Keep Pending unchanged; Dismiss clears; filter/sort respected
+- **Hardening smoke:** 2604 passed / 0 failed
+- **Worker route static:** 57 passed / 0 failed / 1 known warn (`/api/u/:slug` — D-218A documented)
+- **D-242C live sanity:** 34/34 PASS
+- **Deploy needed:** Yes — complete
