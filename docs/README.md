@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2665 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2681 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-244A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc, current baseline 2638/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules.
 
-### `D246A_REVIEW_CARD_SCORE_LABEL_CLARITY.md` ⭐ CURRENT — D-246A REVIEW CARD SCORE LABEL CLARITY
+### `D247A_REVIEW_CARD_ADVISORY_HINT_GROUPING.md` ⭐ CURRENT — D-247A REVIEW CARD ADVISORY HINT GROUPING (PENDING DEPLOY)
+
+App/CSS change. Deploy needed. Baseline: 2681/0/24/57 (+16 tests). Moves low-priority advisory/quality hints (`needs sharpening`, `category echo`, `? borderline origin`) out of the primary `.review-card-head` badge row into a dedicated `.review-card-hints` secondary row rendered below the meta line. Scan-critical badges (type, state, ⚑ report, ~similar, truth-derived, Builder) stay in the primary head row. Hints row renders only when hints exist; empty when none apply. CSS `.review-card-hints` added with `opacity:.75` for visual quiet. No hint data removed. D-245B date and D-246A score labels preserved. No moderation/advisory/filter/sort/next-item/Study-nav change. No backend/API/migration/schema/CSP/external asset changes. Drift/Belief expansion files untouched. Worker unchanged.
+
+### `D246A_REVIEW_CARD_SCORE_LABEL_CLARITY.md` — D-246A REVIEW CARD SCORE LABEL CLARITY
 
 App change only (no CSS). Deploy complete. D-246B live sanity 28/28 PASS (2026-07-01). Baseline: 2665/0/24/57 (+13 tests). Replaces cryptic `ev:N ts:N sv:N` score abbreviations in claim review cards with readable `Evidence N · Test N · Survive N` labels, matching the existing inspect-panel/analysisSummary convention. Score values and source fields unchanged. No extra row added. D-245B inline date behavior preserved. No moderation semantics change. No duplicate/advisory/filter/sort/next-item/Study-nav change. No backend/API/migration/schema/CSP/external asset changes. Drift/Belief expansion files untouched. Worker unchanged.
 

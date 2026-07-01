@@ -608,6 +608,7 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 @media(max-width:900px){#casefile{border-bottom:none;padding-bottom:4px}#side-tools h2{margin-top:10px;padding-top:8px}#side-tools .actions{flex-direction:column}#side-tools .actions button{width:100%}}
 /* D-87B: review card metadata chips */
 .review-card-chips{display:flex;flex-wrap:wrap;gap:3px;margin:2px 0 4px}
+.review-card-hints{display:flex;flex-wrap:wrap;gap:3px;margin:3px 0 3px;opacity:.75}
 .rc-builder-chip{font-size:8px;letter-spacing:.05em}
 .rc-chip{display:inline-flex;align-items:center;font-size:.68rem;font-family:monospace;padding:1px 6px;border-radius:3px;white-space:nowrap;line-height:1.6}
 .rc-chip-handle{background:#2a2a3a;color:#9ba3c0;border:1px solid #3a3a50}
