@@ -1,13 +1,14 @@
 # D-261B — Review Inspect Panel Action Spacing Polish
 
 **Scope:** CSS + tests + docs
-**Status:** COMPLETE — deploy needed
+**Status:** COMPLETE — owner deploy PASS (D-261C, 2026-07-01)
 **Baseline:** 2978 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D261B_REVIEW_INSPECT_PANEL_ACTION_SPACING_POLISH.md`, `docs/README.md`
 **App changes:** None (`public/app-v10.js` not touched)
 **Worker changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes (CSS change)
+**Deploy needed:** No — deployed via D-261C (2026-07-01)
+**Deployed Worker version:** `cb5caf6f-67ff-4a41-baa5-22ed836e0cb2`
 
 ---
 
@@ -132,7 +133,82 @@ const mediaSlice = cssSrc.slice(mediaIdx, mediaIdx + 1500);
 | Task | Deploy |
 |------|--------|
 | D-261A | Docs only — no deploy |
-| D-261B | CSS change — owner deploy needed |
+| D-261B | CSS change — owner deploy PASS (D-261C, 2026-07-01) |
+| D-261C | Live closeout — no deploy (closeout of D-261B) |
+
+---
+
+## Live Sanity — D-261C (2026-07-01)
+
+**Result: 41/41 PASS**
+
+**Hardening smoke:** `2978 passed, 0 failed`
+**Worker route static:** `57 passed, 0 failed / 1 known warn`
+**Known warn:** `/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`
+**Deployed Worker version:** `cb5caf6f-67ff-4a41-baa5-22ed836e0cb2`
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opened after deploy | PASS |
+| 2 | Review/moderation page opened | PASS |
+| 3 | Queue loads without console-breaking errors | PASS |
+| 4 | Open a review item inspect panel | PASS |
+| 5 | Inspect action buttons still appear | PASS |
+| 6 | Approve button still appears | PASS |
+| 7 | Keep Pending button still appears | PASS |
+| 8 | Reject button still appears | PASS |
+| 9 | Archive appears where applicable | PASS |
+| 10 | Mark Duplicate... appears where applicable | PASS |
+| 11 | Dismiss ~Similar appears where applicable | PASS |
+| 12 | Study action appears where applicable | PASS |
+| 13 | On wider layout, Study is visually pushed right when horizontal space is available | PASS |
+| 14 | On narrow/mobile, inspect action buttons become consistent full-width tap targets | PASS |
+| 15 | On narrow/mobile, duplicate/advisory actions have a soft separator from primary moderation actions | PASS |
+| 16 | Separator is calm, not warning/error-red/scary | PASS |
+| 17 | Button labels unchanged | PASS |
+| 18 | Button order unchanged | PASS |
+| 19 | Approve behavior unchanged | PASS |
+| 20 | Keep Pending behavior unchanged | PASS |
+| 21 | Reject behavior unchanged | PASS |
+| 22 | Archive behavior unchanged where applicable | PASS |
+| 23 | Mark Duplicate behavior unchanged | PASS |
+| 24 | Dismiss ~Similar behavior unchanged | PASS |
+| 25 | Use as duplicate target behavior unchanged where applicable | PASS |
+| 26 | Study behavior unchanged | PASS |
+| 27 | Search-aware inspect prev/next unchanged | PASS |
+| 28 | "Open next item →" behavior unchanged | PASS |
+| 29 | Decision feedback still works | PASS |
+| 30 | Search/filter/sort behavior unchanged | PASS |
+| 31 | Duplicate/advisory semantics unchanged | PASS |
+| 32 | Moderation semantics unchanged | PASS |
+| 33 | Review card D-245B inline date still works | PASS |
+| 34 | Review card D-246A score labels still work | PASS |
+| 35 | Review card D-247A hint grouping still works | PASS |
+| 36 | D-256 `Dupes + Similar` label remains correct | PASS |
+| 37 | D-258/D-259 mobile wrapping polish still works | PASS |
+| 38 | Public profile pages unaffected | PASS |
+| 39 | Drift/Belief expansion surfaces still load normally | PASS |
+| 40 | No backend/API behavior changed | PASS |
+| 41 | No console errors | PASS |
+
+### Confirmed by live sanity
+
+- **CSS-only change** — `public/app-v10.js`, `src/worker.js`, `public/belief-drift-expansion.js`, `public/index.html` not modified
+- **No markup changes** — inspect panel HTML structure unchanged
+- **No copy changes** — all button labels (Approve / Keep Pending / Reject / Archive / Mark Duplicate... / Dismiss ~Similar / Study) unchanged
+- **Action labels/order unchanged** — verified in panel
+- **Inspect action behavior unchanged** — all moderation/advisory/study actions fire as before
+- **Search-aware inspect prev/next unchanged** — pipeline `applyReviewSort(applyReviewSearch(applyReviewFilter(...)))` intact
+- **"Open next item →" unchanged** — decision feedback navigation intact
+- **Duplicate/advisory semantics unchanged** — Mark Duplicate / Dismiss ~Similar logic intact
+- **Moderation actions unchanged** — Approve/Keep Pending/Reject/Archive unchanged
+- **Desktop Study push confirmed** — `margin-left:auto` pushes Study to far right in flex row on wider layouts
+- **Mobile full-width inspect buttons confirmed** — all buttons expand to `width:100%` at ≤600px
+- **Mobile soft separator confirmed** — calm `border-top:1px solid rgba(255,255,255,.06)` above Mark Duplicate... and Dismiss ~Similar
+- **D-245→D-260 regression locks preserved** — all prior lock tests pass at 2978/0
+- **No public profile exposure** — `.review-inspect-actions` absent from `renderPublicProfileHtml`
+- **Drift/Belief expansion unaffected** — surfaces load normally
+- **No backend/API/migration/schema/CSP/external asset changes**
 
 ---
 
