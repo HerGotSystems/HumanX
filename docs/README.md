@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3035 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3075 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-264A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run (9 mini-arcs, 721 tests, 14 deploys — see D-264A wrap-up), current baseline 3011/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–65.
 
-### `D265B_STUDY_ENTRY_BACK_BUTTON_STYLE_CONSISTENCY.md` ⭐ CURRENT — D-265B/C STUDY ENTRY / BACK BUTTON STYLE CONSISTENCY — LIVE PASS
+### `D266A_STUDY_ENTRY_BACK_BUTTON_STYLE_REGRESSION_LOCK.md` ⭐ CURRENT — D-266A STUDY ENTRY / BACK BUTTON STYLE REGRESSION LOCK — TESTS + DOCS ONLY
+
+Tests + docs only. No deploy needed. Baseline: 3075/0/24/57 (+40 tests). Regression lock for the D-265A/B/C Study entry / Back button style consistency patch. 8 test categories: (1) inspect panel Study hierarchy lock (`btn-study-review` present, `primary btn-study-review` not reintroduced, all Study label variants locked); (2) linked-claim Study label lock (`Study linked claim ↗` exact label, raw-ID button label not reintroduced, `btn-link-small` class, non-public path still shows `review-inspect-id`); (3) evidence card Study button lock (`btn-link-small`, `↗` icon, `studyFromVault` behavior, vault-header parity); (4) Back-to-Review style lock (`btn-back-study` class, CSS rule present, calm secondary styling not destructive red, all Back copy variants locked, `data-action="backToArena"` wired); (5) navigation/context lock (`backToArena` RAF scroll restore, `openReviewClaimStudy` defined, `studyFromVault` defined, search pipeline, inspect prev/next, `lastModeBeforeStudy`); (6) cross-arc compatibility (D-245B date, D-246A score labels, D-256 Dupes+Similar, D-258B sort-bar/feedback, D-261B Study push, moderation actions, dup/advisory semantics); (7) public/Drift/backend boundary (`btn-back-study` + `openReviewClaimStudy` absent from `renderPublicProfileHtml`, Drift file unchanged); (8) deploy integrity (app/CSS/worker unchanged). No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D265B_STUDY_ENTRY_BACK_BUTTON_STYLE_CONSISTENCY.md` — D-265B/C STUDY ENTRY / BACK BUTTON STYLE CONSISTENCY — LIVE PASS
 
 App/CSS + tests + docs. Owner deploy PASS (D-265C, 2026-07-01). 39/39 live sanity PASS. Baseline: 3035/0/24/57 (+24 tests). Addresses D-265A findings: (1) removed `primary` class from inspect panel claim Study button — false hierarchy eliminated, all inspect Study buttons now use `btn-study-review` only; (2) added `btn-back-study` class to all 5 Back navigation buttons + new `.btn-back-study` CSS rule (calm secondary affordance: `rgba(255,255,255,.06)` fill, `rgba(255,255,255,.12)` border, `var(--muted)` text, hover lightens); (3) added `btn-link-small` class and `↗` icon to evidence card Study button, matching vault group header; (4) changed linked claim field label from raw `{claimId} ↗` to `Study linked claim ↗`. No navigation behavior changes. No handler changes. Back-to-Review scroll restore unchanged. Search-aware pipeline unchanged. D-261B inspect action spacing CSS guarantees preserved. Moderation actions unchanged. Duplicate/advisory semantics unchanged. D-245→D-264 locks (315 tests) all pass. No public profile exposure. Drift/Belief files unchanged. No backend/API/migration/schema/CSP/external asset changes.
 
