@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-01 after D-260A Review mobile controls wrapping checkpoint.
-Previous checkpoint: 2026-07-01 after D-257A Review duplicate/similar label clarity checkpoint addendum.
+Last updated: 2026-07-01 after D-263A Review inspect panel action spacing checkpoint.
+Previous checkpoint: 2026-07-01 after D-260A Review mobile controls wrapping checkpoint.
 
 ---
 
@@ -30,10 +30,11 @@ Previous checkpoint: 2026-07-01 after D-257A Review duplicate/similar label clar
 | **D-255A checkpoint HEAD** | see `docs/README.md` after commit (D-255A Review search/filter clarity milestone) |
 | **D-257A checkpoint HEAD** | see `docs/README.md` after commit (D-257A duplicate/similar label clarity checkpoint addendum) |
 | **D-260A checkpoint HEAD** | see `docs/README.md` after commit (D-260A Review mobile controls wrapping checkpoint) |
+| **D-263A checkpoint HEAD** | see `docs/README.md` after commit (D-263A Review inspect panel action spacing checkpoint) |
 
 ---
 
-## Current baseline (as of D-260A)
+## Current baseline (as of D-263A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -47,7 +48,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2959 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3011 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -307,6 +308,50 @@ This mini-arc audited, fixed, and locked the wrapping/layout behavior of Review 
 
 ---
 
+## D-261 → D-262 Review inspect panel action spacing mini-arc summary
+
+This mini-arc audited, fixed, and locked the inspect panel action button layout — specifically the visual density and tap-target quality at narrow viewports. All changes are CSS-only; no copy, behavior, predicate, or moderation action was changed. All previous Review arc behavior guarantees remain intact.
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-261A | `036b459` | Audit | Inspect panel action density audit — full action inventory (7 sections: primary moderation, armed states, archive, dup/advisory, Study variants, advisory field actions, feedback/card); 6 risk findings: F-1 HIGH (all 5–7 buttons flat column at ≤600px, no visual break), F-2 MEDIUM (no structural grouping), F-3 MEDIUM (dead CSS class `.review-inspect-top-actions` in mobile rule), F-4 MEDIUM (no `width:100%` for mobile column), F-5–F-6 LOW; recommended D-261B CSS slice; docs only |
+| D-261B | `246974a` | CSS polish | Desktop Study push (`margin-left:auto` on `.review-inspect-actions .btn-study-review`); mobile full-width tap targets (`width:100%` on `.review-inspect-actions button`); mobile soft separator before dup/advisory group (`.review-inspect-markdup`/`.review-inspect-resolvesim` `margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)`); Study column reset (`margin-left:0`); 19 new tests; 2978 total |
+| D-261C | `ac3e279` | Live closeout | D-261B owner deploy PASS; 41/41 live sanity PASS; deployed Worker: `cb5caf6f-67ff-4a41-baa5-22ed836e0cb2` |
+| D-262A | `92ca239` | Regression lock | 33 tests across 7 categories — desktop Study push, mobile full-width buttons, mobile separator (calm `border-top`, not destructive red), inspect action behavior (Approve/Reject/Keep/markDuplicateUI/resolveSimilarUI/prev-next pipeline/Open next item/reviewDecisionUI), cross-arc compatibility (D-245B/D-256/D-258B/D-259A), public/Drift/backend boundary, deploy integrity |
+| D-263A | this commit | Docs | Inspect panel action spacing checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+
+**CSS changes in D-261B (`public/styles.css` only):**
+- Added `.review-inspect-actions .btn-study-review{margin-left:auto}` (outside media block — desktop push)
+- Added inside `@media(max-width:600px)` Review block: `.review-inspect-actions button{width:100%}`
+- Added inside `@media(max-width:600px)` Review block: `.review-inspect-actions .review-inspect-markdup,.review-inspect-actions .review-inspect-resolvesim{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}`
+- Added inside `@media(max-width:600px)` Review block: `.review-inspect-actions .btn-study-review{margin-left:0}` (reset)
+
+**Tests added in mini-arc:** 19 (D-261B) + 33 (D-262A) = **52 new tests** (2959 → 3011 total).
+**Deploys required:** 1 (D-261C — owner manual terminal deploy).
+**D-261A, D-262A, D-263A:** Audit / tests / docs only — no deploy needed.
+
+---
+
+## Review inspect panel action spacing current behavior (post D-261→D-262)
+
+| Feature | Behavior |
+|---------|---------|
+| Desktop Study push | `.review-inspect-actions .btn-study-review` has `margin-left:auto` — Study floats to far right of the flex action bar on wider layouts, creating a natural gap between primary/dup group and Study |
+| Mobile full-width tap targets | `.review-inspect-actions button{width:100%}` at `@media(max-width:600px)` — all inspect action buttons expand to full container width in the column layout |
+| Mobile soft separator | `.review-inspect-markdup` and `.review-inspect-resolvesim` have `margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)` — calm visual break (6% white alpha, not error red) before the dup/advisory button group |
+| Mobile Study reset | `.review-inspect-actions .btn-study-review{margin-left:0}` inside mobile block — Study stacks naturally in column; overrides desktop push |
+| Action labels | Approve / Keep Pending / Reject / Archive / Mark Duplicate... / Dismiss ~Similar / Study variants — all unchanged |
+| Action button order | Approve → Keep Pending → Reject → [Archive] → [Mark Duplicate...] → [Dismiss ~Similar] → [Study] — unchanged |
+| Inspect action behavior | `requestApproveReview`, `requestRejectReview`, `markDuplicateUI`, `resolveSimilarUI`, `openReviewClaimStudy` all unchanged |
+| Search-aware inspect prev/next | `applyReviewSort(applyReviewSearch(applyReviewFilter(...)))` pipeline unchanged in `renderReviewInspectPanel` |
+| "Open next item →" | `renderReviewList` feedback banner behavior unchanged |
+| Decision feedback | `reviewDecisionUI` still defined and unchanged |
+| Duplicate/advisory semantics | Mark Duplicate / Dismiss ~Similar / Use as duplicate target — all unchanged |
+| Moderation actions | Approve/Keep/Reject/Archive — all unchanged |
+| D-245→D-260 locks | All prior regression lock tests pass without modification |
+
+---
+
 ## Duplicate/similar filter current behavior (post D-256)
 
 | Feature | Behavior |
@@ -501,6 +546,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-256 | **Confirmed** — copy-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-256B |
 | Review mobile/wrapping CSS in public profile | **Blocked** — `.review-sort-bar`, `.review-decision-feedback`, `.review-empty-actions` and all D-258B CSS classes confirmed absent from `renderPublicProfileHtml`; Review mobile CSS remains internal/admin-only | D-259A |
 | No new public data fields in D-258→D-259 | **Confirmed** — CSS-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-259A |
+| Inspect action spacing CSS in public profile | **Blocked** — `.review-inspect-actions`, `btn-study-review`, `review-inspect-markdup`, `review-inspect-resolvesim` and all D-261B CSS classes confirmed absent from `renderPublicProfileHtml`; inspect action spacing remains internal/admin Review UI only | D-262A |
+| No new public data fields in D-261→D-262 | **Confirmed** — CSS-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-262A |
 
 ---
 
@@ -558,7 +605,12 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-258B | Owner deploy PASS — D-258C confirmed live (39/39) |
 | D-258C | Live closeout — no deploy needed (closeout of D-258B deploy) |
 | D-259A | Tests / docs only — no deploy needed |
-| D-260A (this task) | Docs only — **no deploy needed** |
+| D-260A | Docs only — no deploy needed |
+| D-261A | Audit / docs only — no deploy needed |
+| D-261B | Owner deploy PASS — D-261C confirmed live (41/41) · deployed Worker: `cb5caf6f-67ff-4a41-baa5-22ed836e0cb2` |
+| D-261C | Live closeout — no deploy needed (closeout of D-261B deploy) |
+| D-262A | Tests / docs only — no deploy needed |
+| D-263A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -682,6 +734,18 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 53. **Do not treat mobile CSS polish as permission to change filter/search/sort behavior** — D-258B was CSS-only. Any task touching `applyReviewFilter`, `applyReviewSearch`, `applyReviewSort`, or the search pipeline while claiming CSS scope requires a separate explicit spec.
 
+54. **Do not remove desktop Study push without owner approval** — `.review-inspect-actions .btn-study-review{margin-left:auto}` addresses D-261A F-1 (no visual grouping at ≤600px). Removing or weakening it requires a new D-262B (or higher) doc and explicit owner approval.
+
+55. **Do not remove mobile full-width inspect buttons without owner approval** — `.review-inspect-actions button{width:100%}` at ≤600px addresses D-261A F-4 MEDIUM. Must not be removed under any CSS cleanup or layout task.
+
+56. **Do not remove duplicate/advisory soft separator without owner approval** — `border-top:1px solid rgba(255,255,255,.06)` on `.review-inspect-markdup`/`.review-inspect-resolvesim` at ≤600px addresses D-261A F-1 HIGH. Must not be regressed to unseparated column layout without a new spec.
+
+57. **Do not change inspect action labels/order under a CSS-only task** — Approve / Keep Pending / Reject / Archive / Mark Duplicate... / Dismiss ~Similar / Study button order and labels are locked. Any copy or order change requires a separate spec.
+
+58. **Do not change inspect action behavior under a spacing/polish task** — D-261B was CSS-only. Any task claiming CSS scope that touches `requestApproveReview`, `requestRejectReview`, `markDuplicateUI`, `resolveSimilarUI`, `openReviewClaimStudy`, or `reviewDecisionUI` requires a separate explicit spec.
+
+59. **Do not treat inspect spacing polish as permission to change moderation or duplicate/advisory semantics** — D-261B did not alter any moderation route, decision value, advisory semantics, or filter predicate. Future inspect panel CSS tasks must maintain the same constraint.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -706,7 +770,7 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
-| Review queue inspect panel action density audit | D-258A F-3 MEDIUM: 6-7 inspect action buttons stack as tall column on mobile; not addressed by D-258B |
+| Review queue milestone wrap-up checkpoint | Optional: close the full D-227→D-262 Review ergonomics run with a consolidated milestone doc if owner wants a clean arc close |
 | D-245A F-4 pressure handle duplication | Separate spec — pressure cards show handle in both chips and meta |
 | Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 
@@ -878,4 +942,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-258B | `f18db9c` | Review mobile control wrapping polish — sort bar isolation; decision feedback flex-wrap; empty-actions flex; 21 tests |
 | D-258C | `5b8d667` | D-258B live closeout — owner deploy PASS; 39/39 live sanity PASS |
 | D-259A | `8e36fdc` | Review mobile control wrapping regression lock — 35 tests across 7 categories |
-| D-260A | TBD | **[Current]** Review mobile controls wrapping checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-260A | `2f072f6` | Review mobile controls wrapping checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-261A | `036b459` | **[Arc start]** Review inspect panel action density audit — 7 sections; 6 risk findings; docs only |
+| D-261B | `246974a` | Inspect panel action spacing polish — desktop Study push; mobile full-width; mobile soft separator; 19 tests |
+| D-261C | `ac3e279` | D-261B live closeout — owner deploy PASS; 41/41 live sanity PASS; Worker `cb5caf6f` |
+| D-262A | `92ca239` | Inspect panel action spacing regression lock — 33 tests across 7 categories |
+| D-263A | TBD | **[Current]** Review inspect panel action spacing checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
