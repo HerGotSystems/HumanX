@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-06-29 after D-241A review-to-study navigation milestone checkpoint.
-Previous checkpoint: 2026-06-29 after D-238A duplicate advisory milestone checkpoint.
+Last updated: 2026-07-01 after D-244A review next-item flow milestone checkpoint.
+Previous checkpoint: 2026-06-29 after D-241A review-to-study navigation milestone checkpoint.
 
 ---
 
@@ -24,11 +24,12 @@ Previous checkpoint: 2026-06-29 after D-238A duplicate advisory milestone checkp
 | **Pre-D-227 stable HEAD** | `f286300` (D-226A public profile milestone checkpoint) |
 | **D-232A checkpoint HEAD** | see `docs/README.md` — D-232A review ergonomics milestone |
 | **D-238A checkpoint HEAD** | see `docs/README.md` — D-238A duplicate advisory milestone |
-| **D-241A checkpoint HEAD** | see `docs/README.md` after commit (D-241A review-to-study navigation milestone) |
+| **D-241A checkpoint HEAD** | see `docs/README.md` — D-241A review-to-study navigation milestone |
+| **D-244A checkpoint HEAD** | see `docs/README.md` after commit (D-244A review next-item flow milestone) |
 
 ---
 
-## Current baseline (as of D-241A)
+## Current baseline (as of D-244A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -42,7 +43,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2573 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2638 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -188,6 +189,49 @@ This arc audited and improved the moderator navigation path from Review queue in
 
 ---
 
+## D-242 → D-243 review next-item flow mini-arc summary
+
+This arc audited the post-decision moderator experience and added a manual "Open next item →" button to the D-230A feedback banner. After Approve or Reject, the button appears when a valid next item exists in the current sorted/filtered queue. Clicking it opens the inspect panel for that item without making any moderation decision.
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-242A | `6189bf8`/`1226341` | Audit | Post-decision next-item flow audit — found F-1 (no mouse-path next-item affordance); 7 guard tests; also fixed D-98B noscript test broken by upstream Drift/Belief merge |
+| D-242B | `4f2e031` | Feature | "Open next item →" button in D-230A feedback banner; `reviewDecisionFeedbackNextId` state; candidate captured before reload from sorted/filtered queue; post-reload validity check; 24 tests |
+| D-242C | `443bcc6` | Live closeout | D-242B confirmed live; 34/34 PASS (owner deploy 2026-07-01) |
+| D-243A | `d24b5ea` | Regression lock | 34 tests across 7 categories — state, capture, validity, manual-action, cross-arc compat, public boundary, deploy integrity |
+
+**Tests added in arc:** 7 + 24 + 34 = **65 new tests** (2638 total after D-243A).
+**Deploys required in arc:** 1 (D-242C — owner manual terminal deploy).
+**Docs/tests-only tasks:** D-242A, D-243A.
+
+---
+
+## Review next-item flow current behavior (post D-242→D-243)
+
+| Feature | Behavior |
+|---------|---------|
+| Post-Approve feedback | "Approved review item." banner; "Open next item →" button when a valid next item exists |
+| Post-Reject feedback | "Rejected review item." banner; "Open next item →" button when a valid next item exists |
+| Post-Keep-Pending feedback | "Kept review item." + Dismiss only; item stays open in inspect panel; no next-item button |
+| "Open next item →" click | Clears feedback; calls `inspectReviewItem(nextId)`; scrolls to card via existing D-227B behavior |
+| No auto-moderation | Button is navigation only — no `reviewDecisionUI`, no `fetch`/`api()` call |
+| Last-item suppression | Button absent when no valid next item exists (e.g. last in queue or empty queue after decision) |
+| Candidate capture | Derived from `applyReviewSort(applyReviewFilter(reviewQueue.review))` before `loadReviewQueue()` call |
+| Post-reload validity | Candidate checked against fresh `reviewQueue.review` after reload — stale candidate suppresses button |
+| Filter/sort respect | Next item follows current filter chip and sort order |
+| Keyboard advance | `initReviewKb` A+A / R+R / K `_advanceId` auto-advance unchanged |
+| Dismiss | Clears both `reviewDecisionFeedback` and `reviewDecisionFeedbackNextId` via `clearReviewDecisionFeedback()` |
+
+---
+
+## Drift/Belief expansion state (post upstream merge)
+
+The upstream `belief-drift-expansion` branch was merged into main around D-242A. It added `public/belief-drift-expansion.js` and modified `public/index.html`. The D-242A fixup aligned the D-98B noscript smoke test with the new simplified noscript fallback. All subsequent Review lane tasks (D-242B, D-242C, D-243A, D-244A) left Drift/Belief files untouched.
+
+**Rule:** Do not touch `public/belief-drift-expansion.js` or `public/index.html` during Review queue work unless a failing test requires a minimal, explicitly documented compatibility fix.
+
+---
+
 ## Duplicate advisory current behavior (post D-233→D-237)
 
 | Feature | Behavior |
@@ -257,6 +301,8 @@ This arc audited and improved the moderator navigation path from Review queue in
 | No new public data fields in D-233→D-237 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-237A |
 | Review-to-Study internals in public profile | **Blocked** — `openReviewClaimStudy`, `backToArena`, `lastModeBeforeStudy`, `lastInspectedReviewItemId`, and "← Back to Review" confirmed absent from `renderPublicProfileHtml` | D-240A |
 | No new public data fields in D-239→D-240 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-240A |
+| Next-item internals in public profile | **Blocked** — `reviewDecisionFeedbackNextId`, `review-feedback-next`, and "Open next item" confirmed absent from `renderPublicProfileHtml` | D-243A |
+| No new public data fields in D-242→D-243 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-243A |
 
 ---
 
@@ -288,7 +334,11 @@ This arc audited and improved the moderator navigation path from Review queue in
 | D-239A | Audit / docs only — no deploy needed |
 | D-239B | Owner deploy PASS — D-239C confirmed live (13/13) |
 | D-240A | Tests / docs only — no deploy needed |
-| D-241A (this task) | Docs only — **no deploy needed** |
+| D-241A | Docs only — no deploy needed |
+| D-242A | Audit / tests / docs only — no deploy needed |
+| D-242B | Owner deploy PASS — D-242C confirmed live (34/34) |
+| D-243A | Tests / docs only — no deploy needed |
+| D-244A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -344,6 +394,16 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 19. **No queue reload on Back-to-Review** — do not add `loadReviewQueue()` to the `backToArena()` return path without a deliberate spec. Stale-queue behavior on return is correct and expected.
 
+20. **D-243A review next-item flow lock** — any task touching the feedback banner (`reviewDecisionFeedback`, `reviewDecisionFeedbackNextId`, `clearReviewDecisionFeedback`), `reviewDecisionUI`, `renderReviewList` feedback rendering, or `inspectReviewItem` must either pass all D-243A regression tests unchanged, or update the D-243A lock with explicit owner approval before merging.
+
+21. **No auto-moderation on next-item** — do not add auto-approve, auto-reject, auto-keep, or any moderation API call to the "Open next item →" flow. The button must remain navigation-only (`inspectReviewItem` only).
+
+22. **No auto-advance preference/persistence** — do not add `localStorage`, `sessionStorage`, or any backend persistence for the next-item auto-advance preference without a separate owner-approved spec.
+
+23. **No keyboard shortcut advance changes** — do not change `initReviewKb` `_advanceId` behavior, timing, or key bindings without a separate review-flow spec reviewed by the owner.
+
+24. **Drift/Belief expansion boundary** — do not touch `public/belief-drift-expansion.js` or `public/index.html` during Review queue work unless a failing test requires a minimal, explicitly documented compatibility fix.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -364,13 +424,12 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| Review queue next-item flow audit | After a decision, auto-advance to next pending item — natural follow-on to D-239 navigation work |
-| Open related claim / Study navigation follow-up | D-239A F-2–F-5 remaining: button prominence, browser-back support, Study entry button style consistency |
-| Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
-| Review queue next-item flow | After a decision, auto-advance to next pending item in queue |
-| Compact review card metadata/status chips | Denser card for long queues — better scan without opening inspect |
+| Compact review card metadata/status chips audit | Denser card for long queues — better scan without opening inspect panel |
 | Review search/filter clarity | Filter chip accessibility; filter counts; empty-state copy per-filter |
+| Study entry button style consistency | D-239A F-2–F-4: button prominence, browser-back support, Study entry button style inconsistency |
 | Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
+| Open related claim / related item navigation | Follow-up on D-239A remaining findings |
+| Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 
 ---
 
@@ -388,7 +447,7 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 ---
 
-## Full batch history (A-2 → D-241A)
+## Full batch history (A-2 → D-244A)
 
 | Batch | Commit | Change |
 |-------|--------|--------|
@@ -506,4 +565,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-239B | `5c12a10` | Back-to-Review scroll restore — `requestAnimationFrame(scrollToReviewAnchor(_savedId))` in `backToArena()`; 17 tests |
 | D-239C | `725f486` | D-239B confirmed live; 13/13 PASS |
 | D-240A | `cab9952` | Review-to-study navigation regression lock — 30 tests across 7 categories |
-| D-241A | TBD | **[Current]** Review-to-study navigation milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-241A | TBD | Review-to-study navigation milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-242A | `6189bf8`/`1226341` | **[Arc start]** Review queue next-item flow audit — 7 guard tests; D-98B noscript test fixed for upstream noscript simplification |
+| D-242B | `4f2e031` | "Open next item →" button in D-230A feedback banner; `reviewDecisionFeedbackNextId` state; 24 tests |
+| D-242C | `443bcc6` | D-242B confirmed live; 34/34 PASS |
+| D-243A | `d24b5ea` | Review next-item flow regression lock — 34 tests across 7 categories |
+| D-244A | TBD | **[Current]** Review next-item flow milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |

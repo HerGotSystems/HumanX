@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-241A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc, current baseline 2573/0/24/57, privacy boundary state, deployment state, safe next-work rules.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-244A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc, current baseline 2638/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules.
 
-### `D243A_REVIEW_NEXT_ITEM_FLOW_REGRESSION_LOCK.md` ⭐ CURRENT — D-243A REVIEW NEXT-ITEM FLOW REGRESSION LOCK
+### `D244A_REVIEW_NEXT_ITEM_FLOW_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-244A REVIEW NEXT-ITEM FLOW MILESTONE CHECKPOINT
+
+Docs only. Deploy not needed. Baseline: 2638/0/24/57. Closes the D-242→D-243 review next-item flow mini-arc: 65 new tests total (7+24+34), 1 owner deploy (D-242C 34/34 PASS). PROJECT_STATE.md updated with arc summary, next-item behavior table, Drift/Belief expansion state, privacy boundary entries, deployment state, and 5 new safe-next-work rules (20–24). "Open next item →" manual-only affordance confirmed and locked. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D243A_REVIEW_NEXT_ITEM_FLOW_REGRESSION_LOCK.md` — D-243A REVIEW NEXT-ITEM FLOW REGRESSION LOCK
 
 Tests + docs only. Deploy not needed. Baseline: 2638/0/24/57 (+34 new tests). Locks D-242A/B/C next-item behavior across 7 categories: next-ID state (`reviewDecisionFeedbackNextId` + clear), candidate capture (sorted/filtered, approve/reject only, Keep Pending excluded), post-reload validity (candidate checked against fresh queue), manual action (button copy, type, inspectReviewItem, no reviewDecisionUI/fetch), cross-arc compat (D-227B/D-228A/D-229A/D-230A/D-239/D-240/keyboard), public boundary (3 assertions on renderPublicProfileHtml), deploy integrity (app/CSS/worker unchanged). App/CSS/worker/Drift files unchanged. No backend/API/migration/schema/CSP/external asset changes.
 
