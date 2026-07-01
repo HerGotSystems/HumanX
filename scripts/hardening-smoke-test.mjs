@@ -22144,6 +22144,232 @@ console.log('\nD-248A: Review card metadata density regression lock');
   });
 }
 
+// ── D-268B: RunPack fallback guidance + generated-time summary ────────────────
+
+{
+  console.log('\nD-268B: RunPack fallback guidance and generated-time summary');
+
+  const genIdx = appSrc.indexOf('async function generateRunPack(');
+  const genSlice = appSrc.slice(genIdx, genIdx + 2500);
+
+  const summaryIdx = appSrc.indexOf('function runPackSummary(');
+  const summarySlice = appSrc.slice(summaryIdx, summaryIdx + 2000);
+
+  // 1. Fallback RunPack includes instruction field
+  test('D-268B: fallback RunPack includes instruction field', () => {
+    assert.ok(
+      genSlice.includes('is_fallback:true') && genSlice.includes('instruction:'),
+      'fallback RunPack must include an instruction field for AI guidance'
+    );
+  });
+
+  // 2. Fallback RunPack includes output_contract field
+  test('D-268B: fallback RunPack includes output_contract field', () => {
+    assert.ok(
+      genSlice.includes('is_fallback:true') && genSlice.includes('output_contract:'),
+      'fallback RunPack must include an output_contract field so the AI knows the expected return schema'
+    );
+  });
+
+  // 3. Fallback instruction mentions claim-pressure analysis intent
+  test('D-268B: fallback instruction mentions claim-pressure analysis', () => {
+    const instrStart = genSlice.indexOf('instruction:');
+    const instrSlice = genSlice.slice(instrStart, instrStart + 800);
+    assert.ok(
+      instrSlice.includes('claim') && (instrSlice.includes('packet') || instrSlice.includes('analysis')),
+      'fallback instruction must reference claim and packet/analysis purpose'
+    );
+  });
+
+  // 4. Fallback instruction warns not to assume emotionally important claims are true
+  test('D-268B: fallback instruction warns not to assume emotionally important claims are true', () => {
+    const instrStart = genSlice.indexOf('instruction:');
+    const instrSlice = genSlice.slice(instrStart, instrStart + 800);
+    assert.ok(
+      instrSlice.includes('emotionally important'),
+      'fallback instruction must warn not to assume a claim is true because it is emotionally important'
+    );
+  });
+
+  // 5. Fallback instruction warns not to dismiss claims because unpopular
+  test('D-268B: fallback instruction warns not to dismiss claims only because unpopular', () => {
+    const instrStart = genSlice.indexOf('instruction:');
+    const instrSlice = genSlice.slice(instrStart, instrStart + 800);
+    assert.ok(
+      instrSlice.includes('unpopular'),
+      'fallback instruction must warn not to dismiss a claim only because it is unpopular'
+    );
+  });
+
+  // 6. Fallback output_contract requires structured fields
+  test('D-268B: fallback output_contract requires structured verdict and summary fields', () => {
+    const ocStart = genSlice.indexOf('output_contract:');
+    const ocSlice = genSlice.slice(ocStart, ocStart + 800);
+    assert.ok(
+      ocSlice.includes('verdict') && ocSlice.includes('plain_language_summary'),
+      'fallback output_contract must include verdict and plain_language_summary fields'
+    );
+  });
+
+  // 7. Fallback output_contract warns not to invent evidence
+  test('D-268B: fallback output_contract warns not to invent evidence', () => {
+    const genBigSlice = appSrc.slice(genIdx, genIdx + 4000);
+    const ocStart = genBigSlice.indexOf('output_contract:');
+    const ocSlice = genBigSlice.slice(ocStart, ocStart + 1200);
+    assert.ok(
+      ocSlice.includes('invent'),
+      'fallback output_contract must warn not to invent evidence not present in the packet'
+    );
+  });
+
+  // 8. Backend packet path unchanged — buildRunPack still in worker and no instruction field added there by this task
+  test('D-268B: backend buildRunPack exists and is not affected by frontend fallback patch', () => {
+    assert.ok(
+      workerSrc.includes('function buildRunPack('),
+      'buildRunPack must remain defined in worker.js — frontend fallback patch must not touch backend'
+    );
+  });
+
+  // 9. rpRelativeTime helper is defined
+  test('D-268B: rpRelativeTime helper is defined in app-v10.js', () => {
+    assert.ok(
+      appSrc.includes('function rpRelativeTime('),
+      'rpRelativeTime must be defined in app-v10.js for generated-time display'
+    );
+  });
+
+  // 10. rpRelativeTime returns human-readable relative-time strings
+  test('D-268B: rpRelativeTime returns human-readable copy (just now / min ago / h ago)', () => {
+    const rtIdx = appSrc.indexOf('function rpRelativeTime(');
+    const rtSlice = appSrc.slice(rtIdx, rtIdx + 300);
+    assert.ok(
+      rtSlice.includes('just now') && rtSlice.includes('min ago') && rtSlice.includes('h ago'),
+      'rpRelativeTime must return human-readable copy including "just now", "min ago", "h ago"'
+    );
+  });
+
+  // 11. runPackSummary emits rp-summary-generated element when meta available
+  test('D-268B: runPackSummary emits rp-summary-generated element for generated-at display', () => {
+    assert.ok(
+      summarySlice.includes('rp-summary-generated'),
+      'runPackSummary must emit rp-summary-generated element for generated-time display'
+    );
+  });
+
+  // 12. Generated-time summary calls rpRelativeTime
+  test('D-268B: runPackSummary calls rpRelativeTime for generated-at display', () => {
+    assert.ok(
+      summarySlice.includes('rpRelativeTime('),
+      'runPackSummary must call rpRelativeTime() to format generated-at timestamp'
+    );
+  });
+
+  // 13. runPackSummary still shows evidence/pressure/test counts
+  test('D-268B: runPackSummary still renders evidence/pressure/test counts row', () => {
+    assert.ok(
+      summarySlice.includes('rp-summary-count') && summarySlice.includes('evidence') && summarySlice.includes('pressure') && summarySlice.includes('tests'),
+      'runPackSummary must still render evidence/pressure/tests counts row unchanged'
+    );
+  });
+
+  // 14. Stale warning chip still present and unchanged
+  test('D-268B: stale warning chip and detectPacketStaleness call preserved in runPackSummary', () => {
+    assert.ok(
+      summarySlice.includes('detectPacketStaleness') && summarySlice.includes('rp-status-warn') && summarySlice.includes('Possibly stale'),
+      'runPackSummary must still call detectPacketStaleness and show Possibly stale warning chip'
+    );
+  });
+
+  // 15. Stale threshold unchanged (3600000ms = 1h)
+  test('D-268B: detectPacketStaleness stale threshold unchanged at 3600000ms', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness(');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 800);
+    assert.ok(
+      staleSlice.includes('3600000'),
+      'detectPacketStaleness stale threshold must remain at 3600000ms (1h) — D-268B must not change this'
+    );
+  });
+
+  // 16. AI return paste behavior unchanged — saveAnalysisResult still uses JSON.parse
+  test('D-268B: saveAnalysisResult still validates with JSON.parse', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult(');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 600);
+    assert.ok(
+      sarSlice.includes('JSON.parse(text)'),
+      'saveAnalysisResult must still use JSON.parse for AI return validation'
+    );
+  });
+
+  // 17. Analysis parsing field extraction unchanged
+  test('D-268B: saveAnalysisResult field extraction unchanged (output || result || analysis)', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult(');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 600);
+    assert.ok(
+      sarSlice.includes('parsed.output||parsed.result||parsed.analysis||parsed') ||
+      sarSlice.includes('parsed.output || parsed.result || parsed.analysis || parsed'),
+      'saveAnalysisResult field extraction must be unchanged'
+    );
+  });
+
+  // 18. No public truth state change — saveAnalysisResult posts to /api/analysis not review routes
+  test('D-268B: saveAnalysisResult posts to /api/analysis, not review/approve routes', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult(');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 600);
+    assert.ok(
+      sarSlice.includes("'/api/analysis'") && !sarSlice.includes("'/api/review") && !sarSlice.includes("'/api/approve"),
+      'saveAnalysisResult must post to /api/analysis only — must not touch review or approve routes'
+    );
+  });
+
+  // 19. No Review moderation change — requestApproveReview still separate
+  test('D-268B: requestApproveReview still defined separately from saveAnalysisResult', () => {
+    assert.ok(
+      appSrc.includes('function requestApproveReview(') || appSrc.includes('async function requestApproveReview('),
+      'requestApproveReview must still be defined — D-268B must not touch moderation functions'
+    );
+  });
+
+  // 20. No public profile exposure — generateRunPack absent from renderPublicProfileHtml
+  test('D-268B: generateRunPack absent from renderPublicProfileHtml', () => {
+    const ppIdx = appSrc.indexOf('function renderPublicProfileHtml(');
+    const ppSlice = appSrc.slice(ppIdx, ppIdx + 18000);
+    assert.ok(!ppSlice.includes('generateRunPack'), 'generateRunPack must not appear in renderPublicProfileHtml');
+  });
+
+  // 21. Drift/Belief files not modified
+  test('D-268B: belief-drift-expansion.js not modified by D-268B', () => {
+    const driftSrc = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(!driftSrc.includes('D-268B'), 'D-268B must not modify belief-drift-expansion.js');
+  });
+
+  // 22. No backend/API/schema change — worker.js not modified by D-268B
+  test('D-268B: worker.js not modified by D-268B', () => {
+    assert.ok(!workerSrc.includes('D-268B'), 'D-268B must not modify worker.js — frontend-only change');
+  });
+
+  // 23. No CSP/external asset change — index.html not modified by D-268B
+  test('D-268B: index.html not modified by D-268B', () => {
+    const indexSrc = readFileSync(path.join(__dirname, '../public/index.html'), 'utf8');
+    assert.ok(!indexSrc.includes('D-268B'), 'D-268B must not modify index.html');
+  });
+
+  // 24. Fallback still marked is_fallback:true
+  test('D-268B: fallback RunPack still sets is_fallback:true', () => {
+    assert.ok(
+      genSlice.includes('is_fallback:true'),
+      'fallback RunPack must still set is_fallback:true — D-268B must not remove the fallback marker'
+    );
+  });
+
+  // 25. Fallback still uses safeRunPackClaim(selected) for payload (D-171B lock preserved)
+  test('D-268B: fallback RunPack still uses safeRunPackClaim(selected) for payload (D-171B lock)', () => {
+    assert.ok(
+      genSlice.includes('safeRunPackClaim(selected)'),
+      'fallback RunPack payload must still use safeRunPackClaim(selected) — D-171B lock preserved'
+    );
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
