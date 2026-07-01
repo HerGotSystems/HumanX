@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2743 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2758 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-249A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc, current baseline 2722/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–32.
 
-### `D250B_REVIEW_ACTIVE_FILTER_SORT_SUMMARY.md` ⭐ CURRENT — D-250B REVIEW ACTIVE FILTER/SORT SUMMARY — LIVE PASS
+### `D251A_REVIEW_ZERO_RESULTS_FILTER_CLARITY.md` ⭐ CURRENT — D-251A REVIEW ZERO-RESULTS FILTER CLARITY — DEPLOY NEEDED
+
+App/CSS change. Owner deploy pending (D-251B). Baseline: 2758/0/24/57 (+15 tests). Adds `renderReviewEmptyState()` function replacing the inline empty-state template in `renderReviewList`. When the current filter/sort shows 0 items: renders `"No review items match this view."` title, a context line (`Current view: {filter} · Sorted: {sort}`), the existing per-filter explanatory copy (preserved), and a `"Show all review items"` button (absent when already on All). Button uses `data-action="setReviewFilter" data-value="all"` (D-181C compliant — no inline `onclick`). Sort is not reset. D-250B active summary remains visible. No filter/sort/moderation/next-item logic changed. No search added. No public profile exposure. No Drift/Belief expansion changes. No backend/API/migration/schema/CSP/external asset changes. Worker unchanged.
+
+### `D250B_REVIEW_ACTIVE_FILTER_SORT_SUMMARY.md` — D-250B REVIEW ACTIVE FILTER/SORT SUMMARY — LIVE PASS
 
 App/CSS change. Deploy complete. D-250C live sanity 29/29 PASS (2026-07-01). Baseline: 2743/0/24/57 (+13 tests). Adds `renderReviewActiveSummary(list)` function that renders a small muted summary line (`Showing: {filterLabel} · {count} item(s) · Sorted: {sortLabel}`) between the audit bar and the card list. Addresses D-250A F-2: no active filter/sort context near cards. Summary uses existing `reviewStateFilter`/`reviewSortOrder` state and the already-computed filtered+sorted `list` — no behavior change. Filter/sort/next-item/moderation logic all unchanged. D-250A guard tests (D-93B allowlist extended with `2730` and `2743`). CSS `.review-active-summary` added (muted, 11px). No search added. No public profile exposure. No Drift/Belief expansion changes. No backend/API/migration/schema/CSP/external asset changes. Worker unchanged.
 
