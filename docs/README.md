@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2924 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2959 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-257A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc + D-256 duplicate/similar label clarity addendum, current baseline 2924/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–48.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-257A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc + D-256 duplicate/similar label clarity addendum, current baseline 2959/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–48.
 
-### `D258B_REVIEW_MOBILE_CONTROL_WRAPPING_POLISH.md` ⭐ CURRENT — D-258B/C REVIEW MOBILE CONTROL WRAPPING POLISH — LIVE PASS
+### `D259A_REVIEW_MOBILE_CONTROL_WRAPPING_REGRESSION_LOCK.md` ⭐ CURRENT — D-259A REVIEW MOBILE CONTROL WRAPPING REGRESSION LOCK — TESTS + DOCS
+
+Tests + docs only. No deploy needed. Baseline: 2959/0/24/57 (+35 D-259A tests). Locks the D-258B/C mobile wrapping polish: sort-bar CSS isolation/wrapping (`.review-sort-bar`, `.review-sort-label`, `.review-sort-select`), decision-feedback wrapping (`.review-decision-feedback` flex-wrap, button flex-shrink:0), empty-actions flex/stacking (`.review-empty-actions`), sort behavior (`setReviewSort`), search/filter/sort pipeline, inspect prev/next search-awareness, D-250→D-257 behavior guarantees, public profile boundary, Drift/Belief files unmodified. app-v10.js, styles.css, worker, Drift/Belief files all unchanged. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D258B_REVIEW_MOBILE_CONTROL_WRAPPING_POLISH.md` — D-258B/C REVIEW MOBILE CONTROL WRAPPING POLISH — LIVE PASS
 
 CSS + tests. Deploy complete (D-258C, 2026-07-01). Baseline: 2924/0/24/57 (+21 D-258B tests). CSS-only fixes for the two HIGH and one MEDIUM findings from D-258A: F-1 (added `.review-sort-bar`, `.review-sort-label`, `.review-sort-select` rules for sort control layout isolation); F-2 (added `flex-wrap:wrap` and `flex-shrink:0` to `.review-decision-feedback` and its action buttons); F-4 (converted `.review-empty-actions` to `display:flex;flex-wrap:wrap;gap:6px`). No app/worker/Drift/Belief changes. No copy, no behavior, no predicates changed. All D-245→D-257 regression locks preserved. 21 new smoke tests. D-93B allowlist updated. 39/39 live sanity PASS (D-258C). Sort bar wraps safely. Decision feedback wraps safely. Empty actions wrap/stack safely. `Dupes + Similar` label preserved. No public profile exposure. Drift/Belief unaffected. No backend/API/migration/schema/CSP/external asset changes.
 
