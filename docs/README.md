@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-241A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc, current baseline 2573/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D242A_REVIEW_QUEUE_NEXT_ITEM_FLOW_AUDIT.md` ⭐ CURRENT — D-242A REVIEW QUEUE NEXT-ITEM FLOW AUDIT
+### `D242B_REVIEW_DECISION_OPEN_NEXT_ITEM.md` ⭐ CURRENT — D-242B REVIEW DECISION: OPEN NEXT ITEM — **DEPLOY NEEDED**
+
+App + CSS + tests + docs. **Deploy needed — owner deploy required.** Baseline: 2604/0/24/57 (+24 new tests, +5 slice-window fixes). Adds "Open next item →" button to D-230A feedback banner after Approve/Reject when a next item exists in the current sorted/filtered queue. Next item captured before queue reload via applyReviewSort(applyReviewFilter(...)). Button calls clearReviewDecisionFeedback()+inspectReviewItem(nextId) — manual only, no auto-moderation, no backend call. Keep Pending unchanged (no button for 'review' decision). Keyboard _advanceId path unchanged. New state: reviewDecisionFeedbackNextId. CSS: .review-feedback-next with focus-visible. Drift/Belief expansion files untouched. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D242A_REVIEW_QUEUE_NEXT_ITEM_FLOW_AUDIT.md` — D-242A REVIEW QUEUE NEXT-ITEM FLOW AUDIT
 
 Audit + guard tests + docs. Deploy not needed. Baseline: 2580/0/24/57 (+7 new tests). Documents post-decision behavior after Approve/Keep/Reject: item removal from pending filter, inspect panel clearance, feedback banner (D-230A), scroll fallback, and the hidden keyboard auto-advance path (initReviewKb already auto-advances after A+A/R+R/K — button path does not). 7 guard tests lock keyboard advance logic (_advanceId pre-capture, .then() dispatch, next-first preference, _reviewKbInFlight guard), inspect panel nav computation (sorted/filtered _prev/_next, Next → button wiring), and the gap invariant (reviewDecisionUI does not call inspectReviewItem). App/CSS/worker unchanged. No backend/API/migration/schema/CSP/external asset changes. Recommended next: D-242B — "Open next item →" button in the D-230A feedback banner.
 

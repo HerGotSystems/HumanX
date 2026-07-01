@@ -3569,7 +3569,8 @@ test('D-129A: scrollToReviewAnchor falls back through inspect-panel → card-by-
 
 test('D-129A: reviewDecisionUI captures anchor id before action and scrolls after render', () => {
   const idx = appSrc.indexOf('async function reviewDecisionUI(');
-  const body = appSrc.slice(idx, idx + 1000);
+  // D-242B: window extended 1000→1500 — next-item capture logic added before scrollToReviewAnchor
+  const body = appSrc.slice(idx, idx + 1500);
   assert.ok(
     body.includes('_anchorId=inspectedReviewItem') &&
     body.includes('scrollToReviewAnchor(_anchorId)'),
@@ -3714,8 +3715,8 @@ test('D-129C: renderReviewInspectContext function is defined', () => {
 
 test('D-129C: renderReviewList updates #casefile with inspect context when item is open', () => {
   const idx = appSrc.indexOf('function renderReviewList(');
-  // D-230A: window extended 1200→1500 — feedbackBanner variable added ahead of casefile logic
-  const body = appSrc.slice(idx, idx + 1500);
+  // D-242B: window extended 1500→1800 — _fbNextInQueue/next-item button added ahead of casefile logic
+  const body = appSrc.slice(idx, idx + 1800);
   assert.ok(
     body.includes('casefile') &&
     body.includes('renderReviewInspectContext(inspectedReviewItem)') &&
@@ -3726,8 +3727,8 @@ test('D-129C: renderReviewList updates #casefile with inspect context when item 
 
 test('D-129C: renderReviewList falls back to helperText when no item inspected', () => {
   const idx = appSrc.indexOf('function renderReviewList(');
-  // D-230A: window extended 1200→1500 — feedbackBanner variable added ahead of casefile logic
-  const body = appSrc.slice(idx, idx + 1500);
+  // D-242B: window extended 1500→1800 — _fbNextInQueue/next-item button added ahead of casefile logic
+  const body = appSrc.slice(idx, idx + 1800);
   assert.ok(
     body.includes('inspectedReviewItem?renderReviewInspectContext(inspectedReviewItem):helperText()'),
     'renderReviewList must use ternary: inspectedReviewItem ? renderReviewInspectContext : helperText'
@@ -3903,8 +3904,8 @@ test('D-129D: inspect metadata fields still include ID and State', () => {
 
 test('D-129D: D-129C right context panel still swaps on inspect open/close', () => {
   const idx = appSrc.indexOf('function renderReviewList(');
-  // D-230A: window extended 1200→1500 — feedbackBanner variable added ahead of casefile logic
-  const body = appSrc.slice(idx, idx + 1500);
+  // D-242B: window extended 1500→1800 — _fbNextInQueue/next-item button added ahead of casefile logic
+  const body = appSrc.slice(idx, idx + 1800);
   assert.ok(
     body.includes('renderReviewInspectContext(inspectedReviewItem)') &&
     body.includes('helperText()'),
@@ -4015,8 +4016,8 @@ test('D-129E: inspected card suppresses Approve/Keep/Reject (D-129A preserved)',
 
 test('D-129E: D-129C right context panel still active', () => {
   const idx = appSrc.indexOf('function renderReviewList(');
-  // D-230A: window extended 1200→1500 — feedbackBanner variable added ahead of casefile logic
-  const body = appSrc.slice(idx, idx + 1500);
+  // D-242B: window extended 1500→1800 — _fbNextInQueue/next-item button added ahead of casefile logic
+  const body = appSrc.slice(idx, idx + 1800);
   assert.ok(
     body.includes('renderReviewInspectContext(inspectedReviewItem)'),
     'D-129C right context panel swap must remain intact'
@@ -18928,11 +18929,180 @@ console.log('\nD-240A: Review-to-study navigation regression lock');
     );
   });
 
-  test('D-242A [gap lock]: reviewDecisionUI does not call inspectReviewItem (button path has no auto-advance)', () => {
+  test('D-242A [gap lock]: reviewDecisionUI does not call inspectReviewItem directly (next-item is via banner button)', () => {
     assert.ok(
       !decisionSrc.includes('inspectReviewItem('),
-      'reviewDecisionUI must not call inspectReviewItem — button path has no auto-advance (gap target of D-242B)'
+      'reviewDecisionUI must not call inspectReviewItem directly — next-item affordance is via the feedback banner button (D-242B)'
     );
+  });
+}
+
+// ── D-242B: Review decision Open next item ────────────────────────────────────
+
+{
+  console.log('\nD-242B: Review decision — Open next item');
+
+  const decisionSrc = (() => {
+    const start = appSrc.indexOf('async function reviewDecisionUI(');
+    const end = appSrc.indexOf('\nasync function ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 3000);
+  })();
+
+  const renderListSrc = (() => {
+    const start = appSrc.indexOf('function renderReviewList(');
+    const end = appSrc.indexOf('\nfunction ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 4000);
+  })();
+
+  const clearFbSrc = (() => {
+    const start = appSrc.indexOf('function clearReviewDecisionFeedback(');
+    const end = appSrc.indexOf('\n', start + 1);
+    return appSrc.slice(start, end);
+  })();
+
+  const ppSrc = (() => {
+    const start = appSrc.indexOf('function renderPublicProfileHtml(');
+    const end = appSrc.indexOf('\nfunction ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 8000);
+  })();
+
+  // 1. State
+  test('D-242B [state]: reviewDecisionFeedbackNextId module-level variable declared', () => {
+    assert.ok(appSrc.includes('let reviewDecisionFeedbackNextId'), 'reviewDecisionFeedbackNextId must be declared as a module-level let variable');
+  });
+
+  // 2. Capture before reload
+  test('D-242B [capture]: reviewDecisionUI captures next candidate ID before loadReviewQueue', () => {
+    const captureIdx = decisionSrc.indexOf('_nextCandidateId');
+    const reloadIdx = decisionSrc.indexOf('loadReviewQueue');
+    assert.ok(captureIdx >= 0 && captureIdx < reloadIdx, 'reviewDecisionUI must capture _nextCandidateId before calling loadReviewQueue');
+  });
+
+  test('D-242B [capture]: next candidate derived from applyReviewSort/applyReviewFilter', () => {
+    assert.ok(
+      decisionSrc.includes('applyReviewSort(applyReviewFilter('),
+      'reviewDecisionUI must derive next candidate from applyReviewSort(applyReviewFilter(reviewQueue.review))'
+    );
+  });
+
+  test('D-242B [capture]: next item capture only for approve and reject decisions', () => {
+    assert.ok(
+      decisionSrc.includes("decision==='public'") && decisionSrc.includes("decision==='rejected'") && decisionSrc.includes('_captureNext'),
+      'next item capture must be guarded to approve (public) and reject decisions only'
+    );
+  });
+
+  test('D-242B [capture]: reviewDecisionUI sets reviewDecisionFeedbackNextId after decision', () => {
+    assert.ok(
+      decisionSrc.includes('reviewDecisionFeedbackNextId=_nextCandidateId') ||
+      decisionSrc.includes('reviewDecisionFeedbackNextId = _nextCandidateId'),
+      'reviewDecisionUI must assign reviewDecisionFeedbackNextId from the captured candidate'
+    );
+  });
+
+  // 3. Banner rendering
+  test('D-242B [banner]: next-item button rendered only when item still exists in post-reload queue', () => {
+    assert.ok(
+      renderListSrc.includes('reviewDecisionFeedbackNextId') &&
+      renderListSrc.includes('reviewQueue.review') &&
+      renderListSrc.includes('review-feedback-next'),
+      'renderReviewList must check reviewDecisionFeedbackNextId against post-reload queue before rendering button'
+    );
+  });
+
+  test('D-242B [banner]: next-item button copy is "Open next item →"', () => {
+    assert.ok(renderListSrc.includes('Open next item →'), 'feedback banner next-item button must use copy "Open next item →"');
+  });
+
+  test('D-242B [banner]: next-item button is type="button"', () => {
+    assert.ok(
+      renderListSrc.includes('type="button" class="review-feedback-next"') ||
+      renderListSrc.includes('"button" class="review-feedback-next"'),
+      'next-item button must have type="button" to prevent accidental form submission'
+    );
+  });
+
+  test('D-242B [banner]: next-item button calls inspectReviewItem', () => {
+    assert.ok(renderListSrc.includes("inspectReviewItem("), 'next-item button must call inspectReviewItem to open the next item');
+  });
+
+  test('D-242B [banner]: next-item button calls clearReviewDecisionFeedback', () => {
+    assert.ok(renderListSrc.includes('clearReviewDecisionFeedback()'), 'next-item button onclick must call clearReviewDecisionFeedback() to dismiss the banner');
+  });
+
+  test('D-242B [banner]: next-item button does not call reviewDecisionUI', () => {
+    const btnMatch = renderListSrc.match(/review-feedback-next[\s\S]{0,300}/)?.[0] || '';
+    assert.ok(!btnMatch.includes('reviewDecisionUI('), 'next-item button must not call reviewDecisionUI — manual navigation only, no auto-moderation');
+  });
+
+  test('D-242B [banner]: next-item button does not call fetch or api()', () => {
+    const btnMatch = renderListSrc.match(/review-feedback-next[\s\S]{0,300}/)?.[0] || '';
+    assert.ok(!btnMatch.includes('fetch(') && !btnMatch.includes("api('") && !btnMatch.includes('api("'), 'next-item button must not make any backend/API call');
+  });
+
+  // 4. clearReviewDecisionFeedback clears both vars
+  test('D-242B [clear]: clearReviewDecisionFeedback clears reviewDecisionFeedbackNextId', () => {
+    assert.ok(
+      clearFbSrc.includes('reviewDecisionFeedbackNextId=null') || clearFbSrc.includes('reviewDecisionFeedbackNextId = null'),
+      'clearReviewDecisionFeedback must set reviewDecisionFeedbackNextId to null'
+    );
+  });
+
+  // 5. Existing decision feedback unchanged
+  test('D-242B [compat D-230A]: "Approved review item." feedback copy unchanged', () => {
+    assert.ok(decisionSrc.includes("'Approved review item.'"), 'Approved review item. feedback copy must remain unchanged');
+  });
+
+  test('D-242B [compat D-230A]: "Rejected review item." feedback copy unchanged', () => {
+    assert.ok(decisionSrc.includes("'Rejected review item.'"), 'Rejected review item. feedback copy must remain unchanged');
+  });
+
+  test('D-242B [compat D-230A]: "Kept review item." feedback copy unchanged', () => {
+    assert.ok(decisionSrc.includes("'Kept review item.'"), 'Kept review item. feedback copy must remain unchanged');
+  });
+
+  test('D-242B [compat D-230A]: Dismiss button still calls clearReviewDecisionFeedback', () => {
+    assert.ok(renderListSrc.includes('review-feedback-dismiss') && renderListSrc.includes('clearReviewDecisionFeedback()'), 'Dismiss button must still call clearReviewDecisionFeedback');
+  });
+
+  // 6. No public profile exposure
+  test('D-242B [public]: renderPublicProfileHtml excludes reviewDecisionFeedbackNextId', () => {
+    assert.ok(!ppSrc.includes('reviewDecisionFeedbackNextId'), 'renderPublicProfileHtml must not contain reviewDecisionFeedbackNextId');
+  });
+
+  test('D-242B [public]: renderPublicProfileHtml excludes review-feedback-next', () => {
+    assert.ok(!ppSrc.includes('review-feedback-next'), 'renderPublicProfileHtml must not contain review-feedback-next class');
+  });
+
+  test('D-242B [public]: renderPublicProfileHtml excludes "Open next item"', () => {
+    assert.ok(!ppSrc.includes('Open next item'), 'renderPublicProfileHtml must not contain "Open next item" copy');
+  });
+
+  // 7. CSS
+  test('D-242B [css]: styles.css defines .review-feedback-next', () => {
+    assert.ok(cssSrc.includes('review-feedback-next'), 'styles.css must define .review-feedback-next for the next-item button');
+  });
+
+  test('D-242B [css]: .review-feedback-next has focus-visible styling', () => {
+    assert.ok(cssSrc.includes('review-feedback-next:focus-visible'), '.review-feedback-next must have :focus-visible styling for keyboard accessibility');
+  });
+
+  // 8. Keyboard path unchanged
+  test('D-242B [compat D-242A]: keyboard _advanceId auto-advance path unchanged', () => {
+    const kbSrc = (() => {
+      const start = appSrc.indexOf('function initReviewKb(');
+      const end = appSrc.indexOf('\nfunction ', start + 1);
+      return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 4000);
+    })();
+    assert.ok(
+      kbSrc.includes('_advanceId') && kbSrc.includes('inspectReviewItem(_advanceId)'),
+      'keyboard _advanceId auto-advance in initReviewKb must remain unchanged'
+    );
+  });
+
+  // 9. Deploy integrity
+  test('D-242B [deploy]: worker.js not modified by D-242B', () => {
+    assert.ok(!workerSrc.includes('D-242B'), 'worker.js must not be modified by D-242B');
   });
 }
 
