@@ -1,7 +1,7 @@
 # D-271A — RunPack AI-Return Import Visibility Polish
 
 **Scope:** Frontend (`public/app-v10.js`) + tests + docs
-**Status:** COMPLETE — deploy needed
+**Status:** COMPLETE — owner deploy PASS (D-271B, 2026-07-01) — 32/32 live sanity PASS
 **Baseline before:** 3144 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Baseline after:** 3171 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `scripts/hardening-smoke-test.mjs`, `docs/D271A_RUNPACK_AI_RETURN_IMPORT_VISIBILITY_POLISH.md`, `docs/README.md`
@@ -9,7 +9,7 @@
 **CSS changes:** None
 **Worker changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes — `public/app-v10.js` changed
+**Deploy needed:** No — deployed (D-271B)
 
 ---
 
@@ -124,3 +124,83 @@ No CSS changes needed — `open` is HTML-native, `rp-return-next-step` inherits 
 - `wrangler.toml` — not touched
 - No `alignment_labels` — permanently blocked
 - No `top_beliefs_json` in any public API
+
+---
+
+## D-271B — Live Closeout (2026-07-01)
+
+**Owner deploy:** PASS
+**Live RunPack AI-return import visibility sanity:** PASS — 32/32
+
+### Post-deploy static checks
+
+| Script | Result |
+|--------|--------|
+| `node --check public/app-v10.js` | no output, exit 0 |
+| `hardening-smoke-test.mjs` | `3171 passed, 0 failed` |
+| `belief-engine-static-check.mjs` | `24 passed, 0 failed` |
+| `worker-route-static-check.mjs` | `57 passed, 0 failed / 1 known warn` |
+
+Known warn: `/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`
+
+### Live sanity results (32/32 PASS)
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opened after deploy | PASS |
+| 2 | Claim/RunPack area opens without console-breaking errors | PASS |
+| 3 | Existing claim can be loaded | PASS |
+| 4 | RunPack/Investigation Packet can be generated or displayed | PASS |
+| 5 | When a matching RunPack is loaded, "Load AI Analysis Return" is visible/expanded | PASS |
+| 6 | AI-return section does not require user to notice and manually open a hidden collapsed section | PASS |
+| 7 | New next-step copy appears near the import area | PASS |
+| 8 | New copy tells the user to paste the AI/JSON return | PASS |
+| 9 | New copy clearly says it does not publish a truth automatically | PASS |
+| 10 | Import textarea/input still appears | PASS |
+| 11 | Existing accepted input format unchanged | PASS |
+| 12 | Parser behavior unchanged | PASS |
+| 13 | Parse success behavior unchanged | PASS |
+| 14 | Parse failure behavior unchanged | PASS |
+| 15 | `saveAnalysisResult` behavior unchanged | PASS |
+| 16 | Public truth state unchanged | PASS |
+| 17 | Review queue behavior unchanged | PASS |
+| 18 | Review/moderation behavior unchanged | PASS |
+| 19 | Generated-time summary still appears when `generated_at` exists | PASS |
+| 20 | Generated-time copy still human-readable | PASS |
+| 21 | Fallback packet `instruction` still present | PASS |
+| 22 | Fallback packet `output_contract` still present | PASS |
+| 23 | Stale warning still appears when packet is stale | PASS |
+| 24 | Stale threshold behavior unchanged | PASS |
+| 25 | F-4 snapshot-hash stale detection still deferred | PASS |
+| 26 | F-5 packet-ID storage still deferred | PASS |
+| 27 | Packet copy/download behavior unchanged | PASS |
+| 28 | Backend RunPack generation unchanged | PASS |
+| 29 | Public profile pages unaffected | PASS |
+| 30 | Drift/Belief expansion surfaces still load normally | PASS |
+| 31 | No backend/API behavior changed | PASS |
+| 32 | No console errors | PASS |
+
+### Confirmed guarantees (post-deploy)
+
+- `rp-return-section` auto-expands when matching RunPack loaded: `lastPacket && lastPacketClaimId === selected?.id`
+- `rp-return-next-step` copy present and visible
+- Copy tells user to paste AI/JSON return
+- Copy states "Saving does not publish a truth automatically"
+- `saveAnalysisResult` JSON.parse validation unchanged
+- `saveAnalysisResult` field extraction unchanged (`parsed.output||parsed.result||parsed.analysis||parsed`)
+- `saveAnalysisResult` parse failure toast unchanged ("Paste valid JSON first")
+- `saveAnalysisResult` success toast unchanged ("Analysis saved")
+- `saveAnalysisResult` posts to `/api/analysis` only — public truth state unchanged
+- Review/moderation unchanged — `requestApproveReview` / `requestRejectReview` untouched
+- `rp-summary-generated` still emitted by `runPackSummary`
+- Fallback `instruction` preserved (emotionally-important/unpopular/no-independent-verification warnings)
+- Fallback `output_contract` preserved (all 10 fields + no-invent-evidence warning)
+- Stale warning chip preserved; threshold `3600000ms` unchanged
+- F-4 (`source_snapshot_hash` stale) remains deferred
+- F-5 (`packet_id` storage) remains deferred
+- `rp-return-section` and `rp-return-next-step` absent from `renderPublicProfileHtml`
+- `public/belief-drift-expansion.js` unchanged
+- `src/worker.js` unchanged
+- `public/index.html` unchanged
+- `public/styles.css` unchanged
+- No backend/API/migration/schema/CSP/external asset changes
