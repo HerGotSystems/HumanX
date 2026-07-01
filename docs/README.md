@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3171 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3217 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-270A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run (9 mini-arcs, 721 tests, 14 deploys — see D-264A wrap-up) + D-265→D-266 Study entry / Back button style mini-arc (64 tests, 1 deploy — see D-267A checkpoint) + D-268→D-269 RunPack fallback guidance/generated-time mini-arc (69 tests, 1 deploy — see D-270A checkpoint), current baseline 3144/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–77.
 
-### `D271A_RUNPACK_AI_RETURN_IMPORT_VISIBILITY_POLISH.md` ⭐ CURRENT — D-271A/B RUNPACK AI-RETURN IMPORT VISIBILITY POLISH — LIVE PASS
+### `D272A_RUNPACK_AI_RETURN_IMPORT_VISIBILITY_REGRESSION_LOCK.md` ⭐ CURRENT — D-272A RUNPACK AI-RETURN IMPORT VISIBILITY REGRESSION LOCK — TESTS + DOCS ONLY
+
+Tests + docs only. No deploy needed. Baseline: 3217/0/24/57 (+46 tests). Regression lock for D-271A/B RunPack AI-return import visibility polish. 7 test categories: (1) AI-return visibility lock (`rp-return-section` present, `Load AI Analysis Return` title, conditional `open` attribute when `lastPacket&&lastPacketClaimId===selected?.id`, selected-claim gate, `analysisPaste` textarea, `Save Analysis` button, frontend-only visibility); (2) next-step copy lock (`rp-return-next-step` class, paste AI/JSON guidance, no-auto-publish copy, not owner-verified-proof, `ev-origin-note` provenance, copy within `rp-return-section`); (3) parser lock (`JSON.parse`, field extraction `parsed.output||parsed.result||parsed.analysis||parsed`, failure/success toasts, format not narrowed, `saveAnalysisResult` still frontend async); (4) public truth lock (posts to `/api/analysis` only, no `submitTruth`/`requestApproveReview`, moderation unchanged, all AI-return symbols absent from `renderPublicProfileHtml`); (5) D-268→D-270 compat (`rpRelativeTime`, `rp-summary-generated`, fallback instruction/output_contract, stale warning/threshold, F-4/F-5 deferred, `generateRunPack`, Copy/Download buttons); (6) boundary lock (Drift/Belief/worker/index/CSS/app-v10 all unmodified, `alignment_labels` blocked, `top_beliefs_json` absent from public handler); (7) deploy integrity (`selectClaim`/`requestRejectReview` still defined). No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D271A_RUNPACK_AI_RETURN_IMPORT_VISIBILITY_POLISH.md` — D-271A/B RUNPACK AI-RETURN IMPORT VISIBILITY POLISH — LIVE PASS
 
 App + tests + docs. Owner deploy PASS (D-271B, 2026-07-01). 32/32 live sanity PASS. Baseline: 3171/0/24/57 (+27 tests). Addresses D-268A finding F-3: "Load AI Analysis Return" `<details>` in `renderExport()` was always collapsed. Two changes in `rp-return-section`: (1) conditional `open` attribute — auto-expands when `lastPacket && lastPacketClaimId === selected?.id` (same gate used for "Recreate Packet" logic), so the section is immediately visible after packet generation for the current claim; (2) new `rp-return-next-step` copy: "After your AI analyses the packet, paste its JSON response here. Saving does not publish a truth automatically — it only loads analysis for this claim." — actionable, explicit no-auto-publish disclaimer. `saveAnalysisResult()` parser unchanged (`JSON.parse`, field extraction, toasts, `/api/analysis` only). No CSS changes needed (`open` is HTML-native). No worker/index/CSS/Drift/Belief changes. F-4 (`source_snapshot_hash` stale) and F-5 (`packet_id` storage) remain deferred. D-93B allowlist extended with 3100/3144/3171 counts.
 
