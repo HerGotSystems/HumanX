@@ -22709,6 +22709,204 @@ console.log('\nD-248A: Review card metadata density regression lock');
   });
 }
 
+// ── D-271A: RunPack AI-return import visibility polish ────────────────────────
+
+{
+  console.log('\nD-271A: RunPack AI-return import visibility polish');
+
+  const expIdx = appSrc.indexOf('function renderExport(');
+  const expSlice = appSrc.slice(expIdx, expIdx + 6000);
+
+  const sarIdx = appSrc.indexOf('async function saveAnalysisResult(');
+  const sarSlice = appSrc.slice(sarIdx, sarIdx + 900);
+
+  // 1. "Load AI Analysis Return" section still renders
+  test('D-271A: Load AI Analysis Return section still present in renderExport', () => {
+    assert.ok(expSlice.includes('Load AI Analysis Return'), '"Load AI Analysis Return" must still be present in renderExport');
+  });
+
+  // 2. rp-return-section <details> now has conditional open attribute
+  test('D-271A: rp-return-section <details> has conditional open attribute when packet matches', () => {
+    assert.ok(
+      expSlice.includes("rp-return-section\"${lastPacket&&lastPacketClaimId===selected?.id?' open':''}") ||
+      expSlice.includes("rp-return-section\"${lastPacket&&lastPacketClaimId===selected?.id?\" open\":\"\"}"),
+      'rp-return-section <details> must have conditional open attribute based on lastPacket and lastPacketClaimId'
+    );
+  });
+
+  // 3. rp-return-next-step class present (next-step copy class anchor)
+  test('D-271A: rp-return-next-step class present in rp-return-body', () => {
+    assert.ok(expSlice.includes('rp-return-next-step'), 'rp-return-next-step class must be present for the next-step copy paragraph');
+  });
+
+  // 4. Next-step copy tells user to paste AI/JSON response
+  test('D-271A: next-step copy tells user to paste AI JSON response', () => {
+    const nsIdx = expSlice.indexOf('rp-return-next-step');
+    const nsSlice = expSlice.slice(nsIdx, nsIdx + 300);
+    assert.ok(
+      nsSlice.includes('paste') && (nsSlice.includes('JSON') || nsSlice.includes('response')),
+      'rp-return-next-step copy must tell user to paste AI/JSON response'
+    );
+  });
+
+  // 5. Next-step copy does not imply public truth is automatically changed
+  test('D-271A: next-step copy states saving does not publish a truth automatically', () => {
+    const nsIdx = expSlice.indexOf('rp-return-next-step');
+    const nsSlice = expSlice.slice(nsIdx, nsIdx + 300);
+    assert.ok(
+      nsSlice.includes('not publish') || nsSlice.includes('does not publish') || nsSlice.includes('does not automatically'),
+      'rp-return-next-step copy must state that saving does not publish a truth automatically'
+    );
+  });
+
+  // 6. Provenance note still present (unchanged)
+  test('D-271A: ev-origin-note provenance copy still present in rp-return-body', () => {
+    assert.ok(
+      expSlice.includes('not independent external sources') && expSlice.includes('not independent verification'),
+      'ev-origin-note provenance copy must remain unchanged in rp-return-body'
+    );
+  });
+
+  // 7. analysisPaste textarea still present
+  test('D-271A: analysisPaste textarea still present', () => {
+    assert.ok(expSlice.includes('id="analysisPaste"'), 'analysisPaste textarea must still be present');
+  });
+
+  // 8. Save Analysis button still present
+  test('D-271A: Save Analysis button still present', () => {
+    assert.ok(expSlice.includes('saveAnalysisResult') && expSlice.includes('Save Analysis'), 'Save Analysis button must still be present');
+  });
+
+  // 9. saveAnalysisResult still validates with JSON.parse (parser unchanged)
+  test('D-271A: saveAnalysisResult still validates with JSON.parse (parser unchanged)', () => {
+    assert.ok(sarSlice.includes('JSON.parse(text)'), 'saveAnalysisResult JSON.parse validation must be unchanged');
+  });
+
+  // 10. saveAnalysisResult field extraction unchanged
+  test('D-271A: saveAnalysisResult field extraction unchanged', () => {
+    assert.ok(
+      sarSlice.includes('parsed.output||parsed.result||parsed.analysis||parsed') ||
+      sarSlice.includes('parsed.output || parsed.result || parsed.analysis || parsed'),
+      'saveAnalysisResult field extraction must be unchanged'
+    );
+  });
+
+  // 11. saveAnalysisResult parse failure toast unchanged
+  test('D-271A: saveAnalysisResult parse failure toast unchanged', () => {
+    assert.ok(sarSlice.includes('Paste valid JSON first'), 'saveAnalysisResult parse failure toast must remain unchanged');
+  });
+
+  // 12. saveAnalysisResult success toast unchanged
+  test('D-271A: saveAnalysisResult success toast unchanged', () => {
+    assert.ok(sarSlice.includes('Analysis saved'), 'saveAnalysisResult success toast must remain unchanged');
+  });
+
+  // 13. saveAnalysisResult posts to /api/analysis only (public truth state unchanged)
+  test('D-271A: saveAnalysisResult posts to /api/analysis only — public truth state unchanged', () => {
+    assert.ok(
+      sarSlice.includes("'/api/analysis'") && !sarSlice.includes("'/api/review") && !sarSlice.includes("'/api/approve"),
+      'saveAnalysisResult must post to /api/analysis only — not review or approve routes'
+    );
+  });
+
+  // 14. Generated-time summary still present (D-268B lock preserved)
+  test('D-271A: generated-time summary rp-summary-generated still present', () => {
+    const sumIdx = appSrc.indexOf('function runPackSummary(');
+    const sumSlice = appSrc.slice(sumIdx, sumIdx + 2000);
+    assert.ok(sumSlice.includes('rp-summary-generated'), 'rp-summary-generated must still be emitted by runPackSummary');
+  });
+
+  // 15. Fallback instruction still present (D-268B lock preserved)
+  test('D-271A: fallback instruction still present (D-268B lock)', () => {
+    const genIdx = appSrc.indexOf('async function generateRunPack(');
+    const genSlice = appSrc.slice(genIdx, genIdx + 4000);
+    assert.ok(
+      genSlice.includes('instruction:') && genSlice.includes('emotionally important'),
+      'fallback instruction must remain present and include emotionally important warning'
+    );
+  });
+
+  // 16. Fallback output_contract still present (D-268B lock preserved)
+  test('D-271A: fallback output_contract still present (D-268B lock)', () => {
+    const genIdx = appSrc.indexOf('async function generateRunPack(');
+    const genSlice = appSrc.slice(genIdx, genIdx + 4000);
+    assert.ok(genSlice.includes('output_contract:'), 'fallback output_contract must remain present');
+  });
+
+  // 17. Stale warning chip still present (D-269A lock preserved)
+  test('D-271A: stale warning chip still present in runPackSummary (D-269A lock)', () => {
+    const sumIdx = appSrc.indexOf('function runPackSummary(');
+    const sumSlice = appSrc.slice(sumIdx, sumIdx + 2000);
+    assert.ok(sumSlice.includes('Possibly stale') && sumSlice.includes('detectPacketStaleness'), 'stale warning must remain in runPackSummary');
+  });
+
+  // 18. Stale threshold unchanged at 3600000ms
+  test('D-271A: stale threshold unchanged at 3600000ms', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness(');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 800);
+    assert.ok(staleSlice.includes('3600000'), 'stale threshold must remain at 3600000ms');
+  });
+
+  // 19. source_snapshot_hash comparison not added (F-4 deferred)
+  test('D-271A: source_snapshot_hash comparison not added to detectPacketStaleness (F-4 deferred)', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness(');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 800);
+    assert.ok(!staleSlice.includes('source_snapshot_hash'), 'F-4 source_snapshot_hash stale check must remain deferred');
+  });
+
+  // 20. Review moderation unchanged — requestApproveReview still defined
+  test('D-271A: requestApproveReview still defined — Review/moderation unchanged', () => {
+    assert.ok(
+      appSrc.includes('function requestApproveReview(') || appSrc.includes('async function requestApproveReview('),
+      'requestApproveReview must remain defined — D-271A must not touch moderation'
+    );
+  });
+
+  // 21. Public profile does not expose AI-return import controls
+  test('D-271A: rp-return-section not in renderPublicProfileHtml', () => {
+    const ppIdx = appSrc.indexOf('function renderPublicProfileHtml(');
+    const ppSlice = appSrc.slice(ppIdx, ppIdx + 18000);
+    assert.ok(!ppSlice.includes('rp-return-section'), 'rp-return-section must not appear in renderPublicProfileHtml');
+  });
+
+  // 22. rp-return-next-step not in renderPublicProfileHtml
+  test('D-271A: rp-return-next-step not in renderPublicProfileHtml', () => {
+    const ppIdx = appSrc.indexOf('function renderPublicProfileHtml(');
+    const ppSlice = appSrc.slice(ppIdx, ppIdx + 18000);
+    assert.ok(!ppSlice.includes('rp-return-next-step'), 'rp-return-next-step must not appear in renderPublicProfileHtml');
+  });
+
+  // 23. Drift/Belief expansion not modified by D-271A
+  test('D-271A: belief-drift-expansion.js not modified by D-271A', () => {
+    const driftSrc = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(!driftSrc.includes('D-271A'), 'D-271A must not modify belief-drift-expansion.js');
+  });
+
+  // 24. worker.js not modified by D-271A
+  test('D-271A: worker.js not modified by D-271A', () => {
+    assert.ok(!workerSrc.includes('D-271A'), 'D-271A must not modify worker.js');
+  });
+
+  // 25. index.html not modified by D-271A
+  test('D-271A: index.html not modified by D-271A', () => {
+    const indexSrc = readFileSync(path.join(__dirname, '../public/index.html'), 'utf8');
+    assert.ok(!indexSrc.includes('D-271A'), 'D-271A must not modify index.html');
+  });
+
+  // 26. styles.css not modified by D-271A
+  test('D-271A: styles.css not modified by D-271A', () => {
+    assert.ok(!cssSrc.includes('D-271A'), 'D-271A is app+tests+docs only — styles.css must not be modified');
+  });
+
+  // 27. packet_id advisory check still non-blocking (F-5 deferred)
+  test('D-271A: packet_id advisory check still non-blocking in saveAnalysisResult (F-5 deferred)', () => {
+    assert.ok(
+      sarSlice.includes('packet_id') && sarSlice.includes('Advisory'),
+      'packet_id check must remain advisory-only toast in saveAnalysisResult (F-5 deferred)'
+    );
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

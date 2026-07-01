@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3075 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3171 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-270A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run (9 mini-arcs, 721 tests, 14 deploys — see D-264A wrap-up) + D-265→D-266 Study entry / Back button style mini-arc (64 tests, 1 deploy — see D-267A checkpoint) + D-268→D-269 RunPack fallback guidance/generated-time mini-arc (69 tests, 1 deploy — see D-270A checkpoint), current baseline 3144/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–77.
 
-### `D270A_RUNPACK_FALLBACK_GUIDANCE_GENERATED_TIME_CHECKPOINT.md` ⭐ CURRENT — D-270A RUNPACK FALLBACK GUIDANCE / GENERATED-TIME CHECKPOINT — DOCS ONLY
+### `D271A_RUNPACK_AI_RETURN_IMPORT_VISIBILITY_POLISH.md` ⭐ CURRENT — D-271A RUNPACK AI-RETURN IMPORT VISIBILITY POLISH — PENDING DEPLOY
+
+App + tests + docs. Deploy needed (`public/app-v10.js` changed). Baseline: 3171/0/24/57 (+27 tests). Addresses D-268A finding F-3: "Load AI Analysis Return" `<details>` in `renderExport()` was always collapsed. Two changes in `rp-return-section`: (1) conditional `open` attribute — auto-expands when `lastPacket && lastPacketClaimId === selected?.id` (same gate used for "Recreate Packet" logic), so the section is immediately visible after packet generation for the current claim; (2) new `rp-return-next-step` copy: "After your AI analyses the packet, paste its JSON response here. Saving does not publish a truth automatically — it only loads analysis for this claim." — actionable, explicit no-auto-publish disclaimer. `saveAnalysisResult()` parser unchanged (`JSON.parse`, field extraction, toasts, `/api/analysis` only). No CSS changes needed (`open` is HTML-native). No worker/index/CSS/Drift/Belief changes. F-4 (`source_snapshot_hash` stale) and F-5 (`packet_id` storage) remain deferred.
+
+### `D270A_RUNPACK_FALLBACK_GUIDANCE_GENERATED_TIME_CHECKPOINT.md` — D-270A RUNPACK FALLBACK GUIDANCE / GENERATED-TIME CHECKPOINT — DOCS ONLY
 
 Docs only. No deploy needed. Baseline: 3144/0/24/57 (unchanged). Closes the D-268A/B/C/D-269A RunPack fallback guidance + generated-time summary mini-arc. `PROJECT_STATE.md` updated with arc summary (69 new tests total: +25 D-268B +44 D-269A), RunPack fallback behavior table, privacy boundary entries (D-268→D-269 confirmed no public exposure), deployment state, and safe-next-work rules 72–77. Fallback instruction locked: emotionally-important/unpopular/no-independent-verification warnings. Fallback output_contract locked: all 10 fields + no-invent-evidence warning. Generated-time summary locked: `rpRelativeTime()`, `rp-summary-generated`, guards, render order. Stale warning preserved; threshold `3600000ms` unchanged. F-3 (AI-return import collapsed), F-4 (snapshot-hash stale), F-5 (packet-ID storage) remain deferred. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
 
