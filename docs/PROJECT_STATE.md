@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-01 after D-263A Review inspect panel action spacing checkpoint.
-Previous checkpoint: 2026-07-01 after D-260A Review mobile controls wrapping checkpoint.
+Last updated: 2026-07-01 after D-264A Review ergonomics milestone wrap-up.
+Previous checkpoint: 2026-07-01 after D-263A Review inspect panel action spacing checkpoint.
 
 ---
 
@@ -31,10 +31,11 @@ Previous checkpoint: 2026-07-01 after D-260A Review mobile controls wrapping che
 | **D-257A checkpoint HEAD** | see `docs/README.md` after commit (D-257A duplicate/similar label clarity checkpoint addendum) |
 | **D-260A checkpoint HEAD** | see `docs/README.md` after commit (D-260A Review mobile controls wrapping checkpoint) |
 | **D-263A checkpoint HEAD** | see `docs/README.md` after commit (D-263A Review inspect panel action spacing checkpoint) |
+| **D-264A checkpoint HEAD** | see `docs/README.md` after commit (D-264A Review ergonomics milestone wrap-up) |
 
 ---
 
-## Current baseline (as of D-263A)
+## Current baseline (as of D-264A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -352,6 +353,52 @@ This mini-arc audited, fixed, and locked the inspect panel action button layout 
 
 ---
 
+## D-227 → D-263 Review ergonomics full run summary (D-264A wrap-up)
+
+This section records the complete D-227→D-263 Review ergonomics run as a single consolidated milestone. The run delivered nine mini-arcs of progressive improvement to the admin-only Review/moderation UI. All work is confined to the admin Review queue render surface; no public profile exposure, no backend/API/schema changes, and no moderation semantic changes were made across the entire run.
+
+| Arc | Tasks | What it delivered | Tests added | Total after |
+|-----|-------|------------------|-------------|-------------|
+| Review queue ergonomics | D-227→D-232 | Selected-card anchor, scroll preservation, confirm-state clarity, decision feedback banner, regression lock, checkpoint | 113 | 2403 |
+| Duplicate advisory UX | D-233→D-238 | Resolve-similar scroll, structured advisory banner, Copy ID, duplicate-target prefill, regression lock, checkpoint | 123 | 2526 |
+| Review-to-Study navigation | D-239→D-241 | Back-to-Review scroll restore (`requestAnimationFrame`), regression lock, checkpoint | 47 | 2573 |
+| Review next-item flow | D-242→D-244 | "Open next item →" button in decision feedback, regression lock, checkpoint | 65 | 2638 |
+| Review card metadata density | D-245→D-249 | Inline date, readable score labels (`Evidence N · Test N · Survive N`), advisory hint grouping (`.review-card-hints`), regression lock, checkpoint | 84 | 2722 |
+| Review search/filter clarity | D-250→D-255 | Active filter/sort summary, zero-results clarity, ambiguous helper copy, client-side Review search, regression lock, checkpoint | 155 | 2877 |
+| Duplicate/similar label clarity | D-256→D-257 | `Dupes` → `Dupes + Similar` copy rename in 6 locations, checkpoint | 26 | 2903 |
+| Mobile control wrapping | D-258→D-260 | Sort bar isolation, decision feedback flex-wrap, empty-actions flex, regression lock, checkpoint | 56 | 2959 |
+| Inspect panel action spacing | D-261→D-263 | Desktop Study push, mobile full-width buttons, mobile soft separator, regression lock, checkpoint | 52 | 3011 |
+
+**Total tests added in full run:** 721 (2403 - 1682 pre-arc baseline → 3011 final).
+**Code/CSS deploys in full run:** 14 owner manual terminal deploys.
+**Audit/lock/checkpoint tasks:** No deploy needed for any audit, regression lock, or checkpoint task.
+**Latest deployed Worker version:** `cb5caf6f-67ff-4a41-baa5-22ed836e0cb2` (D-261C, 2026-07-01).
+
+### What is now true of the Review queue (post D-264A)
+
+- Review cards are denser and easier to scan.
+- Date metadata appears inline in `.review-card-meta` as `Updated {age}`.
+- Score labels are readable: `Evidence N · Test N · Survive N` (was `ev:N ts:N sv:N`).
+- Low-priority advisory hints are grouped into a secondary `.review-card-hints` row.
+- Active filter / sort / search summary is always visible above the card list.
+- Client-side Review search is active; search-aware pipeline used for all navigation.
+- Zero-results state explains the current filter/sort/search context and offers recovery actions.
+- Ambiguous filter helper copy exists for `~Quality`, `Dupes + Similar`, and `~Similar`.
+- Combined filter label is `Dupes + Similar`; `~Similar` remains advisory-only and a strict subset.
+- "Open next item →" appears in the decision feedback banner after Approve or Reject.
+- Inspect panel prev/next and post-decision next-item both follow the searched + filtered + sorted visible list.
+- Sort bar wraps safely at narrow widths (`.review-sort-bar` flex isolation).
+- Decision feedback banner wraps safely (`flex-wrap` on `.review-decision-feedback`).
+- Empty-state actions stack safely (`display:flex;flex-wrap:wrap` on `.review-empty-actions`).
+- Inspect panel actions have: Study push right on desktop, full-width tap targets on mobile, calm soft separator before dup/advisory group.
+- Back-to-Review scroll restores the selected card position via `requestAnimationFrame`.
+- Confirm-state clarity via `data-review-confirming` attribute and `review-confirm-armed` class.
+- Duplicate/advisory semantics unchanged.
+- Moderation actions unchanged.
+- Public profile render path has not been exposed to any Review internals across the full run.
+
+---
+
 ## Duplicate/similar filter current behavior (post D-256)
 
 | Feature | Behavior |
@@ -610,7 +657,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-261B | Owner deploy PASS — D-261C confirmed live (41/41) · deployed Worker: `cb5caf6f-67ff-4a41-baa5-22ed836e0cb2` |
 | D-261C | Live closeout — no deploy needed (closeout of D-261B deploy) |
 | D-262A | Tests / docs only — no deploy needed |
-| D-263A (this task) | Docs only — **no deploy needed** |
+| D-263A | Docs only — no deploy needed |
+| D-264A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -746,6 +794,18 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 59. **Do not treat inspect spacing polish as permission to change moderation or duplicate/advisory semantics** — D-261B did not alter any moderation route, decision value, advisory semantics, or filter predicate. Future inspect panel CSS tasks must maintain the same constraint.
 
+60. **Review ergonomics protected area — lock preservation** — Any Review queue/card/filter/search/inspect/action layout or CSS change must either pass D-248A, D-254A, D-259A, and D-262A regression lock tests unchanged, or update each affected lock with explicit owner approval and a new documented task. Do not silently weaken any lock in this group.
+
+61. **Do not change moderation semantics under a UI polish task** — Approve/Keep Pending/Reject/Archive routes, decision values, and payload fields must never change under a task scoped to CSS, copy, or layout. Moderation behavior changes require a separate backend/API spec.
+
+62. **Do not change duplicate/advisory semantics under a label/layout task** — `markDuplicateUI`, `resolveSimilarUI`, `mark-duplicate` route, `resolve-similar` route, advisory-only semantics of `near_duplicate_of`, and `Dupes + Similar` filter predicate must never change under a task scoped to copy, CSS, or label clarity.
+
+63. **Do not change search/filter/sort predicates under a copy/CSS task** — `applyReviewFilter`, `applyReviewSearch`, `applyReviewSort`, the `duplicate` filter key, and all filter chip labels must never change under a task scoped to visual polish, CSS, or copy. Predicate changes require a separate spec.
+
+64. **Do not expose Review internals on public profile pages** — No class, function, state variable, or copy string from the Review queue, inspect panel, search/filter/sort system, or admin controls may appear in `renderPublicProfileHtml`. Any new Review feature must add a public-boundary test before merge.
+
+65. **Do not mark live PASS without owner deploy and browser sanity** — Static checks passing locally does not constitute a live closeout. Every code/CSS deploy must be owner-executed via manual terminal deploy and followed by an owner browser sanity check before the live closeout commit is made.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -770,7 +830,7 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
-| Review queue milestone wrap-up checkpoint | Optional: close the full D-227→D-262 Review ergonomics run with a consolidated milestone doc if owner wants a clean arc close |
+| Review queue future follow-up | Only if owner finds live friction — full run is now closed (D-264A) |
 | D-245A F-4 pressure handle duplication | Separate spec — pressure cards show handle in both chips and meta |
 | Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 
@@ -947,4 +1007,5 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-261B | `246974a` | Inspect panel action spacing polish — desktop Study push; mobile full-width; mobile soft separator; 19 tests |
 | D-261C | `ac3e279` | D-261B live closeout — owner deploy PASS; 41/41 live sanity PASS; Worker `cb5caf6f` |
 | D-262A | `92ca239` | Inspect panel action spacing regression lock — 33 tests across 7 categories |
-| D-263A | TBD | **[Current]** Review inspect panel action spacing checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-263A | `b9b2c97` | Review inspect panel action spacing checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-264A | TBD | **[Current]** Review ergonomics milestone wrap-up — full D-227→D-263 run summary; safe-next rules 60–65; docs only; no deploy |

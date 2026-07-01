@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-263A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc + D-256 duplicate/similar label clarity addendum + D-258→D-259 Review mobile controls wrapping mini-arc + D-261→D-262 Review inspect panel action spacing mini-arc, current baseline 3011/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–59.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-264A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run (9 mini-arcs, 721 tests, 14 deploys — see D-264A wrap-up), current baseline 3011/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–65.
 
-### `D263A_REVIEW_INSPECT_PANEL_ACTION_SPACING_CHECKPOINT.md` ⭐ CURRENT — D-263A REVIEW INSPECT PANEL ACTION SPACING CHECKPOINT — DOCS ONLY
+### `D264A_REVIEW_ERGONOMICS_MILESTONE_WRAPUP.md` ⭐ CURRENT — D-264A REVIEW ERGONOMICS MILESTONE WRAP-UP — DOCS ONLY
+
+Docs only. No deploy needed. Baseline: 3011/0/24/57 (unchanged). Closes the full D-227→D-263 Review ergonomics run (9 mini-arcs, 721 tests added, 14 owner deploys). PROJECT_STATE.md updated: full run summary table, consolidated Review queue behavior summary, active lock table (315 lock tests total), deploy state summary, public/privacy boundary consolidated table, safe-next-work rules 60–65 (lock preservation, no moderation/duplicate/advisory/predicate changes under polish tasks, no Review internals on public profile, no live PASS without owner deploy/sanity). No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP changes.
+
+### `D263A_REVIEW_INSPECT_PANEL_ACTION_SPACING_CHECKPOINT.md` — D-263A REVIEW INSPECT PANEL ACTION SPACING CHECKPOINT — DOCS ONLY
 
 Docs only. No deploy needed. Baseline: 3011/0/24/57 (unchanged). Closes the D-261A→D-262A Review inspect panel action spacing mini-arc. PROJECT_STATE.md updated: D-261→D-262 mini-arc summary, inspect panel action spacing behavior table, privacy boundary rows (D-261→D-262), deployment state (D-261A/B/C, D-262A, D-263A), safe-next-work rules 54–59 (Study push lock, mobile full-width lock, separator lock, label/order lock, behavior lock, semantics lock). 52 total new tests in arc (19+33). CSS-only change confirmed. No app/worker/Drift/Belief changes. No backend/API/migration/schema/CSP changes.
 
