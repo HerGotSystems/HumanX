@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-249A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc, current baseline 2722/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–32.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-255A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc, current baseline 2877/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–43.
 
-### `D254A_REVIEW_SEARCH_FILTER_CLARITY_REGRESSION_LOCK.md` ⭐ CURRENT — D-254A REVIEW SEARCH/FILTER CLARITY REGRESSION LOCK — TESTS+DOCS ONLY
+### `D255A_REVIEW_SEARCH_FILTER_CLARITY_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-255A REVIEW SEARCH/FILTER CLARITY MILESTONE CHECKPOINT — DOCS ONLY
+
+Docs only. No deploy needed. Baseline: 2877/0/24/57. Closes the D-250→D-254 review search/filter clarity arc: 155 new tests total (8+13+15+20+35+64), 4 owner deploys (D-250C 29/29, D-251B 20/20, D-252B, D-253B 41/41). PROJECT_STATE.md updated with arc summary, review search/filter behavior table, privacy boundary entries, deployment state, and 11 new safe-next-work rules (33–43). Active summary guarantees, zero-results guarantees, ambiguous filter helper copy guarantees, client-side search guarantees, clear search guarantees, and search-aware navigation guarantees all confirmed and locked. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D254A_REVIEW_SEARCH_FILTER_CLARITY_REGRESSION_LOCK.md` — D-254A REVIEW SEARCH/FILTER CLARITY REGRESSION LOCK — TESTS+DOCS ONLY
 
 Tests+docs only. No deploy needed. Baseline: 2877/0/24/57 (+64 tests). Regression lock for the D-250→D-253 search/filter clarity arc. Locks: D-250B active summary (Showing: filter · count · Search: query · sort), D-251A zero-results title/context/Show-all button, D-252A exact helper copy for ~Quality/Dupes/~Similar, D-253A search pipeline (applyReviewSort(applyReviewSearch(applyReviewFilter(all)))), label/placeholder, field coverage, clear search isolation, search-aware next-item and inspect prev/next navigation. Public profile boundary locked for all four arc additions. No app/CSS/worker/Drift files modified.
 

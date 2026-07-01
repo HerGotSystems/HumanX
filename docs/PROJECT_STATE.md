@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-01 after D-249A review card metadata density milestone checkpoint.
-Previous checkpoint: 2026-07-01 after D-244A review next-item flow milestone checkpoint.
+Last updated: 2026-07-01 after D-255A Review search/filter clarity milestone checkpoint.
+Previous checkpoint: 2026-07-01 after D-249A review card metadata density milestone checkpoint.
 
 ---
 
@@ -27,10 +27,11 @@ Previous checkpoint: 2026-07-01 after D-244A review next-item flow milestone che
 | **D-241A checkpoint HEAD** | see `docs/README.md` — D-241A review-to-study navigation milestone |
 | **D-244A checkpoint HEAD** | see `docs/README.md` after commit (D-244A review next-item flow milestone) |
 | **D-249A checkpoint HEAD** | see `docs/README.md` after commit (D-249A review card metadata density milestone) |
+| **D-255A checkpoint HEAD** | see `docs/README.md` after commit (D-255A Review search/filter clarity milestone) |
 
 ---
 
-## Current baseline (as of D-249A)
+## Current baseline (as of D-255A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -44,7 +45,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2722 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2877 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -228,6 +229,50 @@ This arc audited and improved the metadata density of review queue cards, reduci
 
 ---
 
+## D-250 → D-254 Review search/filter clarity arc summary
+
+This arc audited and improved the Review queue search, filter, and active-state clarity for the moderator, then locked the results with a consolidated regression fence. All changes are confined to the admin-only Review queue render surface; no public profile exposure, no backend/API/schema changes, no moderation semantic changes.
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-250A | `2730 baseline` | Audit | Review search/filter clarity audit — 7 findings (F-1 HIGH no search; F-2 MEDIUM no active-filter context; F-3/F-4/F-5/F-6/F-7 low); 8 guard tests; docs only |
+| D-250B | `(D-250C live)` | Feature | Active filter/sort summary — `renderReviewActiveSummary(list)` renders `Showing: {filter} · {n} item(s) · Sorted: {sort}` between audit bar and cards; 13 tests |
+| D-250C | live closeout | Live | D-250B confirmed live; 29/29 PASS |
+| D-251A | `(D-251B live)` | Feature | Zero-results clarity — `renderReviewEmptyState()` with `"No review items match this view."` title, context line, per-filter copy, "Show all review items" button; 15 tests |
+| D-251B | live closeout | Live | D-251A confirmed live; 20/20 PASS |
+| D-252A | `(D-252B live)` | Feature | Ambiguous filter helper copy — `renderReviewFilterHelper()` for `~Quality`, `Dupes`, `~Similar` only; exact locked copy; 20 tests |
+| D-252B | live closeout | Live | D-252A confirmed live |
+| D-253A | `(D-253B live)` | Feature | Client-side Review search — `reviewSearchQuery` state, `applyReviewSearch(list)`, `renderReviewSearchRow()`, `clearReviewSearch`; search-aware pipeline `applyReviewSort(applyReviewSearch(applyReviewFilter(all)))`; next-item and inspect-panel nav updated; 35 tests |
+| D-253B | live closeout | Live | D-253A confirmed live; 41/41 PASS |
+| D-254A | `aedbd3f` | Regression lock | 64 tests across 9 categories — D-250B/D-251A/D-252A/D-253A behavior locked; public boundary locked; Drift/backend boundary locked |
+| D-255A | this checkpoint | Docs | Search/filter clarity milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+
+**Tests added in arc:** 8 + 13 + 15 + 20 + 35 + 64 = **155 new tests** (2722 → 2877 total).
+**Deploys required in arc:** 3 (D-250C, D-251B, D-252B, D-253B — owner manual terminal deploy).
+**D-250A, D-254A, D-255A:** Audit / tests / docs only — no deploy needed.
+
+---
+
+## Review search/filter current behavior (post D-250→D-254)
+
+| Feature | Behavior |
+|---------|---------|
+| Active filter/sort summary | `renderReviewActiveSummary(list)` renders `Showing: {filter} · {n} item(s) · Sorted: {sort}` above card list; extended with `· Search: "{query}"` when search is active |
+| Zero-results state | `renderReviewEmptyState()` renders `"No review items match this view."` title; context line shows current filter, sort, and search (when active); per-filter explanatory copy preserved; `"Show all review items"` button (when filter ≠ All); `"Clear search"` button (when search is active) |
+| Ambiguous filter helper | `renderReviewFilterHelper()` renders one-line helper below active summary for `~Quality`, `Dupes`, and `~Similar` only; absent for all other filters |
+| Helper copy locked | `~Quality` → `~Quality shows claim items with quality hints.` / `Dupes` → `Dupes includes confirmed duplicates and near-duplicate advisories.` / `~Similar` → `~Similar shows near-duplicate advisory items.` |
+| Search input | `renderReviewSearchRow()` — label `"Search review queue"`, placeholder `"Search claim, ID, handle, source…"`, `type="search"`, delegated `input` event (no inline handlers) |
+| Search pipeline | `applyReviewSort(applyReviewSearch(applyReviewFilter(all)))` — filter first, then search, then sort |
+| Fields searched | item ID, claim/statement/title, handle, category, type, duplicate_of, near_duplicate_of, user_id, origin, source_truth_id — case-insensitive, whitespace-trimmed |
+| Clear search | `clearReviewSearch` in `_D181B_ZERO_PARAM_ACTIONS` — sets `reviewSearchQuery = ''` only; preserves filter and sort |
+| Show all review items | Resets filter to All only; preserves sort and search |
+| Search-aware next-item | `reviewDecisionUI` next-item candidate uses `applyReviewSort(applyReviewSearch(applyReviewFilter(...)))` |
+| Search-aware inspect nav | `renderReviewInspectPanel` prev/next also uses the search-aware pipeline |
+| No backend/API search | Search is 100% client-side — no route in `worker.js`; no `fetch`/`api()` call |
+| No localStorage | `reviewSearchQuery` is session-only — not persisted across reload |
+
+---
+
 ## Review card current behavior (post D-245→D-248)
 
 | Layer | Content |
@@ -347,6 +392,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-242→D-243 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-243A |
 | Review card metadata markers in public profile | **Blocked** — `review-card-hints`, `review-card-head`, `review-card-meta`, `Open next item`, and `reviewCard()` call confirmed absent from `renderPublicProfileHtml` | D-248A |
 | No new public data fields in D-245→D-248 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-248A |
+| Review search/filter markers in public profile | **Blocked** — `reviewSearchQuery`, `review-search`, `clearReviewSearch`, `review-filter-helper`, and `review-active-summary` confirmed absent from `renderPublicProfileHtml` | D-254A |
+| No new public data fields in D-250→D-254 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-254A |
 
 ---
 
@@ -388,7 +435,14 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-246A | Owner deploy PASS — D-246B confirmed live (28/28) |
 | D-247A | Owner deploy PASS — D-247B confirmed live (31/31) |
 | D-248A | Tests / docs only — no deploy needed |
-| D-249A (this task) | Docs only — **no deploy needed** |
+| D-249A | Docs only — no deploy needed |
+| D-250A | Audit / tests / docs only — no deploy needed |
+| D-250B | Owner deploy PASS — D-250C confirmed live (29/29) |
+| D-251A | Owner deploy PASS — D-251B confirmed live (20/20) |
+| D-252A | Owner deploy PASS — D-252B confirmed live |
+| D-253A | Owner deploy PASS — D-253B confirmed live (41/41) · latest Worker: `46c50000-137f-4bba-9632-aa913798e494` |
+| D-254A | Tests / docs only — no deploy needed |
+| D-255A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -470,6 +524,28 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 32. **Pressure card meta extension** — do not extend `metaParts` with additional fields for pressure cards without resolving D-245A F-4 (handle duplication) — adding more fields to an already-duplicated surface increases noise, not scan speed.
 
+33. **D-254A Review search/filter clarity lock** — any task touching `renderReviewActiveSummary`, `renderReviewEmptyState`, `renderReviewFilterHelper`, `renderReviewSearchRow`, `applyReviewSearch`, `setReviewSearch`, or `clearReviewSearch` must either pass all D-254A regression tests unchanged, or update the D-254A lock with explicit owner approval before merging.
+
+34. **No backend/API search without spec** — do not add a `/api/review/search` route or any `fetch`/`api()` call triggered by the Review search input without a separate backend/API spec reviewed by the owner.
+
+35. **No Review search persistence** — do not persist `reviewSearchQuery` to `localStorage`, `sessionStorage`, or any backend field without a separate owner-approved spec. Search must remain session-only.
+
+36. **Clear search isolation** — `clearReviewSearch` must only set `reviewSearchQuery = ''`. It must not alter `reviewStateFilter` or `reviewSortOrder`. Do not combine clear-search with filter or sort resets without a new spec.
+
+37. **Show all review items isolation** — `setReviewFilter` must not touch `reviewSearchQuery`. The "Show all review items" button resets filter only; search and sort must be preserved.
+
+38. **Search-aware next-item required** — do not change `reviewDecisionUI` or `renderReviewInspectPanel` nav computation without preserving the `applyReviewSort(applyReviewSearch(applyReviewFilter(...)))` pipeline.
+
+39. **No filter predicate change under copy tasks** — do not alter `applyReviewFilter` logic under any task scoped to copy, helper text, or label clarity. Filter behavior changes require a separate spec.
+
+40. **No sort predicate change under copy tasks** — do not alter `applyReviewSort` logic under any task scoped to copy, helper text, or search. Sort behavior changes require a separate spec.
+
+41. **Ambiguous filter helper copy is locked** — do not change the exact wording of `~Quality shows claim items with quality hints.`, `Dupes includes confirmed duplicates and near-duplicate advisories.`, or `~Similar shows near-duplicate advisory items.` without a D-254A update and owner approval.
+
+42. **No Review queue controls on public profiles** — do not expose search input, filter chips, sort controls, active summary, filter helper, or zero-results state on public profile pages.
+
+43. **Drift/Belief expansion files remain untouched** — the D-250→D-254 arc did not touch `public/belief-drift-expansion.js` or `public/index.html`. Do not touch these files during Review queue work unless a failing test requires a minimal, explicitly documented compatibility fix.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -490,10 +566,12 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| Review search/filter clarity audit | Filter chip accessibility; filter counts; empty-state copy per-filter |
+| Review queue mobile controls/action wrapping polish | Filter bar and action buttons on narrow viewports |
+| Review filter label rename/split audit | `Dupes` vs `~Similar` conflation (D-250A F-4); separate confirmed vs advisory labels |
 | Study entry button style consistency | D-239A F-2–F-4: button prominence, browser-back support, Study entry button style inconsistency |
 | Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
+| HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | D-245A F-4 pressure handle duplication | Separate spec — pressure cards show handle in both chips and meta |
 | Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 
@@ -645,4 +723,15 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-247A | `ed91f29` | Advisory hint grouping — `needs sharpening` / `category echo` / `? borderline origin` to `.review-card-hints`; CSS added; 16 tests |
 | D-247B | `d139e60` | D-247A confirmed live; 31/31 PASS |
 | D-248A | `e310da7` | Review card metadata density regression lock — 7 categories / 41 tests |
-| D-249A | TBD | **[Current]** Review card metadata density milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-249A | TBD | Review card metadata density milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-250A | `(guard tests)` | **[Arc start]** Review search/filter clarity audit — 7 findings; 8 guard tests; docs only |
+| D-250B | `(D-250C live)` | Active filter/sort summary — `renderReviewActiveSummary(list)`; 13 tests |
+| D-250C | live closeout | D-250B confirmed live; 29/29 PASS |
+| D-251A | `(D-251B live)` | Zero-results filter clarity — `renderReviewEmptyState()`; structured title/context/Show-all; 15 tests |
+| D-251B | live closeout | D-251A confirmed live; 20/20 PASS |
+| D-252A | `(D-252B live)` | Ambiguous filter helper copy — `renderReviewFilterHelper()`; exact locked copy; 20 tests |
+| D-252B | live closeout | D-252A confirmed live |
+| D-253A | `(D-253B live)` | Client-side Review search — `reviewSearchQuery`; `applyReviewSearch`; `renderReviewSearchRow`; `clearReviewSearch`; search-aware pipeline; 35 tests |
+| D-253B | live closeout | D-253A confirmed live; 41/41 PASS |
+| D-254A | `aedbd3f` | Review search/filter clarity regression lock — 9 categories / 64 tests |
+| D-255A | TBD | **[Current]** Review search/filter clarity milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
