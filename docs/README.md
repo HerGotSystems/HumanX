@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-241A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc, current baseline 2573/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D241A_REVIEW_TO_STUDY_NAVIGATION_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-241A REVIEW-TO-STUDY NAVIGATION MILESTONE CHECKPOINT
+### `D242A_REVIEW_QUEUE_NEXT_ITEM_FLOW_AUDIT.md` ⭐ CURRENT — D-242A REVIEW QUEUE NEXT-ITEM FLOW AUDIT
+
+Audit + guard tests + docs. Deploy not needed. Baseline: 2580/0/24/57 (+7 new tests). Documents post-decision behavior after Approve/Keep/Reject: item removal from pending filter, inspect panel clearance, feedback banner (D-230A), scroll fallback, and the hidden keyboard auto-advance path (initReviewKb already auto-advances after A+A/R+R/K — button path does not). 7 guard tests lock keyboard advance logic (_advanceId pre-capture, .then() dispatch, next-first preference, _reviewKbInFlight guard), inspect panel nav computation (sorted/filtered _prev/_next, Next → button wiring), and the gap invariant (reviewDecisionUI does not call inspectReviewItem). App/CSS/worker unchanged. No backend/API/migration/schema/CSP/external asset changes. Recommended next: D-242B — "Open next item →" button in the D-230A feedback banner.
+
+### `D241A_REVIEW_TO_STUDY_NAVIGATION_MILESTONE_CHECKPOINT.md` — D-241A REVIEW-TO-STUDY NAVIGATION MILESTONE CHECKPOINT
 
 Docs only. Deploy not needed. Baseline: 2573/0/24/57. Closes the D-239→D-240 review-to-study navigation mini-arc: 47 new tests total (17+30), 1 owner deploy (D-239B/C). PROJECT_STATE.md updated with arc summary, review-to-study behavior table, privacy boundary entries, deployment state, and 3 new safe-next-work rules. Review-origin capture, Back-to-Review button, inspected item restore, post-render RAF scroll, no-queue-reload, no pushState, and public exposure isolation all confirmed and locked. No app/CSS/worker/backend/API/migration/schema/CSP/external asset changes.
 

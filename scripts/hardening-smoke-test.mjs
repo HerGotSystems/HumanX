@@ -18851,6 +18851,91 @@ console.log('\nD-240A: Review-to-study navigation regression lock');
   });
 }
 
+// ── D-242A: Review queue next-item flow audit guard locks ─────────────────────
+//
+// These tests lock the existing keyboard auto-advance behavior and inspect-panel
+// nav computation so they cannot be silently regressed. They also document (as an
+// invariant) that the button/mouse path does NOT currently call inspectReviewItem
+// after a decision — that gap is the target of D-242B.
+
+{
+  console.log('\nD-242A: Review queue next-item flow audit locks');
+
+  const kbSrc = (() => {
+    const start = appSrc.indexOf('function initReviewKb(');
+    const end = appSrc.indexOf('\nfunction ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 4000);
+  })();
+
+  const inspPanelSrc = (() => {
+    const start = appSrc.indexOf('function renderReviewInspectPanel(');
+    const end = appSrc.indexOf('\nfunction ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 8000);
+  })();
+
+  const decisionSrc = (() => {
+    const start = appSrc.indexOf('async function reviewDecisionUI(');
+    const end = appSrc.indexOf('\nfunction ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 2000);
+  })();
+
+  test('D-242A [kb advance]: initReviewKb computes _advanceId from sorted/filtered list before API call', () => {
+    assert.ok(
+      kbSrc.includes('applyReviewSort(applyReviewFilter(') &&
+      kbSrc.includes('_advanceId') &&
+      kbSrc.includes('reviewDecisionUI('),
+      'initReviewKb must compute _advanceId from sorted/filtered queue before calling reviewDecisionUI'
+    );
+  });
+
+  test('D-242A [kb advance]: initReviewKb calls inspectReviewItem(_advanceId) in .then() after decision', () => {
+    assert.ok(
+      kbSrc.includes('reviewDecisionUI(') &&
+      kbSrc.includes('.then(') &&
+      kbSrc.includes('inspectReviewItem(_advanceId)'),
+      'initReviewKb must call inspectReviewItem(_advanceId) in .then() callback after reviewDecisionUI resolves'
+    );
+  });
+
+  test('D-242A [kb advance]: initReviewKb prefers _next over _prev for _advanceId', () => {
+    assert.ok(
+      kbSrc.includes('_next?.id||_prev?.id') || kbSrc.includes('_next?.id || _prev?.id'),
+      'initReviewKb must prefer _next over _prev when computing _advanceId (next-first, fallback to prev)'
+    );
+  });
+
+  test('D-242A [kb advance]: initReviewKb uses _reviewKbInFlight guard for in-flight decisions', () => {
+    assert.ok(
+      kbSrc.includes('_reviewKbInFlight=true') || kbSrc.includes('_reviewKbInFlight = true'),
+      'initReviewKb must set _reviewKbInFlight=true before dispatching to prevent duplicate in-flight decisions'
+    );
+  });
+
+  test('D-242A [inspect nav]: renderReviewInspectPanel computes _prev/_next from sorted/filtered list', () => {
+    assert.ok(
+      inspPanelSrc.includes('applyReviewSort(applyReviewFilter(') &&
+      (inspPanelSrc.includes('const _prev=') || inspPanelSrc.includes('const _prev =')) &&
+      (inspPanelSrc.includes('const _next=') || inspPanelSrc.includes('const _next =')),
+      'renderReviewInspectPanel must compute _prev/_next from applyReviewSort(applyReviewFilter(reviewQueue.review))'
+    );
+  });
+
+  test('D-242A [inspect nav]: renderReviewInspectPanel renders Next nav button calling inspectReviewItem', () => {
+    assert.ok(
+      inspPanelSrc.includes('inspectReviewItem(') &&
+      (inspPanelSrc.includes('Next →') || inspPanelSrc.includes('Next &rarr;')),
+      'renderReviewInspectPanel must render a Next → nav button wired to inspectReviewItem'
+    );
+  });
+
+  test('D-242A [gap lock]: reviewDecisionUI does not call inspectReviewItem (button path has no auto-advance)', () => {
+    assert.ok(
+      !decisionSrc.includes('inspectReviewItem('),
+      'reviewDecisionUI must not call inspectReviewItem — button path has no auto-advance (gap target of D-242B)'
+    );
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
