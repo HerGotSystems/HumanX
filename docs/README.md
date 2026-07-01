@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2778 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2813 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-249A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc, current baseline 2722/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–32.
 
-### `D252A_REVIEW_AMBIGUOUS_FILTER_HELPER_COPY.md` ⭐ CURRENT — D-252A REVIEW AMBIGUOUS FILTER HELPER COPY — LIVE PASS
+### `D253A_REVIEW_CLIENT_SIDE_SEARCH.md` ⭐ CURRENT — D-253A REVIEW CLIENT-SIDE SEARCH — DEPLOY NEEDED
+
+App/CSS change. Owner deploy pending (D-253B). Baseline: 2813/0/24/57 (+35 tests). Adds `reviewSearchQuery` state, `applyReviewSearch(list)`, `setReviewSearch(q)`, `renderReviewSearchRow()`, and `clearReviewSearch` zero-param action. Search input renders between filter bar and overview strip with `<label>` for accessibility, `type="search"`, and `data-review-search` attribute for delegated `input` event (no inline handlers). Search combines with filter then sort: `applyReviewSort(applyReviewSearch(applyReviewFilter(all)))`. Active summary includes `· Search: "query"` when active. Zero-results context line includes search context; "Clear search" button added alongside "Show all review items". Next-item and inspect-panel prev/next also use search-aware list. D-250A F-1 (no search) addressed. No filter/sort/predicate/moderation/next-item logic otherwise changed. D-250B active summary preserved. D-251A zero-results state preserved. D-252A filter helper preserved. No public profile exposure. No Drift/Belief expansion changes. No backend/API/migration/schema/CSP/external asset changes. Worker unchanged. index.html unchanged. No localStorage/persistence.
+
+### `D252A_REVIEW_AMBIGUOUS_FILTER_HELPER_COPY.md` — D-252A REVIEW AMBIGUOUS FILTER HELPER COPY — LIVE PASS
 
 App/CSS change. Owner deploy PASS (D-252B live sanity PASS 2026-07-01). Baseline: 2778/0/24/57 (+20 tests). Adds `renderReviewFilterHelper()` returning a calm one-line helper note for ambiguous filters (`~Quality`, `Dupes`, `~Similar`). Renders between D-250B active summary and feedbackBanner. No helper for All/default/other filters. Helper uses `.review-filter-helper` CSS class. No filter/sort/predicate/next-item/moderation logic changed. No search added. D-250B active summary preserved. D-251A zero-results state preserved. No public profile exposure. No Drift/Belief expansion changes. No backend/API/migration/schema/CSP/external asset changes. Worker unchanged. index.html unchanged.
 
