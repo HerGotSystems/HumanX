@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-01 after D-255A Review search/filter clarity milestone checkpoint.
-Previous checkpoint: 2026-07-01 after D-249A review card metadata density milestone checkpoint.
+Last updated: 2026-07-01 after D-257A Review duplicate/similar label clarity checkpoint addendum.
+Previous checkpoint: 2026-07-01 after D-255A Review search/filter clarity milestone checkpoint.
 
 ---
 
@@ -28,10 +28,11 @@ Previous checkpoint: 2026-07-01 after D-249A review card metadata density milest
 | **D-244A checkpoint HEAD** | see `docs/README.md` after commit (D-244A review next-item flow milestone) |
 | **D-249A checkpoint HEAD** | see `docs/README.md` after commit (D-249A review card metadata density milestone) |
 | **D-255A checkpoint HEAD** | see `docs/README.md` after commit (D-255A Review search/filter clarity milestone) |
+| **D-257A checkpoint HEAD** | see `docs/README.md` after commit (D-257A duplicate/similar label clarity checkpoint addendum) |
 
 ---
 
-## Current baseline (as of D-255A)
+## Current baseline (as of D-257A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -45,7 +46,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2877 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2903 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -240,7 +241,7 @@ This arc audited and improved the Review queue search, filter, and active-state 
 | D-250C | live closeout | Live | D-250B confirmed live; 29/29 PASS |
 | D-251A | `(D-251B live)` | Feature | Zero-results clarity — `renderReviewEmptyState()` with `"No review items match this view."` title, context line, per-filter copy, "Show all review items" button; 15 tests |
 | D-251B | live closeout | Live | D-251A confirmed live; 20/20 PASS |
-| D-252A | `(D-252B live)` | Feature | Ambiguous filter helper copy — `renderReviewFilterHelper()` for `~Quality`, `Dupes`, `~Similar` only; exact locked copy; 20 tests |
+| D-252A | `(D-252B live)` | Feature | Ambiguous filter helper copy — `renderReviewFilterHelper()` for `~Quality`, `Dupes`, `~Similar` only; exact locked copy; 20 tests (helper copy updated to `Dupes + Similar` by D-256B) |
 | D-252B | live closeout | Live | D-252A confirmed live |
 | D-253A | `(D-253B live)` | Feature | Client-side Review search — `reviewSearchQuery` state, `applyReviewSearch(list)`, `renderReviewSearchRow()`, `clearReviewSearch`; search-aware pipeline `applyReviewSort(applyReviewSearch(applyReviewFilter(all)))`; next-item and inspect-panel nav updated; 35 tests |
 | D-253B | live closeout | Live | D-253A confirmed live; 41/41 PASS |
@@ -253,6 +254,55 @@ This arc audited and improved the Review queue search, filter, and active-state 
 
 ---
 
+## D-256 duplicate/similar label clarity addendum (post D-255A)
+
+This addendum records the copy-only label clarification that followed the D-250→D-254 search/filter clarity arc. No predicate, filter key, card badge, inspect panel field, or moderation action was changed.
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-256A | `3a4805e` | Audit | Duplicate/similar filter label audit — full inventory of all `Dupes`/`~Similar` controls, predicates, helper copy, card badges, inspect panel, action buttons, modals; confirmed `~Similar ⊆ Dupes` always; recommended label rename; docs only |
+| D-256B | `f73a658` | Feature (copy) | Renamed visible combined filter label `Dupes` → `Dupes + Similar` in 6 copy locations; predicate/key/badge/panel/actions unchanged; 26 new D-256B tests; 2877 → 2903 |
+| D-256C | `7615b04` | Live closeout | D-256B owner deploy PASS; 35/35 live sanity PASS |
+| D-257A | this checkpoint | Docs | Duplicate/similar label clarity checkpoint addendum — `PROJECT_STATE.md` updated; docs only; no deploy |
+
+**Copy locations changed in D-256B:**
+- `renderReviewFilterBar` defs: `['duplicate','Dupes']` → `['duplicate','Dupes + Similar']`
+- `renderReviewActiveSummary` filterLabels: `duplicate:'Dupes'` → `duplicate:'Dupes + Similar'`
+- `renderReviewEmptyState` filterLabels: `duplicate:'Dupes'` → `duplicate:'Dupes + Similar'`
+- `renderReviewFilterHelper` helper copy: `'Dupes includes...'` → `'Dupes + Similar includes confirmed duplicates and near-duplicate advisories.'`
+- `reviewEmptyText` duplicate entry: updated to mention confirmed duplicates and similar advisories explicitly
+- `renderReviewAuditSummary` stat label: `{label:'Dupes',...}` → `{label:'Dupes + Similar',...}`
+
+**Tests added in D-256:** 26 (D-256B section). Total: 2877 → 2903.
+**Deploys required:** 1 (D-256C — owner manual terminal deploy).
+**D-256A, D-257A:** Audit / docs only — no deploy needed.
+
+---
+
+## Duplicate/similar filter current behavior (post D-256)
+
+| Feature | Behavior |
+|---------|---------|
+| Visible combined filter label | `Dupes + Similar` (updated D-256B) |
+| Combined filter internal key | `duplicate` (unchanged — `reviewStateFilter === 'duplicate'`) |
+| Combined filter predicate | `duplicate_of \|\| duplicateOf \|\| near_duplicate_of \|\| nearDuplicateOf` (unchanged) |
+| Combined filter scope | Confirmed duplicates (`duplicate_of`) AND near-duplicate advisories (`near_duplicate_of`) |
+| `~Similar` label | `~Similar` (unchanged) |
+| `~Similar` predicate | `near_duplicate_of` only (unchanged) |
+| `~Similar` scope | Advisory-only; strict subset of `Dupes + Similar` |
+| Helper copy | `Dupes + Similar includes confirmed duplicates and near-duplicate advisories.` |
+| Empty-state copy | `No confirmed duplicates or similar advisories in this view.` + context note |
+| Card badge (near_duplicate_of) | `<span class="badge b-similar">~similar</span>` (unchanged) |
+| Card chip (duplicate_of) | `<span class="rc-chip rc-chip-dup">dup</span>` (unchanged) |
+| Card CSS modifier | `review-card-similar` on `near_duplicate_of` items (unchanged) |
+| Inspect panel fields | `Duplicate Of`, `Similar claim (advisory)`, `~similar` advisory banner (unchanged) |
+| Action buttons | `Mark Duplicate...`, `Dismiss ~Similar`, `Use as duplicate target` (unchanged) |
+| Modals | `markDuplicateUI` title "Mark as Duplicate"; `resolveSimilarUI` title "Dismiss Similar Advisory" (unchanged) |
+| No filter split | Combined `Dupes + Similar` filter was NOT split — single predicate, single chip |
+| Moderation semantics | Unchanged — advisory = advisory, confirmed duplicate = confirmed duplicate |
+
+---
+
 ## Review search/filter current behavior (post D-250→D-254)
 
 | Feature | Behavior |
@@ -260,7 +310,7 @@ This arc audited and improved the Review queue search, filter, and active-state 
 | Active filter/sort summary | `renderReviewActiveSummary(list)` renders `Showing: {filter} · {n} item(s) · Sorted: {sort}` above card list; extended with `· Search: "{query}"` when search is active |
 | Zero-results state | `renderReviewEmptyState()` renders `"No review items match this view."` title; context line shows current filter, sort, and search (when active); per-filter explanatory copy preserved; `"Show all review items"` button (when filter ≠ All); `"Clear search"` button (when search is active) |
 | Ambiguous filter helper | `renderReviewFilterHelper()` renders one-line helper below active summary for `~Quality`, `Dupes`, and `~Similar` only; absent for all other filters |
-| Helper copy locked | `~Quality` → `~Quality shows claim items with quality hints.` / `Dupes` → `Dupes includes confirmed duplicates and near-duplicate advisories.` / `~Similar` → `~Similar shows near-duplicate advisory items.` |
+| Helper copy locked | `~Quality` → `~Quality shows claim items with quality hints.` / `Dupes + Similar` → `Dupes + Similar includes confirmed duplicates and near-duplicate advisories.` / `~Similar` → `~Similar shows near-duplicate advisory items.` (updated D-256B) |
 | Search input | `renderReviewSearchRow()` — label `"Search review queue"`, placeholder `"Search claim, ID, handle, source…"`, `type="search"`, delegated `input` event (no inline handlers) |
 | Search pipeline | `applyReviewSort(applyReviewSearch(applyReviewFilter(all)))` — filter first, then search, then sort |
 | Fields searched | item ID, claim/statement/title, handle, category, type, duplicate_of, near_duplicate_of, user_id, origin, source_truth_id — case-insensitive, whitespace-trimmed |
@@ -394,6 +444,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-245→D-248 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-248A |
 | Review search/filter markers in public profile | **Blocked** — `reviewSearchQuery`, `review-search`, `clearReviewSearch`, `review-filter-helper`, and `review-active-summary` confirmed absent from `renderPublicProfileHtml` | D-254A |
 | No new public data fields in D-250→D-254 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-254A |
+| Duplicate/similar label internals in public profile | **Blocked** — `Dupes + Similar` filter copy, `duplicate` filter key, duplicate/similar filter controls remain internal/admin Review UI only; confirmed absent from `renderPublicProfileHtml` | D-256B |
+| No new public data fields in D-256 | **Confirmed** — copy-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-256B |
 
 ---
 
@@ -442,7 +494,11 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-252A | Owner deploy PASS — D-252B confirmed live |
 | D-253A | Owner deploy PASS — D-253B confirmed live (41/41) · latest Worker: `46c50000-137f-4bba-9632-aa913798e494` |
 | D-254A | Tests / docs only — no deploy needed |
-| D-255A (this task) | Docs only — **no deploy needed** |
+| D-255A | Docs only — no deploy needed |
+| D-256A | Audit / docs only — no deploy needed |
+| D-256B | Owner deploy PASS — D-256C confirmed live (35/35) |
+| D-256C | Live closeout — no deploy needed (closeout of D-256B deploy) |
+| D-257A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -540,11 +596,21 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 40. **No sort predicate change under copy tasks** — do not alter `applyReviewSort` logic under any task scoped to copy, helper text, or search. Sort behavior changes require a separate spec.
 
-41. **Ambiguous filter helper copy is locked** — do not change the exact wording of `~Quality shows claim items with quality hints.`, `Dupes includes confirmed duplicates and near-duplicate advisories.`, or `~Similar shows near-duplicate advisory items.` without a D-254A update and owner approval.
+41. **Ambiguous filter helper copy is locked** — do not change the exact wording of `~Quality shows claim items with quality hints.`, `Dupes + Similar includes confirmed duplicates and near-duplicate advisories.`, or `~Similar shows near-duplicate advisory items.` without a D-254A/D-256B update and owner approval. (Updated D-256B: `Dupes` → `Dupes + Similar`.)
 
 42. **No Review queue controls on public profiles** — do not expose search input, filter chips, sort controls, active summary, filter helper, or zero-results state on public profile pages.
 
 43. **Drift/Belief expansion files remain untouched** — the D-250→D-254 arc did not touch `public/belief-drift-expansion.js` or `public/index.html`. Do not touch these files during Review queue work unless a failing test requires a minimal, explicitly documented compatibility fix.
+
+44. **Do not rename `Dupes + Similar` back to `Dupes`** — the D-256B rename was a clarity improvement; reverting requires explicit owner approval and a new spec.
+
+45. **Do not split the combined duplicate/similar filter predicate** — `Dupes + Similar` uses a single predicate covering both `duplicate_of` and `near_duplicate_of`. Splitting into separate confirmed-only and advisory-only filter chips requires a separate audit/spec.
+
+46. **Do not change the internal `duplicate` filter key** — the state key `reviewStateFilter === 'duplicate'` must remain stable under any copy/label-only task. Key renames affect persistence, URL state, and all predicate lookups.
+
+47. **Do not change `~Similar` from advisory-only** — `~Similar` must remain a strict subset of `Dupes + Similar` and advisory-only (`near_duplicate_of` only). Changing its semantics or predicate requires a separate audit/spec.
+
+48. **Do not change duplicate/advisory action semantics under a label-only task** — `Mark Duplicate...`, `Dismiss ~Similar`, `Use as duplicate target`, `markDuplicateUI`, `resolveSimilarUI` actions must remain unchanged under any task scoped to copy, label, or display clarity.
 
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
@@ -567,7 +633,6 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Lane | Notes |
 |------|-------|
 | Review queue mobile controls/action wrapping polish | Filter bar and action buttons on narrow viewports |
-| Review filter label rename/split audit | `Dupes` vs `~Similar` conflation (D-250A F-4); separate confirmed vs advisory labels |
 | Study entry button style consistency | D-239A F-2–F-4: button prominence, browser-back support, Study entry button style inconsistency |
 | Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
@@ -734,4 +799,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-253A | `(D-253B live)` | Client-side Review search — `reviewSearchQuery`; `applyReviewSearch`; `renderReviewSearchRow`; `clearReviewSearch`; search-aware pipeline; 35 tests |
 | D-253B | live closeout | D-253A confirmed live; 41/41 PASS |
 | D-254A | `aedbd3f` | Review search/filter clarity regression lock — 9 categories / 64 tests |
-| D-255A | TBD | **[Current]** Review search/filter clarity milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-255A | `0b8a3a3` | Review search/filter clarity milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-256A | `3a4805e` | **[Arc start]** Duplicate/similar filter label audit — inventory of all `Dupes`/`~Similar` controls, predicates, card badges, inspect panel, action buttons; predicate analysis; docs only |
+| D-256B | `f73a658` | Duplicate/similar label clarity — `Dupes` → `Dupes + Similar` copy rename in 6 locations; 26 new tests; 2877 → 2903 |
+| D-256C | `7615b04` | D-256B live closeout — owner deploy PASS; 35/35 live sanity PASS |
+| D-257A | TBD | **[Current]** Duplicate/similar label clarity checkpoint addendum — `PROJECT_STATE.md` updated; docs only; no deploy |
