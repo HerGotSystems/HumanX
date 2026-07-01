@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-01 after D-267A Study entry / Back button style checkpoint.
-Previous checkpoint: 2026-07-01 after D-264A Review ergonomics milestone wrap-up.
+Last updated: 2026-07-01 after D-270A RunPack fallback guidance / generated-time checkpoint.
+Previous checkpoint: 2026-07-01 after D-267A Study entry / Back button style checkpoint.
 
 ---
 
@@ -33,10 +33,11 @@ Previous checkpoint: 2026-07-01 after D-264A Review ergonomics milestone wrap-up
 | **D-263A checkpoint HEAD** | see `docs/README.md` after commit (D-263A Review inspect panel action spacing checkpoint) |
 | **D-264A checkpoint HEAD** | see `docs/README.md` after commit (D-264A Review ergonomics milestone wrap-up) |
 | **D-267A checkpoint HEAD** | see `docs/README.md` after commit (D-267A Study entry / Back button style checkpoint) |
+| **D-270A checkpoint HEAD** | see `docs/README.md` after commit (D-270A RunPack fallback guidance / generated-time checkpoint) |
 
 ---
 
-## Current baseline (as of D-267A)
+## Current baseline (as of D-270A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -50,7 +51,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3075 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3144 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -455,6 +456,43 @@ This mini-arc audited and fixed Study entry and Back-to-Review button style inco
 
 ---
 
+## D-268 → D-269 RunPack fallback guidance / generated-time mini-arc summary
+
+This arc audited the Claim/RunPack flow, fixed the two highest-value friction findings (F-2 and F-1), and locked the improvements. The implementation was frontend-only. No backend/API/schema changes. No public truth-state changes. No Review/moderation changes.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-268A | Audit | Full Claim/RunPack flow clarity audit. 6-step flow inventory. 7 friction findings: F-2 MEDIUM (fallback missing `instruction`/`output_contract`), F-1 MEDIUM (`generated_at` not shown), F-3 MEDIUM (Load AI Analysis Return collapsed — deferred), F-4 LOW-MEDIUM (`source_snapshot_hash` not in stale check — deferred), F-5 LOW (packet_id not stored — deferred). Docs only. Baseline unchanged: 3075/0/24/57. |
+| D-268B | Feature | Added `instruction` + `output_contract` to fallback packet. Added `rpRelativeTime()` helper. Added `rp-summary-generated` row to `runPackSummary()`. 25 new lock tests. Baseline 3075 → 3100. |
+| D-268C | Live closeout | Owner deploy PASS (2026-07-01). 36/36 live sanity PASS. |
+| D-269A | Regression lock | 44 new tests across 7 categories locking D-268B state permanently. Baseline 3100 → 3144. |
+
+### Current RunPack fallback packet behavior (post D-268B)
+
+| Feature | Behavior |
+|---------|---------|
+| Backend packet `instruction` | Included by `buildRunPack()` (worker.js) — unchanged |
+| Backend packet `output_contract` | Included by `buildRunPack()` (worker.js) — unchanged |
+| **Fallback packet `instruction`** | **Now included** (D-268B) — "Analyse this claim using only the provided packet and your own reasoning. Do not assume a claim is true because it is emotionally important. Do not dismiss a claim only because it is unpopular. Do not claim independent verification." |
+| **Fallback packet `output_contract`** | **Now included** (D-268B) — verdict, plain_language_summary, evidence_score, testability, survivability, strongest_support, strongest_pressure, missing_tests, limitations, ai_provenance_note. "Do not invent evidence not present in the packet." |
+| Fallback `is_fallback:true` | Preserved — fallback always flagged |
+| Fallback payload | `safeRunPackClaim(selected)` — D-171B lock preserved |
+| **Generated-time row** | **New** (D-268B) — `rp-summary-generated small` row, e.g. "Generated just now" / "Generated 12 min ago" / "Generated 2h ago"; conditional on `lastPacketMeta.generated_at`; appears before status chip |
+| `rpRelativeTime()` helper | Defined; returns `just now` / `X min ago` / `Xh ago` / `Xd ago` |
+| Evidence/pressure/test counts row | Unchanged — always shown |
+| Stale warning chip | Unchanged — fires from `detectPacketStaleness()` |
+| Stale threshold | Unchanged — `3600000ms` (1h) |
+| Source-snapshot-hash stale check | Not added (F-4 deferred) |
+| "Load AI Analysis Return" visibility | Not changed (F-3 deferred) |
+| Packet-ID storage with analysis | Not added (F-5 deferred) |
+| `saveAnalysisResult()` parsing | Unchanged — JSON.parse validation; `parsed.output \|\| parsed.result \|\| parsed.analysis \|\| parsed` |
+| `packet_id` mismatch check | Advisory-only non-blocking toast — unchanged |
+| Public truth state | Unchanged — analysis save does not change review_state |
+| Review/moderation | Unchanged |
+| Public profile | `generateRunPack` + `saveAnalysisResult` absent from `renderPublicProfileHtml` |
+
+---
+
 ## Duplicate/similar filter current behavior (post D-256)
 
 | Feature | Behavior |
@@ -653,6 +691,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-261→D-262 | **Confirmed** — CSS-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-262A |
 | Study entry / Back button markers in public profile | **Blocked** — `btn-back-study`, `btn-study-review`, and `openReviewClaimStudy` confirmed absent from `renderPublicProfileHtml`; Study entry / Back-to-Review admin controls remain entirely internal | D-266A |
 | No new public data fields in D-265→D-266 | **Confirmed** — CSS/copy-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-266A |
+| RunPack / Investigation Packet internals in public profile | **Blocked** — `generateRunPack`, `saveAnalysisResult`, `runPackSummary`, `renderExport`, `rpRelativeTime`, and all RunPack internal controls confirmed absent from `renderPublicProfileHtml` | D-269A |
+| No new public data fields in D-268→D-269 | **Confirmed** — frontend-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-269A |
 
 ---
 
@@ -721,7 +761,12 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-265B | Owner deploy PASS — D-265C confirmed live (39/39) |
 | D-265C | Live closeout — no deploy needed (closeout of D-265B deploy) |
 | D-266A | Tests / docs only — no deploy needed |
-| D-267A (this task) | Docs only — **no deploy needed** |
+| D-267A | Docs only — no deploy needed |
+| D-268A | Audit / docs only — no deploy needed |
+| D-268B | Owner deploy PASS — D-268C confirmed live (36/36) |
+| D-268C | Live closeout — no deploy needed (closeout of D-268B deploy) |
+| D-269A | Tests / docs only — no deploy needed |
+| D-270A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -881,6 +926,18 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 71. **Do not expose Review/Study admin controls on public profile pages** — `btn-back-study`, `btn-study-review`, `openReviewClaimStudy`, and all Study entry / Back-to-Review internals must remain absent from `renderPublicProfileHtml`. Any new Study/Review feature must add a public-boundary test before merge.
 
+72. **Do not remove fallback `instruction` under a UI clarity task** — `instruction` must remain in the fallback RunPack packet (D-268B). Removing it leaves AI users without any prompt guidance when the backend is unavailable. Any removal requires explicit owner approval and a new documented task.
+
+73. **Do not remove fallback `output_contract` under a UI clarity task** — `output_contract` must remain in the fallback RunPack packet (D-268B). Removing it leaves AI users without any schema guidance. Any removal requires explicit owner approval and a new documented task.
+
+74. **Do not change stale threshold from `3600000ms` without owner approval** — `detectPacketStaleness()` uses `3600000ms` (1h) as the age threshold. Changing this affects when users see the stale warning. Requires explicit owner approval.
+
+75. **Do not change public truth state from RunPack analysis under a UI clarity task** — `saveAnalysisResult()` posts to `/api/analysis` only. It must never call review/approve routes. Any change to this routing requires a separate backend/moderation spec.
+
+76. **Do not change analysis parser/import behavior under a generated-time/fallback-guidance task** — `saveAnalysisResult()` JSON.parse validation, field extraction, and toast copy are locked. Changes require a separate spec.
+
+77. **Do not implement packet-ID storage without an explicit backend/schema/API decision** — F-5 (storing `packet_id` with saved analysis) requires an `analysis_results` schema migration. Do not add this under any frontend-only task.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -901,11 +958,13 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
-| Open related claim / related item navigation | Follow-up on D-239A remaining findings |
+| RunPack AI-return import visibility | F-3 deferred — auto-expand "Load AI Analysis Return" when packet is ready and no analysis saved |
+| Snapshot-hash stale detection | F-4 deferred — compare `source_snapshot_hash` in `detectPacketStaleness()` for content-level staleness |
+| Packet-ID traceability backend/schema decision | F-5 deferred — store `packet_id` with saved analysis; requires schema migration |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
-| Study page content hierarchy audit | Study page layout, section ordering, dock/content density — post D-265B natural follow-up |
-| Review/Study future follow-up | Only if owner finds live friction — D-264A full run and D-265/D-266 style arc are now complete |
+| Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
+| Open related claim / related item navigation | Follow-up on D-239A remaining findings |
+| Review/Study future follow-up | Only if owner finds live friction — D-264A full run and D-265/D-266/D-267A arc are complete |
 | D-245A F-4 pressure handle duplication | Separate spec — pressure cards show handle in both chips and meta |
 | Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 
@@ -1088,4 +1147,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-265B | `092d6fc` | Study entry / Back button style consistency — 4 CSS/copy changes; `.btn-back-study` CSS rule; 24 tests |
 | D-265C | `22d99e9` | D-265B live closeout — owner deploy PASS; 39/39 live sanity PASS |
 | D-266A | `225ab30` | Study entry / Back button style regression lock — 40 tests across 8 categories |
-| D-267A | this commit | **[Current]** Study entry / Back button style checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-267A | `d8275d0` | Study entry / Back button style checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-268A | `970daf7` | **[Arc start]** Claim/RunPack flow clarity audit — 6-step flow inventory; 7 friction findings (F-2/F-1 addressed, F-3/F-4/F-5 deferred); docs only |
+| D-268B | `732774c` | RunPack fallback guidance + generated-time summary — `instruction`/`output_contract` added to fallback packet; `rpRelativeTime()` helper; `rp-summary-generated` row; 25 tests |
+| D-268C | `e582d3d` | D-268B live closeout — owner deploy PASS; 36/36 live sanity PASS |
+| D-269A | `3a86b10` | RunPack fallback guidance/generated-time regression lock — 44 tests across 7 categories |
+| D-270A | this commit | **[Current]** RunPack fallback guidance/generated-time checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
