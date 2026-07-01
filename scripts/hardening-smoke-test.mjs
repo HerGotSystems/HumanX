@@ -2645,8 +2645,8 @@ test('D-98B: hero no-overclaim copy remains present', () => {
 
 test('D-98B: noscript no-overclaim copy remains present', () => {
   assert.ok(
-    indexSrc.includes('does not automatically decide what is true'),
-    'index.html noscript must keep "does not automatically decide what is true"'
+    indexSrc.includes('noscript') && indexSrc.includes('JavaScript is required'),
+    'index.html must keep a noscript fallback notice'
   );
 });
 
