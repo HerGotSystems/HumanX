@@ -1,14 +1,14 @@
 # D-246A — Review Card Score Label Clarity
 
 **Scope:** Frontend (app-v10.js only) + tests + docs
-**Status:** COMPLETE — pending owner deploy
+**Status:** COMPLETE — owner deploy PASS (D-246B live sanity PASS 2026-07-01)
 **Baseline:** 2665 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `scripts/hardening-smoke-test.mjs`, `docs/D246A_REVIEW_CARD_SCORE_LABEL_CLARITY.md`, `docs/README.md`
 **App UI changes:** Yes — score labels changed from `ev:N ts:N sv:N` to `Evidence N · Test N · Survive N`
 **CSS changes:** None
 **Worker changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes
+**Deploy needed:** No (deployed)
 
 ---
 
@@ -142,19 +142,21 @@ Also updated: D-129E legacy test (previously asserted `ev:/ts:/sv:` string prese
 
 ---
 
-## Live Sanity Checklist (pending owner deploy)
+## Live Sanity Checklist — D-246B PASS (2026-07-01, owner deploy)
 
-- [ ] Review queue loads without JS errors
-- [ ] Claim card meta line shows `Evidence N · Test N · Survive N` (not `ev:N ts:N sv:N`)
-- [ ] Evidence and truth card meta lines unchanged
-- [ ] Date (`Updated {age}`) still in meta line — D-245B preserved
-- [ ] Category and status still visible in meta line
-- [ ] Quality hint badge ("needs sharpening") still appears in head row
-- [ ] Similar/duplicate advisory still visible
-- [ ] Inspect button / Approve / Keep Pending / Reject all functional
-- [ ] Selected card highlight and scroll intact
-- [ ] Confirm-state (approve/reject pending) UI intact
-- [ ] Decision feedback banner + "Open next item →" button intact
-- [ ] Review-to-Study navigation intact
-- [ ] No console errors
-- [ ] No review internals exposed on public profile page
+- [x] Review queue loads without JS errors
+- [x] Claim card meta line shows `Evidence N · Test N · Survive N` (not `ev:N ts:N sv:N`)
+- [x] Evidence and truth card meta lines unchanged
+- [x] Date (`Updated {age}`) still in meta line — D-245B preserved
+- [x] Category and status still visible in meta line
+- [x] Quality hint badge ("needs sharpening") still appears in head row
+- [x] Similar/duplicate advisory still visible
+- [x] Inspect button / Approve / Keep Pending / Reject all functional
+- [x] Selected card highlight and scroll intact
+- [x] Confirm-state (approve/reject pending) UI intact
+- [x] Decision feedback banner + "Open next item →" button intact
+- [x] Review-to-Study navigation intact
+- [x] No console errors
+- [x] No review internals exposed on public profile page
+
+**28/28 PASS** — owner live sanity complete 2026-07-01
