@@ -1,7 +1,7 @@
 # D-253A — Review Client-Side Search
 
 **Scope:** Frontend (app-v10.js, styles.css) + tests + docs
-**Status:** COMPLETE — owner deploy pending (D-253B live sanity)
+**Status:** COMPLETE — owner deploy PASS (D-253B live sanity PASS 2026-07-01)
 **Baseline:** 2813 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D253A_REVIEW_CLIENT_SIDE_SEARCH.md`, `docs/README.md`
 **App UI changes:** Yes — search row with input, label, and clear button
@@ -243,35 +243,37 @@ No `oninput=`, `onclick=`, or other inline event attributes on search elements.
 
 ---
 
-## Live Sanity Checklist — D-253B (pending owner deploy)
+## Live Sanity Checklist — D-253B PASS (2026-07-01, owner deploy)
 
-- [ ] Review queue loads without JS errors
-- [ ] Search row visible: label "Search review queue" + input
-- [ ] Input has placeholder "Search claim, ID, handle, source…"
-- [ ] Type a claim text fragment → matching cards filter in real time
-- [ ] Type an item/claim ID fragment → matching cards filter
-- [ ] Type a handle → matching cards filter
-- [ ] Type a category/type string → matching cards filter
-- [ ] Search is case-insensitive (e.g. "CLAIM" matches "claim")
-- [ ] Active summary shows `· Search: "query"` when search is active
-- [ ] Active summary omits search context when search is cleared/empty
-- [ ] Zero-results empty state shows search context in context line
-- [ ] Zero-results shows "Clear search" button when search active
-- [ ] Zero-results shows "Show all review items" button when filter is not All
-- [ ] Clicking "Clear search" clears search; filter and sort unchanged
-- [ ] Clicking "Show all review items" resets filter to All; search and sort unchanged
-- [ ] D-250B active summary still visible for all filters
-- [ ] D-251A zero-results state still works (with and without search)
-- [ ] D-252A filter helpers still appear for ~Quality / Dupes / ~Similar
-- [ ] "Open next item →" follows same searched+sorted list as cards
-- [ ] Inspect panel Prev/Next navigate within searched list
-- [ ] Moderation actions (Approve/Keep/Reject) unaffected
-- [ ] Confirm-state (D-229A) unaffected
-- [ ] Decision feedback banner (D-230A) unaffected
-- [ ] D-245B inline date still in meta line
-- [ ] D-246A score labels still in meta line
-- [ ] D-247A advisory hints row still renders
-- [ ] Review-to-Study navigation (D-239/D-240) unaffected
-- [ ] No backend/API calls made during search (client-side only)
-- [ ] Search not persisted after page reload (session-only)
-- [ ] No console errors
+- [x] Review queue loads without JS errors
+- [x] Search row visible: label "Search review queue" + input
+- [x] Input has placeholder "Search claim, ID, handle, source…"
+- [x] Type a claim text fragment → matching cards filter in real time
+- [x] Type an item/claim ID fragment → matching cards filter
+- [x] Type a handle → matching cards filter
+- [x] Type a category/type string → matching cards filter
+- [x] Search is case-insensitive (e.g. "CLAIM" matches "claim")
+- [x] Active summary shows `· Search: "query"` when search is active
+- [x] Active summary omits search context when search is cleared/empty
+- [x] Zero-results empty state shows search context in context line
+- [x] Zero-results shows "Clear search" button when search active
+- [x] Zero-results shows "Show all review items" button when filter is not All
+- [x] Clicking "Clear search" clears search; filter and sort unchanged
+- [x] Clicking "Show all review items" resets filter to All; search and sort unchanged
+- [x] D-250B active summary still visible for all filters
+- [x] D-251A zero-results state still works (with and without search)
+- [x] D-252A filter helpers still appear for ~Quality / Dupes / ~Similar
+- [x] "Open next item →" follows same searched+sorted list as cards
+- [x] Inspect panel Prev/Next navigate within searched list
+- [x] Moderation actions (Approve/Keep/Reject) unaffected
+- [x] Confirm-state (D-229A) unaffected
+- [x] Decision feedback banner (D-230A) unaffected
+- [x] D-245B inline date still in meta line
+- [x] D-246A score labels still in meta line
+- [x] D-247A advisory hints row still renders
+- [x] Review-to-Study navigation (D-239/D-240) unaffected
+- [x] No backend/API calls made during search (client-side only)
+- [x] Search not persisted after page reload (session-only)
+- [x] No console errors
+
+**41/41 PASS** — owner live sanity complete 2026-07-01
