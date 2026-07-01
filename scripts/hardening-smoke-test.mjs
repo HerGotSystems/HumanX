@@ -22370,6 +22370,345 @@ console.log('\nD-248A: Review card metadata density regression lock');
   });
 }
 
+// ── D-269A: RunPack fallback guidance + generated-time regression lock ────────
+
+{
+  console.log('\nD-269A: RunPack fallback guidance and generated-time regression lock');
+
+  const genIdx = appSrc.indexOf('async function generateRunPack(');
+  const genBig  = appSrc.slice(genIdx, genIdx + 4000);
+
+  const summaryIdx   = appSrc.indexOf('function runPackSummary(');
+  const summarySlice = appSrc.slice(summaryIdx, summaryIdx + 2000);
+
+  const rtIdx   = appSrc.indexOf('function rpRelativeTime(');
+  const rtSlice = appSrc.slice(rtIdx, rtIdx + 300);
+
+  const instrStart = genBig.indexOf('instruction:');
+  const instrSlice = genBig.slice(instrStart, instrStart + 900);
+
+  const ocStart = genBig.indexOf('output_contract:');
+  const ocSlice = genBig.slice(ocStart, ocStart + 1200);
+
+  // ── Category 1: Fallback guidance lock (12 tests) ─────────────────────────
+
+  // 1. Fallback still includes instruction
+  test('D-269A [fallback-lock]: fallback RunPack still includes instruction field', () => {
+    assert.ok(
+      genBig.includes('is_fallback:true') && genBig.includes('instruction:'),
+      'fallback RunPack must retain instruction field (D-268B lock)'
+    );
+  });
+
+  // 2. Fallback still includes output_contract
+  test('D-269A [fallback-lock]: fallback RunPack still includes output_contract field', () => {
+    assert.ok(
+      genBig.includes('is_fallback:true') && genBig.includes('output_contract:'),
+      'fallback RunPack must retain output_contract field (D-268B lock)'
+    );
+  });
+
+  // 3. Instruction still references claim packet analysis
+  test('D-269A [fallback-lock]: instruction still tells AI to analyse claim using the packet', () => {
+    assert.ok(
+      instrSlice.includes('claim') && (instrSlice.includes('packet') || instrSlice.includes('analysis')),
+      'fallback instruction must still tell the AI to analyse the claim using the packet'
+    );
+  });
+
+  // 4. Emotionally important warning preserved
+  test('D-269A [fallback-lock]: instruction still warns not to assume emotionally important claims are true', () => {
+    assert.ok(
+      instrSlice.includes('emotionally important'),
+      'fallback instruction must still warn not to assume a claim is true because it is emotionally important'
+    );
+  });
+
+  // 5. Unpopular-claim warning preserved
+  test('D-269A [fallback-lock]: instruction still warns not to dismiss claims only because unpopular', () => {
+    assert.ok(
+      instrSlice.includes('unpopular'),
+      'fallback instruction must still warn not to dismiss a claim only because it is unpopular'
+    );
+  });
+
+  // 6. No independent verification warning preserved
+  test('D-269A [fallback-lock]: instruction still warns not to claim independent verification', () => {
+    assert.ok(
+      instrSlice.includes('independent verification') || instrSlice.includes('independent research'),
+      'fallback instruction must still warn not to claim independent verification'
+    );
+  });
+
+  // 7. output_contract still includes verdict
+  test('D-269A [fallback-lock]: output_contract still includes verdict field', () => {
+    assert.ok(ocSlice.includes('verdict'), 'output_contract must still include verdict');
+  });
+
+  // 8. output_contract still includes plain_language_summary
+  test('D-269A [fallback-lock]: output_contract still includes plain_language_summary', () => {
+    assert.ok(ocSlice.includes('plain_language_summary'), 'output_contract must still include plain_language_summary');
+  });
+
+  // 9. output_contract still includes evidence_score, testability, survivability
+  test('D-269A [fallback-lock]: output_contract still includes evidence_score, testability, survivability', () => {
+    assert.ok(
+      ocSlice.includes('evidence_score') && ocSlice.includes('testability') && ocSlice.includes('survivability'),
+      'output_contract must still include evidence_score, testability, survivability'
+    );
+  });
+
+  // 10. output_contract still includes strongest_support, strongest_pressure, missing_tests
+  test('D-269A [fallback-lock]: output_contract still includes strongest_support, strongest_pressure, missing_tests', () => {
+    assert.ok(
+      ocSlice.includes('strongest_support') && ocSlice.includes('strongest_pressure') && ocSlice.includes('missing_tests'),
+      'output_contract must still include strongest_support, strongest_pressure, missing_tests'
+    );
+  });
+
+  // 11. output_contract still includes limitations and ai_provenance_note
+  test('D-269A [fallback-lock]: output_contract still includes limitations and ai_provenance_note', () => {
+    assert.ok(
+      ocSlice.includes('limitations') && ocSlice.includes('ai_provenance_note'),
+      'output_contract must still include limitations and ai_provenance_note'
+    );
+  });
+
+  // 12. output_contract still warns not to invent evidence
+  test('D-269A [fallback-lock]: output_contract still warns not to invent evidence', () => {
+    assert.ok(ocSlice.includes('invent'), 'output_contract must still warn not to invent evidence');
+  });
+
+  // ── Category 2: Generated-time summary lock (8 tests) ─────────────────────
+
+  // 13. rpRelativeTime still defined
+  test('D-269A [generated-time-lock]: rpRelativeTime helper still defined', () => {
+    assert.ok(appSrc.includes('function rpRelativeTime('), 'rpRelativeTime must remain defined (D-268B lock)');
+  });
+
+  // 14. rpRelativeTime still returns "just now"
+  test('D-269A [generated-time-lock]: rpRelativeTime still returns "just now" for sub-60s', () => {
+    assert.ok(rtSlice.includes('just now'), 'rpRelativeTime must still return "just now" copy');
+  });
+
+  // 15. rpRelativeTime still returns minute-based copy
+  test('D-269A [generated-time-lock]: rpRelativeTime still returns "min ago" for sub-1h', () => {
+    assert.ok(rtSlice.includes('min ago'), 'rpRelativeTime must still return "min ago" copy');
+  });
+
+  // 16. rpRelativeTime still returns hour-based copy
+  test('D-269A [generated-time-lock]: rpRelativeTime still returns "h ago" for multi-hour', () => {
+    assert.ok(rtSlice.includes('h ago'), 'rpRelativeTime must still return "h ago" copy');
+  });
+
+  // 17. runPackSummary still emits rp-summary-generated
+  test('D-269A [generated-time-lock]: runPackSummary still emits rp-summary-generated element', () => {
+    assert.ok(summarySlice.includes('rp-summary-generated'), 'runPackSummary must still emit rp-summary-generated (D-268B lock)');
+  });
+
+  // 18. Generated-time row guarded by lastPacketMeta.generated_at
+  test('D-269A [generated-time-lock]: generated-time row still guarded by lastPacketMeta.generated_at', () => {
+    assert.ok(
+      summarySlice.includes('lastPacketMeta') && summarySlice.includes('generated_at'),
+      'generated-time row must still be guarded by lastPacketMeta.generated_at check'
+    );
+  });
+
+  // 19. Generated-time row uses rpRelativeTime
+  test('D-269A [generated-time-lock]: generated-time row still calls rpRelativeTime', () => {
+    assert.ok(summarySlice.includes('rpRelativeTime('), 'generated-time row must still call rpRelativeTime()');
+  });
+
+  // 20. Generated-time row appears before status chip (render order: rp-summary-generated before rp-status-chip)
+  test('D-269A [generated-time-lock]: generated-time row appears before status chip in render order', () => {
+    const genPos  = summarySlice.indexOf('rp-summary-generated');
+    const chipPos = summarySlice.indexOf('rp-status-chip');
+    assert.ok(genPos !== -1 && chipPos !== -1 && genPos < chipPos, 'rp-summary-generated must appear before rp-status-chip in runPackSummary output');
+  });
+
+  // ── Category 3: Stale behavior lock (4 tests) ─────────────────────────────
+
+  // 21. Stale warning chip still present in runPackSummary
+  test('D-269A [stale-lock]: stale warning chip still present in runPackSummary', () => {
+    assert.ok(
+      summarySlice.includes('rp-status-warn') && summarySlice.includes('Possibly stale'),
+      'stale warning chip must remain in runPackSummary (D-268B lock)'
+    );
+  });
+
+  // 22. detectPacketStaleness still called
+  test('D-269A [stale-lock]: detectPacketStaleness still called in runPackSummary', () => {
+    assert.ok(summarySlice.includes('detectPacketStaleness'), 'detectPacketStaleness must still be called in runPackSummary');
+  });
+
+  // 23. Stale threshold unchanged at 3600000ms
+  test('D-269A [stale-lock]: stale threshold still 3600000ms', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness(');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 800);
+    assert.ok(staleSlice.includes('3600000'), 'detectPacketStaleness stale threshold must remain at 3600000ms');
+  });
+
+  // 24. source_snapshot_hash stale check still not added (F-4 deferred)
+  test('D-269A [stale-lock]: source_snapshot_hash comparison not added to detectPacketStaleness (F-4 deferred)', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness(');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 800);
+    assert.ok(
+      !staleSlice.includes('source_snapshot_hash'),
+      'F-4 (source_snapshot_hash stale check) must remain deferred — do not add without explicit owner approval'
+    );
+  });
+
+  // ── Category 4: AI-return / import behavior lock (5 tests) ────────────────
+
+  // 25. "Load AI Analysis Return" section still present
+  test('D-269A [import-lock]: Load AI Analysis Return section still present', () => {
+    const expIdx = appSrc.indexOf('function renderExport(');
+    const expSlice = appSrc.slice(expIdx, expIdx + 5000);
+    assert.ok(expSlice.includes('Load AI Analysis Return'), '"Load AI Analysis Return" section must remain in renderExport');
+  });
+
+  // 26. saveAnalysisResult still uses JSON.parse
+  test('D-269A [import-lock]: saveAnalysisResult still validates with JSON.parse', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult(');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 600);
+    assert.ok(sarSlice.includes('JSON.parse(text)'), 'saveAnalysisResult must still use JSON.parse for AI return validation');
+  });
+
+  // 27. saveAnalysisResult field extraction unchanged
+  test('D-269A [import-lock]: saveAnalysisResult field extraction unchanged', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult(');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 600);
+    assert.ok(
+      sarSlice.includes('parsed.output||parsed.result||parsed.analysis||parsed') ||
+      sarSlice.includes('parsed.output || parsed.result || parsed.analysis || parsed'),
+      'saveAnalysisResult field extraction must be unchanged'
+    );
+  });
+
+  // 28. saveAnalysisResult success copy unchanged
+  test('D-269A [import-lock]: saveAnalysisResult success copy unchanged', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult(');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 900);
+    assert.ok(sarSlice.includes('Analysis saved'), 'saveAnalysisResult success toast copy must remain unchanged');
+  });
+
+  // 29. Packet-ID storage still not added (F-5 deferred) — packet_id advisory still non-blocking
+  test('D-269A [import-lock]: packet_id advisory check still non-blocking in saveAnalysisResult (F-5 deferred)', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult(');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 600);
+    assert.ok(
+      sarSlice.includes('packet_id') && sarSlice.includes('Advisory'),
+      'packet_id check must remain advisory-only toast in saveAnalysisResult (F-5 storage deferred)'
+    );
+  });
+
+  // ── Category 5: Claim / RunPack behavior lock (6 tests) ───────────────────
+
+  // 30. generateRunPack still defined
+  test('D-269A [runpack-lock]: generateRunPack still defined', () => {
+    assert.ok(appSrc.includes('async function generateRunPack('), 'generateRunPack must remain defined');
+  });
+
+  // 31. Backend RunPack route still called
+  test('D-269A [runpack-lock]: generateRunPack still calls POST /api/runpack', () => {
+    assert.ok(
+      genBig.includes("'/api/runpack'") || genBig.includes('"/api/runpack"'),
+      'generateRunPack must still call POST /api/runpack (backend path unchanged)'
+    );
+  });
+
+  // 32. Fallback path still sets is_fallback:true
+  test('D-269A [runpack-lock]: fallback still sets is_fallback:true', () => {
+    assert.ok(genBig.includes('is_fallback:true'), 'fallback RunPack must still set is_fallback:true');
+  });
+
+  // 33. Fallback still uses safeRunPackClaim(selected) — D-171B lock preserved
+  test('D-269A [runpack-lock]: fallback still uses safeRunPackClaim(selected) for payload (D-171B lock)', () => {
+    assert.ok(genBig.includes('safeRunPackClaim(selected)'), 'fallback payload must still use safeRunPackClaim(selected)');
+  });
+
+  // 34. Copy Packet / Download Packet buttons still present
+  test('D-269A [runpack-lock]: Copy Packet and Download Packet buttons still present in renderExport', () => {
+    const expIdx = appSrc.indexOf('function renderExport(');
+    const expSlice = appSrc.slice(expIdx, expIdx + 5000);
+    assert.ok(
+      expSlice.includes('Copy Packet') && expSlice.includes('Download Packet'),
+      'Copy Packet and Download Packet buttons must remain in renderExport'
+    );
+  });
+
+  // 35. saveAnalysisResult still posts to /api/analysis (no public truth state change)
+  test('D-269A [runpack-lock]: saveAnalysisResult still posts to /api/analysis, not approve/review routes', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult(');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 600);
+    assert.ok(
+      sarSlice.includes("'/api/analysis'") && !sarSlice.includes("'/api/review") && !sarSlice.includes("'/api/approve"),
+      'saveAnalysisResult must post to /api/analysis only — no public truth state change'
+    );
+  });
+
+  // ── Category 6: Boundary lock (4 tests) ───────────────────────────────────
+
+  // 36. generateRunPack not in renderPublicProfileHtml
+  test('D-269A [boundary]: generateRunPack not in renderPublicProfileHtml', () => {
+    const ppIdx = appSrc.indexOf('function renderPublicProfileHtml(');
+    const ppSlice = appSrc.slice(ppIdx, ppIdx + 18000);
+    assert.ok(!ppSlice.includes('generateRunPack'), 'generateRunPack must not appear in renderPublicProfileHtml');
+  });
+
+  // 37. saveAnalysisResult not in renderPublicProfileHtml
+  test('D-269A [boundary]: saveAnalysisResult not in renderPublicProfileHtml', () => {
+    const ppIdx = appSrc.indexOf('function renderPublicProfileHtml(');
+    const ppSlice = appSrc.slice(ppIdx, ppIdx + 18000);
+    assert.ok(!ppSlice.includes('saveAnalysisResult'), 'saveAnalysisResult must not appear in renderPublicProfileHtml');
+  });
+
+  // 38. Drift/Belief expansion not modified
+  test('D-269A [boundary]: belief-drift-expansion.js not modified by D-269A', () => {
+    const driftSrc = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(!driftSrc.includes('D-269A'), 'D-269A must not modify belief-drift-expansion.js');
+  });
+
+  // 39. worker.js not modified
+  test('D-269A [boundary]: worker.js not modified by D-269A', () => {
+    assert.ok(!workerSrc.includes('D-269A'), 'D-269A must not modify worker.js');
+  });
+
+  // ── Category 7: Deploy integrity lock (5 tests) ───────────────────────────
+
+  // 40. app-v10.js not modified by D-269A
+  test('D-269A [deploy-integrity]: app-v10.js not modified by D-269A', () => {
+    assert.ok(!appSrc.includes('D-269A'), 'D-269A is tests+docs only — app-v10.js must not be modified');
+  });
+
+  // 41. styles.css not modified by D-269A
+  test('D-269A [deploy-integrity]: styles.css not modified by D-269A', () => {
+    assert.ok(!cssSrc.includes('D-269A'), 'D-269A is tests+docs only — styles.css must not be modified');
+  });
+
+  // 42. index.html not modified by D-269A
+  test('D-269A [deploy-integrity]: index.html not modified by D-269A', () => {
+    const indexSrc = readFileSync(path.join(__dirname, '../public/index.html'), 'utf8');
+    assert.ok(!indexSrc.includes('D-269A'), 'D-269A must not modify index.html');
+  });
+
+  // 43. requestApproveReview still defined (moderation lock)
+  test('D-269A [deploy-integrity]: requestApproveReview still defined — moderation unchanged', () => {
+    assert.ok(
+      appSrc.includes('function requestApproveReview(') || appSrc.includes('async function requestApproveReview('),
+      'requestApproveReview must remain defined — D-269A must not touch moderation functions'
+    );
+  });
+
+  // 44. runPackSummary evidence/pressure/tests counts row still present (counts not removed)
+  test('D-269A [deploy-integrity]: runPackSummary evidence/pressure/tests counts row still present', () => {
+    assert.ok(
+      summarySlice.includes('rp-summary-count') && summarySlice.includes('evidence') && summarySlice.includes('pressure') && summarySlice.includes('tests'),
+      'runPackSummary must still render evidence/pressure/tests counts row — D-269A must not remove it'
+    );
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
