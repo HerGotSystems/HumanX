@@ -210,11 +210,15 @@
 .review-filter-chips{display:flex;gap:6px;flex-wrap:wrap}
 .review-filter-help{margin:5px 0 0;font-size:10px;color:var(--muted);line-height:1.4}
 .review-cleanup-hint{margin:5px 0 0;font-size:10px;color:var(--muted);line-height:1.5;opacity:.7}
+/* D-258B: Sort bar layout — isolates sort label+select pair from chip row */
+.review-sort-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:2px 0}
+.review-sort-label{font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.review-sort-select{font-size:11px;padding:3px 6px;border-radius:6px;background:var(--panel,#10131d);border:1px solid var(--line);color:var(--text);cursor:pointer;min-width:120px;max-width:180px;width:auto}
 /* Empty state */
 .review-empty-state{background:rgba(8,11,18,.5);border-style:dashed}
 .review-empty-title{font-size:13px;font-weight:600;color:var(--text);margin:0 0 4px}
 .review-empty-context{color:var(--muted);margin:0 0 6px}
-.review-empty-actions{margin-top:10px}
+.review-empty-actions{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .review-empty-show-all{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
 .review-empty-show-all:hover{color:var(--text);border-color:var(--text)}
 /* Inspect panel state bar */
@@ -255,12 +259,12 @@
 .btn-cleanup-confirm{background:linear-gradient(135deg,#3d2b00,#1e1500);border:1px solid #ffd16688!important;color:#ffd166;font-weight:700}
 .btn-cleanup-confirm:hover{background:linear-gradient(135deg,#5c4000,#3d2b00)}
 .btn-cleanup-cancel{background:#0b0e16;border:1px solid var(--line);color:var(--muted)}
-/* D-230A: review decision feedback banner */
-.review-decision-feedback{display:flex;align-items:center;gap:8px;background:rgba(47,191,113,.08);border:1px solid rgba(47,191,113,.25);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--fg);grid-column:1/-1}
-.review-feedback-msg{flex:1}
-.review-feedback-dismiss{background:transparent;border:1px solid var(--line);color:var(--muted);font-size:11px;padding:2px 8px;border-radius:4px;cursor:pointer}
+/* D-230A: review decision feedback banner / D-258B: added flex-wrap */
+.review-decision-feedback{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:rgba(47,191,113,.08);border:1px solid rgba(47,191,113,.25);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--fg);grid-column:1/-1}
+.review-feedback-msg{flex:1;min-width:0}
+.review-feedback-dismiss{background:transparent;border:1px solid var(--line);color:var(--muted);font-size:11px;padding:2px 8px;border-radius:4px;cursor:pointer;flex-shrink:0}
 .review-feedback-dismiss:hover{color:var(--fg);border-color:var(--fg)}
-.review-feedback-next{background:transparent;border:1px solid rgba(47,191,113,.45);color:var(--green,#2fbf71);font-size:12px;font-weight:600;padding:2px 10px;border-radius:4px;cursor:pointer}
+.review-feedback-next{background:transparent;border:1px solid rgba(47,191,113,.45);color:var(--green,#2fbf71);font-size:12px;font-weight:600;padding:2px 10px;border-radius:4px;cursor:pointer;flex-shrink:0}
 .review-feedback-next:hover{background:rgba(47,191,113,.1)}
 .review-feedback-next:focus-visible{outline:2px solid var(--green,#2fbf71);outline-offset:2px}
 .review-reason-tag{font-size:11px;color:var(--muted);margin:0 0 5px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
