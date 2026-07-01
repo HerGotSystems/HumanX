@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3011 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3035 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-264A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run (9 mini-arcs, 721 tests, 14 deploys — see D-264A wrap-up), current baseline 3011/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–65.
 
-### `D265A_STUDY_ENTRY_BUTTON_STYLE_CONSISTENCY_AUDIT.md` ⭐ CURRENT — D-265A STUDY ENTRY BUTTON STYLE CONSISTENCY AUDIT — DOCS ONLY
+### `D265B_STUDY_ENTRY_BACK_BUTTON_STYLE_CONSISTENCY.md` ⭐ CURRENT — D-265B STUDY ENTRY / BACK BUTTON STYLE CONSISTENCY — DEPLOY NEEDED
+
+App/CSS + tests + docs. Deploy needed (owner manual terminal deploy + D-265C live closeout required). Baseline: 3035/0/24/57 (+24 tests). Addresses D-265A findings: (1) removed `primary` class from inspect panel claim Study button — false hierarchy eliminated, all inspect Study buttons now use `btn-study-review` only; (2) added `btn-back-study` class to all 5 Back navigation buttons + new `.btn-back-study` CSS rule (calm secondary affordance: `rgba(255,255,255,.06)` fill, `rgba(255,255,255,.12)` border, `var(--muted)` text, hover lightens); (3) added `btn-link-small` class and `↗` icon to evidence card Study button, matching vault group header; (4) changed linked claim field label from raw `{claimId} ↗` to `Study linked claim ↗`. No navigation behavior changes. No handler changes. Back-to-Review scroll restore unchanged. Search-aware pipeline unchanged. D-261B inspect action spacing CSS guarantees preserved. Moderation actions unchanged. Duplicate/advisory semantics unchanged. D-245→D-264 locks (315 tests) all pass. No public profile exposure. Drift/Belief files unchanged. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D265A_STUDY_ENTRY_BUTTON_STYLE_CONSISTENCY_AUDIT.md` — D-265A STUDY ENTRY BUTTON STYLE CONSISTENCY AUDIT — DOCS ONLY
 
 Docs only. No deploy needed. Baseline: 3011/0/24/57 (unchanged). Full static audit of all Study entry and Back navigation buttons across `public/app-v10.js`. 14-button inventory across all surfaces (inspect panel, vault, evidence cards, Truths page, My HumanX, Study page back buttons). 8 friction findings: F-1 HIGH (inspect panel claim Study has `primary` class; evidence/pressure/truth Study buttons do not — false hierarchy in same panel), F-2 HIGH (all 5 Back navigation buttons have no CSS class — browser-default; Back-to-Review moderator path at risk of being overlooked), F-3–F-6 MEDIUM (icon inconsistency `↗` vs `→`, evidence card Study button classless, advisory field Study different appearance, linked claim field shows raw claim ID), F-7–F-8 LOW (label variety, D-261B scope limited to inspect panel). Recommended D-265B: CSS + copy polish only — normalize inspect panel Study class, add `btn-back-study` class to Back buttons, normalize arrow icon to `↗`, add `btn-link-small` to evidence card Study button. No handler changes. No backend changes. No app/CSS/worker/Drift/Belief changes.
 

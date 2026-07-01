@@ -78,6 +78,9 @@
 .study h2{margin:4px 0 6px}
 .study-header{padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--line)}
 .study-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+/* D-265B: Back navigation button — calm secondary affordance in study-nav */
+.btn-back-study{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--muted);padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+.btn-back-study:hover{background:rgba(255,255,255,.10);color:var(--text)}
 .study-meta{margin:0 0 6px}
 .review-badge-block{margin:2px 0 4px}
 .study-review-state{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
