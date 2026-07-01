@@ -1,13 +1,13 @@
 # D-268B — RunPack Fallback Guidance and Generated-Time Summary
 
 **Scope:** Frontend + tests + docs
-**Status:** COMPLETE — deploy needed (app-v10.js changed)
+**Status:** COMPLETE — owner deploy PASS (D-268C, 2026-07-01) — 36/36 live sanity PASS
 **Baseline:** 3100 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `scripts/hardening-smoke-test.mjs`, `docs/D268B_RUNPACK_FALLBACK_GUIDANCE_GENERATED_TIME_SUMMARY.md`, `docs/README.md`
 **CSS changes:** None
 **Worker changes:** None (`src/worker.js` not touched)
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes (public/app-v10.js changed)
+**Deploy needed:** No — owner deploy PASS (D-268C, 2026-07-01)
 
 ---
 
@@ -194,27 +194,48 @@ New baseline: **3100 passed, 0 failed** (was 3075).
 
 ---
 
-## Live Sanity Checklist (pending owner deploy)
+## Live Sanity Checklist — D-268C PASS (2026-07-01)
 
-After deploy, verify in browser:
+Owner deploy PASS. 36/36 live checks PASS.
 
-| # | Check |
-|---|-------|
-| 1 | Open a public claim → enter Study mode → open RunPack tab |
-| 2 | Click "Create Investigation Packet" (backend available) |
-| 3 | Status chip shows "Packet ready · send to AI" |
-| 4 | "Generated just now" appears below counts row |
-| 5 | Wait 2 minutes — status still shows "Packet ready", counts row shows correct counts |
-| 6 | "Generated X min ago" text updates correctly |
-| 7 | Disable network (devtools) → recreate packet → verify fallback warning appears |
-| 8 | Copy packet JSON → verify `instruction` field present in fallback |
-| 9 | Verify `output_contract` field present in fallback |
-| 10 | Verify `is_fallback: true` present in fallback |
-| 11 | Re-enable network → rebuild packet → verify no fallback warning |
-| 12 | Add evidence → stale warning fires correctly (count changed) |
-| 13 | Stale chip still shows "Possibly stale — evidence count changed" |
-| 14 | No changes to public profile, Review queue, or analysis display |
-| 15 | "Load AI Analysis Return" section still collapsed (F-3 deferred) |
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opened after deploy | PASS |
+| 2 | Claim/RunPack area opens without console-breaking errors | PASS |
+| 3 | Existing claim can be loaded | PASS |
+| 4 | RunPack/Investigation Packet can be generated or displayed | PASS |
+| 5 | RunPack summary still shows evidence count | PASS |
+| 6 | RunPack summary still shows pressure count | PASS |
+| 7 | RunPack summary still shows test count | PASS |
+| 8 | RunPack summary now shows a generated-time row when `generated_at` exists | PASS |
+| 9 | Generated-time row is human-readable | PASS |
+| 10 | Generated-time copy understandable (`Generated just now` / `Generated X min ago` / `Generated Xh ago`) | PASS |
+| 11 | Generated-time row appears between count summary and status/stale chip as intended | PASS |
+| 12 | Existing stale warning chip still appears when packet is stale | PASS |
+| 13 | Stale threshold behavior is unchanged | PASS |
+| 14 | Fresh packet does not incorrectly show stale warning | PASS |
+| 15 | Investigation Packet JSON still displays | PASS |
+| 16 | Packet copy behavior unchanged | PASS |
+| 17 | Packet download behavior unchanged | PASS |
+| 18 | Backend-generated RunPack still works | PASS |
+| 19 | Backend packet structure not broken by frontend change | PASS |
+| 20 | Fallback packet code path now includes `instruction` | PASS |
+| 21 | Fallback packet code path now includes `output_contract` | PASS |
+| 22 | Fallback instruction is suitable for claim-pressure analysis | PASS |
+| 23 | Fallback instruction warns not to assume emotionally important claims are true | PASS |
+| 24 | Fallback instruction warns not to dismiss claims only because unpopular | PASS |
+| 25 | Fallback output contract requires structured analysis | PASS |
+| 26 | Fallback output contract warns not to invent evidence | PASS |
+| 27 | AI-return import/paste area behavior unchanged | PASS |
+| 28 | Analysis parsing behavior unchanged | PASS |
+| 29 | Analysis success/failure behavior unchanged | PASS |
+| 30 | Public truth state unchanged | PASS |
+| 31 | Review queue behavior unchanged | PASS |
+| 32 | Review/moderation behavior unchanged | PASS |
+| 33 | Public profile pages unaffected | PASS |
+| 34 | Drift/Belief expansion surfaces still load normally | PASS |
+| 35 | No backend/API behavior changed | PASS |
+| 36 | No console errors | PASS |
 
 ---
 
