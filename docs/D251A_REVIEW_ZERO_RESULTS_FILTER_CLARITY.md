@@ -1,7 +1,7 @@
 # D-251A — Review Zero-Results Filter Clarity
 
 **Scope:** Frontend (app-v10.js, styles.css) + tests + docs
-**Status:** COMPLETE — owner deploy pending (D-251B)
+**Status:** COMPLETE — owner deploy PASS (D-251B live sanity PASS 2026-07-01)
 **Baseline:** 2758 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D251A_REVIEW_ZERO_RESULTS_FILTER_CLARITY.md`, `docs/README.md`
 **App UI changes:** Yes — enhanced zero-results empty state with title, context line, and "Show all review items" button
@@ -202,23 +202,25 @@ No Review items found.
 
 ---
 
-## Live Sanity Checklist — D-251B (pending owner deploy)
+## Live Sanity Checklist — D-251B PASS (2026-07-01, owner deploy)
 
-- [ ] Review queue loads without JS errors
-- [ ] With Pending filter and items: normal card list renders (no empty state)
-- [ ] With a filter that has zero results: `No review items match this view.` title visible
-- [ ] Context line shows correct filter name and sort label
-- [ ] Existing per-filter copy still appears below context line
-- [ ] `Show all review items` button visible when on a filtered view with zero results
-- [ ] `Show all review items` button absent when on `All` filter with zero items
-- [ ] Clicking `Show all review items` switches to All filter without changing sort
-- [ ] D-250B active summary still shows `Showing: {filter} · 0 items · Sorted: {sort}` above empty state
-- [ ] Empty state is calm — not error-red, not alarming
-- [ ] Moderation actions (Approve/Keep/Reject) unaffected on non-empty queues
-- [ ] Confirm-state (D-229A) unaffected
-- [ ] Decision feedback banner (D-230A) unaffected
-- [ ] D-245B inline date still in meta line
-- [ ] D-246A score labels still in meta line
-- [ ] D-247A advisory hints row still renders
-- [ ] Review-to-Study navigation (D-239/D-240) unaffected
-- [ ] No console errors
+- [x] Review queue loads without JS errors
+- [x] With Pending filter and items: normal card list renders (no empty state)
+- [x] With a filter that has zero results: `No review items match this view.` title visible
+- [x] Context line shows correct filter name and sort label
+- [x] Existing per-filter copy still appears below context line
+- [x] `Show all review items` button visible when on a filtered view with zero results
+- [x] `Show all review items` button absent when on `All` filter with zero items
+- [x] Clicking `Show all review items` switches to All filter without changing sort
+- [x] D-250B active summary still shows `Showing: {filter} · 0 items · Sorted: {sort}` above empty state
+- [x] Empty state is calm — not error-red, not alarming
+- [x] Moderation actions (Approve/Keep/Reject) unaffected on non-empty queues
+- [x] Confirm-state (D-229A) unaffected
+- [x] Decision feedback banner (D-230A) unaffected
+- [x] D-245B inline date still in meta line
+- [x] D-246A score labels still in meta line
+- [x] D-247A advisory hints row still renders
+- [x] Review-to-Study navigation (D-239/D-240) unaffected
+- [x] No console errors
+
+**28/28 PASS** — owner live sanity complete 2026-07-01
