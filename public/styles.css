@@ -161,8 +161,7 @@
 .review-filter-chip-active .review-filter-count{background:rgba(87,184,255,.22)}
 .review-card-head{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px}
 .review-card-title{margin:0 0 3px;font-size:12px;line-height:1.3;font-weight:600}
-.review-card-meta{margin:0 0 2px}
-.review-card-date{margin:0 0 5px}
+.review-card-meta{margin:0 0 5px}
 .review-card-pending{border-left:3px solid #ffd166aa}
 .review-card-public{border-left:3px solid #39ff9faa;background:linear-gradient(180deg,rgba(57,255,159,.04),rgba(16,19,29,.86))}
 .review-card-rejected{border-left:3px solid #ff3b5c55;opacity:.55;filter:saturate(.35)}
@@ -442,8 +441,7 @@
   #reviewList.grid{gap:5px}
   #reviewList .card{padding:7px 9px}
   .review-card-head{margin-bottom:3px}
-  .review-card-meta{margin-bottom:1px}
-  .review-card-date{margin-bottom:4px}
+  .review-card-meta{margin-bottom:4px}
   .review-actions{margin-top:4px;gap:3px}
   .review-actions button{padding:4px 6px;font-size:10px}
   .review-actions .btn-inspect{padding:4px 8px}
