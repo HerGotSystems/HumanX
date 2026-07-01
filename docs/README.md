@@ -53,9 +53,9 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-249A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc, current baseline 2722/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–32.
 
-### `D252A_REVIEW_AMBIGUOUS_FILTER_HELPER_COPY.md` ⭐ CURRENT — D-252A REVIEW AMBIGUOUS FILTER HELPER COPY — DEPLOY NEEDED
+### `D252A_REVIEW_AMBIGUOUS_FILTER_HELPER_COPY.md` ⭐ CURRENT — D-252A REVIEW AMBIGUOUS FILTER HELPER COPY — LIVE PASS
 
-App/CSS change. Owner deploy pending (D-252B). Baseline: 2778/0/24/57 (+20 tests). Adds `renderReviewFilterHelper()` returning a calm one-line helper note for ambiguous filters (`~Quality`, `Dupes`, `~Similar`). Renders between D-250B active summary and feedbackBanner. No helper for All/default/other filters. Helper uses `.review-filter-helper` CSS class. No filter/sort/predicate/next-item/moderation logic changed. No search added. D-250B active summary preserved. D-251A zero-results state preserved. No public profile exposure. No Drift/Belief expansion changes. No backend/API/migration/schema/CSP/external asset changes. Worker unchanged. index.html unchanged.
+App/CSS change. Owner deploy PASS (D-252B live sanity PASS 2026-07-01). Baseline: 2778/0/24/57 (+20 tests). Adds `renderReviewFilterHelper()` returning a calm one-line helper note for ambiguous filters (`~Quality`, `Dupes`, `~Similar`). Renders between D-250B active summary and feedbackBanner. No helper for All/default/other filters. Helper uses `.review-filter-helper` CSS class. No filter/sort/predicate/next-item/moderation logic changed. No search added. D-250B active summary preserved. D-251A zero-results state preserved. No public profile exposure. No Drift/Belief expansion changes. No backend/API/migration/schema/CSP/external asset changes. Worker unchanged. index.html unchanged.
 
 ### `D251A_REVIEW_ZERO_RESULTS_FILTER_CLARITY.md` — D-251A REVIEW ZERO-RESULTS FILTER CLARITY — LIVE PASS
 

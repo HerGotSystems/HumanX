@@ -1,7 +1,7 @@
 # D-252A — Review Ambiguous Filter Helper Copy
 
 **Scope:** Frontend (app-v10.js, styles.css) + tests + docs
-**Status:** COMPLETE — owner deploy pending (D-252B live sanity)
+**Status:** COMPLETE — owner deploy PASS (D-252B live sanity PASS 2026-07-01)
 **Baseline:** 2778 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D252A_REVIEW_AMBIGUOUS_FILTER_HELPER_COPY.md`, `docs/README.md`
 **App UI changes:** Yes — filter helper note for ~Quality, Dupes, ~Similar
@@ -177,28 +177,30 @@ Added after `.review-active-summary{...}`:
 
 ---
 
-## Live Sanity Checklist — D-252B (pending owner deploy)
+## Live Sanity Checklist — D-252B PASS (2026-07-01, owner deploy)
 
-- [ ] Review queue loads without JS errors
-- [ ] With ~Quality filter active and items: helper shows `~Quality shows claim items with quality hints.`
-- [ ] With Dupes filter active and items: helper shows `Dupes includes confirmed duplicates and near-duplicate advisories.`
-- [ ] With ~Similar filter active and items: helper shows `~Similar shows near-duplicate advisory items.`
-- [ ] With Pending (default) filter: no helper note visible
-- [ ] With All filter: no helper note visible
-- [ ] With Public filter: no helper note visible
-- [ ] Helper appears below active summary and above cards
-- [ ] Helper text is calm — smaller/muted, not alarming
-- [ ] Helper visible when zero-results empty state is shown for ~Quality
-- [ ] Helper visible when zero-results empty state is shown for Dupes
-- [ ] Helper visible when zero-results empty state is shown for ~Similar
-- [ ] D-250B active summary (`Showing: X · N items · Sorted: Y`) still visible for all filters
-- [ ] D-251A zero-results empty state ("No review items match this view.") still works
-- [ ] `Show all review items` button still works in zero-results state
-- [ ] Moderation actions (Approve/Keep/Reject) unaffected
-- [ ] Confirm-state (D-229A) unaffected
-- [ ] Decision feedback banner (D-230A) unaffected
-- [ ] D-245B inline date still in meta line
-- [ ] D-246A score labels still in meta line
-- [ ] D-247A advisory hints row still renders
-- [ ] Review-to-Study navigation (D-239/D-240) unaffected
-- [ ] No console errors
+- [x] Review queue loads without JS errors
+- [x] With ~Quality filter active and items: helper shows `~Quality shows claim items with quality hints.`
+- [x] With Dupes filter active and items: helper shows `Dupes includes confirmed duplicates and near-duplicate advisories.`
+- [x] With ~Similar filter active and items: helper shows `~Similar shows near-duplicate advisory items.`
+- [x] With Pending (default) filter: no helper note visible
+- [x] With All filter: no helper note visible
+- [x] With Public filter: no helper note visible
+- [x] Helper appears below active summary and above cards
+- [x] Helper text is calm — smaller/muted, not alarming
+- [x] Helper visible when zero-results empty state is shown for ~Quality
+- [x] Helper visible when zero-results empty state is shown for Dupes
+- [x] Helper visible when zero-results empty state is shown for ~Similar
+- [x] D-250B active summary (`Showing: X · N items · Sorted: Y`) still visible for all filters
+- [x] D-251A zero-results empty state ("No review items match this view.") still works
+- [x] `Show all review items` button still works in zero-results state
+- [x] Moderation actions (Approve/Keep/Reject) unaffected
+- [x] Confirm-state (D-229A) unaffected
+- [x] Decision feedback banner (D-230A) unaffected
+- [x] D-245B inline date still in meta line
+- [x] D-246A score labels still in meta line
+- [x] D-247A advisory hints row still renders
+- [x] Review-to-Study navigation (D-239/D-240) unaffected
+- [x] No console errors
+
+**34/34 PASS** — owner live sanity complete 2026-07-01
