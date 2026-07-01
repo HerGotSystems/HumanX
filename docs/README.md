@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2978 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3011 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-260A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc + D-256 duplicate/similar label clarity addendum + D-258→D-259 Review mobile controls wrapping mini-arc, current baseline 2978/0/24/57 (after D-261B), privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–53.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-260A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc + D-256 duplicate/similar label clarity addendum + D-258→D-259 Review mobile controls wrapping mini-arc, current baseline 3011/0/24/57 (after D-262A), privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–53.
 
-### `D261B_REVIEW_INSPECT_PANEL_ACTION_SPACING_POLISH.md` ⭐ CURRENT — D-261B/C REVIEW INSPECT PANEL ACTION SPACING POLISH — LIVE PASS
+### `D262A_REVIEW_INSPECT_PANEL_ACTION_SPACING_REGRESSION_LOCK.md` ⭐ CURRENT — D-262A REVIEW INSPECT PANEL ACTION SPACING REGRESSION LOCK — TESTS + DOCS ONLY
+
+Tests + docs. No deploy needed. Baseline: 3011/0/24/57. 33 new tests across 7 categories locking D-261B inspect-panel action spacing polish: (1) desktop Study push (`margin-left:auto` not removed); (2) mobile full-width buttons (`width:100%` in Review `@media` block); (3) mobile soft separator (calm `border-top` on `.review-inspect-markdup`/`.review-inspect-resolvesim`, not destructive red); (4) inspect action behavior (Approve/Reject/Keep/markDuplicateUI/resolveSimilarUI/search-aware prev-next/Open next item/reviewDecisionUI); (5) cross-arc compatibility (D-245B date, D-256 Dupes+Similar, D-258B sort-bar/feedback, D-259A pipeline); (6) public/Drift/backend boundary; (7) deploy integrity. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D261B_REVIEW_INSPECT_PANEL_ACTION_SPACING_POLISH.md` — D-261B/C REVIEW INSPECT PANEL ACTION SPACING POLISH — LIVE PASS
 
 CSS + tests + docs. Owner deploy PASS (D-261C, 2026-07-01). Deployed Worker: `cb5caf6f-67ff-4a41-baa5-22ed836e0cb2`. Baseline: 2978/0/24/57. Three CSS additions to `public/styles.css`: (1) desktop Study push (`margin-left:auto` on `.review-inspect-actions .btn-study-review`); (2) mobile full-width tap targets (`width:100%` on `.review-inspect-actions button`); (3) mobile soft visual separator before dup/advisory group (`.review-inspect-markdup`/`.review-inspect-resolvesim` `margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)`) + Study column reset (`margin-left:0`). 19 new tests covering desktop push, mobile rules, separator styling, behavior/label locks, public boundary. 41/41 live inspect-action spacing sanity PASS. CSS-only change. No app/worker/Drift/Belief changes. D-245→D-260 regression locks preserved.
 
