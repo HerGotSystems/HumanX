@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2813 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2877 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-249A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc, current baseline 2722/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–32.
 
-### `D253A_REVIEW_CLIENT_SIDE_SEARCH.md` ⭐ CURRENT — D-253A REVIEW CLIENT-SIDE SEARCH — LIVE PASS
+### `D254A_REVIEW_SEARCH_FILTER_CLARITY_REGRESSION_LOCK.md` ⭐ CURRENT — D-254A REVIEW SEARCH/FILTER CLARITY REGRESSION LOCK — TESTS+DOCS ONLY
+
+Tests+docs only. No deploy needed. Baseline: 2877/0/24/57 (+64 tests). Regression lock for the D-250→D-253 search/filter clarity arc. Locks: D-250B active summary (Showing: filter · count · Search: query · sort), D-251A zero-results title/context/Show-all button, D-252A exact helper copy for ~Quality/Dupes/~Similar, D-253A search pipeline (applyReviewSort(applyReviewSearch(applyReviewFilter(all)))), label/placeholder, field coverage, clear search isolation, search-aware next-item and inspect prev/next navigation. Public profile boundary locked for all four arc additions. No app/CSS/worker/Drift files modified.
+
+### `D253A_REVIEW_CLIENT_SIDE_SEARCH.md` — D-253A REVIEW CLIENT-SIDE SEARCH — LIVE PASS
 
 App/CSS change. Owner deploy PASS (D-253B live sanity PASS 2026-07-01). Baseline: 2813/0/24/57 (+35 tests). Adds `reviewSearchQuery` state, `applyReviewSearch(list)`, `setReviewSearch(q)`, `renderReviewSearchRow()`, and `clearReviewSearch` zero-param action. Search input renders between filter bar and overview strip with `<label>` for accessibility, `type="search"`, and `data-review-search` attribute for delegated `input` event (no inline handlers). Search combines with filter then sort: `applyReviewSort(applyReviewSearch(applyReviewFilter(all)))`. Active summary includes `· Search: "query"` when active. Zero-results context line includes search context; "Clear search" button added alongside "Show all review items". Next-item and inspect-panel prev/next also use search-aware list. D-250A F-1 (no search) addressed. No filter/sort/predicate/moderation/next-item logic otherwise changed. D-250B active summary preserved. D-251A zero-results state preserved. D-252A filter helper preserved. No public profile exposure. No Drift/Belief expansion changes. No backend/API/migration/schema/CSP/external asset changes. Worker unchanged. index.html unchanged. No localStorage/persistence.
 

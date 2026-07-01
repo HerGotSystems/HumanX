@@ -832,7 +832,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed') || readmeSrc.includes('2543 passed, 0 failed') || readmeSrc.includes('2573 passed, 0 failed') || readmeSrc.includes('2638 passed, 0 failed') || readmeSrc.includes('2652 passed, 0 failed') || readmeSrc.includes('2665 passed, 0 failed') || readmeSrc.includes('2681 passed, 0 failed') || readmeSrc.includes('2722 passed, 0 failed') || readmeSrc.includes('2730 passed, 0 failed') || readmeSrc.includes('2743 passed, 0 failed') || readmeSrc.includes('2758 passed, 0 failed') || readmeSrc.includes('2778 passed, 0 failed') || readmeSrc.includes('2813 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed') || readmeSrc.includes('2543 passed, 0 failed') || readmeSrc.includes('2573 passed, 0 failed') || readmeSrc.includes('2638 passed, 0 failed') || readmeSrc.includes('2652 passed, 0 failed') || readmeSrc.includes('2665 passed, 0 failed') || readmeSrc.includes('2681 passed, 0 failed') || readmeSrc.includes('2722 passed, 0 failed') || readmeSrc.includes('2730 passed, 0 failed') || readmeSrc.includes('2743 passed, 0 failed') || readmeSrc.includes('2758 passed, 0 failed') || readmeSrc.includes('2778 passed, 0 failed') || readmeSrc.includes('2813 passed, 0 failed') || readmeSrc.includes('2877 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2216,7 +2216,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed') || readmeSrc.includes('2543 passed, 0 failed') || readmeSrc.includes('2573 passed, 0 failed') || readmeSrc.includes('2638 passed, 0 failed') || readmeSrc.includes('2652 passed, 0 failed') || readmeSrc.includes('2665 passed, 0 failed') || readmeSrc.includes('2681 passed, 0 failed') || readmeSrc.includes('2722 passed, 0 failed') || readmeSrc.includes('2730 passed, 0 failed') || readmeSrc.includes('2743 passed, 0 failed') || readmeSrc.includes('2758 passed, 0 failed') || readmeSrc.includes('2778 passed, 0 failed') || readmeSrc.includes('2813 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed') || readmeSrc.includes('2543 passed, 0 failed') || readmeSrc.includes('2573 passed, 0 failed') || readmeSrc.includes('2638 passed, 0 failed') || readmeSrc.includes('2652 passed, 0 failed') || readmeSrc.includes('2665 passed, 0 failed') || readmeSrc.includes('2681 passed, 0 failed') || readmeSrc.includes('2722 passed, 0 failed') || readmeSrc.includes('2730 passed, 0 failed') || readmeSrc.includes('2743 passed, 0 failed') || readmeSrc.includes('2758 passed, 0 failed') || readmeSrc.includes('2778 passed, 0 failed') || readmeSrc.includes('2813 passed, 0 failed') || readmeSrc.includes('2877 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -20336,6 +20336,333 @@ console.log('\nD-248A: Review card metadata density regression lock');
   test('D-253A: belief-drift-expansion.js not modified', () => {
     const driftSrcLocal = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
     assert.ok(!driftSrcLocal.includes('reviewSearchQuery'), 'belief-drift-expansion.js must not be modified for D-253A');
+  });
+}
+
+// ── Section D-254A: Review search/filter clarity regression lock ──────────────
+{
+  // Shared source slices
+  const rlStart = appSrc.indexOf('function renderReviewList(){');
+  const rlSrc = appSrc.slice(rlStart, rlStart + 4000);
+
+  const raStart = appSrc.indexOf('\nfunction renderReviewActiveSummary(');
+  const raEnd = raStart !== -1 ? appSrc.indexOf('\nfunction renderReviewFilterHelper(', raStart) : -1;
+  const raSrc = raStart !== -1 && raEnd !== -1 ? appSrc.slice(raStart, raEnd) : '';
+
+  const rfhStart = appSrc.indexOf('\nfunction renderReviewFilterHelper(');
+  const rfhEnd = rfhStart !== -1 ? appSrc.indexOf('\nfunction renderReviewEmptyState(', rfhStart) : -1;
+  const rfhSrc = rfhStart !== -1 && rfhEnd !== -1 ? appSrc.slice(rfhStart, rfhEnd) : '';
+
+  const reStart = appSrc.indexOf('\nfunction renderReviewEmptyState(');
+  const reEnd = reStart !== -1 ? appSrc.indexOf('\nfunction renderReviewList(', reStart) : -1;
+  const reSrc = reStart !== -1 && reEnd !== -1 ? appSrc.slice(reStart, reEnd) : '';
+
+  const srStart = appSrc.indexOf('\nfunction renderReviewSearchRow(');
+  const srEnd = srStart !== -1 ? appSrc.indexOf('\nfunction renderReviewActiveSummary(', srStart) : -1;
+  const srSrc = srStart !== -1 && srEnd !== -1 ? appSrc.slice(srStart, srEnd) : '';
+
+  const asStart = appSrc.indexOf('\nfunction applyReviewSearch(');
+  const asEnd = asStart !== -1 ? appSrc.indexOf('\nfunction setReviewSort(', asStart) : -1;
+  const asSrc = asStart !== -1 && asEnd !== -1 ? appSrc.slice(asStart, asEnd) : '';
+
+  const inspStart = appSrc.indexOf('\nfunction renderReviewInspectPanel(');
+  const inspEnd = inspStart !== -1 ? appSrc.indexOf('\nasync function reviewDecisionUI(', inspStart) : -1;
+  const inspSrc = inspStart !== -1 && inspEnd !== -1 ? appSrc.slice(inspStart, inspEnd) : '';
+
+  const decStart = appSrc.indexOf('\nasync function reviewDecisionUI(');
+  const decEnd = decStart !== -1 ? appSrc.indexOf('\nfunction copySimilarClaimId(', decStart) : -1;
+  const decSrc = decStart !== -1 && decEnd !== -1 ? appSrc.slice(decStart, decEnd) : '';
+
+  const zpStart = appSrc.indexOf('const _D181B_ZERO_PARAM_ACTIONS=');
+  const zpSrc = appSrc.slice(zpStart, zpStart + 3000);
+
+  const ppStart = appSrc.indexOf('function renderPublicProfileHtml(');
+  const ppSrc = ppStart !== -1 ? appSrc.slice(ppStart, ppStart + 20000) : '';
+
+  // ── Group 1: D-250B active summary lock ──────────────────────────────────
+  test('D-254A [D-250B lock]: renderReviewActiveSummary defined', () => {
+    assert.ok(raStart !== -1, 'renderReviewActiveSummary must still be defined');
+  });
+
+  test('D-254A [D-250B lock]: active summary renders review-active-summary class', () => {
+    assert.ok(raSrc.includes('review-active-summary'), 'renderReviewActiveSummary must use .review-active-summary class');
+  });
+
+  test('D-254A [D-250B lock]: active summary includes "Showing:" text', () => {
+    assert.ok(raSrc.includes('Showing:'), 'renderReviewActiveSummary must include "Showing:" prefix');
+  });
+
+  test('D-254A [D-250B lock]: active summary includes filter label', () => {
+    assert.ok(raSrc.includes('filterLabels') && raSrc.includes('reviewStateFilter'), 'renderReviewActiveSummary must include the active filter label');
+  });
+
+  test('D-254A [D-250B lock]: active summary includes item count', () => {
+    assert.ok(raSrc.includes('list.length') || raSrc.includes('n=list.length'), 'renderReviewActiveSummary must include visible item count');
+  });
+
+  test('D-254A [D-250B lock]: active summary includes sort label', () => {
+    assert.ok(raSrc.includes('sortLabels') && raSrc.includes('reviewSortOrder'), 'renderReviewActiveSummary must include the active sort label');
+  });
+
+  test('D-254A [D-250B lock]: active summary omits search context when query is empty (conditional)', () => {
+    assert.ok(raSrc.includes('reviewSearchQuery?'), 'renderReviewActiveSummary must conditionally include search context');
+  });
+
+  test('D-254A [D-250B lock]: active summary wired in renderReviewList', () => {
+    assert.ok(rlSrc.includes('renderReviewActiveSummary(list)'), 'renderReviewList must still call renderReviewActiveSummary(list)');
+  });
+
+  // ── Group 2: D-251A zero-results clarity lock ────────────────────────────
+  test('D-254A [D-251A lock]: renderReviewEmptyState defined', () => {
+    assert.ok(reStart !== -1, 'renderReviewEmptyState must still be defined');
+  });
+
+  test('D-254A [D-251A lock]: zero-results title is "No review items match this view."', () => {
+    assert.ok(reSrc.includes('No review items match this view.'), 'renderReviewEmptyState title must remain exact');
+  });
+
+  test('D-254A [D-251A lock]: zero-results context line references filter and sort', () => {
+    assert.ok(reSrc.includes('Current view:') && reSrc.includes('reviewStateFilter') && reSrc.includes('reviewSortOrder'), 'zero-results context line must reference current filter and sort');
+  });
+
+  test('D-254A [D-251A lock]: zero-results still calls reviewEmptyText for per-filter copy', () => {
+    assert.ok(reSrc.includes('reviewEmptyText(f)'), 'renderReviewEmptyState must still call reviewEmptyText(f)');
+  });
+
+  test('D-254A [D-251A lock]: Show-all-review-items button remains in zero-results state', () => {
+    assert.ok(reSrc.includes('Show all review items') && reSrc.includes('data-action="setReviewFilter" data-value="all"'), '"Show all review items" button must remain in renderReviewEmptyState');
+  });
+
+  test('D-254A [D-251A lock]: Show-all-review-items uses delegated data-action (no inline onclick)', () => {
+    assert.ok(!reSrc.includes('onclick="setReviewFilter'), 'Show all review items button must not use inline onclick="setReviewFilter"');
+  });
+
+  test('D-254A [D-251A lock]: Show-all does not reference setReviewSort (sort preserved)', () => {
+    assert.ok(!reSrc.includes('setReviewSort'), 'renderReviewEmptyState must not call setReviewSort — sort must be preserved');
+  });
+
+  test('D-254A [D-251A lock]: zero-results wired in renderReviewList', () => {
+    assert.ok(rlSrc.includes('renderReviewEmptyState()'), 'renderReviewList must still call renderReviewEmptyState()');
+  });
+
+  // ── Group 3: D-252A ambiguous filter helper lock ─────────────────────────
+  test('D-254A [D-252A lock]: renderReviewFilterHelper defined', () => {
+    assert.ok(rfhStart !== -1, 'renderReviewFilterHelper must still be defined');
+  });
+
+  test('D-254A [D-252A lock]: ~Quality helper copy exact', () => {
+    assert.ok(rfhSrc.includes('~Quality shows claim items with quality hints.'), '~Quality helper copy must remain exact');
+  });
+
+  test('D-254A [D-252A lock]: Dupes helper copy exact', () => {
+    assert.ok(rfhSrc.includes('Dupes includes confirmed duplicates and near-duplicate advisories.'), 'Dupes helper copy must remain exact');
+  });
+
+  test('D-254A [D-252A lock]: ~Similar helper copy exact', () => {
+    assert.ok(rfhSrc.includes('~Similar shows near-duplicate advisory items.'), '~Similar helper copy must remain exact');
+  });
+
+  test('D-254A [D-252A lock]: helper returns empty for non-ambiguous filters', () => {
+    assert.ok(rfhSrc.includes("if(!msg)return''"), 'renderReviewFilterHelper must return empty string for non-ambiguous filters');
+  });
+
+  test('D-254A [D-252A lock]: helper uses review-filter-helper CSS class', () => {
+    assert.ok(rfhSrc.includes('review-filter-helper'), 'renderReviewFilterHelper must use .review-filter-helper CSS class');
+  });
+
+  test('D-254A [D-252A lock]: helper wired in renderReviewList after summary', () => {
+    assert.ok(rlSrc.includes('renderReviewFilterHelper()') && rlSrc.includes('summary+helper+'), 'renderReviewList must wire helper after summary');
+  });
+
+  // ── Group 4: D-253A client-side search lock ──────────────────────────────
+  test('D-254A [D-253A lock]: renderReviewSearchRow defined', () => {
+    assert.ok(srStart !== -1, 'renderReviewSearchRow must still be defined');
+  });
+
+  test('D-254A [D-253A lock]: search label exact "Search review queue"', () => {
+    assert.ok(srSrc.includes('Search review queue'), 'search label must remain "Search review queue"');
+  });
+
+  test('D-254A [D-253A lock]: search placeholder exact', () => {
+    assert.ok(srSrc.includes('Search claim, ID, handle, source'), 'search placeholder must remain unchanged');
+  });
+
+  test('D-254A [D-253A lock]: search input type="search"', () => {
+    assert.ok(srSrc.includes('type="search"'), 'search input must use type="search"');
+  });
+
+  test('D-254A [D-253A lock]: applyReviewSearch defined', () => {
+    assert.ok(asStart !== -1, 'applyReviewSearch must still be defined');
+  });
+
+  test('D-254A [D-253A lock]: applyReviewSearch short-circuits on empty query', () => {
+    assert.ok(asSrc.includes('if(!reviewSearchQuery)return list'), 'applyReviewSearch must short-circuit when query is empty');
+  });
+
+  test('D-254A [D-253A lock]: applyReviewSearch is case-insensitive', () => {
+    assert.ok(asSrc.includes('.toLowerCase()'), 'applyReviewSearch must use toLowerCase()');
+  });
+
+  test('D-254A [D-253A lock]: applyReviewSearch matches all required fields', () => {
+    assert.ok(
+      asSrc.includes('i.id') &&
+      asSrc.includes('i.handle') &&
+      asSrc.includes('i.category') &&
+      asSrc.includes('i.user_id') &&
+      asSrc.includes('i.origin') &&
+      asSrc.includes('i.source_truth_id'),
+      'applyReviewSearch must include all required search fields'
+    );
+  });
+
+  test('D-254A [D-253A lock]: combined filter+search+sort pipeline in renderReviewList', () => {
+    assert.ok(rlSrc.includes('applyReviewSort(applyReviewSearch(applyReviewFilter(all)))'), 'renderReviewList must apply filter → search → sort in exact order');
+  });
+
+  test('D-254A [D-253A lock]: search row wired in renderReviewList', () => {
+    assert.ok(rlSrc.includes('renderReviewSearchRow()') && rlSrc.includes('bar+searchRow+'), 'renderReviewList must render and wire search row');
+  });
+
+  test('D-254A [D-253A lock]: no localStorage used for search', () => {
+    assert.ok(!asSrc.includes('localStorage') && !srSrc.includes('localStorage'), 'search must not use localStorage');
+  });
+
+  test('D-254A [D-253A lock]: no inline oninput on search input', () => {
+    assert.ok(!srSrc.includes('oninput='), 'search input must not use inline oninput=');
+  });
+
+  // ── Group 5: D-253A search UI behavior lock ──────────────────────────────
+  test('D-254A [D-253A UI lock]: active summary includes Search context format when active', () => {
+    assert.ok(raSrc.includes('Search:') && raSrc.includes('reviewSearchQuery'), 'active summary must include Search: context when query is active');
+  });
+
+  test('D-254A [D-253A UI lock]: zero-results context includes Search when active', () => {
+    assert.ok(reSrc.includes('isSearchActive') && reSrc.includes('Search:'), 'zero-results context must include search when active');
+  });
+
+  test('D-254A [D-253A UI lock]: clear search button conditional on hasQuery', () => {
+    assert.ok(srSrc.includes('hasQuery') && srSrc.includes('clearReviewSearch'), 'clear search button must render only when query is active');
+  });
+
+  test('D-254A [D-253A UI lock]: clear search uses data-action delegation', () => {
+    assert.ok(srSrc.includes('data-action="clearReviewSearch"') && !srSrc.includes('onclick="clearReviewSearch'), 'clear search must use data-action, not inline onclick');
+  });
+
+  test('D-254A [D-253A UI lock]: clearReviewSearch in _D181B_ZERO_PARAM_ACTIONS', () => {
+    assert.ok(zpSrc.includes('clearReviewSearch'), 'clearReviewSearch must be registered in _D181B_ZERO_PARAM_ACTIONS');
+  });
+
+  test('D-254A [D-253A UI lock]: clearReviewSearch does not touch reviewStateFilter', () => {
+    const clearMatch = zpSrc.match(/clearReviewSearch[^,}]*/)?.[0] || '';
+    assert.ok(!clearMatch.includes('reviewStateFilter'), 'clearReviewSearch must not alter reviewStateFilter');
+  });
+
+  test('D-254A [D-253A UI lock]: clearReviewSearch does not touch reviewSortOrder', () => {
+    const clearMatch = zpSrc.match(/clearReviewSearch[^,}]*/)?.[0] || '';
+    assert.ok(!clearMatch.includes('reviewSortOrder'), 'clearReviewSearch must not alter reviewSortOrder');
+  });
+
+  test('D-254A [D-253A UI lock]: Show-all does not clear search (no reviewSearchQuery reference in Show-all action)', () => {
+    // Show-all uses setReviewFilter via data-action — it must not clear reviewSearchQuery
+    assert.ok(appSrc.includes('data-action="setReviewFilter" data-value="all"'), 'Show-all must use data-action delegation');
+    const setFilterFn = appSrc.slice(appSrc.indexOf('\nfunction setReviewFilter('), appSrc.indexOf('\nfunction setReviewFilter(') + 200);
+    assert.ok(!setFilterFn.includes('reviewSearchQuery'), 'setReviewFilter must not clear reviewSearchQuery — search is preserved');
+  });
+
+  // ── Group 6: Search-aware navigation lock ────────────────────────────────
+  test('D-254A [nav lock]: reviewDecisionUI next-item uses search-aware pipeline', () => {
+    assert.ok(decSrc.includes('applyReviewSort(applyReviewSearch(applyReviewFilter('), 'reviewDecisionUI must use search-aware filter+search+sort pipeline for next-item capture');
+  });
+
+  test('D-254A [nav lock]: renderReviewInspectPanel prev/next uses search-aware pipeline', () => {
+    assert.ok(inspSrc.includes('applyReviewSort(applyReviewSearch(applyReviewFilter('), 'renderReviewInspectPanel must use search-aware pipeline for prev/next navigation');
+  });
+
+  test('D-254A [nav lock]: Open next item → button still present', () => {
+    assert.ok(rlSrc.includes('Open next item →') || appSrc.includes('Open next item →'), '"Open next item →" button must still be present');
+  });
+
+  test('D-254A [nav lock]: reviewDecisionUI still guards next-item capture to approve/reject only', () => {
+    assert.ok(decSrc.includes("decision==='public'") && decSrc.includes("decision==='rejected'"), 'next-item capture must still be guarded to public/rejected decisions');
+  });
+
+  test('D-254A [nav lock]: moderation actions (Approve/Keep/Reject) still present in inspect panel', () => {
+    assert.ok(inspSrc.includes('btn-approve') && inspSrc.includes('btn-keep') && inspSrc.includes('btn-reject'), 'moderation action buttons must still be present in inspect panel');
+  });
+
+  // ── Group 7: Cross-arc compatibility lock ────────────────────────────────
+  test('D-254A [cross-arc lock]: D-245B inline date still in renderReviewList pipeline (via reviewCard)', () => {
+    assert.ok(appSrc.includes('reviewAge(') && appSrc.includes('Updated '), 'D-245B inline date pattern must still be present in review card');
+  });
+
+  test('D-254A [cross-arc lock]: D-246A score labels still present', () => {
+    assert.ok(appSrc.includes('Evidence ') && appSrc.includes('Test ') && appSrc.includes('Survive '), 'D-246A score labels must still be present');
+  });
+
+  test('D-254A [cross-arc lock]: D-247A advisory hints row still present', () => {
+    assert.ok(appSrc.includes('review-card-hints') && appSrc.includes('hintBadges'), 'D-247A advisory hints row must still be present');
+  });
+
+  test('D-254A [cross-arc lock]: duplicate advisory semantics unchanged (near_duplicate_of / duplicate_of)', () => {
+    assert.ok(appSrc.includes('near_duplicate_of') && appSrc.includes('duplicate_of'), 'duplicate/advisory field references must remain present');
+  });
+
+  test('D-254A [cross-arc lock]: Review-to-Study navigation still present', () => {
+    assert.ok(appSrc.includes('openReviewClaimStudy') && appSrc.includes('Open Study View'), 'Review-to-Study navigation must still be present');
+  });
+
+  test('D-254A [cross-arc lock]: all four arc components wired together in renderReviewList', () => {
+    assert.ok(
+      rlSrc.includes('renderReviewSearchRow()') &&       // D-253A
+      rlSrc.includes('renderReviewActiveSummary(list)') && // D-250B
+      rlSrc.includes('renderReviewFilterHelper()') &&    // D-252A
+      rlSrc.includes('renderReviewEmptyState()'),        // D-251A
+      'All four D-250→D-253 arc components must be wired in renderReviewList'
+    );
+  });
+
+  // ── Group 8: Public/Drift/backend boundary lock ──────────────────────────
+  test('D-254A [boundary lock]: renderPublicProfileHtml does not reference reviewSearchQuery', () => {
+    assert.ok(!ppSrc.includes('reviewSearchQuery'), 'reviewSearchQuery must not appear in public profile render path');
+  });
+
+  test('D-254A [boundary lock]: renderPublicProfileHtml does not reference review-search', () => {
+    assert.ok(!ppSrc.includes('review-search'), 'review-search must not appear in public profile render path');
+  });
+
+  test('D-254A [boundary lock]: renderPublicProfileHtml does not reference clearReviewSearch', () => {
+    assert.ok(!ppSrc.includes('clearReviewSearch'), 'clearReviewSearch must not appear in public profile render path');
+  });
+
+  test('D-254A [boundary lock]: renderPublicProfileHtml does not reference review-filter-helper', () => {
+    assert.ok(!ppSrc.includes('review-filter-helper'), 'review-filter-helper must not appear in public profile render path');
+  });
+
+  test('D-254A [boundary lock]: renderPublicProfileHtml does not reference review-active-summary', () => {
+    assert.ok(!ppSrc.includes('review-active-summary'), 'review-active-summary must not appear in public profile render path');
+  });
+
+  test('D-254A [boundary lock]: no backend search API route in worker.js', () => {
+    assert.ok(!workerSrc.includes('/api/review/search') && !workerSrc.includes('reviewSearch'), 'worker.js must not have a backend review search route');
+  });
+
+  test('D-254A [boundary lock]: belief-drift-expansion.js not modified', () => {
+    const driftSrcLocal = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(!driftSrcLocal.includes('reviewSearchQuery') && !driftSrcLocal.includes('clearReviewSearch'), 'belief-drift-expansion.js must not contain review search internals');
+  });
+
+  // ── Group 9: Deploy integrity ─────────────────────────────────────────────
+  test('D-254A [deploy integrity]: app-v10.js not modified by D-254A (tag absent)', () => {
+    assert.ok(!appSrc.includes('D-254A'), 'D-254A must not modify app-v10.js — tests+docs only');
+  });
+
+  test('D-254A [deploy integrity]: worker.js not modified by D-254A (tag absent)', () => {
+    assert.ok(!workerSrc.includes('D-254A'), 'D-254A must not modify worker.js — tests+docs only');
+  });
+
+  test('D-254A [deploy integrity]: index.html not modified by D-254A', () => {
+    const indexSrc = readFileSync(path.join(__dirname, '../public/index.html'), 'utf8');
+    assert.ok(!indexSrc.includes('D-254A'), 'D-254A must not modify index.html');
   });
 }
 
