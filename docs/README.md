@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2573 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2638 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-244A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc, current baseline 2638/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules.
 
-### `D244A_REVIEW_NEXT_ITEM_FLOW_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-244A REVIEW NEXT-ITEM FLOW MILESTONE CHECKPOINT
+### `D245A_REVIEW_CARD_METADATA_DENSITY_AUDIT.md` ⭐ CURRENT — D-245A REVIEW CARD METADATA DENSITY AUDIT
+
+Docs only. Deploy not needed. Baseline: 2638/0/24/57 (unchanged). Full inventory of every badge, chip, and row in `reviewCard`: 7 friction findings including head-row badge overflow (F-1 HIGH), dense score triplet (F-2 MEDIUM), dedicated date row (F-3 MEDIUM), and pressure handle duplication (F-4 MEDIUM). Recommends D-245B (inline date into meta row) as first implementation slice. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D244A_REVIEW_NEXT_ITEM_FLOW_MILESTONE_CHECKPOINT.md` — D-244A REVIEW NEXT-ITEM FLOW MILESTONE CHECKPOINT
 
 Docs only. Deploy not needed. Baseline: 2638/0/24/57. Closes the D-242→D-243 review next-item flow mini-arc: 65 new tests total (7+24+34), 1 owner deploy (D-242C 34/34 PASS). PROJECT_STATE.md updated with arc summary, next-item behavior table, Drift/Belief expansion state, privacy boundary entries, deployment state, and 5 new safe-next-work rules (20–24). "Open next item →" manual-only affordance confirmed and locked. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
 
