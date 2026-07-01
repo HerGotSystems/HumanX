@@ -1,14 +1,14 @@
 # D-265B — Study Entry / Back Button Style Consistency
 
 **Scope:** Frontend copy/CSS/tests/docs
-**Status:** COMPLETE — deploy needed (app/CSS changed)
+**Status:** COMPLETE — owner deploy PASS (D-265C, 2026-07-01)
 **Baseline:** 3035 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D265B_STUDY_ENTRY_BACK_BUTTON_STYLE_CONSISTENCY.md`, `docs/README.md`
 **CSS changes:** Yes — `.btn-back-study` rule added to `public/styles.css`
 **App changes:** Yes — 4 copy/class changes in `public/app-v10.js`
 **Worker changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes — owner manual terminal deploy required + D-265C live closeout
+**Deploy needed:** No — owner deploy PASS, D-265C live sanity PASS 39/39
 
 ---
 
@@ -226,25 +226,51 @@ New baseline: `3035 passed, 0 failed` (was 3011).
 
 ---
 
-## Live Sanity Checklist (Pending Owner Deploy)
+## Live Sanity Checklist — D-265C PASS (2026-07-01) — 39/39
 
-The following items should be verified in browser after owner manual terminal deploy:
+Owner deploy PASS. All 39 live sanity items confirmed by owner in browser after terminal deploy.
 
-1. Study page Back button appears visually — no longer plain browser-default styling
-2. `← Back to Review` button has subtle fill/border from `.btn-back-study`
-3. `← Back to Vault` button has same `.btn-back-study` appearance
-4. `← Back to Truths` button has same `.btn-back-study` appearance
-5. `← Back to My HumanX` button has same `.btn-back-study` appearance
-6. `← Back to Claims` button has same `.btn-back-study` appearance
-7. Clicking any Back button navigates correctly — no behavior change
-8. Back-to-Review scroll restoration still works — returns to inspect panel card
-9. Inspect panel claim Study button (`Open Study View ↗`) no longer has elevated `primary` styling — appears same weight as `Study Parent Claim ↗` and `Study Linked Claim ↗`
-10. Inspect panel claim Study button still has gradient background from `btn-study-review`
-11. Evidence card Study button (`Study Linked Claim ↗`) appears as a small link-style button (matching vault group header)
-12. Linked Claim field row (truth items, public linked claim) shows `Study linked claim ↗` instead of raw claim ID
-13. All moderation actions (Approve / Keep / Reject / Mark Duplicate / Dismiss ~Similar) still work correctly
-14. No public profile changes — Study/Back controls not visible on public profile pages
-15. No backend/API/migration/schema/CSP/external asset changes confirmed
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Study page Back button appears visually — no longer plain browser-default styling | PASS |
+| 2 | `← Back to Review` button has subtle fill/border from `.btn-back-study` | PASS |
+| 3 | `← Back to Vault` button has same `.btn-back-study` appearance | PASS |
+| 4 | `← Back to Truths` button has same `.btn-back-study` appearance | PASS |
+| 5 | `← Back to My HumanX` button has same `.btn-back-study` appearance | PASS |
+| 6 | `← Back to Claims` button has same `.btn-back-study` appearance | PASS |
+| 7 | Clicking any Back button navigates correctly — no behavior change | PASS |
+| 8 | Back-to-Review scroll restoration still works — returns to inspect panel card | PASS |
+| 9 | Inspect panel claim Study (`Open Study View ↗`) no longer elevated — same weight as `Study Parent Claim ↗` / `Study Linked Claim ↗` | PASS |
+| 10 | Inspect panel claim Study still has gradient background from `btn-study-review` | PASS |
+| 11 | Evidence card Study button (`Study Linked Claim ↗`) appears as small link-style (matching vault group header) | PASS |
+| 12 | Linked Claim field row shows `Study linked claim ↗` instead of raw claim ID | PASS |
+| 13 | All moderation actions (Approve / Keep / Reject / Mark Duplicate / Dismiss ~Similar) still work correctly | PASS |
+| 14 | No public profile changes — Study/Back controls not visible on public profile pages | PASS |
+| 15 | No backend/API/migration/schema/CSP/external asset changes confirmed | PASS |
+| 16 | Review queue loads without console-breaking errors | PASS |
+| 17 | Inspect panel Study button appears where expected | PASS |
+| 18 | Desktop Study push from D-261B still works (Study floated right on desktop) | PASS |
+| 19 | Linked claim Study behavior unchanged (navigates to Study View) | PASS |
+| 20 | Evidence card Study behavior unchanged (`studyFromVault` navigates correctly) | PASS |
+| 21 | Back-to-Review copy remains `← Back to Review` | PASS |
+| 22 | Review search/filter/sort context preserved after Back-to-Review | PASS |
+| 23 | Search-aware inspect prev/next unchanged | PASS |
+| 24 | "Open next item →" behavior unchanged | PASS |
+| 25 | Approve behavior unchanged | PASS |
+| 26 | Keep Pending behavior unchanged | PASS |
+| 27 | Reject behavior unchanged | PASS |
+| 28 | Mark Duplicate behavior unchanged | PASS |
+| 29 | Dismiss ~Similar behavior unchanged | PASS |
+| 30 | Duplicate/advisory semantics unchanged | PASS |
+| 31 | Moderation semantics unchanged | PASS |
+| 32 | Review card D-245B inline date still works | PASS |
+| 33 | Review card D-246A score labels still work | PASS |
+| 34 | Review card D-247A hint grouping still works | PASS |
+| 35 | D-256 `Dupes + Similar` label remains correct | PASS |
+| 36 | D-258/D-259 mobile wrapping polish still works | PASS |
+| 37 | D-261 inspect panel action spacing still works | PASS |
+| 38 | Drift/Belief expansion surfaces still load normally | PASS |
+| 39 | No console errors | PASS |
 
 ---
 
