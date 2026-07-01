@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-244A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc, current baseline 2638/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-249A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc, current baseline 2722/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–32.
 
-### `D248A_REVIEW_CARD_METADATA_DENSITY_REGRESSION_LOCK.md` ⭐ CURRENT — D-248A REVIEW CARD METADATA DENSITY REGRESSION LOCK
+### `D249A_REVIEW_CARD_METADATA_DENSITY_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-249A REVIEW CARD METADATA DENSITY MILESTONE CHECKPOINT
+
+Docs only. Deploy not needed. Baseline: 2722/0/24/57. Closes the D-245→D-248 review card metadata-density mini-arc: 84 new tests total (14+13+16+41), 3 owner deploys (D-245C 24/24, D-246B 28/28, D-247B 31/31). PROJECT_STATE.md updated with arc summary, review card behavior table (meta line, score labels, hints row), privacy boundary entries, deployment state, and 8 new safe-next-work rules (25–32). D-245A F-1/F-2/F-3 resolved; F-4 deferred. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D248A_REVIEW_CARD_METADATA_DENSITY_REGRESSION_LOCK.md` — D-248A REVIEW CARD METADATA DENSITY REGRESSION LOCK
 
 Tests + docs only. Deploy not needed. Baseline: 2722/0/24/57 (+41 tests). Regression lock for the D-245→D-247 review card metadata-density mini-arc: 7 categories / 41 tests locking inline date (D-245B), readable score labels (D-246A), advisory hint grouping (D-247A), primary head-row badge set, cross-arc behavior compatibility (D-227B/D-229A/D-230A/D-242B/D-237A/D-239→D-240), public/Drift/backend boundaries, and deploy integrity. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
 

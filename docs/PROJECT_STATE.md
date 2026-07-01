@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-01 after D-244A review next-item flow milestone checkpoint.
-Previous checkpoint: 2026-06-29 after D-241A review-to-study navigation milestone checkpoint.
+Last updated: 2026-07-01 after D-249A review card metadata density milestone checkpoint.
+Previous checkpoint: 2026-07-01 after D-244A review next-item flow milestone checkpoint.
 
 ---
 
@@ -26,10 +26,11 @@ Previous checkpoint: 2026-06-29 after D-241A review-to-study navigation mileston
 | **D-238A checkpoint HEAD** | see `docs/README.md` — D-238A duplicate advisory milestone |
 | **D-241A checkpoint HEAD** | see `docs/README.md` — D-241A review-to-study navigation milestone |
 | **D-244A checkpoint HEAD** | see `docs/README.md` after commit (D-244A review next-item flow milestone) |
+| **D-249A checkpoint HEAD** | see `docs/README.md` after commit (D-249A review card metadata density milestone) |
 
 ---
 
-## Current baseline (as of D-244A)
+## Current baseline (as of D-249A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -43,7 +44,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2638 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2722 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -206,6 +207,47 @@ This arc audited the post-decision moderator experience and added a manual "Open
 
 ---
 
+## D-245 → D-248 review card metadata density mini-arc summary
+
+This arc audited and improved the metadata density of review queue cards, reducing visual noise in the primary badge row and replacing cryptic score abbreviations with readable labels. All changes are confined to the review queue render surface and admin-only view; no public profile exposure, no backend/API/schema changes, no moderation semantic changes.
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-245A | `7bc3ec6` | Audit | Metadata density audit — 7 friction findings; F-1 badge overflow, F-2 cryptic scores, F-3 standalone date row, F-4 pressure handle duplication; docs only |
+| D-245B | `246bd23` | Feature | Inline date — `Updated {age}` moved from standalone `<p class="review-card-date">` into `.review-card-meta` concat; CSS date rules removed; 14 tests |
+| D-245C | `dd90094` | Live closeout | D-245B confirmed live; 24/24 PASS |
+| D-246A | `acf7bb9` | Feature | Score label clarity — `ev:N ts:N sv:N` → `Evidence N · Test N · Survive N`; 13 tests |
+| D-246B | `c4894da` | Live closeout | D-246A confirmed live; 28/28 PASS |
+| D-247A | `ed91f29` | Feature | Advisory hint grouping — `needs sharpening` / `category echo` / `? borderline origin` moved to `.review-card-hints` secondary row; CSS added; 16 tests |
+| D-247B | `d139e60` | Live closeout | D-247A confirmed live; 31/31 PASS |
+| D-248A | `e310da7` | Regression lock | 7 categories / 41 tests — inline date, score labels, hint grouping, head badge set, cross-arc compat, public/Drift/backend boundary, deploy integrity |
+
+**Tests added in arc:** 14 + 13 + 16 + 41 = **84 new tests** (2638 → 2722 total).
+**Deploys required in arc:** 3 (D-245C, D-246B, D-247B — owner manual terminal deploy).
+**D-245A and D-248A:** Docs / tests only — no deploy needed.
+
+---
+
+## Review card current behavior (post D-245→D-248)
+
+| Layer | Content |
+|-------|---------|
+| `.review-card-head` | type · state · ⚑ report · `~similar` · `truth-derived` · Builder — max 6 badges (was 9) |
+| `.review-card-chips` | origin / handle / dup / locked chips — unchanged |
+| `.review-reason-tag` | report reason — unchanged, conditional |
+| `h3 .review-card-title` | claim text — unchanged |
+| `p .review-card-meta` | category · status · `Evidence N · Test N · Survive N` · `Updated {age}` |
+| `.review-card-hints` | `needs sharpening` · `category echo` · `? borderline origin` — conditional, opacity .75; absent when none apply |
+| `.review-actions` | Inspect / Approve / Keep Pending / Reject — unchanged |
+
+| Score label (old) | Score label (new, D-246A) |
+|-------------------|-----------------------------|
+| `ev:N ts:N sv:N` | `Evidence N · Test N · Survive N` |
+
+Source fields (`evidence_score`, `testability`, `survivability`) and values unchanged.
+
+---
+
 ## Review next-item flow current behavior (post D-242→D-243)
 
 | Feature | Behavior |
@@ -303,6 +345,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-239→D-240 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-240A |
 | Next-item internals in public profile | **Blocked** — `reviewDecisionFeedbackNextId`, `review-feedback-next`, and "Open next item" confirmed absent from `renderPublicProfileHtml` | D-243A |
 | No new public data fields in D-242→D-243 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-243A |
+| Review card metadata markers in public profile | **Blocked** — `review-card-hints`, `review-card-head`, `review-card-meta`, `Open next item`, and `reviewCard()` call confirmed absent from `renderPublicProfileHtml` | D-248A |
+| No new public data fields in D-245→D-248 | **Confirmed** — zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-248A |
 
 ---
 
@@ -338,7 +382,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-242A | Audit / tests / docs only — no deploy needed |
 | D-242B | Owner deploy PASS — D-242C confirmed live (34/34) |
 | D-243A | Tests / docs only — no deploy needed |
-| D-244A (this task) | Docs only — **no deploy needed** |
+| D-244A | Docs only — no deploy needed |
+| D-245A | Audit / docs only — no deploy needed |
+| D-245B | Owner deploy PASS — D-245C confirmed live (24/24) |
+| D-246A | Owner deploy PASS — D-246B confirmed live (28/28) |
+| D-247A | Owner deploy PASS — D-247B confirmed live (31/31) |
+| D-248A | Tests / docs only — no deploy needed |
+| D-249A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -404,6 +454,22 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 24. **Drift/Belief expansion boundary** — do not touch `public/belief-drift-expansion.js` or `public/index.html` during Review queue work unless a failing test requires a minimal, explicitly documented compatibility fix.
 
+25. **D-248A review card metadata density lock** — any task touching review card layout, metadata rows, badge/chip render paths, or the advisory hint grouping must either pass all D-248A regression tests unchanged, or update the D-248A lock with explicit owner approval before merging.
+
+26. **No standalone date row** — do not reintroduce `<p class="review-card-date">` — the date belongs in `metaParts` via `.concat(['Updated '+updated])`.
+
+27. **No cryptic score abbreviations** — do not reintroduce `ev:` / `ts:` / `sv:` — the readable `Evidence / Test / Survive` labels must be preserved.
+
+28. **No advisory hints in head row** — do not move `needs sharpening`, `category echo`, or `? borderline origin` back into the primary `.review-card-head` row without a new owner-approved spec.
+
+29. **Hints row preservation** — do not remove the `.review-card-hints` secondary row or its conditional render.
+
+30. **Head row badge set** — do not move scan-critical badges (`~similar`, `truth-derived`, type, state, ⚑ report) out of the primary head row without a new owner-approved spec.
+
+31. **New metadata rows require density audit** — do not add new `<p>` or `<div>` elements between `.review-card-chips` and `.review-actions` without a D-245A-style density audit confirming the new row does not push action buttons below the viewport on a typical queue.
+
+32. **Pressure card meta extension** — do not extend `metaParts` with additional fields for pressure cards without resolving D-245A F-4 (handle duplication) — adding more fields to an already-duplicated surface increases noise, not scan speed.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -424,11 +490,11 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| Compact review card metadata/status chips audit | Denser card for long queues — better scan without opening inspect panel |
-| Review search/filter clarity | Filter chip accessibility; filter counts; empty-state copy per-filter |
+| Review search/filter clarity audit | Filter chip accessibility; filter counts; empty-state copy per-filter |
 | Study entry button style consistency | D-239A F-2–F-4: button prominence, browser-back support, Study entry button style inconsistency |
 | Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
+| D-245A F-4 pressure handle duplication | Separate spec — pressure cards show handle in both chips and meta |
 | Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 
 ---
@@ -570,4 +636,13 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-242B | `4f2e031` | "Open next item →" button in D-230A feedback banner; `reviewDecisionFeedbackNextId` state; 24 tests |
 | D-242C | `443bcc6` | D-242B confirmed live; 34/34 PASS |
 | D-243A | `d24b5ea` | Review next-item flow regression lock — 34 tests across 7 categories |
-| D-244A | TBD | **[Current]** Review next-item flow milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-244A | TBD | Review next-item flow milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-245A | `7bc3ec6` | **[Arc start]** Review card metadata density audit — 7 friction findings; F-1/F-2/F-3/F-4 prioritised; docs only |
+| D-245B | `246bd23` | Inline date — `Updated {age}` into `.review-card-meta`; CSS `.review-card-date` removed; 14 tests |
+| D-245C | `dd90094` | D-245B confirmed live; 24/24 PASS |
+| D-246A | `acf7bb9` | Score label clarity — `ev:N ts:N sv:N` → `Evidence N · Test N · Survive N`; 13 tests |
+| D-246B | `c4894da` | D-246A confirmed live; 28/28 PASS |
+| D-247A | `ed91f29` | Advisory hint grouping — `needs sharpening` / `category echo` / `? borderline origin` to `.review-card-hints`; CSS added; 16 tests |
+| D-247B | `d139e60` | D-247A confirmed live; 31/31 PASS |
+| D-248A | `e310da7` | Review card metadata density regression lock — 7 categories / 41 tests |
+| D-249A | TBD | **[Current]** Review card metadata density milestone checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
