@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-01 after D-264A Review ergonomics milestone wrap-up.
-Previous checkpoint: 2026-07-01 after D-263A Review inspect panel action spacing checkpoint.
+Last updated: 2026-07-01 after D-267A Study entry / Back button style checkpoint.
+Previous checkpoint: 2026-07-01 after D-264A Review ergonomics milestone wrap-up.
 
 ---
 
@@ -32,10 +32,11 @@ Previous checkpoint: 2026-07-01 after D-263A Review inspect panel action spacing
 | **D-260A checkpoint HEAD** | see `docs/README.md` after commit (D-260A Review mobile controls wrapping checkpoint) |
 | **D-263A checkpoint HEAD** | see `docs/README.md` after commit (D-263A Review inspect panel action spacing checkpoint) |
 | **D-264A checkpoint HEAD** | see `docs/README.md` after commit (D-264A Review ergonomics milestone wrap-up) |
+| **D-267A checkpoint HEAD** | see `docs/README.md` after commit (D-267A Study entry / Back button style checkpoint) |
 
 ---
 
-## Current baseline (as of D-264A)
+## Current baseline (as of D-267A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -49,7 +50,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3011 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3075 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -399,6 +400,61 @@ This section records the complete D-227→D-263 Review ergonomics run as a singl
 
 ---
 
+## D-265 → D-266 Study entry / Back button style mini-arc summary
+
+This mini-arc audited and fixed Study entry and Back-to-Review button style inconsistencies in the Review inspect panel, evidence cards, and Study page. Changes are CSS/copy-only; no navigation behavior, scroll restoration, moderation actions, or advisory semantics were changed.
+
+| Task | Commit | Type | What it did |
+|------|--------|------|-------------|
+| D-265A | `bf45c87` | Audit | Study entry / Back button style consistency audit — full 14-button inventory across inspect panel, vault, evidence cards, Truths page, My HumanX, Study page back buttons; 8 friction findings (F-1 HIGH: `primary` false hierarchy on inspect panel claim Study; F-2 HIGH: all 5 Back buttons unstyled; F-3–F-6 MEDIUM; F-7–F-8 LOW); docs only |
+| D-265B | `092d6fc` | CSS/copy polish | 4 targeted changes: (1) removed `primary` from inspect panel claim Study button; (2) changed linked claim field label `{claimId} ↗` → `Study linked claim ↗`; (3) added `btn-link-small` + `↗` to evidence card Study button; (4) added `btn-back-study` class to all 5 Back navigation buttons + `.btn-back-study` CSS rule (calm secondary affordance); 24 new tests; baseline 3011 → 3035 |
+| D-265C | `22d99e9` | Live closeout | D-265B owner deploy PASS (2026-07-01); 39/39 live sanity PASS |
+| D-266A | `225ab30` | Regression lock | 40 new tests across 8 categories — inspect panel Study hierarchy, linked-claim Study label, evidence card Study style/icon, Back-to-Review style, Back-to-Review behavior, navigation/context, cross-arc compatibility, public/Drift/backend boundary + deploy integrity; baseline 3035 → 3075 |
+| D-267A | this commit | Docs | Study entry / Back button style checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+
+**Tests added in mini-arc:** 24 (D-265B) + 40 (D-266A) = **64 new tests** (3011 → 3075 total).
+**Code/CSS deploys:** 1 (D-265B/C — owner manual terminal deploy).
+**D-265A, D-266A, D-267A:** Audit / tests / docs only — no deploy needed.
+**Latest deployed Worker version:** `cb5caf6f-67ff-4a41-baa5-22ed836e0cb2` (unchanged from D-261C).
+
+### What is now true of Study entry and Back-to-Review buttons (post D-265→D-266)
+
+- Inspect panel claim Study button no longer has false `primary` hierarchy — all inspect panel Study buttons use `btn-study-review` only.
+- D-261B Study push (`margin-left:auto` on `.review-inspect-actions .btn-study-review`) remains active on desktop.
+- Linked claim field Study button (inspect panel truth branch) shows `Study linked claim ↗` instead of raw claim ID.
+- Evidence card Study button uses `btn-link-small` (matching vault group header) and includes `↗` icon.
+- All 5 Back navigation buttons use `class="btn-back-study"` with calm secondary styling (`rgba(255,255,255,.06)` fill, `rgba(255,255,255,.12)` border, `var(--muted)` text) — not destructive red.
+- All Back-to-Review navigation behavior unchanged: `data-action="backToArena"`, scroll restoration via `requestAnimationFrame(() => scrollToReviewAnchor(_savedId))`, no queue reload on return.
+- Review search/filter/sort context preserved on return from Study.
+- Search-aware inspect prev/next unchanged.
+- "Open next item →" behavior unchanged.
+- Moderation actions unchanged.
+- Duplicate/advisory semantics unchanged.
+
+---
+
+## Study entry / Back-to-Review button current behavior (post D-265→D-266)
+
+| Feature | Behavior |
+|---------|---------|
+| Inspect panel claim Study | `class="btn-study-review"`, `Open Study View ↗`, calls `openReviewClaimStudy(id)` — no `primary` class |
+| Inspect panel evidence/pressure Study | `class="btn-study-review"`, `Study Parent Claim ↗`, calls `openReviewClaimStudy(claim_id)` |
+| Inspect panel truth Study | `class="btn-study-review"`, `Study Linked Claim ↗`, calls `openReviewClaimStudy(linked_id)` (public linked claims only) |
+| Linked claim Study button (truth, public) | `class="btn-link-small"`, `Study linked claim ↗`, calls `openReviewClaimStudy(linked)` |
+| Non-public linked claim | Shows `review-inspect-id` code element + state span — no Study button |
+| Evidence card Study button | `class="btn-link-small"`, `Study Linked Claim ↗`, calls `studyFromVault(claimId)` |
+| Vault group header Study button | `class="btn-link-small"`, `Study claim ↗`, calls `studyFromVault(claimId)` |
+| All 5 Back navigation buttons | `class="btn-back-study"`, `data-action="backToArena"`, copy variants: `← Back to Review` / `← Back to Vault` / `← Back to Truths` / `← Back to My HumanX` / `← Back to Claims` |
+| `.btn-back-study` CSS | `background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--muted);padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer` — calm secondary, not destructive red |
+| `.btn-back-study:hover` CSS | `background:rgba(255,255,255,.10);color:var(--text)` |
+| D-261B Study push | `.review-inspect-actions .btn-study-review{margin-left:auto}` — Study floats right on desktop, resets to `margin-left:0` on mobile |
+| Back-to-Review scroll restore | `requestAnimationFrame(() => scrollToReviewAnchor(_savedId))` — deferred RAF, null-safe guard |
+| No queue reload on Back-to-Review | `loadReviewQueue()` NOT called on return; cached queue used |
+| Review context preserved | `reviewSearchQuery`, `reviewStateFilter`, `reviewSortOrder` all preserved on return from Study |
+| Search-aware inspect nav | `applyReviewSort(applyReviewSearch(applyReviewFilter(...)))` pipeline unchanged |
+
+---
+
 ## Duplicate/similar filter current behavior (post D-256)
 
 | Feature | Behavior |
@@ -595,6 +651,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-258→D-259 | **Confirmed** — CSS-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-259A |
 | Inspect action spacing CSS in public profile | **Blocked** — `.review-inspect-actions`, `btn-study-review`, `review-inspect-markdup`, `review-inspect-resolvesim` and all D-261B CSS classes confirmed absent from `renderPublicProfileHtml`; inspect action spacing remains internal/admin Review UI only | D-262A |
 | No new public data fields in D-261→D-262 | **Confirmed** — CSS-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-262A |
+| Study entry / Back button markers in public profile | **Blocked** — `btn-back-study`, `btn-study-review`, and `openReviewClaimStudy` confirmed absent from `renderPublicProfileHtml`; Study entry / Back-to-Review admin controls remain entirely internal | D-266A |
+| No new public data fields in D-265→D-266 | **Confirmed** — CSS/copy-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-266A |
 
 ---
 
@@ -658,7 +716,12 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-261C | Live closeout — no deploy needed (closeout of D-261B deploy) |
 | D-262A | Tests / docs only — no deploy needed |
 | D-263A | Docs only — no deploy needed |
-| D-264A (this task) | Docs only — **no deploy needed** |
+| D-264A | Docs only — no deploy needed |
+| D-265A | Audit / docs only — no deploy needed |
+| D-265B | Owner deploy PASS — D-265C confirmed live (39/39) |
+| D-265C | Live closeout — no deploy needed (closeout of D-265B deploy) |
+| D-266A | Tests / docs only — no deploy needed |
+| D-267A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -806,6 +869,18 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 65. **Do not mark live PASS without owner deploy and browser sanity** — Static checks passing locally does not constitute a live closeout. Every code/CSS deploy must be owner-executed via manual terminal deploy and followed by an owner browser sanity check before the live closeout commit is made.
 
+66. **Do not re-add `primary` to the inspect panel Study button without owner approval** — the `primary` class was removed from the claim Study button in D-265B to eliminate a false visual hierarchy. Reintroducing it requires a D-266A lock test update and explicit owner approval.
+
+67. **Do not remove `btn-back-study` from Back-to-Review controls without owner approval** — all 5 Back navigation buttons use `btn-back-study` (D-265B). Removing the class or its CSS rule requires a D-266A lock test update and explicit owner approval.
+
+68. **Do not change Back-to-Review behavior under a style/copy task** — D-265B was CSS/copy only. Any task claiming style or copy scope that touches `backToArena()`, `data-action="backToArena"`, `lastModeBeforeStudy`, or `lastInspectedReviewItemId` requires a separate navigation spec.
+
+69. **Do not change scroll restoration under a style/copy task** — the `requestAnimationFrame(() => scrollToReviewAnchor(_savedId))` restore in `backToArena()` must not be altered under any CSS or copy task. Behavior changes require a separate spec.
+
+70. **Do not change Study navigation handlers under a style/copy task** — `openReviewClaimStudy`, `studyFromVault`, and their call sites must not change under any task scoped to Study button style, Back button style, or label clarity.
+
+71. **Do not expose Review/Study admin controls on public profile pages** — `btn-back-study`, `btn-study-review`, `openReviewClaimStudy`, and all Study entry / Back-to-Review internals must remain absent from `renderPublicProfileHtml`. Any new Study/Review feature must add a public-boundary test before merge.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -826,11 +901,11 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| Study entry button style consistency | D-239A F-2–F-4: button prominence, browser-back support, Study entry button style inconsistency |
 | Claim/RunPack flow clarity | Investigation Packet workflow, AI-return parsing, stale detection |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
-| Review queue future follow-up | Only if owner finds live friction — full run is now closed (D-264A) |
+| Study page content hierarchy audit | Study page layout, section ordering, dock/content density — post D-265B natural follow-up |
+| Review/Study future follow-up | Only if owner finds live friction — D-264A full run and D-265/D-266 style arc are now complete |
 | D-245A F-4 pressure handle duplication | Separate spec — pressure cards show handle in both chips and meta |
 | Duplicate canonical/merge backend spec | If owner wants an explicit merge/canonical resolution flow, needs a backend/API spec first |
 
@@ -1008,4 +1083,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-261C | `ac3e279` | D-261B live closeout — owner deploy PASS; 41/41 live sanity PASS; Worker `cb5caf6f` |
 | D-262A | `92ca239` | Inspect panel action spacing regression lock — 33 tests across 7 categories |
 | D-263A | `b9b2c97` | Review inspect panel action spacing checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
-| D-264A | TBD | **[Current]** Review ergonomics milestone wrap-up — full D-227→D-263 run summary; safe-next rules 60–65; docs only; no deploy |
+| D-264A | TBD | Review ergonomics milestone wrap-up — full D-227→D-263 run summary; safe-next rules 60–65; docs only; no deploy |
+| D-265A | `bf45c87` | **[Arc start]** Study entry / Back button style consistency audit — 14-button inventory; 8 friction findings; docs only |
+| D-265B | `092d6fc` | Study entry / Back button style consistency — 4 CSS/copy changes; `.btn-back-study` CSS rule; 24 tests |
+| D-265C | `22d99e9` | D-265B live closeout — owner deploy PASS; 39/39 live sanity PASS |
+| D-266A | `225ab30` | Study entry / Back button style regression lock — 40 tests across 8 categories |
+| D-267A | this commit | **[Current]** Study entry / Back button style checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
