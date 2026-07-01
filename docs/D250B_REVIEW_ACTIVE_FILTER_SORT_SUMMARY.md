@@ -1,7 +1,7 @@
 # D-250B — Review Active Filter/Sort Summary
 
 **Scope:** Frontend (app-v10.js, styles.css) + tests + docs
-**Status:** COMPLETE — owner deploy pending (D-250C)
+**Status:** COMPLETE — owner deploy PASS (D-250C live sanity PASS 2026-07-01)
 **Baseline:** 2743 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/app-v10.js`, `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D250B_REVIEW_ACTIVE_FILTER_SORT_SUMMARY.md`, `docs/README.md`
 **App UI changes:** Yes — active filter/sort summary line added above cards
@@ -169,23 +169,25 @@ The summary line appears between the audit bar and the feedback banner/first car
 
 ---
 
-## Live Sanity Checklist — D-250C (pending owner deploy)
+## Live Sanity Checklist — D-250C PASS (2026-07-01, owner deploy)
 
-- [ ] Review queue loads without JS errors
-- [ ] Summary line visible above cards: `Showing: Pending · N items · Sorted: Newest first` on default load
-- [ ] Changing filter chip updates summary filter label and item count
-- [ ] Changing sort select updates summary sort label
-- [ ] Summary renders `0 items` when filter matches nothing
-- [ ] Summary renders `1 item` (singular) when filter matches exactly one item
-- [ ] Summary styled muted — visually calmer than cards and confirm states
-- [ ] Summary does not render on public profile page
-- [ ] "Open next item →" button continues to follow current filter+sort
-- [ ] Moderation actions (Approve/Keep/Reject) unaffected
-- [ ] Confirm-state (D-229A) unaffected
-- [ ] Decision feedback banner (D-230A) unaffected
-- [ ] D-245B inline date still in meta line
-- [ ] D-246A score labels still in meta line
-- [ ] D-247A advisory hints row still renders below meta line
-- [ ] Review-to-Study navigation (D-239/D-240) unaffected
-- [ ] Mobile layout: summary wraps cleanly on narrow screens
-- [ ] No console errors
+- [x] Review queue loads without JS errors
+- [x] Summary line visible above cards: `Showing: Pending · N items · Sorted: Newest first` on default load
+- [x] Changing filter chip updates summary filter label and item count
+- [x] Changing sort select updates summary sort label
+- [x] Summary renders `0 items` when filter matches nothing
+- [x] Summary renders `1 item` (singular) when filter matches exactly one item
+- [x] Summary styled muted — visually calmer than cards and confirm states
+- [x] Summary does not render on public profile page
+- [x] "Open next item →" button continues to follow current filter+sort
+- [x] Moderation actions (Approve/Keep/Reject) unaffected
+- [x] Confirm-state (D-229A) unaffected
+- [x] Decision feedback banner (D-230A) unaffected
+- [x] D-245B inline date still in meta line
+- [x] D-246A score labels still in meta line
+- [x] D-247A advisory hints row still renders below meta line
+- [x] Review-to-Study navigation (D-239/D-240) unaffected
+- [x] Mobile layout: summary wraps cleanly on narrow screens
+- [x] No console errors
+
+**29/29 PASS** — owner live sanity complete 2026-07-01
