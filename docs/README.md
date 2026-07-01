@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2959 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2978 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-260A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc + D-256 duplicate/similar label clarity addendum + D-258→D-259 Review mobile controls wrapping mini-arc, current baseline 2959/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–53.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-260A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc + D-250→D-254 review search/filter clarity arc + D-256 duplicate/similar label clarity addendum + D-258→D-259 Review mobile controls wrapping mini-arc, current baseline 2978/0/24/57 (after D-261B), privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–53.
 
-### `D261A_REVIEW_INSPECT_PANEL_ACTION_DENSITY_AUDIT.md` ⭐ CURRENT — D-261A REVIEW INSPECT PANEL ACTION DENSITY AUDIT — DOCS ONLY
+### `D261B_REVIEW_INSPECT_PANEL_ACTION_SPACING_POLISH.md` ⭐ CURRENT — D-261B REVIEW INSPECT PANEL ACTION SPACING POLISH — CSS + TESTS + DOCS
+
+CSS + tests + docs. Deploy needed. Baseline: 2978/0/24/57. Three CSS additions to `public/styles.css`: (1) desktop Study push (`margin-left:auto` on `.review-inspect-actions .btn-study-review`); (2) mobile full-width tap targets (`width:100%` on `.review-inspect-actions button`); (3) mobile soft visual separator before dup/advisory group (`.review-inspect-markdup`/`.review-inspect-resolvesim` `margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)`) + Study column reset (`margin-left:0`). 19 new tests covering desktop push, mobile rules, separator styling, behavior/label locks, public boundary. No app/worker/Drift/Belief changes.
+
+### `D261A_REVIEW_INSPECT_PANEL_ACTION_DENSITY_AUDIT.md` — D-261A REVIEW INSPECT PANEL ACTION DENSITY AUDIT — DOCS ONLY
 
 Docs only. No deploy needed. Baseline: 2959/0/24/57 (unchanged). Audit of inspect panel action buttons for D-258A F-3 MEDIUM (action density/column height on mobile). Full action inventory: 7 moderation actions (Approve/Keep/Reject + armed states + Archive), 2 duplicate/advisory actions (Mark Duplicate.../Dismiss ~Similar), 3 Study variants, 3 advisory field actions (Use as dup target/Copy ID/Study advisory), 2 feedback banner buttons, 4 card-level actions. Risk findings: F-1 HIGH (at ≤600px all 5–7 buttons collapse to a single flat column with no visual break between primary/dup/study groups); F-2 MEDIUM (no structural action grouping in HTML); F-3 MEDIUM (dead CSS class `.review-inspect-top-actions` in mobile media rule — never emitted); F-4 MEDIUM (no explicit `width:100%` for mobile column); F-5–F-6 LOW. Recommended D-261B: CSS-only — `margin-left:auto` on `.btn-study-review` on desktop + `margin-top` separator before dup group on mobile + `width:100%` for column buttons. All D-229A→D-259A regression locks must be preserved. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
 

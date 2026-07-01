@@ -307,6 +307,8 @@
 .review-inspect-actions{display:flex;gap:5px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:7px;margin-top:2px}
 .review-inspect-actions button{padding:8px 12px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:#0b0e16;color:var(--text)}
 .btn-study-review{background:linear-gradient(135deg,var(--red),var(--purple));border:0!important;color:#fff!important}
+/* D-261B: Study button pushed to far right on desktop — creates natural gap before advisory/study group */
+.review-inspect-actions .btn-study-review{margin-left:auto}
 /* Approve button inside inspect panel — needs green gradient regardless of panel context */
 .review-inspect-actions .review-inspect-approve{background:linear-gradient(135deg,#00622c,#003d1a);border:1px solid #39ff9f55!important;color:#5fff9f!important;font-weight:800}
 .review-inspect-actions .review-inspect-approve:hover{background:linear-gradient(135deg,#007f38,#00622c)}
@@ -315,7 +317,13 @@
 .review-inspect-markdup{border-color:#6b3f8a55!important;color:#c084fc!important;background:linear-gradient(135deg,#1e0a2e,#12051a)!important}
 .review-inspect-resolvesim{border-color:#2a4a6a55!important;color:#7cb3e0!important;background:linear-gradient(135deg,#0d1a2a,#070f1a)!important}
 .btn-link-small{background:transparent;border:none;padding:0;color:var(--blue);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-@media(max-width:600px){.review-admin-bar{flex-direction:column;align-items:stretch}.review-header-left{justify-content:space-between}.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-actions .btn-inspect{margin-right:0;flex:1}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-top-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}}
+@media(max-width:600px){.review-admin-bar{flex-direction:column;align-items:stretch}.review-header-left{justify-content:space-between}.review-token-form{flex-direction:column}.review-token-form input,.review-token-form button{width:100%}.review-actions{flex-direction:column}.review-actions .btn-inspect{margin-right:0;flex:1}.review-inspect-fields{grid-template-columns:1fr}.review-inspect-actions{flex-direction:column}.review-inspect-top-actions{flex-direction:column}.review-inspect-header{flex-direction:column}.btn-close-inspect{align-self:flex-end}.review-filter-bar{gap:5px}.review-filter-chip{font-size:10px;padding:5px 9px}
+/* D-261B: full-width tap targets in mobile column */
+.review-inspect-actions button{width:100%}
+/* D-261B: soft visual separator before duplicate/advisory actions in mobile column */
+.review-inspect-actions .review-inspect-markdup,.review-inspect-actions .review-inspect-resolvesim{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}
+/* D-261B: reset desktop Study push in mobile column — Study stacks naturally */
+.review-inspect-actions .btn-study-review{margin-left:0}}
 /* Evidence Vault readability */
 .vault-header{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(16,19,29,.86);margin-bottom:4px}
 .vault-header-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
