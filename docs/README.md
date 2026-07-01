@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2681 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2722 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-244A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc, current baseline 2638/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules.
 
-### `D247A_REVIEW_CARD_ADVISORY_HINT_GROUPING.md` ⭐ CURRENT — D-247A REVIEW CARD ADVISORY HINT GROUPING
+### `D248A_REVIEW_CARD_METADATA_DENSITY_REGRESSION_LOCK.md` ⭐ CURRENT — D-248A REVIEW CARD METADATA DENSITY REGRESSION LOCK
+
+Tests + docs only. Deploy not needed. Baseline: 2722/0/24/57 (+41 tests). Regression lock for the D-245→D-247 review card metadata-density mini-arc: 7 categories / 41 tests locking inline date (D-245B), readable score labels (D-246A), advisory hint grouping (D-247A), primary head-row badge set, cross-arc behavior compatibility (D-227B/D-229A/D-230A/D-242B/D-237A/D-239→D-240), public/Drift/backend boundaries, and deploy integrity. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D247A_REVIEW_CARD_ADVISORY_HINT_GROUPING.md` — D-247A REVIEW CARD ADVISORY HINT GROUPING
 
 App/CSS change. Deploy complete. D-247B live sanity 31/31 PASS (2026-07-01). Baseline: 2681/0/24/57 (+16 tests). Moves low-priority advisory/quality hints (`needs sharpening`, `category echo`, `? borderline origin`) out of the primary `.review-card-head` badge row into a dedicated `.review-card-hints` secondary row rendered below the meta line. Scan-critical badges (type, state, ⚑ report, ~similar, truth-derived, Builder) stay in the primary head row. Hints row renders only when hints exist; empty when none apply. CSS `.review-card-hints` added with `opacity:.75` for visual quiet. No hint data removed. D-245B date and D-246A score labels preserved. No moderation/advisory/filter/sort/next-item/Study-nav change. No backend/API/migration/schema/CSP/external asset changes. Drift/Belief expansion files untouched. Worker unchanged.
 
