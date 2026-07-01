@@ -1,14 +1,14 @@
 # D-258B — Review Mobile Control Wrapping Polish
 
 **Scope:** CSS + tests + docs
-**Status:** COMPLETE — deploy needed
+**Status:** COMPLETE — owner deploy PASS — D-258C live sanity PASS
 **Baseline:** 2924 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Files changed:** `public/styles.css`, `scripts/hardening-smoke-test.mjs`, `docs/D258B_REVIEW_MOBILE_CONTROL_WRAPPING_POLISH.md`, `docs/README.md`
 **App UI changes:** CSS-only — layout/wrapping polish; no copy, no behavior
 **CSS changes:** Yes — 3 additions, 1 update (see below)
 **Worker changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes
+**Deploy needed:** No — deploy complete (D-258C, 2026-07-01)
 
 ---
 
@@ -134,39 +134,57 @@ All CSS classes added/modified are admin-only Review queue classes. None appear 
 
 ## Deploy
 
-Owner must deploy `public/styles.css` via `wrangler deploy` for CSS changes to go live. No backend/migration/schema/CSP/external asset changes required.
+Owner deployed `public/styles.css` via `wrangler deploy` on 2026-07-01. No backend/migration/schema/CSP/external asset changes required.
+
+**Deploy result: PASS (D-258C, 2026-07-01)**
 
 ---
 
-## Live Sanity Checklist (pending owner deploy)
+## Live Sanity Checklist — D-258C PASS (2026-07-01)
 
-When D-258B is deployed, verify:
+All 39 items verified by owner after deploy.
 
-1. Review/moderation page opens normally.
-2. Queue loads without console errors.
-3. Filter chips display and wrap correctly.
-4. Sort "Sort:" label and select appear below/near the chip row, not mid-chip-row.
-5. Sort select is readable and tappable (not crushed).
-6. Sort select value persists correctly (behavior unchanged).
-7. Active filter + search + sort behavior unchanged.
-8. When a decision is made, the feedback banner displays message + buttons.
-9. On narrow viewports, feedback banner wraps without overflow.
-10. "Open next item →" button remains readable and tappable.
-11. "Dismiss" button remains readable and tappable.
-12. "Open next item →" click behavior unchanged (navigation only).
-13. "Dismiss" click behavior unchanged.
-14. When no search/filter matches: zero-results empty state displays.
-15. "Clear search" and "Show all review items" buttons have consistent gap.
-16. Both buttons are readable and tappable.
-17. "Clear search" resets search only (preserves filter/sort).
-18. "Show all review items" resets filter only (preserves search/sort).
-19. `Dupes + Similar` filter chip label unchanged.
-20. `~Similar` filter chip label unchanged.
-21. Card badges unchanged (`~similar`, `dup`, type, state).
-22. Card metadata unchanged (date, score labels, hint row).
-23. Duplicate/similar advisory controls unchanged.
-24. D-245→D-257 behavior unchanged throughout.
-25. No console errors.
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opened after deploy | PASS |
+| 2 | Review/moderation page opened | PASS |
+| 3 | Queue loads without console-breaking errors | PASS |
+| 4 | Filter chips still render normally | PASS |
+| 5 | Sort control remains readable | PASS |
+| 6 | Sort control no longer feels crushed into the filter chips | PASS |
+| 7 | Sort label remains readable | PASS |
+| 8 | Sort select remains usable | PASS |
+| 9 | Search row still renders normally | PASS |
+| 10 | Search input remains usable | PASS |
+| 11 | Clear search remains usable when search is active | PASS |
+| 12 | Active summary still appears normally | PASS |
+| 13 | Ambiguous filter helper still appears for `~Quality`, `Dupes + Similar`, and `~Similar` | PASS |
+| 14 | Zero-results empty state still appears normally | PASS |
+| 15 | `Clear search` and `Show all review items` buttons have sane spacing | PASS |
+| 16 | Empty-state buttons wrap or stack cleanly on narrow width | PASS |
+| 17 | Decision feedback banner still appears after moderation decisions | PASS |
+| 18 | Decision feedback text wraps safely | PASS |
+| 19 | `Open next item →` button remains readable/tappable | PASS |
+| 20 | Dismiss feedback button remains readable/tappable | PASS |
+| 21 | Feedback buttons do not shrink into unreadable shapes | PASS |
+| 22 | Mobile/narrow width does not create obvious horizontal overflow in Review controls | PASS |
+| 23 | Review card head row still behaves normally | PASS |
+| 24 | Review card hint row still behaves normally | PASS |
+| 25 | Card action buttons still work | PASS |
+| 26 | Inspect panel actions still work | PASS |
+| 27 | Search/filter/sort behavior unchanged | PASS |
+| 28 | Next-item remains search-aware | PASS |
+| 29 | Inspect prev/next remains search-aware | PASS |
+| 30 | Duplicate/advisory semantics unchanged | PASS |
+| 31 | Moderation actions unchanged | PASS |
+| 32 | Review card D-245B inline date still works | PASS |
+| 33 | Review card D-246A score labels still work | PASS |
+| 34 | Review card D-247A hint grouping still works | PASS |
+| 35 | `Dupes + Similar` label still appears correctly | PASS |
+| 36 | Public profile pages are unaffected | PASS |
+| 37 | Drift/Belief expansion surfaces still load normally | PASS |
+| 38 | No backend/API behavior changed | PASS |
+| 39 | No console errors | PASS |
 
 ---
 
