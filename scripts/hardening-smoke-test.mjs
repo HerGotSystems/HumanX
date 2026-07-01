@@ -19844,6 +19844,46 @@ console.log('\nD-248A: Review card metadata density regression lock');
   });
 }
 
+// ── Section D-250A: Review filter/sort/search guard tests ────────────────────
+// Audit-only: asserts existing hooks are present and public boundary holds.
+// No filter/sort behavior change. No app/CSS/worker change.
+{
+  test('D-250A: setReviewFilter function defined', () => {
+    assert.ok(appSrc.includes('function setReviewFilter('), 'setReviewFilter must remain defined');
+  });
+
+  test('D-250A: applyReviewFilter default review path present', () => {
+    assert.ok(appSrc.includes("function applyReviewFilter(") && appSrc.includes("reviewStateFilter||'review'"), 'applyReviewFilter must use reviewStateFilter with review default');
+  });
+
+  test('D-250A: applyReviewFilter ~Similar path checks near_duplicate_of', () => {
+    assert.ok(appSrc.includes("if(f==='similar')return list.filter(i=>!!i.near_duplicate_of)"), '~Similar filter must check near_duplicate_of');
+  });
+
+  test('D-250A: applyReviewFilter ~Quality excludes non-claim types (truth/evidence/pressure)', () => {
+    assert.ok(appSrc.includes("if(tp==='truth'||tp==='evidence'||tp==='pressure')return false"), '~Quality filter must explicitly exclude non-claim types — advisory guard for label clarity');
+  });
+
+  test('D-250A: setReviewSort function defined', () => {
+    assert.ok(appSrc.includes('function setReviewSort('), 'setReviewSort must remain defined');
+  });
+
+  test('D-250A: reviewFilterHelpText function defined', () => {
+    assert.ok(appSrc.includes('function reviewFilterHelpText('), 'reviewFilterHelpText must remain defined');
+  });
+
+  test('D-250A: no review search state variable (search not yet implemented)', () => {
+    assert.ok(!appSrc.includes('reviewSearch') && !appSrc.includes('reviewQuery'), 'No review search state exists — if search is added, update D-250A and create D-252A implementation doc');
+  });
+
+  test('D-250A: renderPublicProfileHtml does not reference setReviewFilter', () => {
+    const ppStart = appSrc.indexOf('function renderPublicProfileHtml(');
+    assert.ok(ppStart !== -1, 'renderPublicProfileHtml must be defined');
+    const ppSrc = appSrc.slice(ppStart, ppStart + 20000);
+    assert.ok(!ppSrc.includes('setReviewFilter'), 'setReviewFilter must not appear in public profile render path');
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);

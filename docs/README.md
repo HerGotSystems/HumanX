@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `2722 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `2730 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-249A (2026-07-01). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc + D-242→D-243 review next-item flow arc + D-245→D-248 review card metadata density arc, current baseline 2722/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–32.
 
-### `D249A_REVIEW_CARD_METADATA_DENSITY_MILESTONE_CHECKPOINT.md` ⭐ CURRENT — D-249A REVIEW CARD METADATA DENSITY MILESTONE CHECKPOINT
+### `D250A_REVIEW_SEARCH_FILTER_CLARITY_AUDIT.md` ⭐ CURRENT — D-250A REVIEW SEARCH/FILTER CLARITY AUDIT
+
+Docs + guard tests. Deploy not needed. Baseline: 2730/0/24/57 (+8 guard tests). Full audit of all Review queue filter chips (11 chips: Pending/Public/Rejected/Reported/~Similar/~Quality/Pressure/Dupes/Demo-Test/Truth-Derived/All), sort select (5 options: Newest/Oldest/Reported/~Similar/~Quality first), and search (not present — confirmed gap). 7 friction findings: F-1 HIGH no search; F-2 MEDIUM no active filter/sort context near cards; F-3 MEDIUM ~Quality silently claim-only; F-4 MEDIUM Dupes conflates confirmed+advisory; F-5–F-7 LOW. Recommended next slices: D-250B active filter/sort summary line (preferred first), D-251A label clarity, D-252A lightweight client-side search, D-253A regression lock. Guard tests confirm filter/sort hooks, ~Quality non-claim exclusion behavior, no search state var, and public boundary. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D249A_REVIEW_CARD_METADATA_DENSITY_MILESTONE_CHECKPOINT.md` — D-249A REVIEW CARD METADATA DENSITY MILESTONE CHECKPOINT
 
 Docs only. Deploy not needed. Baseline: 2722/0/24/57. Closes the D-245→D-248 review card metadata-density mini-arc: 84 new tests total (14+13+16+41), 3 owner deploys (D-245C 24/24, D-246B 28/28, D-247B 31/31). PROJECT_STATE.md updated with arc summary, review card behavior table (meta line, score labels, hints row), privacy boundary entries, deployment state, and 8 new safe-next-work rules (25–32). D-245A F-1/F-2/F-3 resolved; F-4 deferred. No app/CSS/worker/Drift/Belief changes. No backend/API/migration/schema/CSP/external asset changes.
 
