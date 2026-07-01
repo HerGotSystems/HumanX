@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-241A (2026-06-29). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + D-227→D-231 review ergonomics arc + D-233→D-237 duplicate advisory arc + D-239→D-240 review-to-study navigation arc, current baseline 2573/0/24/57, privacy boundary state, deployment state, safe next-work rules.
 
-### `D242B_REVIEW_DECISION_OPEN_NEXT_ITEM.md` ⭐ CURRENT — D-242B/D-242C REVIEW DECISION: OPEN NEXT ITEM — LIVE PASS
+### `D243A_REVIEW_NEXT_ITEM_FLOW_REGRESSION_LOCK.md` ⭐ CURRENT — D-243A REVIEW NEXT-ITEM FLOW REGRESSION LOCK
+
+Tests + docs only. Deploy not needed. Baseline: 2638/0/24/57 (+34 new tests). Locks D-242A/B/C next-item behavior across 7 categories: next-ID state (`reviewDecisionFeedbackNextId` + clear), candidate capture (sorted/filtered, approve/reject only, Keep Pending excluded), post-reload validity (candidate checked against fresh queue), manual action (button copy, type, inspectReviewItem, no reviewDecisionUI/fetch), cross-arc compat (D-227B/D-228A/D-229A/D-230A/D-239/D-240/keyboard), public boundary (3 assertions on renderPublicProfileHtml), deploy integrity (app/CSS/worker unchanged). App/CSS/worker/Drift files unchanged. No backend/API/migration/schema/CSP/external asset changes.
+
+### `D242B_REVIEW_DECISION_OPEN_NEXT_ITEM.md` — D-242B/D-242C REVIEW DECISION: OPEN NEXT ITEM — LIVE PASS
 
 App + CSS + tests + docs. Owner deploy complete — D-242C live sanity 34/34 PASS. Baseline: 2604/0/24/57 (+24 new tests, +5 slice-window fixes). Adds "Open next item →" button to D-230A feedback banner after Approve/Reject when a next item exists in the current sorted/filtered queue. Next item captured before queue reload via applyReviewSort(applyReviewFilter(...)). Button calls clearReviewDecisionFeedback()+inspectReviewItem(nextId) — manual only, no auto-moderation, no backend call. Keep Pending unchanged (no button for 'review' decision). Last-item/empty-queue suppresses button. Keyboard _advanceId path unchanged. New state: reviewDecisionFeedbackNextId. CSS: .review-feedback-next with focus-visible. Drift/Belief expansion files untouched. No backend/API/migration/schema/CSP/external asset changes.
 

@@ -19106,6 +19106,245 @@ console.log('\nD-240A: Review-to-study navigation regression lock');
   });
 }
 
+// ── D-243A: Review next-item flow regression lock ─────────────────────────────
+//
+// Locks the D-242A/B/C next-item affordance across 7 categories. D-242B covers
+// the implementation-level unit assertions; D-243A adds cross-arc compat locks
+// and boundary guards to catch regressions from future review queue changes.
+
+{
+  console.log('\nD-243A: Review next-item flow regression lock');
+
+  const decisionSrc = (() => {
+    const start = appSrc.indexOf('async function reviewDecisionUI(');
+    const end = appSrc.indexOf('\nasync function ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 3000);
+  })();
+
+  const renderListSrc = (() => {
+    const start = appSrc.indexOf('function renderReviewList(');
+    const end = appSrc.indexOf('\nfunction ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 4000);
+  })();
+
+  const clearFbSrc = (() => {
+    const start = appSrc.indexOf('function clearReviewDecisionFeedback(');
+    const end = appSrc.indexOf('\n', start + 1);
+    return appSrc.slice(start, end);
+  })();
+
+  const ppSrc = (() => {
+    const start = appSrc.indexOf('function renderPublicProfileHtml(');
+    const end = appSrc.indexOf('\nfunction ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 8000);
+  })();
+
+  const kbSrc = (() => {
+    const start = appSrc.indexOf('function initReviewKb(');
+    const end = appSrc.indexOf('\nfunction ', start + 1);
+    return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 4000);
+  })();
+
+  // ── 1. Next-item state lock ───────────────────────────────────────────────
+
+  test('D-243A [state]: reviewDecisionFeedbackNextId module-level state exists', () => {
+    assert.ok(appSrc.includes('let reviewDecisionFeedbackNextId'), 'reviewDecisionFeedbackNextId module-level state must remain declared');
+  });
+
+  test('D-243A [state]: clearReviewDecisionFeedback clears reviewDecisionFeedback', () => {
+    assert.ok(
+      clearFbSrc.includes('reviewDecisionFeedback=null') || clearFbSrc.includes('reviewDecisionFeedback = null'),
+      'clearReviewDecisionFeedback must set reviewDecisionFeedback to null'
+    );
+  });
+
+  test('D-243A [state]: clearReviewDecisionFeedback clears reviewDecisionFeedbackNextId', () => {
+    assert.ok(
+      clearFbSrc.includes('reviewDecisionFeedbackNextId=null') || clearFbSrc.includes('reviewDecisionFeedbackNextId = null'),
+      'clearReviewDecisionFeedback must set reviewDecisionFeedbackNextId to null'
+    );
+  });
+
+  test('D-243A [state]: clearReviewDecisionFeedback calls renderReviewList', () => {
+    assert.ok(clearFbSrc.includes('renderReviewList()'), 'clearReviewDecisionFeedback must call renderReviewList() to update the banner');
+  });
+
+  // ── 2. Candidate capture lock ─────────────────────────────────────────────
+
+  test('D-243A [capture]: reviewDecisionUI captures candidate before loadReviewQueue', () => {
+    const captureIdx = decisionSrc.indexOf('_nextCandidateId');
+    const reloadIdx = decisionSrc.indexOf('loadReviewQueue');
+    assert.ok(captureIdx >= 0 && captureIdx < reloadIdx, 'candidate capture must precede loadReviewQueue in reviewDecisionUI');
+  });
+
+  test('D-243A [capture]: candidate derived from sorted/filtered current list', () => {
+    assert.ok(
+      decisionSrc.includes('applyReviewSort(applyReviewFilter('),
+      'candidate must be derived from applyReviewSort(applyReviewFilter(reviewQueue.review)) in reviewDecisionUI'
+    );
+  });
+
+  test('D-243A [capture]: candidate capture guarded to approve and reject only', () => {
+    assert.ok(
+      decisionSrc.includes("decision==='public'") && decisionSrc.includes("decision==='rejected'"),
+      'candidate capture must be guarded to public (Approve) and rejected (Reject) decisions only'
+    );
+  });
+
+  test('D-243A [capture]: Keep Pending does not set reviewDecisionFeedbackNextId to a non-null value by default', () => {
+    // The _captureNext guard ensures Keep Pending (decision='review') skips capture.
+    // reviewDecisionFeedbackNextId gets assigned _nextCandidateId, which stays null for 'review'.
+    assert.ok(
+      decisionSrc.includes('_captureNext') &&
+      (decisionSrc.includes("decision==='public'||decision==='rejected'") ||
+       (decisionSrc.includes("decision==='public'") && decisionSrc.includes("decision==='rejected'"))),
+      'Keep Pending must not capture a next-item candidate — _captureNext guard must exclude review decision'
+    );
+  });
+
+  // ── 3. Post-reload validity lock ──────────────────────────────────────────
+
+  test('D-243A [validity]: banner checks candidate against post-reload queue before rendering button', () => {
+    assert.ok(
+      renderListSrc.includes('reviewDecisionFeedbackNextId') &&
+      renderListSrc.includes('reviewQueue.review') &&
+      renderListSrc.includes('.find(i=>i.id===reviewDecisionFeedbackNextId)'),
+      'renderReviewList must validate candidate against post-reload reviewQueue.review before showing button'
+    );
+  });
+
+  test('D-243A [validity]: next-item button absent when candidate not found in queue', () => {
+    assert.ok(
+      renderListSrc.includes('_fbNextInQueue') && renderListSrc.includes("_fbNextBtn=_fbNextInQueue?"),
+      'renderReviewList must suppress next-item button when _fbNextInQueue is falsy (candidate absent from post-reload queue)'
+    );
+  });
+
+  test('D-243A [validity]: feedback copy "Approved review item." unchanged', () => {
+    assert.ok(decisionSrc.includes("'Approved review item.'"), 'Approved review item. feedback copy must remain');
+  });
+
+  test('D-243A [validity]: feedback copy "Rejected review item." unchanged', () => {
+    assert.ok(decisionSrc.includes("'Rejected review item.'"), 'Rejected review item. feedback copy must remain');
+  });
+
+  test('D-243A [validity]: feedback copy "Kept review item." unchanged', () => {
+    assert.ok(decisionSrc.includes("'Kept review item.'"), 'Kept review item. feedback copy must remain');
+  });
+
+  // ── 4. Manual action lock ─────────────────────────────────────────────────
+
+  test('D-243A [manual]: next-item button copy is "Open next item →"', () => {
+    assert.ok(renderListSrc.includes('Open next item →'), 'next-item button copy must remain "Open next item →"');
+  });
+
+  test('D-243A [manual]: next-item button is type="button"', () => {
+    assert.ok(
+      renderListSrc.includes('type="button" class="review-feedback-next"') ||
+      renderListSrc.includes('"button" class="review-feedback-next"'),
+      'next-item button must retain type="button"'
+    );
+  });
+
+  test('D-243A [manual]: next-item button calls inspectReviewItem', () => {
+    assert.ok(renderListSrc.includes('inspectReviewItem('), 'next-item button must call inspectReviewItem to open the next item');
+  });
+
+  test('D-243A [manual]: next-item button calls clearReviewDecisionFeedback before opening', () => {
+    assert.ok(renderListSrc.includes('clearReviewDecisionFeedback()'), 'next-item button onclick must call clearReviewDecisionFeedback()');
+  });
+
+  test('D-243A [manual]: next-item button does not call reviewDecisionUI', () => {
+    const btnSlice = renderListSrc.match(/review-feedback-next[\s\S]{0,300}/)?.[0] || '';
+    assert.ok(!btnSlice.includes('reviewDecisionUI('), 'next-item button must not call reviewDecisionUI — manual navigation only');
+  });
+
+  test('D-243A [manual]: next-item button does not call fetch or api()', () => {
+    const btnSlice = renderListSrc.match(/review-feedback-next[\s\S]{0,300}/)?.[0] || '';
+    assert.ok(!btnSlice.includes('fetch(') && !btnSlice.includes("api('") && !btnSlice.includes('api("'), 'next-item button must not make any backend/API call');
+  });
+
+  // ── 5. Existing review flow compatibility lock ─────────────────────────────
+
+  test('D-243A [compat D-227B]: scrollSelectedReviewCardIntoView still exists', () => {
+    assert.ok(appSrc.includes('function scrollSelectedReviewCardIntoView('), 'D-227B: scrollSelectedReviewCardIntoView must remain');
+  });
+
+  test('D-243A [compat D-228A]: withReviewScrollPreserved still exists', () => {
+    assert.ok(appSrc.includes('function withReviewScrollPreserved('), 'D-228A: withReviewScrollPreserved must remain');
+  });
+
+  test('D-243A [compat D-229A]: data-review-confirming still used in review UI', () => {
+    assert.ok(appSrc.includes('data-review-confirming'), 'D-229A: data-review-confirming confirm-state attribute must remain');
+  });
+
+  test('D-243A [compat D-230A]: review-decision-feedback class still used in renderReviewList', () => {
+    assert.ok(renderListSrc.includes('review-decision-feedback'), 'D-230A: review-decision-feedback banner class must remain in renderReviewList');
+  });
+
+  test('D-243A [compat D-230A]: Dismiss button still wired to clearReviewDecisionFeedback', () => {
+    assert.ok(renderListSrc.includes('review-feedback-dismiss') && renderListSrc.includes('clearReviewDecisionFeedback()'), 'D-230A: Dismiss button must still call clearReviewDecisionFeedback');
+  });
+
+  test('D-243A [compat D-239/240]: backToArena review branch still uses requestAnimationFrame scroll', () => {
+    const backSrc = (() => {
+      const start = appSrc.indexOf('function backToArena(');
+      const end = appSrc.indexOf('\nfunction ', start + 1);
+      return end > start ? appSrc.slice(start, end) : appSrc.slice(start, start + 800);
+    })();
+    assert.ok(
+      backSrc.includes('requestAnimationFrame') && backSrc.includes('scrollToReviewAnchor(_savedId)'),
+      'D-239/D-240: backToArena RAF scroll to restored review card must remain intact'
+    );
+  });
+
+  test('D-243A [compat keyboard]: keyboard _advanceId path unchanged', () => {
+    assert.ok(
+      kbSrc.includes('_advanceId') && kbSrc.includes('inspectReviewItem(_advanceId)'),
+      'keyboard _advanceId auto-advance in initReviewKb must remain unchanged'
+    );
+  });
+
+  // ── 6. Duplicate / Drift / public boundary lock ───────────────────────────
+
+  test('D-243A [compat D-233B]: resolveSimilarUI still calls scrollToReviewAnchor', () => {
+    assert.ok(
+      appSrc.includes('function resolveSimilarUI(') && appSrc.includes('scrollToReviewAnchor(claimId)'),
+      'D-233B: resolveSimilarUI must still call scrollToReviewAnchor(claimId)'
+    );
+  });
+
+  test('D-243A [compat D-236A]: "Use as duplicate target" button still present', () => {
+    assert.ok(appSrc.includes('Use as duplicate target'), 'D-236A: "Use as duplicate target" button must remain in inspect panel');
+  });
+
+  test('D-243A [public]: renderPublicProfileHtml excludes reviewDecisionFeedbackNextId', () => {
+    assert.ok(!ppSrc.includes('reviewDecisionFeedbackNextId'), 'renderPublicProfileHtml must not expose reviewDecisionFeedbackNextId');
+  });
+
+  test('D-243A [public]: renderPublicProfileHtml excludes review-feedback-next', () => {
+    assert.ok(!ppSrc.includes('review-feedback-next'), 'renderPublicProfileHtml must not expose review-feedback-next class');
+  });
+
+  test('D-243A [public]: renderPublicProfileHtml excludes "Open next item"', () => {
+    assert.ok(!ppSrc.includes('Open next item'), 'renderPublicProfileHtml must not expose "Open next item" copy');
+  });
+
+  // ── 7. Deploy integrity lock ──────────────────────────────────────────────
+
+  test('D-243A [deploy]: D-243A does not modify public/app-v10.js', () => {
+    assert.ok(!appSrc.includes('D-243A'), 'D-243A is tests+docs only — app-v10.js must not be modified');
+  });
+
+  test('D-243A [deploy]: D-243A does not modify src/worker.js', () => {
+    assert.ok(!workerSrc.includes('D-243A'), 'D-243A is tests+docs only — worker.js must not be modified');
+  });
+
+  test('D-243A [deploy]: D-243A does not modify public/styles.css', () => {
+    assert.ok(!cssSrc.includes('D-243A'), 'D-243A is tests+docs only — styles.css must not be modified');
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
