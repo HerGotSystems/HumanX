@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-298A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint) + D-285 owner pending-Review Truth visibility (see D-286A checkpoint) + D-287 saved analysis assisted Truth draft (see D-288A checkpoint) + D-289 owner workflow product polish / saved-analysis card copy consolidation (see D-290A checkpoint) + D-291 My HumanX Recent Truths prominence (see D-292A checkpoint) + D-293 My HumanX collapsible Profile Settings (see D-294A checkpoint) + D-295 My HumanX profile setup nudge (see D-296A checkpoint) + D-297 beta readiness Home Step 5 and My HumanX tab (see D-298A checkpoint), current baseline 3462/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–116.
 
-### `D298A_BETA_READINESS_HOME_STEP5_MY_HUMANX_TAB_CHECKPOINT.md` ⭐ CURRENT — D-298A BETA READINESS HOME STEP 5 AND MY HUMANX TAB CHECKPOINT — DOCS ONLY
+### `D299A_HUMANX_FIRST_BETA_TESTER_SCRIPT.md` ⭐ CURRENT — D-299A HUMANX FIRST BETA TESTER SCRIPT — DOCS ONLY
+
+First beta tester script for Mike to use with one outside person. Contains: tester start message (copy-paste), 11-step tester task list, 8 safe example claims, observation sheet, 10 post-test questions, success/failure criteria, and next-action rules. No implementation. Baseline 3462/0/24/57. No deploy needed.
+
+### `D298A_BETA_READINESS_HOME_STEP5_MY_HUMANX_TAB_CHECKPOINT.md` — D-298A BETA READINESS HOME STEP 5 AND MY HUMANX TAB CHECKPOINT — DOCS ONLY
 
 Closes the D-297 arc. Records: D-297A product pass (22 questions; post-submit path unguided); D-297B Home Step 5 and "My HumanX" tab label (18 new tests + 4 existing updates; baseline 3442 → 3462); D-297C live PASS (25/25). Safe-next rules 114–116 added. Baseline 3462/0/24/57. No deploy needed.
 
