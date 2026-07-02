@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-280A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc (see D-280A checkpoint), current baseline 3298/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–89.
 
-### `D280A_OWNER_RUNPACK_WORKFLOW_WORDING_CHECKPOINT.md` ⭐ CURRENT — D-280A OWNER RUNPACK WORKFLOW WORDING CHECKPOINT — DOCS ONLY
+### `D281A_SAVED_ANALYSIS_TO_TRUTH_BOUNDARY_AUDIT.md` ⭐ CURRENT — D-281A SAVED ANALYSIS TO TRUTH BOUNDARY AUDIT — DOCS ONLY
+
+Audit of the boundary between saved AI analysis and public Truth creation/review. **Boundary is structurally sound** — `saveAnalysisResult()` posts only to `/api/analysis`; no Truth creation, no review-state change, no public exposure. Two copy findings: **F-1 MEDIUM** (no-auto-publish copy absent from Study view Analysis panel entry point — only present in RunPack panel), **F-2 LOW** (`analysisItem()` card has no explicit "private" label). D-281B recommended: frontend-only, add no-auto-publish copy to `sectionAnalyses()` + add "private" note to `analysisItem()`. No backend/schema/migration changes needed. Baseline: 3298/0/24/57 (unchanged).
+
+### `D280A_OWNER_RUNPACK_WORKFLOW_WORDING_CHECKPOINT.md` — D-280A OWNER RUNPACK WORKFLOW WORDING CHECKPOINT — DOCS ONLY
 
 Closes the D-279 owner RunPack workflow wording mini-arc. Confirms D-279B stale warning wording polish (`claim updated since packet`) is live and locked. All D-271/D-275/D-277 locks preserved. Safe-next rules 87–89 added. Baseline: 3298/0/24/57 (unchanged). No deploy needed. RunPack F-3/F-4/F-5 + provenance visibility + stale wording polish all COMPLETE.
 
