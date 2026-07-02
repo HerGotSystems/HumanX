@@ -1,7 +1,7 @@
 # D-275B — RunPack Packet-ID Storage Branch Implementation
 
 **Scope:** Schema migration + backend handler + frontend (`public/app-v10.js`) + tests + docs
-**Status:** COMPLETE on branch — migration created but NOT applied to live D1 — no deploy — pending owner approval
+**Status:** COMPLETE — owner deploy PASS (D-275D, 2026-07-02) — 22/22 live sanity PASS
 **Branch:** `d275b-runpack-packet-id-storage`
 **Baseline before:** 3239 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Baseline after:** 3263 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
@@ -11,8 +11,9 @@
 **CSS changes:** None
 **Worker changes:** None — `src/worker.js` not modified
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Not yet — pending owner migration + deploy
-**Migration applied live:** NO — file created only
+**Deploy needed:** No — deployed (D-275D, 2026-07-02)
+**Migration applied live:** YES — `0017_analysis_results_packet_id.sql` applied to `humanx` D1 (D-275D, 2026-07-02)
+**Deployed Worker version:** `759acc15-a6dd-4e50-a070-0d3356e5c257`
 
 ---
 
@@ -231,3 +232,53 @@ Known warn: `/api/u/:slug — known parameterised route; implemented via regex i
 - `wrangler.toml` — not touched
 - No `alignment_labels` — permanently blocked
 - No `top_beliefs_json` in any public API
+
+---
+
+## D-275D — Live Closeout (2026-07-02)
+
+**Branch merged to main:** PASS (`git merge --ff-only d275b-runpack-packet-id-storage`) — main HEAD `53a8363`
+**D1 migration applied:** PASS — `0017_analysis_results_packet_id.sql` applied to live `humanx` database (f68709d8-b93a-4e5b-8a0e-5b58cc357125) — 2 commands executed in 0.71ms
+**Owner deploy:** PASS — `npx wrangler deploy` — `759acc15-a6dd-4e50-a070-0d3356e5c257`
+**Deployed Worker version:** `759acc15-a6dd-4e50-a070-0d3356e5c257`
+**Live packet-ID storage sanity:** PASS — 22/22
+
+### Post-deploy static checks
+
+| Script | Result |
+|--------|--------|
+| `node --check public/app-v10.js` | no output, exit 0 |
+| `node --check src/worker.js` | no output, exit 0 |
+| `node --check src/analysis-results.js` | no output, exit 0 |
+| `hardening-smoke-test.mjs` | `3263 passed, 0 failed` |
+| `belief-engine-static-check.mjs` | `24 passed, 0 failed` |
+| `worker-route-static-check.mjs` | `57 passed, 0 failed / 1 known warn` |
+
+Known warn: `/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`
+
+### Live sanity results (22/22 PASS)
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Claim/RunPack area opens without console-breaking errors | PASS |
+| 3 | Existing claim can be selected | PASS |
+| 4 | RunPack/Investigation Packet can be generated or displayed | PASS |
+| 5 | AI-return import area still appears | PASS |
+| 6 | `rp-return-section` auto-expands only when `lastPacket && lastPacketClaimId === selected?.id` | PASS |
+| 7 | `rp-return-next-step` copy still appears | PASS |
+| 8 | Copy still tells user to paste AI/JSON return | PASS |
+| 9 | Copy still states "Saving does not publish a truth automatically" | PASS |
+| 10 | Parser behavior unchanged (`JSON.parse`, field extraction) | PASS |
+| 11 | `saveAnalysisResult` still posts only to `/api/analysis` | PASS |
+| 12 | Saving analysis with a matching loaded RunPack includes `packet_id` in stored result | PASS |
+| 13 | Existing save behavior still works when `packet_id` is absent | PASS |
+| 14 | Stored packet ID preserves underscore format (`rp_*`) | PASS |
+| 15 | Public truth state unchanged | PASS |
+| 16 | Review/moderation unchanged | PASS |
+| 17 | Public profile `/u/:slug` unaffected | PASS |
+| 18 | Snapshot-hash stale detection still works (`source snapshot changed`) | PASS |
+| 19 | Generated-time stale warning still works | PASS |
+| 20 | Evidence/test count stale checks still work | PASS |
+| 21 | Drift/Belief expansion unaffected | PASS |
+| 22 | No console errors | PASS |
