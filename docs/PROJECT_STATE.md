@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-278A saved analysis provenance visibility checkpoint.
-Previous checkpoint: 2026-07-02 after D-276A RunPack provenance checkpoint.
+Last updated: 2026-07-02 after D-280A owner RunPack workflow wording checkpoint.
+Previous checkpoint: 2026-07-02 after D-278A saved analysis provenance visibility checkpoint.
 
 ---
 
@@ -37,10 +37,11 @@ Previous checkpoint: 2026-07-02 after D-276A RunPack provenance checkpoint.
 | **D-273A checkpoint HEAD** | see `docs/README.md` after commit (D-273A RunPack AI-return import visibility checkpoint) |
 | **D-276A checkpoint HEAD** | see `docs/README.md` after commit (D-276A RunPack provenance checkpoint) |
 | **D-278A checkpoint HEAD** | see `docs/README.md` after commit (D-278A saved analysis provenance visibility checkpoint) |
+| **D-280A checkpoint HEAD** | see `docs/README.md` after commit (D-280A owner RunPack workflow wording checkpoint) |
 
 ---
 
-## Current baseline (as of D-278A)
+## Current baseline (as of D-280A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -54,7 +55,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3288 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3298 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -530,13 +531,26 @@ This arc surfaced the stored `packet_id` to the owner/private Study view. D-277A
 
 **Tests added in arc:** 25 new tests (3263 → 3288 total). **Deploys:** 1 (D-277C). **Schema migrations applied:** 0. **No backend/API/CSS/index changes.**
 
+### D-279 mini-arc: Owner RunPack workflow wording polish
+
+This arc audited the full owner RunPack workflow for friction, identified that `source snapshot changed` was internal storage language not suited for users, and renamed it. D-279A confirmed no structural gap in the workflow. D-279B was frontend-only. D-279C was the live closeout.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-279A | Audit | Full owner RunPack workflow continuity audit. 15 questions answered. Workflow logically complete. F-2 (`source snapshot changed` wording) identified. Docs only. Baseline unchanged: 3288/0/24/57. |
+| D-279B | Frontend | `detectPacketStaleness()` wording: `'source snapshot changed'` → `'claim updated since packet'`. 3 existing test assertion strings updated. 10 new D-279B block tests. Baseline 3288 → 3298. |
+| D-279C | Live closeout | Owner deploy PASS (2026-07-02). 21/21 live sanity PASS. Deployed Worker version not captured. |
+
+**Detection logic unchanged:** `meta.source_snapshot_hash!=null && simpleClaimHash(selected)!==meta.source_snapshot_hash` — only the pushed string changed.
+**Tests added in arc:** 10 new tests (3288 → 3298 total). **Deploys:** 1 (D-279C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
 |---------|---------|
-| **F-4 snapshot-hash stale check** | **`detectPacketStaleness()` checks `meta.source_snapshot_hash`** — `if(meta.source_snapshot_hash!=null&&simpleClaimHash(selected)!==meta.source_snapshot_hash)w.push('source snapshot changed')` |
+| **F-4 snapshot-hash stale check** | **`detectPacketStaleness()` checks `meta.source_snapshot_hash`** — `if(meta.source_snapshot_hash!=null&&simpleClaimHash(selected)!==meta.source_snapshot_hash)w.push('claim updated since packet')` (D-279B: was `'source snapshot changed'`) |
 | Guard against old packets | `source_snapshot_hash != null` guard — no false positives for packets without the field |
-| Stale reason | `'source snapshot changed'` appended to stale chip |
+| Stale reason | `'claim updated since packet'` appended to stale chip (D-279B; was `'source snapshot changed'`) |
 | For fallback packets | Exact comparison (same `simpleClaimHash` algorithm used at generation) |
 | For backend packets | Coarser comparison — may miss content edits that don't change counts (known acceptable limitation) |
 | **F-5 packet-ID storage** | **`analysis_results.packet_id TEXT` live** — nullable; populated when `saveAnalysisResult()` has a matching `lastPacket` |
@@ -564,7 +578,7 @@ This arc surfaced the stored `packet_id` to the owner/private Study view. D-277A
 | Evidence/pressure/test counts row | Unchanged — always shown |
 | Stale warning chip | Unchanged — fires from `detectPacketStaleness()` |
 | Stale threshold | Unchanged — `3600000ms` (1h) |
-| Source-snapshot-hash stale check | **Added (D-274B)** — `if(meta.source_snapshot_hash!=null&&simpleClaimHash(selected)!==meta.source_snapshot_hash)w.push('source snapshot changed')` |
+| Source-snapshot-hash stale check | **Added (D-274B), wording updated (D-279B)** — `if(meta.source_snapshot_hash!=null&&simpleClaimHash(selected)!==meta.source_snapshot_hash)w.push('claim updated since packet')` |
 | "Load AI Analysis Return" visibility | **Fixed (D-271A)** — `rp-return-section` auto-expands when `lastPacket&&lastPacketClaimId===selected?.id` |
 | Packet-ID storage with analysis | **Added (D-275D live)** — `analysis_results.packet_id` column live; `saveAnalysisResult()` includes `packet_id` from `lastPacket` |
 | `saveAnalysisResult()` parsing | Unchanged — JSON.parse validation; `parsed.output \|\| parsed.result \|\| parsed.analysis \|\| parsed` |
@@ -778,6 +792,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | RunPack provenance internals in public profile | **Blocked** — `detectPacketStaleness`, `simpleClaimHash`, `source_snapshot_hash` stale check, and `packet_id` resolution all absent from `renderPublicProfileHtml`; AI-return import controls remain internal | D-275B tests 12–15 |
 | `analysis_results.packet_id` on public profile | **Not exposed** — `loadPublicProfileSummary` never calls `listAnalysisForClaim`; `packetId` field appears only in authenticated `GET /api/claims/:id` response | D-275C review item 10 |
 | No new public data fields in D-274→D-275 | **Confirmed** — F-4 frontend-only (no new API fields); F-5 adds `packet_id` to `analysis_results` only, not surfaced on public profile | D-274B, D-275B |
+| Stale warning wording in public profile | **Blocked** — `detectPacketStaleness()`, `simpleClaimHash`, `claim updated since packet` wording, and all RunPack stale-detection internals confirmed absent from `renderPublicProfileHtml` | D-279B tests 5–10 |
+| No new public data fields in D-279 | **Confirmed** — frontend-only wording change; zero new API/schema/storage fields; no backend/migration/CSP changes | D-279B |
 
 ---
 
@@ -867,9 +883,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-277A | Audit — no deploy needed |
 | D-277B | Owner deploy PASS — 22/22 live sanity PASS · deployed Worker version not captured |
 | D-277C | Live closeout — no deploy needed (closeout of D-277B deploy) |
-| D-278A (this task) | Docs only — **no deploy needed** |
+| D-278A | Docs only — no deploy needed |
+| D-279A | Audit / docs only — no deploy needed |
+| D-279B | Owner deploy PASS — 21/21 live sanity PASS (D-279C, 2026-07-02) · deployed Worker version not captured |
+| D-279C | Live closeout — no deploy needed (closeout of D-279B deploy) |
+| D-280A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-277C, 2026-07-02) |
+| **Latest deployed Worker** | not captured (D-279C, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1058,6 +1078,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 86. **Frontend-only provenance UI changes still need public-profile non-exposure tests** — even if an implementation is classified as frontend-only, any change to `analysisItem()` or `sectionAnalyses()` must add or preserve tests confirming the new content does not appear in `renderPublicProfileHtml`. Do not remove D-275B tests 13–15 or D-277B tests 8–9 under any refactor.
 
+87. **User-facing RunPack warnings should avoid internal storage/hash language** — stale warning copy must be user-readable. Language like `source snapshot changed` reveals internal hash state and is unsuitable for user-facing display. Future stale-detection copy should describe what the user needs to know (e.g. `claim updated since packet`) not what field changed internally.
+
+88. **Stale-detection copy changes must preserve the underlying comparison logic** — any rename or reword of `detectPacketStaleness()` warning strings must not alter the detection condition (`meta.source_snapshot_hash!=null && simpleClaimHash(selected)!==meta.source_snapshot_hash`), the stale threshold (`3600000ms`), the evidence/test/pressure count checks, or the generated-time check. Copy changes are D-93B-allowlist-gated and require README update before the smoke test passes.
+
+89. **Any future wording polish touching `public/app-v10.js` still needs deploy + live closeout** — frontend-only copy changes are not zero-risk. They require: (1) `node --check` pass, (2) full hardening smoke pass, (3) owner manual terminal deploy, (4) browser live sanity, (5) live closeout docs update. Do not mark a wording change as complete without a live closeout commit.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1082,7 +1108,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Snapshot-hash stale detection | **COMPLETE** — F-4 implemented in D-274B; `source_snapshot_hash` check live in `detectPacketStaleness()` |
 | Packet-ID traceability backend/schema decision | **COMPLETE** — F-5 implemented in D-275B/C/D; `analysis_results.packet_id` live; Worker `759acc15` |
 | Saved analysis provenance visibility | **COMPLETE** — D-277B/C; `analysisItem()` renders `Saved from RunPack: rp_...` when `packetId` exists; live |
-| Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5 and provenance display complete; any further RunPack backend work requires an audit task; frontend-only provenance changes must still add public-profile non-exposure tests |
+| Stale warning wording polish | **COMPLETE** — D-279B/C; `claim updated since packet` live; old `source snapshot changed` removed from UI |
+| Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, and stale wording polish all complete; any further RunPack backend work requires an audit task; frontend-only changes must still add public-profile non-exposure tests |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
@@ -1279,4 +1306,20 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-271A | `f948b0e` | **[Arc start]** RunPack AI-return import visibility polish — `rp-return-section` auto-expands on matching RunPack; `rp-return-next-step` no-auto-publish copy; 27 tests |
 | D-271B | `cc4fec6` | D-271A live closeout — owner deploy PASS; 32/32 live sanity PASS; deployed Worker version not captured |
 | D-272A | `7d6d2bc` | RunPack AI-return import visibility regression lock — 46 tests across 7 categories; D-93B allowlist extended |
-| D-273A | this commit | **[Current]** RunPack AI-return import visibility checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-273A | `checkpoint` | RunPack AI-return import visibility checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-274A | `audit` | F-4 snapshot-hash stale detection audit — feasibility confirmed; frontend-only via `simpleClaimHash(selected)` vs `meta.source_snapshot_hash`; docs only |
+| D-274B | `(D-274C live)` | F-4 stale detection — single `if` block in `detectPacketStaleness()`; 22 new tests + 3 flipped; baseline 3217 → 3239 |
+| D-274C | live closeout | D-274B owner deploy PASS; 24/24 live sanity PASS; deployed Worker version not captured |
+| D-275A | `audit` | F-5 packet-ID storage audit — NOT frontend-only; schema migration required; docs only |
+| D-275B | `branch` | Migration `0017_analysis_results_packet_id.sql`; `src/analysis-results.js`; `public/app-v10.js`; 20 new tests + 3 fixes; baseline 3239 → 3263; branch `d275b-runpack-packet-id-storage` |
+| D-275C | `review` | Pre-merge 22-item checklist; no blocker; docs only on branch |
+| D-275D | `merge+deploy` | Branch merged to main; D1 migration `0017` applied; owner deploy PASS; 22/22 live sanity PASS; Worker `759acc15-a6dd-4e50-a070-0d3356e5c257` |
+| D-276A | `checkpoint` | RunPack provenance checkpoint — `PROJECT_STATE.md` updated; baseline 3263/0/24/57; docs only; no deploy |
+| D-277A | `audit` | Saved analysis provenance visibility audit — `packetId` not rendered; frontend-only safe; docs only |
+| D-277B | `(D-277C live)` | `analysisItem()` conditional provenance line `Saved from RunPack: ${esc(a.packetId)}`; 25 new tests; baseline 3263 → 3288 |
+| D-277C | live closeout | D-277B owner deploy PASS; 22/22 live sanity PASS; deployed Worker version not captured |
+| D-278A | `checkpoint` | Saved analysis provenance visibility checkpoint — `PROJECT_STATE.md` updated; baseline 3288/0/24/57; docs only; no deploy |
+| D-279A | `audit` | Owner RunPack workflow continuity audit — workflow complete; F-2 wording polish identified; docs only |
+| D-279B | `(D-279C live)` | `detectPacketStaleness()` wording: `source snapshot changed` → `claim updated since packet`; 10 new tests; baseline 3288 → 3298 |
+| D-279C | live closeout | D-279B owner deploy PASS; 21/21 live sanity PASS; deployed Worker version not captured |
+| D-280A | this commit | **[Current]** Owner RunPack workflow wording checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
