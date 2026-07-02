@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-296A My HumanX profile setup nudge checkpoint.
-Previous checkpoint: 2026-07-02 after D-294A My HumanX collapsible Profile Settings checkpoint.
+Last updated: 2026-07-02 after D-298A Beta readiness Home Step 5 and My HumanX tab checkpoint.
+Previous checkpoint: 2026-07-02 after D-296A My HumanX profile setup nudge checkpoint.
 
 ---
 
@@ -46,10 +46,11 @@ Previous checkpoint: 2026-07-02 after D-294A My HumanX collapsible Profile Setti
 | **D-292A checkpoint HEAD** | see `docs/README.md` after commit (D-292A My HumanX Recent Truths prominence checkpoint) |
 | **D-294A checkpoint HEAD** | see `docs/README.md` after commit (D-294A My HumanX collapsible Profile Settings checkpoint) |
 | **D-296A checkpoint HEAD** | see `docs/README.md` after commit (D-296A My HumanX profile setup nudge checkpoint) |
+| **D-298A checkpoint HEAD** | see `docs/README.md` after commit (D-298A Beta readiness Home Step 5 and My HumanX tab checkpoint) |
 
 ---
 
-## Current baseline (as of D-296A)
+## Current baseline (as of D-298A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -63,7 +64,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3442 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3462 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -741,6 +742,44 @@ This arc ran a product pass over whether My HumanX needed a "Needs attention" st
 
 **Tests added in arc:** 18 new tests + 7 slice-window widenings (3424 → 3442 total). **Deploys:** 1 (D-295B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
 
+### D-297 mini-arc: Beta readiness Home Step 5 and My HumanX tab
+
+This arc ran a beta readiness product pass (D-297A), concluded that the post-submit path was unguided for first testers, and implemented targeted copy and label fixes (D-297B). D-297C was the live closeout.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-297A | Product pass (docs) | Full 22-question beta readiness pass. Conclusion: inbound flow (Browse → Submit) is clear; the post-submit path (Review pending → My HumanX) is unguided. "Me" tab label does not communicate owner dashboard to a first tester. D-297B candidate classified frontend-only. Docs only. Baseline unchanged: 3462/0/24/57. |
+| D-297B | Frontend | `renderHome()`: added Step 5 to the "Start here" strip — "Track Review: submitted Truths wait for admin approval and appear in My HumanX with a Review badge." `public/index.html`: renamed visible "Me" tab label to "My HumanX" (`id="tab-me"` and `setMode('me')` preserved). 18 new D-297B tests; 4 existing tests updated (label assertion + 3 slice-window widenings). Baseline 3442 → 3462. |
+| D-297C | Live closeout | Owner deploy PASS (2026-07-02). 25/25 live sanity PASS. Deployed Worker version not captured. |
+| D-298A | Checkpoint (docs) | Closes D-297 arc. No deploy. Baseline unchanged 3462/0/24/57. |
+
+**D-297 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| Home Step 5 copy | `"Track Review — submitted Truths wait for admin approval and appear in My HumanX with a Review badge."` |
+| Step 5 explains admin approval | Yes |
+| Step 5 directs to My HumanX | Yes |
+| Step 5 mentions Review badge | Yes |
+| Visible tab label | `My HumanX` |
+| Internal tab id | `tab-me` — unchanged |
+| Tab onclick | `setMode('me')` — unchanged |
+| `renderMe()` | Unchanged |
+| D-285B post-submit navigation | `renderMe()` / `tab-me` / toast — all preserved |
+| Post-submit toast | `"Submitted for Review — you can see it in My HumanX with the Review badge."` |
+| My HumanX data source | `GET /api/my-humanx` — unchanged |
+| Review explanation | `"Review: awaiting admin approval — goes Public when approved."` — unchanged |
+| Yellow Review badge | Preserved — `ME_STATE_CLR.review = 'b-yellow'` unchanged |
+| Truth submission uses `review_state='review'` | Confirmed |
+| No auto-publish | Confirmed |
+| Admin Review only approval path | Confirmed |
+| Public profile `/u/:slug` | Unaffected |
+| Saved analysis | Private — unchanged |
+| Draft Truth from analysis | Draft-only — unchanged |
+| No CSS, backend, schema, API, migration changes in D-297 | Confirmed |
+
+**Tests added in arc:** 18 new tests + 4 existing test updates (3442 → 3462 total). **Deploys:** 1 (D-297B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -1130,9 +1169,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-295A | Docs only — no deploy needed |
 | D-295B | Owner deploy PASS — D-295C confirmed live (27/27) · deployed Worker version not captured |
 | D-295C | Live closeout — no deploy needed (closeout of D-295B deploy) |
-| D-296A (this task) | Docs only — **no deploy needed** |
+| D-296A | Docs only — no deploy needed |
+| D-297A | Docs only — no deploy needed |
+| D-297B | Owner deploy PASS — D-297C confirmed live (25/25) · deployed Worker version not captured |
+| D-297C | Live closeout — no deploy needed (closeout of D-297B deploy) |
+| D-298A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-295C, 2026-07-02) |
+| **Latest deployed Worker** | not captured (D-297B/C, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1375,6 +1418,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 113. **Do not add dismiss/localStorage state for server-derived profile setup nudges unless separately audited** — The profile-setup nudge has no dismiss button and no localStorage. It self-clears via data alone. Any future addition of a dismiss flag, a `localStorage` key, or a server-side `dismissed` column for this nudge requires a separate audit task and explicit owner approval. The D-295B test (no localStorage introduced) must continue to pass.
 
+114. **Home onboarding copy must keep the post-submit Review state understandable to first testers** — The "Start here" Step 5 (`"Track Review — submitted Truths wait for admin approval and appear in My HumanX with a Review badge."`) was added specifically so a first beta tester can find their submission without Mike explaining it. Any future rewrite of the "Start here" strip must preserve a step that covers the post-submit Review pending state. The D-297B tests 1–4 (Step 5 presence and copy content) must continue to pass.
+
+115. **Visible owner-dashboard naming may say `My HumanX`, but internal `tab-me` behavior must remain stable unless separately audited** — The tab was relabelled from `Me` to `My HumanX` for beta clarity. The `id="tab-me"` attribute, the `onclick="setMode('me')"` handler, and the `tab-me` references in JS (post-submit navigation, `renderMe()`) must not be renamed under a copy task alone. Any future rename of the internal `tab-me` id requires an audit of all JS callers and a separate spec. The D-297B tests 5–6 (label and id) must continue to pass.
+
+116. **Beta-readiness improvements should prefer copy/navigation clarity before new backend features** — The D-297A product pass found that all first-tester gaps were copy and navigation, not missing features. Future beta-readiness tasks should exhaust copy/navigation fixes first. A new backend feature, new API endpoint, or new schema column for onboarding purposes requires an audit task with explicit classification before implementation.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1409,9 +1458,11 @@ These are suggestions only. Do not start any until explicitly assigned.
 | My HumanX Recent Truths prominence | **COMPLETE** — D-291A product pass (19 questions); D-291B reorder + Review explanation; D-291C live PASS (24/24); baseline 3405/0/24/57. Recent Truths now visible immediately after filter bar. |
 | My HumanX collapsible Profile Settings | **COMPLETE** — D-293A product pass (15 questions); D-293B `<details>/<summary>` wrap in `meProfileSettingsHtml()`; D-293C live PASS (27/27); baseline 3424/0/24/57. Profile Settings collapses by default; Account card always visible; counts/filter/Truths immediately reachable. |
 | My HumanX profile setup nudge | **COMPLETE** — D-295A product pass (18 questions; general count strip ruled out); D-295B narrow nudge in `renderMeHtml()` (`!profile_public && !profile_slug` only); D-295C live PASS (27/27); baseline 3442/0/24/57. Nudge self-clears once slug set or profile_public true. No dismiss state. No localStorage. No backend/CSS changes. |
+| Beta readiness Home Step 5 and My HumanX tab | **COMPLETE** — D-297A product pass (22 questions; post-submit path unguided identified as top gap); D-297B Home Step 5 + "My HumanX" tab label (internal `tab-me` preserved); D-297C live PASS (25/25); baseline 3462/0/24/57. No backend/CSS/schema changes. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
-| Next owner-dashboard improvement | **Stop** — My HumanX polish arc (D-291→D-295) is complete as of D-296A. Owner-dashboard layout is well-ordered; profile nudge, collapsible settings, and Recent Truths prominence are all live. Do not add further owner-dashboard improvements unless a real live friction appears and is explicitly assigned. Any change to data source, Review state visibility, or public/private boundary must still audit-first. |
+| Next owner-dashboard improvement | **Stop** — My HumanX polish arc (D-291→D-297) is complete as of D-298A. Owner-dashboard layout is well-ordered; profile nudge, collapsible settings, Recent Truths prominence, and beta-readiness onboarding copy are all live. Do not add further owner-dashboard improvements unless a real live friction appears and is explicitly assigned. Any change to data source, Review state visibility, or public/private boundary must still audit-first. |
+| Next beta-readiness work | **Tester script or first-run checklist only if live testing shows confusion** — the Home Step 5 and My HumanX tab changes (D-297B/C) have closed the post-submit gap. No further beta-readiness copy changes are needed unless a real first-tester confusion is reported. A guided first-run checklist or onboarding wizard would require a separate spec before implementation. |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
@@ -1654,4 +1705,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-295A | `audit` | My HumanX "Needs attention" product pass — 18 questions; general strip ruled out; D-295B candidate profile-setup nudge; docs only |
 | D-295B | `(D-295C live)` | `renderMeHtml()` profileNudge const — `!profile_public && !profile_slug` condition; 18 new tests + 7 slice fixes; baseline 3424 → 3442 |
 | D-295C | live closeout | D-295B owner deploy PASS; 27/27 live sanity PASS; deployed Worker version not captured |
-| D-296A | this commit | **[Current]** My HumanX profile setup nudge checkpoint — `PROJECT_STATE.md` updated; safe-next rules 111–113 added; baseline confirmed 3442/0/24/57; docs only; no deploy |
+| D-296A | `caee055` | My HumanX profile setup nudge checkpoint — `PROJECT_STATE.md` updated; safe-next rules 111–113 added; baseline confirmed 3442/0/24/57; docs only; no deploy |
+| D-297A | `b4d29dd` | HumanX beta readiness product pass — 22 questions; post-submit path unguided identified as top gap; "Me" tab label gap identified; D-297B candidate frontend-only; docs only; no deploy |
+| D-297B | `e636ec0` | Home Step 5 added to "Start here" strip; "Me" tab label → "My HumanX" (`tab-me` preserved); 18 new tests + 4 existing updates; baseline 3442 → 3462; deploy needed |
+| D-297C | `f1921af` | D-297B live closeout — owner deploy PASS; 25/25 live sanity PASS; deployed Worker version not captured |
+| D-298A | this commit | **[Current]** Beta readiness Home Step 5 and My HumanX tab checkpoint — `PROJECT_STATE.md` updated; safe-next rules 114–116 added; baseline confirmed 3462/0/24/57; docs only; no deploy |
