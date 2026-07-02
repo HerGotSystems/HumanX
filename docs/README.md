@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3317 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3337 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-286A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint) + D-285 owner pending-Review Truth visibility (see D-286A checkpoint), current baseline 3337/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–98.
 
-### `D286A_OWNER_PENDING_REVIEW_TRUTH_VISIBILITY_CHECKPOINT.md` ⭐ CURRENT — D-286A OWNER PENDING-REVIEW TRUTH VISIBILITY CHECKPOINT — DOCS ONLY
+### `D287A_SAVED_ANALYSIS_ASSISTED_TRUTH_DRAFT_AUDIT.md` ⭐ CURRENT — D-287A SAVED ANALYSIS ASSISTED TRUTH DRAFT AUDIT — DOCS ONLY
+
+Full audit (23 questions) of whether saved AI analysis can assist the owner in drafting a Truth. Key findings: `plainLanguageSummary` is the safest prefill candidate for `truthStatement`; `verdict` must never be used as truth text (it is an AI classification label). A "Draft Truth from analysis" button in `analysisItem()` would be frontend-only — no backend, no schema, no migration. Review gate (`review_state='review'`) fully preserved. Auto-submit and auto-publish remain impossible. D-287B classification: frontend-only, single function (`analysisItem()`). Baseline: 3337/0/24/57 (unchanged). No deploy needed.
+
+### `D286A_OWNER_PENDING_REVIEW_TRUTH_VISIBILITY_CHECKPOINT.md` — D-286A OWNER PENDING-REVIEW TRUTH VISIBILITY CHECKPOINT — DOCS ONLY
 
 Closes the D-285 arc. Records: `GET /api/my-humanx` already returns pending-Review Truths; `meRecentTruthsHtml()` renders yellow `Review` badge; D-285B post-submission navigation live (three paths → My HumanX); D-285C 25/25 live PASS. Safe-next rules 96–98 added. Baseline 3337/0/24/57. No deploy needed.
 
