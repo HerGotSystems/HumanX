@@ -53,9 +53,13 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-290A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint) + D-285 owner pending-Review Truth visibility (see D-286A checkpoint) + D-287 saved analysis assisted Truth draft (see D-288A checkpoint) + D-289 owner workflow product polish / saved-analysis card copy consolidation (see D-290A checkpoint), current baseline 3383/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–104.
 
-### `D291B_MY_HUMANX_RECENT_TRUTHS_PROMINENCE_REVIEW_EXPLANATION.md` ⭐ CURRENT — D-291B MY HUMANX RECENT TRUTHS PROMINENCE — PENDING DEPLOY
+### `D291B_MY_HUMANX_RECENT_TRUTHS_PROMINENCE_REVIEW_EXPLANATION.md` ⭐ CURRENT — D-291C MY HUMANX RECENT TRUTHS PROMINENCE LIVE CLOSEOUT — DOCS ONLY
 
-Moved "Recent Truths" panel immediately after the filter bar in `renderMeHtml()` (was after Recent Claims / Belief Snapshots / Mirror / Reflection / Avatar). Added `"Review: awaiting admin approval — goes Public when approved."` note inside the panel. 20 new regression tests; 2 existing tests updated (D-137E, D-139B) to reflect new section order. Baseline 3383 → 3405 / 0 / 24 / 57. Frontend-only, no backend changes.
+Live closeout for D-291B. Owner deployed 2026-07-02. 24/24 live sanity PASS. D-291B doc updated to mark deploy PASS. README updated from pending deploy to LIVE. Baseline unchanged 3405/0/24/57. No code changes.
+
+### `D291B_MY_HUMANX_RECENT_TRUTHS_PROMINENCE_REVIEW_EXPLANATION.md` — D-291B MY HUMANX RECENT TRUTHS PROMINENCE — LIVE ✓
+
+Moved "Recent Truths" panel immediately after the filter bar in `renderMeHtml()` (was after Recent Claims / Belief Snapshots / Mirror / Reflection / Avatar). Added `"Review: awaiting admin approval — goes Public when approved."` note inside the panel. 20 new regression tests; 2 existing tests updated (D-137E, D-139B) to reflect new section order. Baseline 3383 → 3405 / 0 / 24 / 57. Frontend-only, no backend changes. Owner deployed 2026-07-02 — 24/24 live sanity PASS (D-291C).
 
 ### `D291A_MY_HUMANX_OWNER_DASHBOARD_PRODUCT_PASS.md` — D-291A MY HUMANX OWNER DASHBOARD PRODUCT PASS — DOCS ONLY
 
