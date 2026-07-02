@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-296A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint) + D-285 owner pending-Review Truth visibility (see D-286A checkpoint) + D-287 saved analysis assisted Truth draft (see D-288A checkpoint) + D-289 owner workflow product polish / saved-analysis card copy consolidation (see D-290A checkpoint) + D-291 My HumanX Recent Truths prominence (see D-292A checkpoint) + D-293 My HumanX collapsible Profile Settings (see D-294A checkpoint) + D-295 My HumanX profile setup nudge (see D-296A checkpoint), current baseline 3442/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–113.
 
-### `D296A_MY_HUMANX_PROFILE_SETUP_NUDGE_CHECKPOINT.md` ⭐ CURRENT — D-296A MY HUMANX PROFILE SETUP NUDGE CHECKPOINT — DOCS ONLY
+### `D297A_HUMANX_BETA_READINESS_PRODUCT_PASS.md` ⭐ CURRENT — D-297A HUMANX BETA READINESS PRODUCT PASS — DOCS ONLY
+
+22-question product pass on whether HumanX is ready for a first outside beta tester. Conclusion: mostly yes, but the post-submit experience (Review pending, "Me" tab label) is unguided — a tester who submits a Claim will land on My HumanX with a yellow Review badge and no context. D-297B candidate: add Step 5 to the Home "Start here" strip explaining post-submit Review state + rename "Me" tab to "My HumanX". Classification: frontend-only. Baseline 3442/0/24/57. No deploy needed.
+
+### `D296A_MY_HUMANX_PROFILE_SETUP_NUDGE_CHECKPOINT.md` — D-296A MY HUMANX PROFILE SETUP NUDGE CHECKPOINT — DOCS ONLY
 
 Closes the D-295 arc. Records: D-295A product pass (18 questions; general count-based strip ruled out; profile-setup nudge identified); D-295B `profileNudge` const in `renderMeHtml()` (condition `!profile_public && !profile_slug`; 18 new tests + 7 slice widenings; baseline 3424 → 3442); D-295C live PASS (27/27). Safe-next rules 111–113 added. Baseline 3442/0/24/57. No deploy needed.
 
