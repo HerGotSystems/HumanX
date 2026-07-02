@@ -23836,7 +23836,7 @@ console.log('\nD-248A: Review card metadata density regression lock');
   const sectionAnalysesSlice = appSrc.slice(sectionAnalysesIdx, sectionAnalysesIdx + 1600);
 
   const analysisItemIdx = appSrc.indexOf('function analysisItem(');
-  const analysisItemSlice = appSrc.slice(analysisItemIdx, analysisItemIdx + 1400);
+  const analysisItemSlice = appSrc.slice(analysisItemIdx, analysisItemIdx + 2000);
 
   const pubProfIdx = appSrc.indexOf('renderPublicProfileHtml');
   const pubProfSlice = appSrc.slice(pubProfIdx, pubProfIdx + 4000);
@@ -23999,7 +23999,7 @@ console.log('\nD-248A: Review card metadata density regression lock');
   const saveSlice = appSrc.slice(saveSliceIdx, saveSliceIdx + 1000);
 
   const analysisItemIdx = appSrc.indexOf('function analysisItem(');
-  const analysisItemSlice = appSrc.slice(analysisItemIdx, analysisItemIdx + 1200);
+  const analysisItemSlice = appSrc.slice(analysisItemIdx, analysisItemIdx + 2000);
 
   // 1. submitTruth success path no longer navigates only to renderTruths
   test('D-285B: submitTruth no longer calls renderTruths() after success', () => {
@@ -24153,6 +24153,221 @@ console.log('\nD-248A: Review card metadata density regression lock');
 
   test('D-285B [D-277/D-281 lock]: public profile does not expose Saved from RunPack', () => {
     assert.ok(!pubProfSlice.includes('Saved from RunPack'), '"Saved from RunPack" must not appear in public profile (D-285B lock)');
+  });
+}
+
+// ── Section D-287B: Saved analysis assisted Truth draft ───────────────────────
+{
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+
+  const analysisItemIdx = appSrc.indexOf('function analysisItem(');
+  const analysisItemSlice = appSrc.slice(analysisItemIdx, analysisItemIdx + 2000);
+
+  const draftFnIdx = appSrc.indexOf('async function draftTruthFromAnalysis(');
+  const draftFnSlice = appSrc.slice(draftFnIdx, draftFnIdx + 800);
+
+  const submitTruthIdx = appSrc.indexOf('async function submitTruth(');
+  const submitTruthSlice = appSrc.slice(submitTruthIdx, submitTruthIdx + 800);
+
+  const promoteBeliefIdx = appSrc.indexOf('async function promoteBelief(');
+  const promoteBeliefSlice = appSrc.slice(promoteBeliefIdx, promoteBeliefIdx + 900);
+
+  const pubProfIdx = appSrc.indexOf('function renderPublicProfileHtml(');
+  const pubProfSlice = appSrc.slice(pubProfIdx, pubProfIdx + 4000);
+
+  const sectionAnalysesIdx = appSrc.indexOf('function sectionAnalyses(');
+  const sectionAnalysesSlice = appSrc.slice(sectionAnalysesIdx, sectionAnalysesIdx + 1600);
+
+  const saveSliceIdx = appSrc.indexOf('async function saveAnalysisResult(');
+  const saveSlice = appSrc.slice(saveSliceIdx, saveSliceIdx + 800);
+
+  const staleIdx = appSrc.indexOf('function detectPacketStaleness(');
+  const staleSlice = appSrc.slice(staleIdx, staleIdx + 1200);
+
+  const exportIdx = appSrc.indexOf('function renderExport(');
+  const exportSlice = appSrc.slice(exportIdx, exportIdx + 5000);
+
+  const paramActionsIdx = appSrc.indexOf('const _D181C_PARAM_ACTIONS=');
+  const paramActionsSlice = appSrc.slice(paramActionsIdx, paramActionsIdx + 600);
+
+  // 1. analysisItem renders Draft Truth from analysis button
+  test('D-287B: analysisItem renders "Draft Truth from analysis" button', () => {
+    assert.ok(
+      analysisItemSlice.includes('Draft Truth from analysis'),
+      'analysisItem must render "Draft Truth from analysis" button (D-287B)'
+    );
+  });
+
+  // 2. Draft button is conditional on plainLanguageSummary
+  test('D-287B: draft action is conditional on plainLanguageSummary', () => {
+    assert.ok(
+      analysisItemSlice.includes('a.plainLanguageSummary||raw.plain_language_summary'),
+      'Draft Truth button must be conditional on plainLanguageSummary (D-287B)'
+    );
+  });
+
+  // 3. Draft action uses plainLanguageSummary as data-summary
+  test('D-287B: draft action passes plainLanguageSummary via data-summary', () => {
+    assert.ok(
+      analysisItemSlice.includes('data-summary='),
+      'Draft Truth button must pass summary via data-summary attribute (D-287B)'
+    );
+  });
+
+  // 4. Draft action does not use verdict as Truth content
+  test('D-287B: draft action does not pass verdict as Truth content', () => {
+    assert.ok(
+      !analysisItemSlice.includes('data-summary="${esc(verdict)}') &&
+      !analysisItemSlice.includes("data-summary='${esc(verdict)}"),
+      'Draft Truth button must not use verdict as Truth content (D-287B)'
+    );
+  });
+
+  // 5. Dangerous wording "Publish Truth from analysis" is absent
+  test('D-287B: "Publish Truth from analysis" wording is absent', () => {
+    assert.ok(
+      !analysisItemSlice.includes('Publish Truth from analysis'),
+      '"Publish Truth from analysis" must not appear in analysisItem (D-287B)'
+    );
+  });
+
+  // 6. Draft-only guidance "Draft only" exists
+  test('D-287B: draft-only guidance "Draft only" exists in analysisItem', () => {
+    assert.ok(
+      analysisItemSlice.includes('Draft only'),
+      '"Draft only" guidance must appear in analysisItem (D-287B)'
+    );
+  });
+
+  // 7. Draft-only guidance says owner must review and submit for Review
+  test('D-287B: draft-only guidance says review and submit for Review', () => {
+    assert.ok(
+      analysisItemSlice.includes('submit for Review'),
+      'Draft-only guidance must say "submit for Review" (D-287B)'
+    );
+  });
+
+  // 8. draftTruthFromAnalysis function does not call submitTruth directly
+  test('D-287B: draftTruthFromAnalysis does not call submitTruth()', () => {
+    assert.ok(
+      !draftFnSlice.includes('submitTruth(') && !draftFnSlice.includes('submitBuilderTruth('),
+      'draftTruthFromAnalysis must not call submitTruth() or submitBuilderTruth() (D-287B)'
+    );
+  });
+
+  // 9. draftTruthFromAnalysis does not call approve/reject/review routes
+  test('D-287B: draftTruthFromAnalysis does not call approve/reject/review routes', () => {
+    assert.ok(
+      !draftFnSlice.includes('requestApproveReview') &&
+      !draftFnSlice.includes('requestRejectReview') &&
+      !draftFnSlice.includes('/api/review'),
+      'draftTruthFromAnalysis must not call approve/reject/review routes (D-287B)'
+    );
+  });
+
+  // 10. Existing Truth submission still uses review_state='review' (via submitTruth POST path)
+  test('D-287B: existing Truth submission path still references review_state', () => {
+    assert.ok(
+      submitTruthSlice.includes('review_state') || submitTruthSlice.includes('/api/truths'),
+      'submitTruth must still use the review_state=review path via /api/truths (D-287B)'
+    );
+  });
+
+  // 11. D-285B post-submit navigation: submitTruth still calls renderMe()
+  test('D-287B [D-285B lock]: submitTruth still navigates to renderMe() after submission', () => {
+    assert.ok(
+      submitTruthSlice.includes('await renderMe()'),
+      'submitTruth must still navigate to renderMe() after success (D-287B D-285B lock)'
+    );
+  });
+
+  // 12. D-285B post-submit navigation: submitTruth activates tab-me
+  test('D-287B [D-285B lock]: submitTruth still activates tab-me after submission', () => {
+    assert.ok(
+      submitTruthSlice.includes("'tab-me'"),
+      'submitTruth must still activate tab-me after success (D-287B D-285B lock)'
+    );
+  });
+
+  // 13. D-285B toast preserved
+  test('D-287B [D-285B lock]: post-submit toast "Submitted for Review — you can see it in My HumanX" preserved', () => {
+    assert.ok(
+      submitTruthSlice.includes('Submitted for Review') &&
+      submitTruthSlice.includes('My HumanX') &&
+      submitTruthSlice.includes('Review badge'),
+      'D-285B post-submit toast must be preserved (D-287B lock)'
+    );
+  });
+
+  // 14. Public profile does not expose Draft Truth from analysis
+  test('D-287B: public profile does not expose "Draft Truth from analysis"', () => {
+    assert.ok(
+      !pubProfSlice.includes('Draft Truth from analysis'),
+      '"Draft Truth from analysis" must not appear in public profile (D-287B)'
+    );
+  });
+
+  // 15. Public profile does not expose saved analysis metadata
+  test('D-287B: public profile does not expose saved analysis metadata', () => {
+    assert.ok(
+      !pubProfSlice.includes('analysisItem') && !pubProfSlice.includes('sectionAnalyses'),
+      'Public profile must not expose saved analysis metadata (D-287B)'
+    );
+  });
+
+  // 16. Saved analysis private note still present
+  test('D-287B [D-281B lock]: analysisItem still renders "Private analysis note — not public truth."', () => {
+    assert.ok(
+      analysisItemSlice.includes('Private analysis note') && analysisItemSlice.includes('not public truth'),
+      'analysisItem must still render private note (D-287B D-281B lock)'
+    );
+  });
+
+  // 17. No-auto-publish copy still present in sectionAnalyses
+  test('D-287B [D-281B lock]: sectionAnalyses still says "Saving analysis does not publish a truth automatically"', () => {
+    assert.ok(
+      sectionAnalysesSlice.includes('Saving analysis does not publish a truth automatically'),
+      'sectionAnalyses must still have no-auto-publish copy (D-287B D-281B lock)'
+    );
+  });
+
+  // 18. saveAnalysisResult still posts only to /api/analysis
+  test('D-287B [D-277/D-281 lock]: saveAnalysisResult still posts only to /api/analysis', () => {
+    assert.ok(
+      saveSlice.includes('/api/analysis') && !saveSlice.includes('/api/truths'),
+      'saveAnalysisResult must post only to /api/analysis (D-287B lock)'
+    );
+  });
+
+  // 19. AI-return import locks preserved
+  test('D-287B [D-271/D-272 lock]: rp-return-section still present in renderExport', () => {
+    assert.ok(exportSlice.includes('rp-return-section'), 'rp-return-section must still be in renderExport (D-287B lock)');
+  });
+
+  // 20. Stale detection locks preserved
+  test('D-287B [D-274/D-279 lock]: detectPacketStaleness still pushes "claim updated since packet"', () => {
+    assert.ok(staleSlice.includes('claim updated since packet'), 'detectPacketStaleness must still push stale reason (D-287B lock)');
+  });
+
+  // 21. Packet-ID / provenance locks preserved
+  test('D-287B [D-275/D-277 lock]: analysisItem still renders "Saved from RunPack" provenance line', () => {
+    assert.ok(analysisItemSlice.includes('Saved from RunPack:'), 'analysisItem must still render "Saved from RunPack:" provenance (D-287B lock)');
+  });
+
+  // 22. draftTruthFromAnalysis registered in param actions (not zero-param)
+  test('D-287B: draftTruthFromAnalysis is registered in _D181C_PARAM_ACTIONS', () => {
+    assert.ok(
+      paramActionsSlice.includes('draftTruthFromAnalysis'),
+      'draftTruthFromAnalysis must be registered in _D181C_PARAM_ACTIONS (D-287B)'
+    );
+  });
+
+  // 23. No CSS changes — styles.css not referenced by draftTruthFromAnalysis
+  test('D-287B: draftTruthFromAnalysis function exists in app-v10.js only (no worker/schema change)', () => {
+    assert.ok(
+      draftFnIdx >= 0,
+      'draftTruthFromAnalysis must exist in app-v10.js (D-287B)'
+    );
   });
 }
 
