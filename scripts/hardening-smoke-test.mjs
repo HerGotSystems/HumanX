@@ -23600,9 +23600,9 @@ console.log('\nD-248A: Review card metadata density regression lock');
   const pubProfEnd277 = appSrc.indexOf('\n', pubProfIdx277 + 1);
   const pubProfSlice277 = appSrc.slice(pubProfIdx277, pubProfEnd277 > pubProfIdx277 ? pubProfEnd277 : pubProfIdx277 + 4000);
 
-  // 1. analysisItem renders "Saved from RunPack:"
-  test('D-277B: analysisItem renders "Saved from RunPack:" provenance line', () => {
-    assert.ok(aiSlice277.includes('Saved from RunPack:'), 'analysisItem must contain "Saved from RunPack:" provenance line');
+  // 1. analysisItem renders RunPack provenance (consolidated in D-289B — now "RunPack:")
+  test('D-277B: analysisItem renders RunPack provenance (consolidated compact form)', () => {
+    assert.ok(aiSlice277.includes('RunPack:'), 'analysisItem must contain RunPack provenance');
   });
 
   // 2. Provenance line uses a.packetId
@@ -23623,9 +23623,10 @@ console.log('\nD-248A: Review card metadata density regression lock');
     );
   });
 
-  // 5. Provenance line uses ev-origin-note and small classes
+  // 5. Provenance line uses ev-origin-note and small classes (D-289B: consolidated; checked via RunPack: offset)
   test('D-277B: analysisItem provenance line uses ev-origin-note and small classes', () => {
-    const provenanceZone = aiSlice277.slice(aiSlice277.indexOf('Saved from RunPack:') - 100, aiSlice277.indexOf('Saved from RunPack:') + 50);
+    const rpIdx = aiSlice277.indexOf('RunPack:');
+    const provenanceZone = aiSlice277.slice(Math.max(0, rpIdx - 100), rpIdx + 50);
     assert.ok(
       provenanceZone.includes('ev-origin-note') && provenanceZone.includes('small'),
       'provenance line must use existing ev-origin-note and small classes'
@@ -23817,10 +23818,10 @@ console.log('\nD-248A: Review card metadata density regression lock');
   });
 
   // 7. D-277 provenance visibility locks preserved
-  test('D-279B [D-277 lock]: analysisItem still renders "Saved from RunPack:" provenance line', () => {
+  test('D-279B [D-277 lock]: analysisItem still renders RunPack provenance (D-289B: consolidated to "RunPack:")', () => {
     const aiIdx = appSrc.indexOf('function analysisItem(');
     const aiSlice = appSrc.slice(aiIdx, aiIdx + 1200);
-    assert.ok(aiSlice.includes('Saved from RunPack:'), 'analysisItem must still render "Saved from RunPack:" provenance line');
+    assert.ok(aiSlice.includes('RunPack:'), 'analysisItem must still render RunPack provenance (consolidated in D-289B)');
   });
 
   test('D-279B [D-277 lock]: renderPublicProfileHtml does not expose "Saved from RunPack"', () => {
@@ -23864,10 +23865,10 @@ console.log('\nD-248A: Review card metadata density regression lock');
     );
   });
 
-  test('D-281B: analysisItem contains private-analysis note', () => {
+  test('D-281B: analysisItem contains private-analysis note (D-289B: consolidated to "Private analysis")', () => {
     assert.ok(
-      analysisItemSlice.includes('Private analysis note'),
-      'analysisItem must contain "Private analysis note"'
+      analysisItemSlice.includes('Private analysis'),
+      'analysisItem must contain "Private analysis"'
     );
   });
 
@@ -23960,8 +23961,8 @@ console.log('\nD-248A: Review card metadata density regression lock');
     );
   });
 
-  test('D-281B [D-277 lock]: analysisItem still renders Saved from RunPack provenance line', () => {
-    assert.ok(analysisItemSlice.includes('Saved from RunPack:'), 'analysisItem must still render "Saved from RunPack:" provenance line');
+  test('D-281B [D-277 lock]: analysisItem still renders RunPack provenance (D-289B: consolidated to "RunPack:")', () => {
+    assert.ok(analysisItemSlice.includes('RunPack:'), 'analysisItem must still render RunPack provenance');
   });
 
   test('D-281B [D-277 lock]: public profile does not expose Saved from RunPack', () => {
@@ -24147,8 +24148,8 @@ console.log('\nD-248A: Review card metadata density regression lock');
     );
   });
 
-  test('D-285B [D-277/D-281 lock]: analysisItem still renders Saved from RunPack provenance line', () => {
-    assert.ok(analysisItemSlice.includes('Saved from RunPack:'), 'analysisItem must still render "Saved from RunPack:" provenance line (D-285B lock)');
+  test('D-285B [D-277/D-281 lock]: analysisItem still renders RunPack provenance (D-289B: consolidated to "RunPack:")', () => {
+    assert.ok(analysisItemSlice.includes('RunPack:'), 'analysisItem must still render RunPack provenance (D-285B lock, consolidated in D-289B)');
   });
 
   test('D-285B [D-277/D-281 lock]: public profile does not expose Saved from RunPack', () => {
@@ -24315,11 +24316,11 @@ console.log('\nD-248A: Review card metadata density regression lock');
     );
   });
 
-  // 16. Saved analysis private note still present
-  test('D-287B [D-281B lock]: analysisItem still renders "Private analysis note — not public truth."', () => {
+  // 16. Saved analysis private note still present (D-289B: consolidated to "Private analysis · not public truth")
+  test('D-287B [D-281B lock]: analysisItem still renders private note and not-public-truth (consolidated in D-289B)', () => {
     assert.ok(
-      analysisItemSlice.includes('Private analysis note') && analysisItemSlice.includes('not public truth'),
-      'analysisItem must still render private note (D-287B D-281B lock)'
+      analysisItemSlice.includes('Private analysis') && analysisItemSlice.includes('not public truth'),
+      'analysisItem must still render private/not-public-truth note (D-287B D-281B lock, consolidated in D-289B)'
     );
   });
 
@@ -24349,9 +24350,9 @@ console.log('\nD-248A: Review card metadata density regression lock');
     assert.ok(staleSlice.includes('claim updated since packet'), 'detectPacketStaleness must still push stale reason (D-287B lock)');
   });
 
-  // 21. Packet-ID / provenance locks preserved
-  test('D-287B [D-275/D-277 lock]: analysisItem still renders "Saved from RunPack" provenance line', () => {
-    assert.ok(analysisItemSlice.includes('Saved from RunPack:'), 'analysisItem must still render "Saved from RunPack:" provenance (D-287B lock)');
+  // 21. Packet-ID / provenance locks preserved (D-289B: consolidated to "RunPack:")
+  test('D-287B [D-275/D-277 lock]: analysisItem still renders RunPack provenance (consolidated in D-289B)', () => {
+    assert.ok(analysisItemSlice.includes('RunPack:'), 'analysisItem must still render RunPack provenance (D-287B lock)');
   });
 
   // 22. draftTruthFromAnalysis registered in param actions (not zero-param)
@@ -24368,6 +24369,199 @@ console.log('\nD-248A: Review card metadata density regression lock');
       draftFnIdx >= 0,
       'draftTruthFromAnalysis must exist in app-v10.js (D-287B)'
     );
+  });
+}
+
+// ── Section D-289B: Saved analysis card context copy consolidation ────────────
+{
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const cssSrc289 = readFileSync(path.join(__dirname, '../public/styles.css'), 'utf8');
+
+  const analysisItemIdx = appSrc.indexOf('function analysisItem(');
+  const analysisItemSlice = appSrc.slice(analysisItemIdx, analysisItemIdx + 2000);
+
+  const draftFnIdx = appSrc.indexOf('async function draftTruthFromAnalysis(');
+  const draftFnSlice = appSrc.slice(draftFnIdx, draftFnIdx + 800);
+
+  const pubProfIdx = appSrc.indexOf('renderPublicProfileHtml');
+  const pubProfSlice = appSrc.slice(pubProfIdx, pubProfIdx + 4000);
+
+  const saveSliceIdx = appSrc.indexOf('async function saveAnalysisResult(');
+  const saveSlice = appSrc.slice(saveSliceIdx, saveSliceIdx + 800);
+
+  const submitTruthIdx = appSrc.indexOf('async function submitTruth(');
+  const submitTruthSlice = appSrc.slice(submitTruthIdx, submitTruthIdx + 800);
+
+  const staleIdx = appSrc.indexOf('function detectPacketStaleness(');
+  const staleSlice = appSrc.slice(staleIdx, staleIdx + 1200);
+
+  const exportIdx = appSrc.indexOf('function renderExport(');
+  const exportSlice = appSrc.slice(exportIdx, exportIdx + 5000);
+
+  // 1. Compact context block present
+  test('D-289B: analysisItem contains consolidated "Private analysis" context copy', () => {
+    assert.ok(analysisItemSlice.includes('Private analysis'), 'analysisItem must contain "Private analysis" in consolidated block');
+  });
+
+  // 2. not public truth still present
+  test('D-289B: analysisItem still says "not public truth"', () => {
+    assert.ok(analysisItemSlice.includes('not public truth'), 'analysisItem must still say "not public truth"');
+  });
+
+  // 3. not independent verification still present
+  test('D-289B: analysisItem still says "not independent verification"', () => {
+    assert.ok(analysisItemSlice.includes('not independent verification'), 'analysisItem must still say "not independent verification"');
+  });
+
+  // 4. RunPack provenance still conditionally rendered
+  test('D-289B: analysisItem still conditionally includes RunPack provenance when a.packetId exists', () => {
+    assert.ok(
+      analysisItemSlice.includes('a.packetId?') || analysisItemSlice.includes('a.packetId ?'),
+      'analysisItem must still gate RunPack provenance on a.packetId'
+    );
+    assert.ok(analysisItemSlice.includes('RunPack:'), 'analysisItem must still render "RunPack:" provenance label');
+  });
+
+  // 5. Packet ID still escaped
+  test('D-289B: analysisItem still escapes packet ID with esc(a.packetId)', () => {
+    assert.ok(analysisItemSlice.includes('esc(a.packetId)'), 'analysisItem must still escape a.packetId with esc()');
+  });
+
+  // 6. Old separate "Private analysis note — not public truth." line is gone
+  test('D-289B: analysisItem does not render separate "Private analysis note — not public truth." line', () => {
+    assert.ok(
+      !analysisItemSlice.includes('Private analysis note — not public truth'),
+      'Old separate "Private analysis note — not public truth." must not appear (consolidated in D-289B)'
+    );
+  });
+
+  // 7. Old separate "Saved from RunPack:" label is gone
+  test('D-289B: analysisItem does not render old separate "Saved from RunPack:" label', () => {
+    assert.ok(
+      !analysisItemSlice.includes('Saved from RunPack:'),
+      'Old separate "Saved from RunPack:" label must not appear (consolidated in D-289B)'
+    );
+  });
+
+  // 8. RunPack provenance not removed entirely
+  test('D-289B: analysisItem has not removed RunPack provenance entirely', () => {
+    assert.ok(analysisItemSlice.includes('RunPack:'), 'RunPack provenance must not be removed entirely');
+  });
+
+  // 9. No-packet case does not show RunPack text
+  test('D-289B: no-packet case does not show RunPack text', () => {
+    // The conditional is: a.packetId ? `...RunPack: ${esc(a.packetId)}...` : '...no RunPack...'
+    // Verify the else branch (after the colon) contains no "RunPack:"
+    const condIdx = analysisItemSlice.indexOf('a.packetId?');
+    const condSlice = analysisItemSlice.slice(condIdx, condIdx + 400);
+    // Find the ternary else branch — after the closing backtick of the truthy branch
+    const afterTrueEnd = condSlice.indexOf(":'<p");
+    assert.ok(afterTrueEnd >= 0, 'ternary else branch for no-packet case must be present');
+    const elseSlice = condSlice.slice(afterTrueEnd);
+    assert.ok(!elseSlice.includes('RunPack:'), 'no-packet else branch must not contain "RunPack:"');
+  });
+
+  // 10. Draft Truth from analysis button remains present
+  test('D-289B: "Draft Truth from analysis" button remains present in analysisItem', () => {
+    assert.ok(analysisItemSlice.includes('Draft Truth from analysis'), '"Draft Truth from analysis" must still be present (D-289B)');
+  });
+
+  // 11. Draft action still uses plainLanguageSummary
+  test('D-289B: draft action still uses plainLanguageSummary', () => {
+    assert.ok(
+      analysisItemSlice.includes('a.plainLanguageSummary||raw.plain_language_summary'),
+      'draft action must still be conditional on plainLanguageSummary'
+    );
+  });
+
+  // 12. Draft action does not use verdict as Truth content
+  test('D-289B: draft action does not use verdict as Truth content', () => {
+    assert.ok(
+      !analysisItemSlice.includes('data-summary="${esc(verdict)}"'),
+      'draft action must not use verdict as truth content'
+    );
+  });
+
+  // 13. draftTruthFromAnalysis does not call submitTruth
+  test('D-289B: draftTruthFromAnalysis does not call submitTruth()', () => {
+    assert.ok(!draftFnSlice.includes('submitTruth('), 'draftTruthFromAnalysis must not call submitTruth()');
+    assert.ok(!draftFnSlice.includes('submitBuilderTruth('), 'draftTruthFromAnalysis must not call submitBuilderTruth()');
+  });
+
+  // 14. saveAnalysisResult still posts only to /api/analysis
+  test('D-289B: saveAnalysisResult still posts only to /api/analysis', () => {
+    assert.ok(saveSlice.includes('/api/analysis'), 'saveAnalysisResult must post to /api/analysis');
+    assert.ok(!saveSlice.includes('/api/truths'), 'saveAnalysisResult must not post to /api/truths');
+    assert.ok(!saveSlice.includes('/api/review'), 'saveAnalysisResult must not post to /api/review');
+  });
+
+  // 15. Public profile does not expose private analysis metadata
+  test('D-289B: public profile does not expose saved analysis metadata, packetId, or Draft Truth copy', () => {
+    assert.ok(!pubProfSlice.includes('analysisItem'), 'renderPublicProfileHtml must not call analysisItem');
+    assert.ok(!pubProfSlice.includes('packetId'), 'packetId must not appear in public profile');
+    assert.ok(!pubProfSlice.includes('Draft Truth from analysis'), '"Draft Truth from analysis" must not appear in public profile');
+  });
+
+  // 16. Review/moderation handlers unchanged
+  test('D-289B: Review/moderation handlers remain unchanged', () => {
+    assert.ok(appSrc.includes('requestApproveReview'), 'requestApproveReview must still be defined');
+    assert.ok(appSrc.includes('requestRejectReview'), 'requestRejectReview must still be defined');
+    assert.ok(appSrc.includes('reviewDecisionUI'), 'reviewDecisionUI must still be defined');
+  });
+
+  // 17. Truth submission still uses review_state
+  test('D-289B: Truth submission still references review_state', () => {
+    assert.ok(submitTruthSlice.includes('review_state') || appSrc.includes('review_state'), 'Truth submission must still produce review_state=review');
+  });
+
+  // 18. D-285B post-submit navigation preserved
+  test('D-289B [D-285B lock]: post-submit navigation to My HumanX preserved', () => {
+    assert.ok(submitTruthSlice.includes('renderMe()'), 'submitTruth must still call renderMe() after submission');
+    assert.ok(submitTruthSlice.includes('tab-me'), 'submitTruth must still activate tab-me after submission');
+    assert.ok(
+      submitTruthSlice.includes('Submitted for Review') && submitTruthSlice.includes('My HumanX with the Review badge'),
+      'submitTruth post-submit toast must still be preserved'
+    );
+  });
+
+  // 19. Stale detection preserved
+  test('D-289B [D-274/D-279 lock]: stale detection locks preserved', () => {
+    assert.ok(staleSlice.includes('claim updated since packet'), 'detectPacketStaleness must still push "claim updated since packet"');
+    assert.ok(staleSlice.includes('meta.source_snapshot_hash'), 'detectPacketStaleness must still check meta.source_snapshot_hash');
+    assert.ok(staleSlice.includes('simpleClaimHash(selected)'), 'detectPacketStaleness must still call simpleClaimHash(selected)');
+  });
+
+  // 20. AI-return import locks preserved
+  test('D-289B [D-271/D-272 lock]: AI-return import locks preserved', () => {
+    assert.ok(exportSlice.includes('rp-return-section'), 'rp-return-section must still be in renderExport');
+    assert.ok(appSrc.includes('Load AI Analysis Return'), '"Load AI Analysis Return" must still be present');
+    assert.ok(appSrc.includes('Saving does not publish a truth automatically'), '"Saving does not publish a truth automatically" must still be present');
+    assert.ok(saveSlice.includes('JSON.parse'), 'saveAnalysisResult must still use JSON.parse validation');
+    assert.ok(
+      saveSlice.includes('parsed.output') && saveSlice.includes('parsed.result') && saveSlice.includes('parsed.analysis'),
+      'saveAnalysisResult field extraction must still be present'
+    );
+  });
+
+  // 21. No CSS changes
+  test('D-289B: No CSS changes made (styles.css unchanged)', () => {
+    assert.ok(!cssSrc289.includes('D-289B'), 'styles.css must not be modified by D-289B');
+  });
+
+  // 22. No backend/API/schema/storage changes
+  test('D-289B: No backend/API/schema/storage changes', () => {
+    const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+    const analysisSrc = readFileSync(path.join(__dirname, '../src/analysis-results.js'), 'utf8');
+    const truthsSrc = readFileSync(path.join(__dirname, '../src/truths.js'), 'utf8');
+    assert.ok(!workerSrc.includes('D-289B'), 'src/worker.js must not be modified by D-289B');
+    assert.ok(!analysisSrc.includes('D-289B'), 'src/analysis-results.js must not be modified by D-289B');
+    assert.ok(!truthsSrc.includes('D-289B'), 'src/truths.js must not be modified by D-289B');
+  });
+
+  // 23. Drift/Belief expansion files untouched
+  test('D-289B: Drift/Belief expansion files remain untouched', () => {
+    const driftSrc = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(!driftSrc.includes('D-289B'), 'belief-drift-expansion.js must not be modified by D-289B');
   });
 }
 
