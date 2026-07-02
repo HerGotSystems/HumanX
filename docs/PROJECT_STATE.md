@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-273A RunPack AI-return import visibility checkpoint.
-Previous checkpoint: 2026-07-01 after D-270A RunPack fallback guidance / generated-time checkpoint.
+Last updated: 2026-07-02 after D-276A RunPack provenance checkpoint.
+Previous checkpoint: 2026-07-02 after D-273A RunPack AI-return import visibility checkpoint.
 
 ---
 
@@ -35,10 +35,11 @@ Previous checkpoint: 2026-07-01 after D-270A RunPack fallback guidance / generat
 | **D-267A checkpoint HEAD** | see `docs/README.md` after commit (D-267A Study entry / Back button style checkpoint) |
 | **D-270A checkpoint HEAD** | see `docs/README.md` after commit (D-270A RunPack fallback guidance / generated-time checkpoint) |
 | **D-273A checkpoint HEAD** | see `docs/README.md` after commit (D-273A RunPack AI-return import visibility checkpoint) |
+| **D-276A checkpoint HEAD** | see `docs/README.md` after commit (D-276A RunPack provenance checkpoint) |
 
 ---
 
-## Current baseline (as of D-273A)
+## Current baseline (as of D-276A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -52,7 +53,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3217 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3263 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -495,9 +496,45 @@ This arc addressed D-268A finding F-3 (Load AI Analysis Return section always co
 | `saveAnalysisResult` success toast | Unchanged — "Analysis saved — verdict shown in the Analysis section." |
 | `saveAnalysisResult` route | Unchanged — posts to `/api/analysis` only |
 | Public truth state | Unchanged — analysis save does not change `review_state` |
-| `packet_id` advisory check | Advisory-only non-blocking toast — unchanged (F-5 deferred) |
-| F-4 snapshot-hash stale check | Not added (F-4 deferred) |
-| F-5 packet-ID storage | Not added (F-5 deferred) |
+| `packet_id` advisory check | Advisory-only non-blocking toast — unchanged |
+| F-4 snapshot-hash stale check | **Added (D-274B)** — `source snapshot changed` fired when `simpleClaimHash(selected) !== meta.source_snapshot_hash` |
+| F-5 packet-ID storage | **Added (D-275D live)** — `packet_id` stored in `analysis_results` when `lastPacketClaimId===selected?.id` |
+
+### D-274→D-275 mini-arc: RunPack provenance (snapshot-hash stale detection + packet-ID storage)
+
+This arc addressed D-268A findings F-4 and F-5, implementing content-level stale detection and packet-ID traceability for saved AI analysis results. F-4 was frontend-only; F-5 required schema migration + backend + frontend and used branch/PR workflow.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-274A | Audit | F-4 snapshot-hash stale detection audit. Frontend-only feasible via `simpleClaimHash(selected)` vs `meta.source_snapshot_hash`. Docs only. Baseline unchanged: 3239/0/24/57. |
+| D-274B | Feature | Single `if` block in `detectPacketStaleness()`. 22 new tests + 3 prior F-4-deferred tests flipped. Baseline 3217 → 3239. |
+| D-274C | Live closeout | Owner deploy PASS (2026-07-02). 24/24 live sanity PASS. Deployed Worker version not captured. |
+| D-275A | Audit | F-5 packet-ID storage audit. NOT frontend-only — requires schema migration + backend + frontend. Docs only. Baseline unchanged: 3239/0/24/57. |
+| D-275B | Branch implementation | Migration `0017_analysis_results_packet_id.sql`, `src/analysis-results.js`, `public/app-v10.js`. 20 new tests + 3 slice-width fixes. Baseline 3239 → 3263. Branch `d275b-runpack-packet-id-storage`. |
+| D-275C | Pre-merge review | 22-item checklist. No blocker. Docs only on branch. |
+| D-275D | Merge + migration + deploy | Branch merged to main. D1 migration applied live. Owner deploy PASS (2026-07-02). 22/22 live sanity PASS. Worker: `759acc15-a6dd-4e50-a070-0d3356e5c257`. |
+| D-276A | Checkpoint | Docs only — no deploy. Baseline unchanged 3263/0/24/57. |
+
+**Tests added in arc:** 42 new tests (3217 → 3263 total). **Deploys:** 2 (D-274C, D-275D). **Schema migrations applied:** 1 (`0017`). **F-3, F-4, F-5 all COMPLETE.**
+
+### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
+
+| Feature | Behavior |
+|---------|---------|
+| **F-4 snapshot-hash stale check** | **`detectPacketStaleness()` checks `meta.source_snapshot_hash`** — `if(meta.source_snapshot_hash!=null&&simpleClaimHash(selected)!==meta.source_snapshot_hash)w.push('source snapshot changed')` |
+| Guard against old packets | `source_snapshot_hash != null` guard — no false positives for packets without the field |
+| Stale reason | `'source snapshot changed'` appended to stale chip |
+| For fallback packets | Exact comparison (same `simpleClaimHash` algorithm used at generation) |
+| For backend packets | Coarser comparison — may miss content edits that don't change counts (known acceptable limitation) |
+| **F-5 packet-ID storage** | **`analysis_results.packet_id TEXT` live** — nullable; populated when `saveAnalysisResult()` has a matching `lastPacket` |
+| Frontend source | `JSON.parse(lastPacket).packet_id` — from session packet, NOT from AI return JSON |
+| Frontend gate | `lastPacket && lastPacketClaimId === selected?.id` — prevents stale cross-claim ID |
+| Backend sanitizer | `cleanText(body.packet_id \|\| '', 80) \|\| null` — NOT `cleanId()` (preserves `rp_*` underscores) |
+| Historical rows | `packet_id = NULL` — no data loss; existing saves unaffected |
+| `mapAnalysis()` return | `packetId: a.packet_id \|\| null` |
+| `packet_id` in `GET /api/claims/:id` | Present in `analyses` array — non-sensitive metadata identifier |
+| Public profile exposure | None — `loadPublicProfileSummary` never calls `listAnalysisForClaim` |
+| Advisory mismatch toast | Unchanged — still non-blocking |
 
 ### Current RunPack fallback packet behavior (post D-268B)
 
@@ -514,9 +551,9 @@ This arc addressed D-268A finding F-3 (Load AI Analysis Return section always co
 | Evidence/pressure/test counts row | Unchanged — always shown |
 | Stale warning chip | Unchanged — fires from `detectPacketStaleness()` |
 | Stale threshold | Unchanged — `3600000ms` (1h) |
-| Source-snapshot-hash stale check | Not added (F-4 deferred) |
-| "Load AI Analysis Return" visibility | Not changed (F-3 deferred) |
-| Packet-ID storage with analysis | Not added (F-5 deferred) |
+| Source-snapshot-hash stale check | **Added (D-274B)** — `if(meta.source_snapshot_hash!=null&&simpleClaimHash(selected)!==meta.source_snapshot_hash)w.push('source snapshot changed')` |
+| "Load AI Analysis Return" visibility | **Fixed (D-271A)** — `rp-return-section` auto-expands when `lastPacket&&lastPacketClaimId===selected?.id` |
+| Packet-ID storage with analysis | **Added (D-275D live)** — `analysis_results.packet_id` column live; `saveAnalysisResult()` includes `packet_id` from `lastPacket` |
 | `saveAnalysisResult()` parsing | Unchanged — JSON.parse validation; `parsed.output \|\| parsed.result \|\| parsed.analysis \|\| parsed` |
 | `packet_id` mismatch check | Advisory-only non-blocking toast — unchanged |
 | Public truth state | Unchanged — analysis save does not change review_state |
@@ -725,6 +762,9 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-265→D-266 | **Confirmed** — CSS/copy-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-266A |
 | RunPack / Investigation Packet internals in public profile | **Blocked** — `generateRunPack`, `saveAnalysisResult`, `runPackSummary`, `renderExport`, `rpRelativeTime`, and all RunPack internal controls confirmed absent from `renderPublicProfileHtml` | D-269A |
 | No new public data fields in D-268→D-269 | **Confirmed** — frontend-only change; zero new API/schema fields; no backend/API/migration/schema/CSP changes | D-269A |
+| RunPack provenance internals in public profile | **Blocked** — `detectPacketStaleness`, `simpleClaimHash`, `source_snapshot_hash` stale check, and `packet_id` resolution all absent from `renderPublicProfileHtml`; AI-return import controls remain internal | D-275B tests 12–15 |
+| `analysis_results.packet_id` on public profile | **Not exposed** — `loadPublicProfileSummary` never calls `listAnalysisForClaim`; `packetId` field appears only in authenticated `GET /api/claims/:id` response | D-275C review item 10 |
+| No new public data fields in D-274→D-275 | **Confirmed** — F-4 frontend-only (no new API fields); F-5 adds `packet_id` to `analysis_results` only, not surfaced on public profile | D-274B, D-275B |
 
 ---
 
@@ -802,8 +842,17 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-271A | Owner deploy PASS — D-271B confirmed live (32/32) · deployed Worker version not captured |
 | D-271B | Live closeout — no deploy needed (closeout of D-271A deploy) |
 | D-272A | Tests / docs only — no deploy needed |
-| D-273A (this task) | Docs only — **no deploy needed** |
+| D-273A | Docs only — no deploy needed |
+| D-274A | Audit — no deploy needed |
+| D-274B | Owner deploy PASS — D-274C confirmed live (24/24) · deployed Worker version not captured |
+| D-274C | Live closeout — no deploy needed (closeout of D-274B deploy) |
+| D-275A | Audit — no deploy needed |
+| D-275B | Branch `d275b-runpack-packet-id-storage` — no standalone deploy (branch-only) |
+| D-275C | Pre-merge review — no deploy needed |
+| D-275D | Owner deploy PASS — 22/22 live sanity PASS · D1 migration `0017` applied · deployed Worker: `759acc15-a6dd-4e50-a070-0d3356e5c257` |
+| D-276A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
+| **Latest deployed Worker** | `759acc15-a6dd-4e50-a070-0d3356e5c257` (D-275D, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -980,6 +1029,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 80. **Next RunPack backend work (F-4/F-5) must be branch/PR style** — any implementation of snapshot-hash stale detection (F-4) or packet-ID storage (F-5) requires a backend/schema change and must follow branch/PR workflow with explicit owner approval before merge. Do not add these under any frontend-only or docs-only task.
 
+81. **Future analysis-result storage changes require branch/PR workflow** — any change to `analysis_results` schema, `addAnalysisResult()`, or the POST body accepted by `/api/analysis` requires a branch/PR-style workflow with explicit owner approval before merge. This includes adding new columns, changing sanitizer logic, or modifying the INSERT column list.
+
+82. **Do not use `cleanId()` for `rp_*` packet IDs** — `cleanId()` strips underscores, which corrupts `rp_abc123_lc2x9k`-format IDs. Use `cleanText(value, 80)` instead for any field that may contain `rp_*` values. Do not switch back to `cleanId()` for packet-ID sanitization.
+
+83. **Do not assume public profile exposes analysis metadata** — `loadPublicProfileSummary()` does not call `listAnalysisForClaim()`. `analysis_results.packet_id` and `packetId` in `GET /api/claims/:id` are authenticated-only fields. Verify `/u/:slug` separately from authenticated claim detail routes before assuming any analysis field is public.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1001,8 +1056,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Lane | Notes |
 |------|-------|
 | RunPack AI-return import visibility | **COMPLETE** — F-3 addressed in D-271A/B; regression-locked in D-272A |
-| Snapshot-hash stale detection | F-4 deferred — compare `source_snapshot_hash` in `detectPacketStaleness()` for content-level staleness; requires backend/schema decision |
-| Packet-ID traceability backend/schema decision | F-5 deferred — store `packet_id` with saved analysis; requires schema migration |
+| Snapshot-hash stale detection | **COMPLETE** — F-4 implemented in D-274B; `source_snapshot_hash` check live in `detectPacketStaleness()` |
+| Packet-ID traceability backend/schema decision | **COMPLETE** — F-5 implemented in D-275B/C/D; `analysis_results.packet_id` live; Worker `759acc15` |
+| Next RunPack work | **Audit-first** — F-3/F-4/F-5 complete; any further RunPack backend work requires an audit task before implementation unless frontend-only |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
@@ -1023,6 +1079,7 @@ These are suggestions only. Do not start any until explicitly assigned.
 | No Wrangler / D1 commands | `wrangler d1 execute`, `wrangler deploy`, and all variants are off-limits unless the user explicitly requests them. |
 | No live write smoke | `scripts/write-endpoint-smoke-test.mjs` requires explicit per-session user approval. Do not run routinely. |
 | Migration 0007 applied — do not re-apply | `migrations/0007_add_evidence_review_state.sql` was applied manually via Cloudflare D1 Console on 2026-06-06 (D-42A). `evidence.review_state TEXT DEFAULT 'public'` and `evidence.report_count INTEGER DEFAULT 0` now exist in production. Both indexes confirmed present. Running the migration again will fail with "duplicate column name". Do not re-apply. Full record in `docs/D42A_EVIDENCE_MIGRATION_APPLY_RESULT.md`. |
+| Migration 0017 applied — do not re-apply | `migrations/0017_analysis_results_packet_id.sql` was applied to live `humanx` D1 (f68709d8-b93a-4e5b-8a0e-5b58cc357125) in D-275D (2026-07-02). `analysis_results.packet_id TEXT` (nullable) now exists in production. Do not re-apply. Re-running will fail with "duplicate column name". |
 
 ---
 
