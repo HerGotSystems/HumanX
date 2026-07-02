@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-288A saved analysis assisted Truth draft checkpoint.
-Previous checkpoint: 2026-07-02 after D-286A owner pending-Review Truth visibility checkpoint.
+Last updated: 2026-07-02 after D-290A owner workflow product polish checkpoint.
+Previous checkpoint: 2026-07-02 after D-288A saved analysis assisted Truth draft checkpoint.
 
 ---
 
@@ -42,10 +42,11 @@ Previous checkpoint: 2026-07-02 after D-286A owner pending-Review Truth visibili
 | **D-284A checkpoint HEAD** | see `docs/README.md` after commit (D-284A Truth drafting and Review workflow checkpoint) |
 | **D-286A checkpoint HEAD** | see `docs/README.md` after commit (D-286A owner pending-Review Truth visibility checkpoint) |
 | **D-288A checkpoint HEAD** | see `docs/README.md` after commit (D-288A saved analysis assisted Truth draft checkpoint) |
+| **D-290A checkpoint HEAD** | see `docs/README.md` after commit (D-290A owner workflow product polish checkpoint) |
 
 ---
 
-## Current baseline (as of D-288A)
+## Current baseline (as of D-290A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -59,7 +60,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3360 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3383 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -615,6 +616,34 @@ This arc audited and implemented a safe owner-only action that helps draft a Tru
 
 **Tests added in arc:** 23 new tests (3337 → 3360 total). **Deploys:** 1 (D-287B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
 
+### D-289 mini-arc: Owner workflow product polish (saved-analysis card context copy consolidation)
+
+This arc ran a product pass over the full owner workflow (D-289A), identified the highest-friction visual issue — three stacked provenance/disclaimer notes before useful analysis card content — and fixed it by consolidating them into one compact line (D-289B). D-289C was the live closeout.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-289A | Product pass (docs) | Full 15-question owner workflow product pass (claim → RunPack → saved analysis → draft Truth → submit → My HumanX). Identified stacked `ev-origin-note` paragraphs as highest-friction issue. Docs only. Baseline unchanged: 3360/0/24/57. |
+| D-289B | Frontend | `analysisItem()`: replaced three separate stacked `<p>` notes with one conditional compact line: `"Private analysis · not public truth · not independent verification [· RunPack: rp_...]"`. RunPack provenance still conditional on `a.packetId`; still escaped with `esc(a.packetId)`. No-packet case omits RunPack segment. 23 new D-289B tests; 8 existing tests updated (D-277B ×2, D-279B, D-281B ×2, D-285B, D-287B ×2) to reflect consolidated copy. Baseline 3360 → 3383. |
+| D-289C | Live closeout | Owner deploy PASS (2026-07-02). 33/33 live sanity PASS. Deployed Worker version not captured. |
+| D-290A | Checkpoint (docs) | Closes D-289 arc. No deploy. Baseline unchanged 3383/0/24/57. |
+
+**D-289 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| Compact context line present | `"Private analysis · not public truth · not independent verification"` — always shown |
+| Old separate "Private analysis note — not public truth." line | Removed |
+| Old separate "Saved from RunPack:" label | Removed |
+| RunPack provenance | Still shown when `a.packetId` exists — `"· RunPack: ${esc(a.packetId)}"` |
+| RunPack provenance when absent | Omitted — no-packet case produces no RunPack text |
+| `esc(a.packetId)` | Preserved — packet ID still XSS-escaped |
+| `Draft Truth from analysis` button | Unchanged — still present when `plainLanguageSummary` exists |
+| Draft action behavior | Unchanged — prefill-only, no auto-submit, no auto-publish |
+| No backend/API/schema/CSS/index/worker changes in D-289 | Confirmed |
+| Public profile `/u/:slug` | Unaffected — `analysisItem()` still absent from `renderPublicProfileHtml()` |
+
+**Tests added in arc:** 23 new tests + 8 updated (3360 → 3383 total). **Deploys:** 1 (D-289B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -872,6 +901,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | Draft Truth from analysis on public profile | **Blocked** — `"Draft Truth from analysis"` button, `draftTruthFromAnalysis()`, and `analysis-draft-action` class are rendered only inside `analysisItem()` inside `sectionAnalyses()` inside owner-only `renderStudy()`. Confirmed absent from `renderPublicProfileHtml` | D-287B test 14 |
 | Saved analysis metadata on public profile (post D-287) | **Blocked** — `analysisItem()` and `sectionAnalyses()` remain absent from `renderPublicProfileHtml`; no new public analysis field introduced | D-287B test 15 |
 | No new public data fields in D-287 | **Confirmed** — frontend-only change; zero new API/schema/storage fields; no backend/migration/CSP changes | D-287B |
+| Compact context line on public profile (post D-289) | **Blocked** — `analysisItem()` still absent from `renderPublicProfileHtml()`; consolidated compact line (`"Private analysis · not public truth · not independent verification · RunPack: rp_..."`) is owner/private only; `packetId` not exposed | D-289B test 15 |
+| No new public data fields in D-289 | **Confirmed** — frontend-only copy consolidation; zero new API/schema/storage fields; no backend/migration/CSS/CSP changes | D-289B |
 
 ---
 
@@ -979,9 +1010,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-287A | Audit / docs only — no deploy needed |
 | D-287B | Owner deploy PASS — D-287C confirmed live (31/31) · deployed Worker version not captured |
 | D-287C | Live closeout — no deploy needed (closeout of D-287B deploy) |
-| D-288A (this task) | Docs only — **no deploy needed** |
+| D-288A | Docs only — no deploy needed |
+| D-289A | Docs only — no deploy needed |
+| D-289B | Owner deploy PASS — D-289C confirmed live (33/33) · deployed Worker version not captured |
+| D-289C | Live closeout — no deploy needed (closeout of D-289B deploy) |
+| D-290A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-287C, 2026-07-02) |
+| **Latest deployed Worker** | not captured (D-289C, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1200,6 +1235,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 101. **Any future analysis-to-Truth automation must preserve explicit owner review, normal submit, `review_state='review'`, and admin Review approval** — the D-287B pattern (prefill → owner edits → owner clicks submit → `POST /api/truths` → `review_state='review'` → admin Review → approve/reject) is the minimum safe pipeline. Do not short-circuit any step of this pipeline under any convenience, speed, or UX polish task.
 
+102. **Saved-analysis context copy must stay compact while preserving private/not-truth/not-verification/provenance meaning** — the D-289B compact line (`"Private analysis · not public truth · not independent verification [· RunPack: rp_...]"`) preserves all three safety meanings in one line. Future card copy changes must not remove any of these three meanings, must not restore the three-line stacked layout without explicit owner approval, and must not expose the consolidated line on any public surface.
+
+103. **Product polish must not remove public-profile non-exposure tests** — the D-289B test section confirmed that the compact context line does not appear in `renderPublicProfileHtml`. Do not remove D-289B test 15 (public profile non-exposure) under any card layout refactor. Non-exposure tests are permanently load-bearing regardless of which copy variant is in use.
+
+104. **Any future card layout change in `analysisItem()` must preserve the draft-only Truth action and Review gate locks** — `analysisItem()` now carries both the compact context line and the `"Draft Truth from analysis"` button. Any card layout change must pass D-287B tests 1–23 and D-289B tests 10–18 unchanged, or update each affected lock with explicit owner approval before merging.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1230,8 +1271,10 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Owner pending-Review Truth visibility | **COMPLETE** — D-285A/B/C; `GET /api/my-humanx` already returns pending truths; `meRecentTruthsHtml()` renders them with yellow `Review` badge; post-submission navigation now sends owner to My HumanX; live PASS |
 | Saved analysis ↔ Truth boundary | **COMPLETE** — D-281A/B/C + D-283A; boundary structurally confirmed; copy accurate; no auto-publish path exists |
 | Saved analysis assisted Truth draft | **COMPLETE** — D-287A audit (23 questions); D-287B implementation (`draftTruthFromAnalysis()`, prefill-only, `plainLanguageSummary` only); D-287C live PASS (31/31); baseline 3360/0/24/57. Draft action is owner/private only; auto-submit and auto-publish impossible; Review gate fully preserved. |
-| Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, and boundary copy all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
-| Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, and analysis-assisted draft now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
+| Owner workflow product polish | **COMPLETE** — D-289A product pass (15 questions); D-289B card copy consolidation (three stacked notes → one compact line); D-289C live PASS (33/33); baseline 3383/0/24/57. All safety meanings preserved. |
+| Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
+| Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
+| Next owner-facing improvement | **Open** — the RunPack/saved-analysis/Truth arc is complete as of D-290A. Future owner-facing work should start with a new product pass or explicit owner pain point. Do not extend this arc without a fresh trigger. |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
