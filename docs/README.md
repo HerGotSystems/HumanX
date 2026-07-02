@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-280A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc (see D-280A checkpoint), current baseline 3298/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–89.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-282A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc (see D-282A checkpoint), current baseline 3317/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–92.
 
-### `D281B_SAVED_ANALYSIS_PRIVATE_NO_AUTO_PUBLISH_COPY_POLISH.md` ⭐ CURRENT — D-281B/C SAVED ANALYSIS PRIVATE / NO-AUTO-PUBLISH COPY POLISH — LIVE PASS
+### `D282A_SAVED_ANALYSIS_TO_TRUTH_BOUNDARY_CHECKPOINT.md` ⭐ CURRENT — D-282A SAVED ANALYSIS TO TRUTH BOUNDARY CHECKPOINT — DOCS ONLY
+
+Closes the D-281 saved-analysis / Truth-boundary copy arc. Confirms D-281B private/no-auto-publish copy is live and locked. `saveAnalysisResult()` posts only to `/api/analysis`. All D-271/D-275/D-277/D-279 locks preserved. Safe-next rules 90–92 added. Baseline: 3317/0/24/57 (unchanged). No deploy needed. Saved analysis ↔ Truth boundary COMPLETE.
+
+### `D281B_SAVED_ANALYSIS_PRIVATE_NO_AUTO_PUBLISH_COPY_POLISH.md` — D-281B/C SAVED ANALYSIS PRIVATE / NO-AUTO-PUBLISH COPY POLISH — LIVE PASS
 
 Frontend-only copy polish. `sectionAnalyses()` now includes `"Saving analysis does not publish a truth automatically — it only stores private analysis for this claim."` `analysisItem()` now includes `"Private analysis note — not public truth."` Both use existing `ev-origin-note` class. No behavior change. No CSS/backend/schema/migration/worker changes. Baseline: 3317 passed, 0 failed / 24 / 57 (+19 tests). Owner deploy PASS (D-281C, 2026-07-02). 25/25 live sanity PASS. Deployed Worker version: not captured.
 

@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-280A owner RunPack workflow wording checkpoint.
-Previous checkpoint: 2026-07-02 after D-278A saved analysis provenance visibility checkpoint.
+Last updated: 2026-07-02 after D-282A saved analysis to Truth boundary checkpoint.
+Previous checkpoint: 2026-07-02 after D-280A owner RunPack workflow wording checkpoint.
 
 ---
 
@@ -38,10 +38,11 @@ Previous checkpoint: 2026-07-02 after D-278A saved analysis provenance visibilit
 | **D-276A checkpoint HEAD** | see `docs/README.md` after commit (D-276A RunPack provenance checkpoint) |
 | **D-278A checkpoint HEAD** | see `docs/README.md` after commit (D-278A saved analysis provenance visibility checkpoint) |
 | **D-280A checkpoint HEAD** | see `docs/README.md` after commit (D-280A owner RunPack workflow wording checkpoint) |
+| **D-282A checkpoint HEAD** | see `docs/README.md` after commit (D-282A saved analysis to Truth boundary checkpoint) |
 
 ---
 
-## Current baseline (as of D-280A)
+## Current baseline (as of D-282A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -55,7 +56,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3298 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3317 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -544,6 +545,19 @@ This arc audited the full owner RunPack workflow for friction, identified that `
 **Detection logic unchanged:** `meta.source_snapshot_hash!=null && simpleClaimHash(selected)!==meta.source_snapshot_hash` — only the pushed string changed.
 **Tests added in arc:** 10 new tests (3288 → 3298 total). **Deploys:** 1 (D-279C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker changes.**
 
+### D-281 mini-arc: Saved analysis to Truth boundary copy polish
+
+This arc audited the boundary between saved AI analysis and public Truth creation, found it structurally sound, and added explicit private/no-auto-publish copy to close two copy-clarity gaps. D-281A confirmed no functional gap. D-281B was frontend-only. D-281C was the live closeout.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-281A | Audit | Saved analysis ↔ Truth boundary audit. 16 questions answered. Boundary structurally sound. F-1 (no-auto-publish copy absent from Study view Analysis panel) and F-2 (`analysisItem()` lacked explicit "private" label) identified. Docs only. Baseline unchanged: 3298/0/24/57. |
+| D-281B | Frontend | `sectionAnalyses()`: added `"Saving analysis does not publish a truth automatically — it only stores private analysis for this claim."` `analysisItem()`: added `"Private analysis note — not public truth."` Both use existing `ev-origin-note` class. 19 new tests. Baseline 3298 → 3317. |
+| D-281C | Live closeout | Owner deploy PASS (2026-07-02). 25/25 live sanity PASS. Deployed Worker version not captured. |
+
+**Behavior unchanged:** `saveAnalysisResult()` still posts only to `/api/analysis`. No Truth creation/submission/approval route added. No CSS/backend/schema/migration/worker changes.
+**Tests added in arc:** 19 new tests (3298 → 3317 total). **Deploys:** 1 (D-281C). **Schema migrations applied:** 0.
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -794,6 +808,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-274→D-275 | **Confirmed** — F-4 frontend-only (no new API fields); F-5 adds `packet_id` to `analysis_results` only, not surfaced on public profile | D-274B, D-275B |
 | Stale warning wording in public profile | **Blocked** — `detectPacketStaleness()`, `simpleClaimHash`, `claim updated since packet` wording, and all RunPack stale-detection internals confirmed absent from `renderPublicProfileHtml` | D-279B tests 5–10 |
 | No new public data fields in D-279 | **Confirmed** — frontend-only wording change; zero new API/schema/storage fields; no backend/migration/CSP changes | D-279B |
+| Saved-analysis private/no-auto-publish copy in public profile | **Blocked** — `"Saving analysis does not publish a truth automatically"` and `"Private analysis note — not public truth."` confirmed absent from `renderPublicProfileHtml`; `sectionAnalyses()` and `analysisItem()` remain owner/private surfaces only | D-281B tests 10–12 |
+| No new public data fields in D-281 | **Confirmed** — frontend-only copy change; zero new API/schema/storage fields; no backend/migration/CSP changes | D-281B |
 
 ---
 
@@ -887,9 +903,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-279A | Audit / docs only — no deploy needed |
 | D-279B | Owner deploy PASS — 21/21 live sanity PASS (D-279C, 2026-07-02) · deployed Worker version not captured |
 | D-279C | Live closeout — no deploy needed (closeout of D-279B deploy) |
-| D-280A (this task) | Docs only — **no deploy needed** |
+| D-280A | Docs only — no deploy needed |
+| D-281A | Audit / docs only — no deploy needed |
+| D-281B | Owner deploy PASS — 25/25 live sanity PASS (D-281C, 2026-07-02) · deployed Worker version not captured |
+| D-281C | Live closeout — no deploy needed (closeout of D-281B deploy) |
+| D-282A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-279C, 2026-07-02) |
+| **Latest deployed Worker** | not captured (D-281C, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1084,6 +1104,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 89. **Any future wording polish touching `public/app-v10.js` still needs deploy + live closeout** — frontend-only copy changes are not zero-risk. They require: (1) `node --check` pass, (2) full hardening smoke pass, (3) owner manual terminal deploy, (4) browser live sanity, (5) live closeout docs update. Do not mark a wording change as complete without a live closeout commit.
 
+90. **Saved analysis must remain separate from Truth publication unless an explicit audited workflow is added** — `saveAnalysisResult()` must not call `POST /api/truths`, `POST /api/review/decision`, or any approve/publish route without a new audit task and explicit owner approval. The no-auto-publish boundary is locked by D-281B tests and must not be regressed under any UI polish or "analysis → Truth" convenience task.
+
+91. **Any "analysis → Truth" action requires audit first and must not auto-publish** — if a future task adds a "draft Truth from analysis" affordance, it must: (1) complete an audit task first, (2) be prefill-only with no auto-submit, (3) require explicit owner confirmation before any `POST /api/truths` call, and (4) add public-boundary non-exposure tests. Do not add this under any copy, UI, or RunPack task.
+
+92. **Public profile and truth surfaces must continue to be tested for non-exposure of saved-analysis metadata** — any new field added to `analysisItem()`, `sectionAnalyses()`, or `saveAnalysisResult()` must add a corresponding test confirming the field does not appear in `renderPublicProfileHtml`. Do not remove D-281B tests 10–12 under any refactor.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1109,7 +1135,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Packet-ID traceability backend/schema decision | **COMPLETE** — F-5 implemented in D-275B/C/D; `analysis_results.packet_id` live; Worker `759acc15` |
 | Saved analysis provenance visibility | **COMPLETE** — D-277B/C; `analysisItem()` renders `Saved from RunPack: rp_...` when `packetId` exists; live |
 | Stale warning wording polish | **COMPLETE** — D-279B/C; `claim updated since packet` live; old `source snapshot changed` removed from UI |
-| Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, and stale wording polish all complete; any further RunPack backend work requires an audit task; frontend-only changes must still add public-profile non-exposure tests |
+| Saved analysis ↔ Truth boundary copy | **COMPLETE** — D-281B/C; explicit no-auto-publish + private-note copy live; boundary structurally confirmed |
+| Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, and boundary copy all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
@@ -1322,4 +1349,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-279A | `audit` | Owner RunPack workflow continuity audit — workflow complete; F-2 wording polish identified; docs only |
 | D-279B | `(D-279C live)` | `detectPacketStaleness()` wording: `source snapshot changed` → `claim updated since packet`; 10 new tests; baseline 3288 → 3298 |
 | D-279C | live closeout | D-279B owner deploy PASS; 21/21 live sanity PASS; deployed Worker version not captured |
-| D-280A | this commit | **[Current]** Owner RunPack workflow wording checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-280A | `checkpoint` | Owner RunPack workflow wording checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-281A | `audit` | Saved analysis ↔ Truth boundary audit — boundary structurally sound; F-1/F-2 copy gaps identified; docs only |
+| D-281B | `(D-281C live)` | Saved analysis private/no-auto-publish copy polish — `sectionAnalyses()` + `analysisItem()` copy added; 19 new tests; baseline 3298 → 3317 |
+| D-281C | live closeout | D-281B owner deploy PASS; 25/25 live sanity PASS; deployed Worker version not captured |
+| D-282A | this commit | **[Current]** Saved analysis to Truth boundary checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
