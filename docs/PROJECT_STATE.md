@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-294A My HumanX collapsible Profile Settings checkpoint.
-Previous checkpoint: 2026-07-02 after D-292A My HumanX Recent Truths prominence checkpoint.
+Last updated: 2026-07-02 after D-296A My HumanX profile setup nudge checkpoint.
+Previous checkpoint: 2026-07-02 after D-294A My HumanX collapsible Profile Settings checkpoint.
 
 ---
 
@@ -45,10 +45,11 @@ Previous checkpoint: 2026-07-02 after D-292A My HumanX Recent Truths prominence 
 | **D-290A checkpoint HEAD** | see `docs/README.md` after commit (D-290A owner workflow product polish checkpoint) |
 | **D-292A checkpoint HEAD** | see `docs/README.md` after commit (D-292A My HumanX Recent Truths prominence checkpoint) |
 | **D-294A checkpoint HEAD** | see `docs/README.md` after commit (D-294A My HumanX collapsible Profile Settings checkpoint) |
+| **D-296A checkpoint HEAD** | see `docs/README.md` after commit (D-296A My HumanX profile setup nudge checkpoint) |
 
 ---
 
-## Current baseline (as of D-294A)
+## Current baseline (as of D-296A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -62,7 +63,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3424 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3442 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -707,6 +708,39 @@ This arc ran a product pass over My HumanX as a whole dashboard (D-293A), identi
 
 **Tests added in arc:** 15 new tests (3405 → 3424 total). **Deploys:** 1 (D-293B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
 
+### D-295 mini-arc: My HumanX profile setup nudge
+
+This arc ran a product pass over whether My HumanX needed a "Needs attention" strip (D-295A), concluded that only one genuinely new signal existed — profile setup state — and implemented a narrow, self-clearing nudge (D-295B). D-295C was the live closeout.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-295A | Product pass (docs) | Full 18-question product pass on whether My HumanX needs a "Needs attention" strip. Conclusion: a general count-based strip would duplicate My Content counts panel. Only useful signal: owner has never configured a public profile (no slug, not public). D-295B candidate classified frontend-only. Docs only. Baseline unchanged: 3424/0/24/57. |
+| D-295B | Frontend | `renderMeHtml()`: added `profileNudge` const — conditional `<p>` rendered only when `!u.profile_public && !u.profile_slug`. Copy: "Set up your public profile: open Profile Settings, choose a slug, and switch your profile public when ready." Placed above Account card in template. 18 new D-295B tests; 7 existing slice-window widenings (D-137D ×2, D-137D/E ×2, D-137E ×2, D-139B, D-140B — preamble grew ~272 chars; all assertion logic unchanged). Baseline 3424 → 3442. |
+| D-295C | Live closeout | Owner deploy PASS (2026-07-02). 27/27 live sanity PASS. Deployed Worker version not captured. |
+| D-296A | Checkpoint (docs) | Closes D-295 arc. No deploy. Baseline unchanged 3442/0/24/57. |
+
+**D-295 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| Nudge condition | `!u.profile_public && !u.profile_slug` — both must be unset |
+| Nudge self-clears | Yes — next `renderMe()` re-fetches `GET /api/my-humanx`; if slug set or `profile_public` true, `profileNudge === ''` |
+| Nudge placement | Above Account card, below privacy intro paragraph |
+| Nudge copy | `"Set up your public profile: open Profile Settings, choose a slug, and switch your profile public when ready."` |
+| Not a general count-based strip | Yes — no pending Review count, no My Content count duplication |
+| My Content counts panel | Unchanged — still renders all per-state chips via `meCountsRow()` |
+| No dismiss state | Yes — no button, no JS state, no localStorage |
+| Account card | Unchanged — `meAccountCardHtml()` called after `${profileNudge}` |
+| Profile Settings | Unchanged — still `<details>/<summary>` (D-293B preserved) |
+| Recent Truths | Still first content panel after filter bar (D-291B preserved) |
+| Review explanation | `"Review: awaiting admin approval — goes Public when approved."` unchanged |
+| Yellow `Review` badge | Preserved — `ME_STATE_CLR.review = 'b-yellow'` unchanged |
+| `GET /api/my-humanx` data source | Unchanged |
+| Public profile `/u/:slug` | Unaffected |
+| No CSS, backend, schema, API, migration changes in D-295 | Confirmed |
+
+**Tests added in arc:** 18 new tests + 7 slice-window widenings (3424 → 3442 total). **Deploys:** 1 (D-295B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -971,6 +1005,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-291 | **Confirmed** — frontend-only template reorder and copy addition; zero new API/schema/storage fields; no backend/migration/CSS/CSP changes | D-291B |
 | Profile Settings controls in public profile | **Not exposed** — `meProfileSettingsHtml()` is owner-private; `<details>/<summary>` wrapping is My HumanX-only; `me-profile-settings` class absent from `renderPublicProfileHtml()` | D-293B test 12 |
 | No new public data fields in D-293 | **Confirmed** — frontend-only `<details>/<summary>` wrap; zero new API/schema/storage fields; no backend/migration/CSS/CSP changes | D-293B |
+| Profile setup nudge on public profile | **Not exposed** — `profileNudge` is rendered only inside `renderMeHtml()` which is owner-private; `<p>` nudge content is not called from `renderPublicProfileHtml()`; nudge condition uses `u.profile_public` and `u.profile_slug` from owner-only `GET /api/my-humanx` | D-295B test 15 |
+| No new public data fields in D-295 | **Confirmed** — frontend-only conditional in `renderMeHtml()`; `u.profile_public` and `u.profile_slug` already in existing `GET /api/my-humanx` response; zero new API/schema/storage fields; no backend/migration/CSS/CSP changes | D-295B |
 
 ---
 
@@ -1090,9 +1126,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-293A | Docs only — no deploy needed |
 | D-293B | Owner deploy PASS — D-293C confirmed live (27/27) · deployed Worker version not captured |
 | D-293C | Live closeout — no deploy needed (closeout of D-293B deploy) |
-| D-294A (this task) | Docs only — **no deploy needed** |
+| D-294A | Docs only — no deploy needed |
+| D-295A | Docs only — no deploy needed |
+| D-295B | Owner deploy PASS — D-295C confirmed live (27/27) · deployed Worker version not captured |
+| D-295C | Live closeout — no deploy needed (closeout of D-295B deploy) |
+| D-296A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-293C, 2026-07-02) |
+| **Latest deployed Worker** | not captured (D-295C, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1329,6 +1369,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 110. **Owner-dashboard layout changes must keep Recent Truths high enough for post-submit Review visibility** — Recent Truths must stay as the first content panel after the filter bar (D-291B). Any future `renderMeHtml()` reorder that moves Recent Truths below the Profile Settings block, My Content counts, or Recent Claims requires a new spec and explicit owner approval. The D-291B and D-293B positional tests must continue to pass.
 
+111. **My HumanX nudges must stay narrow and self-clearing — not become noisy count dashboards** — The D-295B profile-setup nudge fires only when `!profile_public && !profile_slug`. Any future nudge or attention strip in `renderMeHtml()` must be equally specific. A general "Needs attention" strip that repeats My Content counts or pending-Review counts is prohibited. The D-295B tests (no general "Needs attention" strip; no My Content count duplication) must continue to pass.
+
+112. **Profile setup guidance must remain tied to actual profile state from `GET /api/my-humanx`** — The nudge condition uses `u.profile_public` and `u.profile_slug` which are already in the API response. Any future nudge that requires additional backend fields, query parameters, or new API endpoints must be audited as a backend task before implementation. Do not add frontend conditionals that cannot be satisfied by the existing `GET /api/my-humanx` payload.
+
+113. **Do not add dismiss/localStorage state for server-derived profile setup nudges unless separately audited** — The profile-setup nudge has no dismiss button and no localStorage. It self-clears via data alone. Any future addition of a dismiss flag, a `localStorage` key, or a server-side `dismissed` column for this nudge requires a separate audit task and explicit owner approval. The D-295B test (no localStorage introduced) must continue to pass.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1362,9 +1408,10 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Owner workflow product polish | **COMPLETE** — D-289A product pass (15 questions); D-289B card copy consolidation (three stacked notes → one compact line); D-289C live PASS (33/33); baseline 3383/0/24/57. All safety meanings preserved. |
 | My HumanX Recent Truths prominence | **COMPLETE** — D-291A product pass (19 questions); D-291B reorder + Review explanation; D-291C live PASS (24/24); baseline 3405/0/24/57. Recent Truths now visible immediately after filter bar. |
 | My HumanX collapsible Profile Settings | **COMPLETE** — D-293A product pass (15 questions); D-293B `<details>/<summary>` wrap in `meProfileSettingsHtml()`; D-293C live PASS (27/27); baseline 3424/0/24/57. Profile Settings collapses by default; Account card always visible; counts/filter/Truths immediately reachable. |
+| My HumanX profile setup nudge | **COMPLETE** — D-295A product pass (18 questions; general count strip ruled out); D-295B narrow nudge in `renderMeHtml()` (`!profile_public && !profile_slug` only); D-295C live PASS (27/27); baseline 3442/0/24/57. Nudge self-clears once slug set or profile_public true. No dismiss state. No localStorage. No backend/CSS changes. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
-| Next owner-dashboard improvement | **Open** — My HumanX post-submit landing page polish arc (D-291→D-293) is complete as of D-294A. Owner-dashboard layout is well-ordered. Next work can move beyond immediate post-submit friction unless a new live issue appears. Any change to data source, Review state visibility, or public/private boundary must still audit-first. |
+| Next owner-dashboard improvement | **Stop** — My HumanX polish arc (D-291→D-295) is complete as of D-296A. Owner-dashboard layout is well-ordered; profile nudge, collapsible settings, and Recent Truths prominence are all live. Do not add further owner-dashboard improvements unless a real live friction appears and is explicitly assigned. Any change to data source, Review state visibility, or public/private boundary must still audit-first. |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
@@ -1591,4 +1638,20 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-287A | `88ed4ed` | Saved analysis assisted Truth draft audit — 23 questions; safe prefill source `plainLanguageSummary`; `verdict` blocked; D-287B classified frontend-only; docs only; no deploy |
 | D-287B | `d96a6a1` | Saved analysis assisted Truth draft — `draftTruthFromAnalysis()` added; "Draft Truth from analysis" button in `analysisItem()`; prefill-only; 23 new tests; baseline 3337 → 3360; deploy needed |
 | D-287C | `1559793` | D-287B live closeout — owner deploy PASS; 31/31 live sanity PASS; deployed Worker version not captured |
-| D-288A | this commit | **[Current]** Saved analysis assisted Truth draft checkpoint — `PROJECT_STATE.md` updated; safe-next rules 99–101 added; baseline confirmed 3360/0/24/57; docs only; no deploy |
+| D-288A | `80877ec` | Saved analysis assisted Truth draft checkpoint — `PROJECT_STATE.md` updated; safe-next rules 99–101 added; baseline confirmed 3360/0/24/57; docs only; no deploy |
+| D-289A | `audit` | Owner workflow product pass — 15 questions; stacked ev-origin-note paragraphs identified as highest friction; D-289B classified frontend-only; docs only |
+| D-289B | `(D-289C live)` | `analysisItem()` card copy consolidation — three stacked notes → one compact line; 23 new tests + 8 updated; baseline 3360 → 3383 |
+| D-289C | live closeout | D-289B owner deploy PASS; 33/33 live sanity PASS; deployed Worker version not captured |
+| D-290A | `checkpoint` | Owner workflow product polish checkpoint; docs only; no deploy; baseline unchanged 3383/0/24/57 |
+| D-291A | `audit` | My HumanX product pass — 19 questions; Recent Truths buried at position 12; D-291B classified frontend-only; docs only |
+| D-291B | `(D-291C live)` | `renderMeHtml()` Recent Truths reorder + Review explanation; 20 new tests + 2 updated; baseline 3383 → 3405 |
+| D-291C | live closeout | D-291B owner deploy PASS; 24/24 live sanity PASS; deployed Worker version not captured |
+| D-292A | `checkpoint` | My HumanX Recent Truths prominence checkpoint; docs only; no deploy; baseline unchanged 3405/0/24/57 |
+| D-293A | `audit` | My HumanX dashboard product pass — 15 questions; Profile Settings always-open identified; D-293B classified frontend-only; docs only |
+| D-293B | `(D-293C live)` | `meProfileSettingsHtml()` `<details>/<summary>` wrap; 15 new tests; baseline 3405 → 3424 |
+| D-293C | live closeout | D-293B owner deploy PASS; 27/27 live sanity PASS; deployed Worker version not captured |
+| D-294A | `checkpoint` | My HumanX collapsible Profile Settings checkpoint; docs only; no deploy; baseline unchanged 3424/0/24/57 |
+| D-295A | `audit` | My HumanX "Needs attention" product pass — 18 questions; general strip ruled out; D-295B candidate profile-setup nudge; docs only |
+| D-295B | `(D-295C live)` | `renderMeHtml()` profileNudge const — `!profile_public && !profile_slug` condition; 18 new tests + 7 slice fixes; baseline 3424 → 3442 |
+| D-295C | live closeout | D-295B owner deploy PASS; 27/27 live sanity PASS; deployed Worker version not captured |
+| D-296A | this commit | **[Current]** My HumanX profile setup nudge checkpoint — `PROJECT_STATE.md` updated; safe-next rules 111–113 added; baseline confirmed 3442/0/24/57; docs only; no deploy |
