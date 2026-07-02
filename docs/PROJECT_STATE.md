@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-286A owner pending-Review Truth visibility checkpoint.
-Previous checkpoint: 2026-07-02 after D-284A Truth drafting and Review workflow checkpoint.
+Last updated: 2026-07-02 after D-288A saved analysis assisted Truth draft checkpoint.
+Previous checkpoint: 2026-07-02 after D-286A owner pending-Review Truth visibility checkpoint.
 
 ---
 
@@ -41,10 +41,11 @@ Previous checkpoint: 2026-07-02 after D-284A Truth drafting and Review workflow 
 | **D-282A checkpoint HEAD** | see `docs/README.md` after commit (D-282A saved analysis to Truth boundary checkpoint) |
 | **D-284A checkpoint HEAD** | see `docs/README.md` after commit (D-284A Truth drafting and Review workflow checkpoint) |
 | **D-286A checkpoint HEAD** | see `docs/README.md` after commit (D-286A owner pending-Review Truth visibility checkpoint) |
+| **D-288A checkpoint HEAD** | see `docs/README.md` after commit (D-288A saved analysis assisted Truth draft checkpoint) |
 
 ---
 
-## Current baseline (as of D-286A)
+## Current baseline (as of D-288A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -58,7 +59,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3337 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3360 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -584,6 +585,36 @@ This arc audited and fixed the post-submission experience for Truth owners. D-28
 **Backend/schema/API/CSS unchanged across entire D-285 arc.** `review_state='review'` preserved. Review gate preserved. Public profile unaffected. Public Truths tab behavior unchanged. Saved analysis boundary unchanged.
 **Tests added in arc:** 20 new tests + 1 updated (3317 → 3337 total). **Deploys:** 1 (D-285B/C).
 
+### D-287 mini-arc: Saved analysis assisted Truth draft
+
+This arc audited and implemented a safe owner-only action that helps draft a Truth from saved AI analysis. D-287A confirmed the action is safe as frontend-only if prefill-only and sourced from `plainLanguageSummary`. D-287B implemented the action. D-287C was the live closeout.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-287A | Audit | 23 questions answered. Safe prefill source: `plainLanguageSummary` (prose text). `verdict` must never be used as Truth content (AI label). Action is frontend-only — no backend, schema, or migration. `review_state='review'` and Review gate preserved. Auto-submit and auto-publish remain impossible. Docs only. Baseline unchanged: 3337/0/24/57. |
+| D-287B | Frontend | `analysisItem()` now conditionally renders "Draft Truth from analysis" button when `plainLanguageSummary` exists. New `draftTruthFromAnalysis(summary)` async function: switches to Truths tab, calls `renderTruths()`, sets `truthStatement` from `plainLanguageSummary`, focuses field, sets `truthOrigin` to `"RunPack analysis"` if empty, toasts `"Draft ready — review and submit for Review when ready."` Registered in `_D181C_PARAM_ACTIONS`. 23 new tests; two existing `analysisItemSlice` sizes bumped from 1400→2000 and 1200→2000. Baseline 3337 → 3360. |
+| D-287C | Live closeout | Owner deploy PASS (2026-07-02). 31/31 live sanity PASS. Deployed Worker version not captured. |
+| D-288A | Checkpoint | Docs only — closes D-287 arc. No deploy. Baseline unchanged 3360/0/24/57. |
+
+**D-287 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| Draft action label | `"Draft Truth from analysis"` — no `"Publish Truth from analysis"` wording |
+| Prefill source | `plainLanguageSummary` only |
+| `verdict` used as Truth content | Never |
+| Draft-only guidance | `"Draft only — review and submit for Review when ready."` adjacent to button |
+| Auto-submit | No — `draftTruthFromAnalysis` never calls `submitTruth()` or `submitBuilderTruth()` |
+| Auto-publish | No — no publish/approve route touched |
+| Owner must explicitly submit | Yes — must click "Submit Truth for Review" after reviewing draft |
+| `review_state='review'` on actual submission | Yes — unchanged in `src/truths.js` and `POST /api/truths` |
+| Review gate preserved | Yes — `requestApproveReview`, `requestRejectReview`, `reviewDecisionUI` all unchanged |
+| D-285B post-submit navigation | Preserved — all three paths navigate to `renderMe()` + `tab-me`; toast unchanged |
+| Public profile | `"Draft Truth from analysis"` not exposed; `analysisItem()` not called from `renderPublicProfileHtml()` |
+| Backend/schema/API/CSS | No changes in D-287 |
+
+**Tests added in arc:** 23 new tests (3337 → 3360 total). **Deploys:** 1 (D-287B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -838,6 +869,9 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-281 | **Confirmed** — frontend-only copy change; zero new API/schema/storage fields; no backend/migration/CSP changes | D-281B |
 | Owner pending-Review Truths on public profile | **Not exposed** — `GET /api/my-humanx` is `requireUser`-gated owner-only; public profile `/u/:slug` retains `COALESCE(review_state,'public')='public'` filter; pending truths remain invisible to public | D-285A audit Q12, D-285B tests 4–5 |
 | No new public data fields in D-285 | **Confirmed** — frontend-only navigation/copy change; zero new API/schema/storage fields; no backend/migration/CSP changes | D-285B |
+| Draft Truth from analysis on public profile | **Blocked** — `"Draft Truth from analysis"` button, `draftTruthFromAnalysis()`, and `analysis-draft-action` class are rendered only inside `analysisItem()` inside `sectionAnalyses()` inside owner-only `renderStudy()`. Confirmed absent from `renderPublicProfileHtml` | D-287B test 14 |
+| Saved analysis metadata on public profile (post D-287) | **Blocked** — `analysisItem()` and `sectionAnalyses()` remain absent from `renderPublicProfileHtml`; no new public analysis field introduced | D-287B test 15 |
+| No new public data fields in D-287 | **Confirmed** — frontend-only change; zero new API/schema/storage fields; no backend/migration/CSP changes | D-287B |
 
 ---
 
@@ -941,9 +975,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-285A | Audit / docs only — no deploy needed |
 | D-285B | Owner deploy PASS — D-285C confirmed live (25/25) · deployed Worker version not captured |
 | D-285C | Live closeout — no deploy needed (closeout of D-285B deploy) |
-| D-286A (this task) | Docs only — **no deploy needed** |
+| D-286A | Docs only — no deploy needed |
+| D-287A | Audit / docs only — no deploy needed |
+| D-287B | Owner deploy PASS — D-287C confirmed live (31/31) · deployed Worker version not captured |
+| D-287C | Live closeout — no deploy needed (closeout of D-287B deploy) |
+| D-288A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-285C, 2026-07-02) |
+| **Latest deployed Worker** | not captured (D-287C, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1156,6 +1194,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 98. **Truth submission UX changes must preserve `review_state='review'` and the admin Review gate** — any future frontend change to Truth submission paths (`submitTruth`, `submitBuilderTruth`, `promoteBelief('truth')`) must not alter `POST /api/truths` behavior, must not add a self-approval path, and must not bypass the admin-only Review queue.
 
+99. **Analysis-assisted Truth actions must remain draft-only unless explicitly audited otherwise** — `draftTruthFromAnalysis()` is prefill-only. It must not call `submitTruth()`, `submitBuilderTruth()`, `promoteBelief('truth')`, or any approve/review route. Any future enhancement that moves from prefill toward automation requires a new audit task and explicit owner approval before implementation.
+
+100. **Do not use machine labels like `verdict` as Truth statement content** — `verdict` is an AI classification token (`'strongly-supported'`, `'contested'`, etc.), not a human-authored claim statement. It must never appear in `truthStatement` or any Truth form field as prefilled content. Only `plainLanguageSummary` (prose text) is approved for Truth prefill.
+
+101. **Any future analysis-to-Truth automation must preserve explicit owner review, normal submit, `review_state='review'`, and admin Review approval** — the D-287B pattern (prefill → owner edits → owner clicks submit → `POST /api/truths` → `review_state='review'` → admin Review → approve/reject) is the minimum safe pipeline. Do not short-circuit any step of this pipeline under any convenience, speed, or UX polish task.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1185,8 +1229,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Truth drafting/Review workflow audit | **COMPLETE** — D-283A/D-284A; three creation paths confirmed all produce `review_state='review'`; admin-only Review gate confirmed; copy accurate |
 | Owner pending-Review Truth visibility | **COMPLETE** — D-285A/B/C; `GET /api/my-humanx` already returns pending truths; `meRecentTruthsHtml()` renders them with yellow `Review` badge; post-submission navigation now sends owner to My HumanX; live PASS |
 | Saved analysis ↔ Truth boundary | **COMPLETE** — D-281A/B/C + D-283A; boundary structurally confirmed; copy accurate; no auto-publish path exists |
+| Saved analysis assisted Truth draft | **COMPLETE** — D-287A audit (23 questions); D-287B implementation (`draftTruthFromAnalysis()`, prefill-only, `plainLanguageSummary` only); D-287C live PASS (31/31); baseline 3360/0/24/57. Draft action is owner/private only; auto-submit and auto-publish impossible; Review gate fully preserved. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, and boundary copy all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
-| Next Truth workflow work | **Audit-first** — pending-Review visibility and post-submission navigation now complete; any further Truth UX, analysis-to-Truth workflow, or Review state change requires an audit task before implementation |
+| Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, and analysis-assisted draft now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
@@ -1409,4 +1454,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-285A | `d76680a` | Owner pending-Review Truth visibility audit — 21 questions; key finding: `GET /api/my-humanx` already returns pending truths; D-283A/D-284A F-1 overstated; D-285B classified frontend-only; docs only; no deploy |
 | D-285B | `3aea36c` | Post-submit navigation to My HumanX — `submitTruth`, `submitBuilderTruth`, `promoteBelief('truth')` all navigate to `renderMe()`/`tab-me`; new toast copy; 20 new tests; baseline 3317 → 3337; deploy needed |
 | D-285C | `685e54e` | D-285B live closeout — owner deploy PASS; 25/25 live sanity PASS; deployed Worker version not captured |
-| D-286A | this commit | **[Current]** Owner pending-Review Truth visibility checkpoint — `PROJECT_STATE.md` updated; safe-next rules 96–98 added; baseline updated to 3337/0/24/57; docs only; no deploy |
+| D-286A | `4c8e956` | Owner pending-Review Truth visibility checkpoint — `PROJECT_STATE.md` updated; safe-next rules 96–98 added; baseline updated to 3337/0/24/57; docs only; no deploy |
+| D-287A | `88ed4ed` | Saved analysis assisted Truth draft audit — 23 questions; safe prefill source `plainLanguageSummary`; `verdict` blocked; D-287B classified frontend-only; docs only; no deploy |
+| D-287B | `d96a6a1` | Saved analysis assisted Truth draft — `draftTruthFromAnalysis()` added; "Draft Truth from analysis" button in `analysisItem()`; prefill-only; 23 new tests; baseline 3337 → 3360; deploy needed |
+| D-287C | `1559793` | D-287B live closeout — owner deploy PASS; 31/31 live sanity PASS; deployed Worker version not captured |
+| D-288A | this commit | **[Current]** Saved analysis assisted Truth draft checkpoint — `PROJECT_STATE.md` updated; safe-next rules 99–101 added; baseline confirmed 3360/0/24/57; docs only; no deploy |
