@@ -1,7 +1,7 @@
 # D-289B — Saved Analysis Card Context Copy Consolidation
 
 **Scope:** Frontend + tests + docs
-**Status:** COMPLETE — deploy needed (`public/app-v10.js` changed)
+**Status:** COMPLETE — owner deployed (D-289C live closeout)
 **Branch:** main (direct commit)
 **Baseline before D-289B:** 3360 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Hardening after D-289B:** 3383 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
@@ -168,4 +168,48 @@ Known warn: `/api/u/:slug — known parameterised route; implemented via regex i
 | Task | Deploy | Result |
 |------|--------|--------|
 | D-289A | No | Docs only |
+| D-289B | **Yes — owner deployed** | PASS — D-289C live closeout |
+| D-289C | No | Live closeout |
+
+## Live Sanity (D-289C — owner-verified, 2026-07-02)
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Owner can open a claim/Study view without console-breaking errors | PASS |
+| 3 | Saved analysis cards still render | PASS |
+| 4 | Saved analysis card shows compact context line | PASS |
+| 5 | Compact context line includes `Private analysis` | PASS |
+| 6 | Compact context line includes `not public truth` | PASS |
+| 7 | Compact context line includes `not independent verification` | PASS |
+| 8 | When `packetId` exists, compact context line includes RunPack provenance | PASS |
+| 9 | Packet ID underscore format remains preserved visually | PASS |
+| 10 | Packet ID remains escaped safely | PASS |
+| 11 | When `packetId` is absent, RunPack segment is not shown | PASS |
+| 12 | Old stacked separate note `"Private analysis note — not public truth."` no longer shown | PASS |
+| 13 | Old stacked separate provenance line `"Saved from RunPack:"` no longer shown | PASS |
+| 14 | Verdict badge/meters/plain-language summary easier to reach (notes consolidated) | PASS |
+| 15 | `Draft Truth from analysis` still appears when `plainLanguageSummary` exists | PASS |
+| 16 | Draft action still pre-fills from `plainLanguageSummary` | PASS |
+| 17 | Draft action does not use `verdict` as Truth content | PASS |
+| 18 | Draft action remains draft-only | PASS |
+| 19 | Draft action does not submit or publish | PASS |
+| 20 | `saveAnalysisResult()` still posts only to `/api/analysis` | PASS |
+| 21 | Public profile `/u/:slug` does not expose saved analysis metadata | PASS |
+| 22 | Public profile `/u/:slug` does not expose `packetId` | PASS |
+| 23 | Public profile `/u/:slug` does not expose `Draft Truth from analysis` | PASS |
+| 24 | Review/moderation behavior unchanged | PASS |
+| 25 | Truth submission still uses `review_state='review'` | PASS |
+| 26 | D-285B post-submit navigation preserved: `renderMe()`, `tab-me`, toast `Submitted for Review — you can see it in My HumanX with the Review badge.` | PASS |
+| 27 | Stale detection preserved: `claim updated since packet` | PASS |
+| 28 | AI-return import locks preserved: `rp-return-section`, `Load AI Analysis Return`, `Saving does not publish a truth automatically` | PASS |
+| 29 | Parser behavior unchanged: `JSON.parse`, `parsed.output \|\| parsed.result \|\| parsed.analysis \|\| parsed` | PASS |
+| 30 | Packet-ID/provenance storage unchanged | PASS |
+| 31 | Drift/Belief expansion unaffected | PASS |
+| 32 | No backend/API/schema/storage behavior changed | PASS |
+| 33 | No console errors | PASS |
+
+**Live sanity: 33/33 PASS**
+
+Deployed Worker version: not captured.
 | D-289B | **Yes — deploy needed** | `public/app-v10.js` changed |

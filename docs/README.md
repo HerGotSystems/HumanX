@@ -53,7 +53,7 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-288A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint) + D-285 owner pending-Review Truth visibility (see D-286A checkpoint) + D-287 saved analysis assisted Truth draft (see D-288A checkpoint), current baseline 3360/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–101.
 
-### `D289B_SAVED_ANALYSIS_CARD_CONTEXT_COPY_CONSOLIDATION.md` ⭐ CURRENT — D-289B SAVED ANALYSIS CARD CONTEXT COPY CONSOLIDATION — DEPLOY NEEDED
+### `D289B_SAVED_ANALYSIS_CARD_CONTEXT_COPY_CONSOLIDATION.md` ⭐ CURRENT — D-289B SAVED ANALYSIS CARD CONTEXT COPY CONSOLIDATION — LIVE
 
 Consolidates three stacked provenance/disclaimer notes in `analysisItem()` into one compact `"Private analysis · not public truth · not independent verification [· RunPack: rp_...]"` line. All three safety meanings preserved. RunPack provenance still conditional on `a.packetId`; packet ID still escaped. 23 new tests + 8 existing tests updated. Baseline 3383/0/24/57. Deploy needed (`public/app-v10.js` changed).
 
