@@ -1,7 +1,7 @@
 # D-277B — Saved Analysis RunPack Provenance Visibility
 
 **Scope:** Frontend (`public/app-v10.js`) + tests + docs
-**Status:** COMPLETE — deploy needed (`public/app-v10.js` changed)
+**Status:** COMPLETE — owner deploy PASS (D-277C, 2026-07-02) — 22/22 live sanity PASS
 **Branch:** main (direct commit)
 **Baseline before:** 3263 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Baseline after:** 3288 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
@@ -13,7 +13,8 @@
 **Backend changes:** None — `src/analysis-results.js` not modified
 **Schema/migration changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes — `public/app-v10.js` changed
+**Deploy needed:** No — deployed (D-277C, 2026-07-02)
+**Deployed Worker version:** not captured
 
 ---
 
@@ -159,3 +160,49 @@ Known warn: `/api/u/:slug — known parameterised route; implemented via regex i
 - Public profile rendering — not modified
 - No `alignment_labels` — permanently blocked
 - No `top_beliefs_json` in any public API
+
+---
+
+## D-277C — Live Closeout (2026-07-02)
+
+**Owner deploy:** PASS — `npx wrangler deploy`
+**Deployed Worker version:** not captured
+**Live sanity:** PASS — 22/22
+
+### Post-deploy static checks
+
+| Check | Result |
+|-------|--------|
+| `node --check public/app-v10.js` | no output, exit 0 |
+| `hardening-smoke-test.mjs` | `3288 passed, 0 failed` |
+| `belief-engine-static-check.mjs` | `24 passed, 0 failed` |
+| `worker-route-static-check.mjs` | `57 passed, 0 failed / 1 known warn` |
+
+Known warn: `/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`
+
+### Live sanity results (22/22 PASS)
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Claim/Study detail area opens without console-breaking errors | PASS |
+| 3 | Existing claim can be selected | PASS |
+| 4 | Saved AI analysis results still render | PASS |
+| 5 | Analysis disclaimer still appears | PASS |
+| 6 | Provenance line appears when saved analysis has `packetId`: `Saved from RunPack: rp_...` | PASS |
+| 7 | Provenance line is absent when saved analysis has no `packetId` | PASS |
+| 8 | Packet ID underscore format preserved visually | PASS |
+| 9 | Packet ID is escaped safely | PASS |
+| 10 | Existing meters still appear after disclaimer/provenance area | PASS |
+| 11 | Public profile `/u/:slug` does not expose `Saved from RunPack` | PASS |
+| 12 | Public profile `/u/:slug` does not expose `packetId` | PASS |
+| 13 | Public truth behavior unchanged | PASS |
+| 14 | Review/moderation unchanged | PASS |
+| 15 | AI-return import area still works (`rp-return-section`, `Load AI Analysis Return`, `rp-return-next-step`, no-auto-publish guidance) | PASS |
+| 16 | Parser behavior unchanged (`JSON.parse`, field extraction) | PASS |
+| 17 | `saveAnalysisResult` still posts only to `/api/analysis` | PASS |
+| 18 | D-274 stale detection still works (`source snapshot changed`) | PASS |
+| 19 | D-275 packet-ID save behavior still works | PASS |
+| 20 | Drift/Belief expansion unaffected | PASS |
+| 21 | No backend/API/schema/storage behavior changed | PASS |
+| 22 | No console errors | PASS |
