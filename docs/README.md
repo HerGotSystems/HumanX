@@ -53,9 +53,9 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-278A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc (see D-278A checkpoint), current baseline 3288/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–86.
 
-### `D279B_RUNPACK_STALE_WARNING_WORDING_POLISH.md` ⭐ CURRENT — D-279B RUNPACK STALE WARNING WORDING POLISH — PENDING DEPLOY
+### `D279B_RUNPACK_STALE_WARNING_WORDING_POLISH.md` ⭐ CURRENT — D-279B/C RUNPACK STALE WARNING WORDING POLISH — LIVE PASS
 
-Frontend-only wording polish. `detectPacketStaleness()` in `public/app-v10.js` now pushes `'claim updated since packet'` instead of `'source snapshot changed'`. Detection logic, stale threshold, and all other stale checks unchanged. No backend/schema/migration/CSS/index/worker changes. Baseline: 3298 passed, 0 failed / 24 (belief-engine) / 57 (route, 1 known warn) (+10 tests: 3 new D-279B assertions + 7 lock preservation tests; 3 existing test labels updated). Deploy needed — `public/app-v10.js` changed.
+Frontend-only wording polish. `detectPacketStaleness()` in `public/app-v10.js` now pushes `'claim updated since packet'` instead of `'source snapshot changed'`. Detection logic, stale threshold, and all other stale checks unchanged. No backend/schema/migration/CSS/index/worker changes. Baseline: 3298 passed, 0 failed / 24 (belief-engine) / 57 (route, 1 known warn) (+10 tests). Owner deploy PASS (D-279C, 2026-07-02). 21/21 live sanity PASS. Deployed Worker version: not captured.
 
 ### `D279A_OWNER_RUNPACK_WORKFLOW_CONTINUITY_AUDIT.md` — D-279A OWNER RUNPACK WORKFLOW CONTINUITY AUDIT — DOCS ONLY
 

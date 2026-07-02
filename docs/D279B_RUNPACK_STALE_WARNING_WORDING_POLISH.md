@@ -1,7 +1,7 @@
 # D-279B — RunPack Stale Warning Wording Polish
 
 **Scope:** Frontend (`public/app-v10.js`) + tests + docs
-**Status:** COMPLETE — deploy needed (`public/app-v10.js` changed)
+**Status:** COMPLETE — owner deploy PASS (D-279C, 2026-07-02) — 21/21 live sanity PASS
 **Branch:** main (direct commit)
 **Baseline before:** 3288 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Baseline after:** 3298 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
@@ -13,7 +13,8 @@
 **Backend changes:** None — `src/analysis-results.js` not modified
 **Schema/migration changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes — `public/app-v10.js` changed
+**Deploy needed:** No — deployed (D-279C, 2026-07-02)
+**Deployed Worker version:** not captured
 
 ---
 
@@ -141,3 +142,48 @@ Known warn: `/api/u/:slug — known parameterised route; implemented via regex i
 - Public profile rendering — not modified
 - No `alignment_labels` — permanently blocked
 - No `top_beliefs_json` in any public API
+
+---
+
+## D-279C — Live Closeout (2026-07-02)
+
+**Owner deploy:** PASS — `npx wrangler deploy`
+**Deployed Worker version:** not captured
+**Live sanity:** PASS — 21/21
+
+### Post-deploy static checks
+
+| Check | Result |
+|-------|--------|
+| `node --check public/app-v10.js` | no output, exit 0 |
+| `hardening-smoke-test.mjs` | `3298 passed, 0 failed` |
+| `belief-engine-static-check.mjs` | `24 passed, 0 failed` |
+| `worker-route-static-check.mjs` | `57 passed, 0 failed / 1 known warn` |
+
+Known warn: `/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`
+
+### Live sanity results (21/21 PASS)
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Claim/RunPack area opens without console-breaking errors | PASS |
+| 3 | Existing claim can be selected | PASS |
+| 4 | RunPack/Investigation Packet can be generated or displayed | PASS |
+| 5 | Snapshot-hash stale warning uses new copy: `claim updated since packet` | PASS |
+| 6 | Old copy `source snapshot changed` is not shown | PASS |
+| 7 | Hash comparison logic still works when claim hash differs from packet `source_snapshot_hash` | PASS |
+| 8 | Generated-time stale warning still works | PASS |
+| 9 | Evidence/test count stale checks still work | PASS |
+| 10 | Stale threshold behaviorally unchanged | PASS |
+| 11 | AI-return import area still works (`rp-return-section`, `Load AI Analysis Return`, `rp-return-next-step`, no-auto-publish guidance) | PASS |
+| 12 | Parser behavior unchanged (`JSON.parse`, field extraction) | PASS |
+| 13 | `saveAnalysisResult` still posts only to `/api/analysis` | PASS |
+| 14 | D-275 packet-ID save behavior still works | PASS |
+| 15 | Saved-analysis provenance line still works: `Saved from RunPack: rp_...` | PASS |
+| 16 | Public profile `/u/:slug` does not expose packet/analysis provenance | PASS |
+| 17 | Public truth behavior unchanged | PASS |
+| 18 | Review/moderation unchanged | PASS |
+| 19 | Drift/Belief expansion unaffected | PASS |
+| 20 | No backend/API/schema/storage behavior changed | PASS |
+| 21 | No console errors | PASS |
