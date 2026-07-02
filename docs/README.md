@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-288A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint) + D-285 owner pending-Review Truth visibility (see D-286A checkpoint) + D-287 saved analysis assisted Truth draft (see D-288A checkpoint), current baseline 3360/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–101.
 
-### `D288A_SAVED_ANALYSIS_ASSISTED_TRUTH_DRAFT_CHECKPOINT.md` ⭐ CURRENT — D-288A SAVED ANALYSIS ASSISTED TRUTH DRAFT CHECKPOINT — DOCS ONLY
+### `D289A_OWNER_WORKFLOW_PRODUCT_PASS.md` ⭐ CURRENT — D-289A OWNER WORKFLOW PRODUCT PASS — DOCS ONLY
+
+Product pass over the complete owner workflow (claim → RunPack → saved analysis → draft Truth → submit → My HumanX). Answers 15 product-pass questions. Identifies D-289B candidate: consolidate the three stacked provenance/disclaimer notes in `analysisItem()` into a compact block to improve card scannability. No implementation. Baseline 3360/0/24/57. No deploy needed.
+
+### `D288A_SAVED_ANALYSIS_ASSISTED_TRUTH_DRAFT_CHECKPOINT.md` — D-288A SAVED ANALYSIS ASSISTED TRUTH DRAFT CHECKPOINT — DOCS ONLY
 
 Closes the D-287 arc. Records: D-287A audit (23 questions; `plainLanguageSummary` safe; `verdict` blocked; frontend-only); D-287B implementation (`draftTruthFromAnalysis()`, prefill-only, conditional button, draft-only guidance); D-287C 31/31 live PASS. Safe-next rules 99–101 added. Baseline 3360/0/24/57. No deploy needed.
 
