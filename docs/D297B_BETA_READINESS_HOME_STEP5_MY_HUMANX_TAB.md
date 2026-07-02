@@ -1,7 +1,7 @@
 # D-297B — Beta Readiness Home Step 5 and My HumanX Tab
 
 **Scope:** Frontend-only (`public/app-v10.js`, `public/index.html`, `scripts/hardening-smoke-test.mjs`)
-**Status:** COMPLETE — deploy needed (frontend files changed)
+**Status:** COMPLETE — owner deployed (D-297C live closeout: 25/25 PASS)
 **Branch:** main (direct commit)
 **Baseline before D-297B:** 3442 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Baseline after D-297B:** 3462 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
@@ -124,4 +124,37 @@ The `id`, `class`, and `onclick` are unchanged — only the visible text label c
 | Task | Deploy | Notes |
 |------|--------|-------|
 | D-297A | No | Product pass / docs only |
-| D-297B | **Needed** | Frontend files changed (`app-v10.js`, `index.html`) |
+| D-297B | **Yes — owner deployed** | PASS — D-297C live closeout (25/25) |
+| D-297C | No | Live closeout |
+
+### D-297C Live Sanity (2026-07-02) — 25/25 PASS
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Home loads without console-breaking errors | PASS |
+| 3 | Home "Start here" strip is visible | PASS |
+| 4 | Step 5 appears: "5. Track Review — submitted Truths wait for admin approval and appear in My HumanX with a Review badge." | PASS |
+| 5 | Step 5 clearly says submitted Truths wait for admin approval | PASS |
+| 6 | Step 5 clearly points to My HumanX | PASS |
+| 7 | Step 5 mentions Review badge | PASS |
+| 8 | Visible tab label says "My HumanX" | PASS |
+| 9 | Internal tab behavior still works when clicking My HumanX | PASS |
+| 10 | `tab-me` behavior remains preserved | PASS |
+| 11 | `renderMe()` still loads My HumanX | PASS |
+| 12 | My HumanX opens without console-breaking errors | PASS |
+| 13 | My HumanX data source remains `GET /api/my-humanx` | PASS |
+| 14 | Review explanation inside My HumanX remains: "Review: awaiting admin approval — goes Public when approved." | PASS |
+| 15 | Pending Truths still show yellow Review badge | PASS |
+| 16 | Truth submission still uses `review_state='review'` | PASS |
+| 17 | D-285B post-submit navigation preserved (`renderMe()`, `tab-me`, toast) | PASS |
+| 18 | No direct publish/approve route added to submission path | PASS |
+| 19 | Public profile `/u/:slug` unaffected | PASS |
+| 20 | Saved analysis remains private | PASS |
+| 21 | Draft Truth from analysis remains draft-only | PASS |
+| 22 | No backend/API/schema/storage behavior changed | PASS |
+| 23 | No CSS behavior changed | PASS |
+| 24 | Drift/Belief expansion unaffected | PASS |
+| 25 | No console errors | PASS |
+
+**Deployed Worker version:** not captured
