@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-282A saved analysis to Truth boundary checkpoint.
-Previous checkpoint: 2026-07-02 after D-280A owner RunPack workflow wording checkpoint.
+Last updated: 2026-07-02 after D-284A Truth drafting and Review workflow checkpoint.
+Previous checkpoint: 2026-07-02 after D-282A saved analysis to Truth boundary checkpoint.
 
 ---
 
@@ -39,10 +39,11 @@ Previous checkpoint: 2026-07-02 after D-280A owner RunPack workflow wording chec
 | **D-278A checkpoint HEAD** | see `docs/README.md` after commit (D-278A saved analysis provenance visibility checkpoint) |
 | **D-280A checkpoint HEAD** | see `docs/README.md` after commit (D-280A owner RunPack workflow wording checkpoint) |
 | **D-282A checkpoint HEAD** | see `docs/README.md` after commit (D-282A saved analysis to Truth boundary checkpoint) |
+| **D-284A checkpoint HEAD** | see `docs/README.md` after commit (D-284A Truth drafting and Review workflow checkpoint) |
 
 ---
 
-## Current baseline (as of D-282A)
+## Current baseline (as of D-284A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -558,6 +559,16 @@ This arc audited the boundary between saved AI analysis and public Truth creatio
 **Behavior unchanged:** `saveAnalysisResult()` still posts only to `/api/analysis`. No Truth creation/submission/approval route added. No CSS/backend/schema/migration/worker changes.
 **Tests added in arc:** 19 new tests (3298 → 3317 total). **Deploys:** 1 (D-281C). **Schema migrations applied:** 0.
 
+### D-283 mini-arc: Truth drafting and Review workflow audit
+
+This arc audited the Truth creation and Review gate end-to-end. No code was changed. The audit confirmed all three frontend Truth creation paths produce `review_state='review'`, the Review gate is admin-only, and saved AI analysis has no connection to Truth submission.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-283A | Audit | Full audit of Truth drafting and Review workflow. 21 audit questions answered. Three frontend creation paths (`submitTruth`, `submitBuilderTruth`, `promoteBelief('truth')`) all produce `review_state='review'`. Admin-only Review queue handles approval/rejection. No path bypasses Review. No saved-analysis path connects to Truth creation. All copy accurate. One LOW finding (F-1): owner has no way to see their own pending-Review truths after submission. No fix needed without backend query/API change. Docs only. Baseline unchanged: 3317/0/24/57. |
+
+**No code changes. No schema changes. No deploy. Baseline unchanged.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -907,7 +918,9 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-281A | Audit / docs only — no deploy needed |
 | D-281B | Owner deploy PASS — 25/25 live sanity PASS (D-281C, 2026-07-02) · deployed Worker version not captured |
 | D-281C | Live closeout — no deploy needed (closeout of D-281B deploy) |
-| D-282A (this task) | Docs only — **no deploy needed** |
+| D-282A | Docs only — no deploy needed |
+| D-283A | Audit / docs only — no deploy needed |
+| D-284A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 | **Latest deployed Worker** | not captured (D-281C, 2026-07-02) |
 
@@ -1110,6 +1123,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 92. **Public profile and truth surfaces must continue to be tested for non-exposure of saved-analysis metadata** — any new field added to `analysisItem()`, `sectionAnalyses()`, or `saveAnalysisResult()` must add a corresponding test confirming the field does not appear in `renderPublicProfileHtml`. Do not remove D-281B tests 10–12 under any refactor.
 
+93. **Truth creation must continue to route through Review** — all three creation paths (`submitTruth`, `submitBuilderTruth`, `promoteBelief('truth')`) produce `review_state='review'`. No future task may bypass this gate without a separate backend/moderation spec and explicit owner approval.
+
+94. **Saved analysis must never auto-publish a Truth** — `saveAnalysisResult()` must not call `POST /api/truths`, `POST /api/review/decision`, or any approve/publish route. Any "analysis → Truth" affordance must be prefill-only with explicit owner confirmation before any `POST /api/truths` call, must not auto-publish, and must add public-boundary non-exposure tests.
+
+95. **Owner pending-Review Truth visibility requires backend/API audit before implementation** — `GET /api/me` truths query currently filters to `review_state='public'` only. Showing owners their pending-Review truths requires a backend query change and is branch/PR-required. Do not add this under any frontend-only or docs-only task.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1136,7 +1155,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Saved analysis provenance visibility | **COMPLETE** — D-277B/C; `analysisItem()` renders `Saved from RunPack: rp_...` when `packetId` exists; live |
 | Stale warning wording polish | **COMPLETE** — D-279B/C; `claim updated since packet` live; old `source snapshot changed` removed from UI |
 | Saved analysis ↔ Truth boundary copy | **COMPLETE** — D-281B/C; explicit no-auto-publish + private-note copy live; boundary structurally confirmed |
+| Truth drafting/Review workflow audit | **COMPLETE** — D-283A/D-284A; three creation paths confirmed all produce `review_state='review'`; admin-only Review gate confirmed; copy accurate; one LOW finding (F-1) deferred |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, and boundary copy all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
+| Owner pending-Review Truth visibility | **Backend/API audit required first** — `GET /api/me` truths query filters to `public` only; showing pending truths to owner requires backend query change + branch/PR workflow |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
@@ -1353,4 +1374,6 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-281A | `audit` | Saved analysis ↔ Truth boundary audit — boundary structurally sound; F-1/F-2 copy gaps identified; docs only |
 | D-281B | `(D-281C live)` | Saved analysis private/no-auto-publish copy polish — `sectionAnalyses()` + `analysisItem()` copy added; 19 new tests; baseline 3298 → 3317 |
 | D-281C | live closeout | D-281B owner deploy PASS; 25/25 live sanity PASS; deployed Worker version not captured |
-| D-282A | this commit | **[Current]** Saved analysis to Truth boundary checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-282A | `dbb6f75` | Saved analysis to Truth boundary checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-283A | `e6ab0d0` | Truth drafting and Review workflow audit — 21 questions; three creation paths confirmed; Review gate confirmed; no code changes; docs only; no deploy |
+| D-284A | this commit | **[Current]** Truth drafting and Review workflow checkpoint — `PROJECT_STATE.md` updated; safe-next rules 93–95 added; docs only; no deploy |

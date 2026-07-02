@@ -51,9 +51,13 @@ Expected results:
 
 Read these first when starting a new session or returning after time away.
 
-**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-282A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc (see D-282A checkpoint), current baseline 3317/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–92.
+**Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-284A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint), current baseline 3317/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–95.
 
-### `D283A_TRUTH_DRAFTING_AND_REVIEW_WORKFLOW_AUDIT.md` ⭐ CURRENT — D-283A TRUTH DRAFTING AND REVIEW WORKFLOW AUDIT — DOCS ONLY
+### `D284A_TRUTH_DRAFTING_AND_REVIEW_WORKFLOW_CHECKPOINT.md` ⭐ CURRENT — D-284A TRUTH DRAFTING AND REVIEW WORKFLOW CHECKPOINT — DOCS ONLY
+
+Closes the D-283 Truth drafting/Review workflow audit arc. Three frontend creation paths all produce `review_state='review'`. Admin-only Review gate confirmed. Saved analysis ↔ Truth boundary confirmed sound. All copy accurate. F-1 LOW (owner pending-Review visibility) deferred — backend/API audit required. Safe-next rules 93–95 added. Baseline: 3317/0/24/57 (unchanged). No deploy needed.
+
+### `D283A_TRUTH_DRAFTING_AND_REVIEW_WORKFLOW_AUDIT.md` — D-283A TRUTH DRAFTING AND REVIEW WORKFLOW AUDIT — DOCS ONLY
 
 Full audit of the Truth creation and Review gate. Three frontend creation paths (`submitTruth`, `submitBuilderTruth`, `promoteBelief('truth')`) all produce `review_state='review'`. Admin-only Review queue handles approval/rejection. No path bypasses Review. Saved AI analysis has no connection to Truth creation. All copy accurate. One LOW finding (F-1): no owner-facing view of pending-Review truths — no fix required without backend change. Baseline: 3317/0/24/57 (unchanged). No deploy needed.
 
