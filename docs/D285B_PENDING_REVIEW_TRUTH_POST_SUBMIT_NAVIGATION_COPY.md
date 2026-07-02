@@ -137,4 +137,38 @@ Known warn: `/api/u/:slug — known parameterised route; implemented via regex i
 | Task | Deploy | Result |
 |------|--------|--------|
 | D-285A | No | Docs only |
-| D-285B | **Yes — needed** | `public/app-v10.js` changed |
+| D-285B | **Yes — owner deployed** | PASS — D-285C live closeout |
+
+## Live Sanity (D-285C — owner-verified, 2026-07-02)
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Owner can access Truth submission flow | PASS |
+| 3 | `submitTruth()` success path sends owner to My HumanX | PASS |
+| 4 | `submitBuilderTruth()` success path sends owner to My HumanX | PASS |
+| 5 | `promoteBelief('truth')` success path sends owner to My HumanX | PASS |
+| 6 | Toast: `Submitted for Review — you can see it in My HumanX with the Review badge.` | PASS |
+| 7 | My HumanX tab opens after submission | PASS |
+| 8 | Submitted pending Truth visible in My HumanX | PASS |
+| 9 | Pending Truth shows yellow `Review` badge | PASS |
+| 10 | `GET /api/my-humanx` remains owner pending Truth visibility source | PASS |
+| 11 | Truth submissions still use `review_state='review'` | PASS |
+| 12 | No submitted Truth publishes automatically | PASS |
+| 13 | Admin Review remains the only approval path | PASS |
+| 14 | Public Truths tab behavior unchanged for public/approved Truths | PASS |
+| 15 | Public profile `/u/:slug` unaffected | PASS |
+| 16 | Saved analysis remains separate from Truth submission | PASS |
+| 17 | `saveAnalysisResult()` still posts only to `/api/analysis` | PASS |
+| 18 | AI-return import locks preserved (`rp-return-section`, `Load AI Analysis Return`, `Saving does not publish a truth automatically`) | PASS |
+| 19 | Stale detection still works (`claim updated since packet`) | PASS |
+| 20 | Packet-ID storage still works | PASS |
+| 21 | Saved-analysis provenance/private-boundary copy preserved | PASS |
+| 22 | Review/moderation behavior unchanged | PASS |
+| 23 | Drift/Belief expansion unaffected | PASS |
+| 24 | No backend/API/schema/storage behavior changed | PASS |
+| 25 | No console errors | PASS |
+
+**Live sanity: 25/25 PASS**
+
+Deployed Worker version: not captured.
