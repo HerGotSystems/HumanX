@@ -1,7 +1,7 @@
 # D-274B — RunPack Snapshot-Hash Stale Detection Implementation
 
 **Scope:** Frontend (`public/app-v10.js`) + tests + docs
-**Status:** COMPLETE — deploy needed
+**Status:** COMPLETE — owner deploy PASS (D-274C, 2026-07-02) — 24/24 live sanity PASS
 **Baseline before:** 3217 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Baseline after:** 3239 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **New tests:** +22 (D-274B block: 22 new; 3 prior F-4-deferred tests updated)
@@ -10,7 +10,7 @@
 **CSS changes:** None
 **Worker changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes — `public/app-v10.js` changed
+**Deploy needed:** No — deployed (D-274C, 2026-07-02)
 
 ---
 
@@ -145,3 +145,51 @@ For **fallback packets**, `simpleClaimHash(selected)` is an **exact match** comp
 - `wrangler.toml` — not touched
 - No `alignment_labels` — permanently blocked
 - No `top_beliefs_json` in any public API
+
+---
+
+## D-274C — Live Closeout (2026-07-02)
+
+**Owner deploy:** PASS
+**Live snapshot-hash stale detection sanity:** PASS — 24/24
+**Deployed Worker version:** not captured
+
+### Post-deploy static checks
+
+| Script | Result |
+|--------|--------|
+| `node --check public/app-v10.js` | no output, exit 0 |
+| `hardening-smoke-test.mjs` | `3239 passed, 0 failed` |
+| `belief-engine-static-check.mjs` | `24 passed, 0 failed` |
+| `worker-route-static-check.mjs` | `57 passed, 0 failed / 1 known warn` |
+
+Known warn: `/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`
+
+### Live sanity results (24/24 PASS)
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Claim/RunPack area opens without console-breaking errors | PASS |
+| 3 | Existing claim can be selected | PASS |
+| 4 | RunPack/Investigation Packet can be generated or displayed | PASS |
+| 5 | Normal generated-time stale warning still works | PASS |
+| 6 | Evidence/test count stale checks still work | PASS |
+| 7 | New `source snapshot changed` stale warning appears when claim hash differs from packet | PASS |
+| 8 | Non-stale packet state still does not show the new warning | PASS |
+| 9 | `Load AI Analysis Return` still appears | PASS |
+| 10 | `rp-return-section` auto-expands when `lastPacket && lastPacketClaimId === selected?.id` | PASS |
+| 11 | `rp-return-next-step` copy still appears | PASS |
+| 12 | Copy tells user to paste AI/JSON return | PASS |
+| 13 | Copy states "Saving does not publish a truth automatically" | PASS |
+| 14 | Parser behavior unchanged (`JSON.parse`, field extraction) | PASS |
+| 15 | Parse failure toast unchanged | PASS |
+| 16 | Success toast unchanged | PASS |
+| 17 | `saveAnalysisResult` posts only to `/api/analysis` | PASS |
+| 18 | Public truth state unchanged | PASS |
+| 19 | Review/moderation unchanged | PASS |
+| 20 | Public profile does not expose AI-return import controls | PASS |
+| 21 | F-5 packet-ID storage still deferred | PASS |
+| 22 | Drift/Belief expansion unaffected | PASS |
+| 23 | No backend/API/schema/storage behavior changed | PASS |
+| 24 | No console errors | PASS |
