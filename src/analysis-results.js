@@ -19,6 +19,7 @@ export async function addAnalysisResult(request, env, helpers) {
 
   const now = Date.now();
   const id = makeId('anl');
+  const packetId = cleanText(body.packet_id || '', 80) || null;
   const verdict = cleanText(analysis.verdict || '', 80);
   const evidenceScore = clampNum(analysis.evidence_score ?? analysis.evidenceScore, 0, 100);
   const testability = clampNum(analysis.testability, 0, 100);
@@ -44,8 +45,8 @@ export async function addAnalysisResult(request, env, helpers) {
     INSERT INTO analysis_results (
       id,claim_id,user_id,source,verdict,evidence_score,testability,survivability,
       strongest_support_json,strongest_pressure_json,missing_tests_json,
-      plain_language_summary,raw_json,created_at
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      plain_language_summary,raw_json,packet_id,created_at
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `).bind(
     id,
     claimId,
@@ -60,6 +61,7 @@ export async function addAnalysisResult(request, env, helpers) {
     JSON.stringify(asArray(missingTests)),
     cleanText(plainLanguageSummary, 1200),
     JSON.stringify(analysis),
+    packetId,
     now
   ).run();
 
@@ -93,6 +95,7 @@ export function mapAnalysis(a) {
     missingTests: safeParse(a.missing_tests_json) || [],
     plainLanguageSummary: a.plain_language_summary || '',
     raw: safeParse(a.raw_json) || null,
+    packetId: a.packet_id || null,
     createdAt: a.created_at,
     handle: a.handle || 'anon'
   };
