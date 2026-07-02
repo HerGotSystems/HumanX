@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-276A RunPack provenance checkpoint.
-Previous checkpoint: 2026-07-02 after D-273A RunPack AI-return import visibility checkpoint.
+Last updated: 2026-07-02 after D-278A saved analysis provenance visibility checkpoint.
+Previous checkpoint: 2026-07-02 after D-276A RunPack provenance checkpoint.
 
 ---
 
@@ -36,10 +36,11 @@ Previous checkpoint: 2026-07-02 after D-273A RunPack AI-return import visibility
 | **D-270A checkpoint HEAD** | see `docs/README.md` after commit (D-270A RunPack fallback guidance / generated-time checkpoint) |
 | **D-273A checkpoint HEAD** | see `docs/README.md` after commit (D-273A RunPack AI-return import visibility checkpoint) |
 | **D-276A checkpoint HEAD** | see `docs/README.md` after commit (D-276A RunPack provenance checkpoint) |
+| **D-278A checkpoint HEAD** | see `docs/README.md` after commit (D-278A saved analysis provenance visibility checkpoint) |
 
 ---
 
-## Current baseline (as of D-276A)
+## Current baseline (as of D-278A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -53,7 +54,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3263 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3288 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -517,6 +518,18 @@ This arc addressed D-268A findings F-4 and F-5, implementing content-level stale
 
 **Tests added in arc:** 42 new tests (3217 → 3263 total). **Deploys:** 2 (D-274C, D-275D). **Schema migrations applied:** 1 (`0017`). **F-3, F-4, F-5 all COMPLETE.**
 
+### D-277 mini-arc: Saved analysis provenance visibility
+
+This arc surfaced the stored `packet_id` to the owner/private Study view. D-277A confirmed frontend-only feasibility. D-277B added a conditional provenance line to `analysisItem()`. D-277C was the live closeout.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-277A | Audit | Confirmed `packetId` is already returned by `GET /api/claims/:id` but not rendered. Frontend-only implementation safe. No backend/schema changes needed. Docs only. Baseline unchanged: 3263/0/24/57. |
+| D-277B | Implementation | `analysisItem()` line 466: conditional `<p class="small ev-origin-note">Saved from RunPack: ${esc(a.packetId)}</p>` added. 25 new tests. Baseline 3263 → 3288. |
+| D-277C | Live closeout | Owner deploy PASS (2026-07-02). 22/22 live sanity PASS. Deployed Worker version: not captured. |
+
+**Tests added in arc:** 25 new tests (3263 → 3288 total). **Deploys:** 1 (D-277C). **Schema migrations applied:** 0. **No backend/API/CSS/index changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -850,9 +863,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-275B | Branch `d275b-runpack-packet-id-storage` — no standalone deploy (branch-only) |
 | D-275C | Pre-merge review — no deploy needed |
 | D-275D | Owner deploy PASS — 22/22 live sanity PASS · D1 migration `0017` applied · deployed Worker: `759acc15-a6dd-4e50-a070-0d3356e5c257` |
-| D-276A (this task) | Docs only — **no deploy needed** |
+| D-276A | Docs only — no deploy needed |
+| D-277A | Audit — no deploy needed |
+| D-277B | Owner deploy PASS — 22/22 live sanity PASS · deployed Worker version not captured |
+| D-277C | Live closeout — no deploy needed (closeout of D-277B deploy) |
+| D-278A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | `759acc15-a6dd-4e50-a070-0d3356e5c257` (D-275D, 2026-07-02) |
+| **Latest deployed Worker** | not captured (D-277C, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1035,6 +1052,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 83. **Do not assume public profile exposes analysis metadata** — `loadPublicProfileSummary()` does not call `listAnalysisForClaim()`. `analysis_results.packet_id` and `packetId` in `GET /api/claims/:id` are authenticated-only fields. Verify `/u/:slug` separately from authenticated claim detail routes before assuming any analysis field is public.
 
+84. **Owner/private provenance display must remain separate from public surfaces** — `analysisItem()` renders in `sectionAnalyses()` inside `renderStudy()` only. Do not call `analysisItem()` from `renderPublicProfileHtml`, truth cards, or any unauthenticated surface. Any reuse across the public/private boundary requires an explicit audit.
+
+85. **Any future public exposure of packet/analysis provenance requires explicit audit first** — `packet_id`, `packetId`, `Saved from RunPack`, and any future provenance field derived from `analysis_results` must be audited for privacy/security impact before appearing in any public route, public profile, or truth card. Do not assume the owner-only display pattern is safe to copy to public surfaces without a new audit task.
+
+86. **Frontend-only provenance UI changes still need public-profile non-exposure tests** — even if an implementation is classified as frontend-only, any change to `analysisItem()` or `sectionAnalyses()` must add or preserve tests confirming the new content does not appear in `renderPublicProfileHtml`. Do not remove D-275B tests 13–15 or D-277B tests 8–9 under any refactor.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1058,7 +1081,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | RunPack AI-return import visibility | **COMPLETE** — F-3 addressed in D-271A/B; regression-locked in D-272A |
 | Snapshot-hash stale detection | **COMPLETE** — F-4 implemented in D-274B; `source_snapshot_hash` check live in `detectPacketStaleness()` |
 | Packet-ID traceability backend/schema decision | **COMPLETE** — F-5 implemented in D-275B/C/D; `analysis_results.packet_id` live; Worker `759acc15` |
-| Next RunPack work | **Audit-first** — F-3/F-4/F-5 complete; any further RunPack backend work requires an audit task before implementation unless frontend-only |
+| Saved analysis provenance visibility | **COMPLETE** — D-277B/C; `analysisItem()` renders `Saved from RunPack: rp_...` when `packetId` exists; live |
+| Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5 and provenance display complete; any further RunPack backend work requires an audit task; frontend-only provenance changes must still add public-profile non-exposure tests |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
