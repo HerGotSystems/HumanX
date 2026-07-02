@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-292A My HumanX Recent Truths prominence checkpoint.
-Previous checkpoint: 2026-07-02 after D-290A owner workflow product polish checkpoint.
+Last updated: 2026-07-02 after D-294A My HumanX collapsible Profile Settings checkpoint.
+Previous checkpoint: 2026-07-02 after D-292A My HumanX Recent Truths prominence checkpoint.
 
 ---
 
@@ -44,10 +44,11 @@ Previous checkpoint: 2026-07-02 after D-290A owner workflow product polish check
 | **D-288A checkpoint HEAD** | see `docs/README.md` after commit (D-288A saved analysis assisted Truth draft checkpoint) |
 | **D-290A checkpoint HEAD** | see `docs/README.md` after commit (D-290A owner workflow product polish checkpoint) |
 | **D-292A checkpoint HEAD** | see `docs/README.md` after commit (D-292A My HumanX Recent Truths prominence checkpoint) |
+| **D-294A checkpoint HEAD** | see `docs/README.md` after commit (D-294A My HumanX collapsible Profile Settings checkpoint) |
 
 ---
 
-## Current baseline (as of D-292A)
+## Current baseline (as of D-294A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -61,7 +62,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3405 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3424 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -675,6 +676,37 @@ This arc ran a product pass over the My HumanX owner dashboard (D-291A), identif
 
 **Tests added in arc:** 20 new tests + 2 updated (3383 → 3405 total). **Deploys:** 1 (D-291B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
 
+### D-293 mini-arc: My HumanX collapsible Profile Settings
+
+This arc ran a product pass over My HumanX as a whole dashboard (D-293A), identified that Profile Settings was always-open and pushed the My Content counts / filter bar / Recent Truths area down on every returning-owner visit after initial setup, and fixed it by wrapping the editable controls in native HTML `<details>/<summary>` (D-293B). D-293C was the live closeout.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-293A | Product pass (docs) | Full 15-question product pass over My HumanX as a whole dashboard. Conclusion: page is well-ordered post-D-291B; one remaining friction — Profile Settings form is always-open between the Account card and the My Content counts/filter/activity area. Expanding and re-collapsing via `<details>/<summary>` identified as smallest safe fix. Docs only. Baseline unchanged: 3405/0/24/57. |
+| D-293B | Frontend | `meProfileSettingsHtml()`: replaced `<h3>Profile Settings</h3>` with `<details><summary>Profile Settings</summary>` wrapping all editable controls (toggle, slug, bio, preview, Save, Copy link). Account card in separate `meAccountCardHtml()` function is completely unaffected. 15 new D-293B tests. Baseline 3405 → 3424. |
+| D-293C | Live closeout | Owner deploy PASS (2026-07-02). 27/27 live sanity PASS. Deployed Worker version not captured. |
+| D-294A | Checkpoint (docs) | Closes D-293 arc. No deploy. Baseline unchanged 3424/0/24/57. |
+
+**D-293 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| Account card always visible | Yes — `meAccountCardHtml()` is a separate function/panel, not inside `<details>` |
+| Profile Settings summary always visible | Yes — `<summary>Profile Settings</summary>` always rendered |
+| Collapsed controls | Toggle, slug, bio, preview/guardrail, Save, Copy link — all inside `<details>` |
+| Profile save behavior | Unchanged — `saveProfileSettingsUI` handler untouched |
+| Public-link copy behavior | Unchanged — `meCopyProfileLink` handler untouched |
+| `meUpdateProfilePreview()` wiring | Unchanged — still wired on toggle, slug, bio inputs |
+| My Content counts | Immediately reachable without scrolling through form |
+| Filter bar | Immediately reachable |
+| Recent Truths | Still first content panel after filter bar |
+| Review explanation | `"Review: awaiting admin approval — goes Public when approved."` unchanged |
+| Yellow `Review` badge | Preserved — `ME_STATE_CLR.review = 'b-yellow'` unchanged |
+| Public profile `/u/:slug` | Unaffected |
+| No CSS, backend, schema, API, migration changes in D-293 | Confirmed |
+
+**Tests added in arc:** 15 new tests (3405 → 3424 total). **Deploys:** 1 (D-293B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -937,6 +969,8 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | Recent Truths / Review explanation in public profile | **Not exposed** — `renderMeHtml()` is owner-private; `meRecentTruthsHtml()` is not called from `renderPublicProfileHtml()`; "Review: awaiting admin approval" explanation copy is owner-dashboard-only | D-291B tests 7–9 |
 | Pending Review Truths on public profile (post D-291) | **Not exposed** — My HumanX `renderMeHtml()` reorder did not alter `renderPublicProfileHtml()`; pending Review truths remain absent from `/u/:slug`; `COALESCE(review_state,'public')='public'` filter on public route unchanged | D-291B test 8 |
 | No new public data fields in D-291 | **Confirmed** — frontend-only template reorder and copy addition; zero new API/schema/storage fields; no backend/migration/CSS/CSP changes | D-291B |
+| Profile Settings controls in public profile | **Not exposed** — `meProfileSettingsHtml()` is owner-private; `<details>/<summary>` wrapping is My HumanX-only; `me-profile-settings` class absent from `renderPublicProfileHtml()` | D-293B test 12 |
+| No new public data fields in D-293 | **Confirmed** — frontend-only `<details>/<summary>` wrap; zero new API/schema/storage fields; no backend/migration/CSS/CSP changes | D-293B |
 
 ---
 
@@ -1052,9 +1086,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-291A | Docs only — no deploy needed |
 | D-291B | Owner deploy PASS — D-291C confirmed live (24/24) · deployed Worker version not captured |
 | D-291C | Live closeout — no deploy needed (closeout of D-291B deploy) |
-| D-292A (this task) | Docs only — **no deploy needed** |
+| D-292A | Docs only — no deploy needed |
+| D-293A | Docs only — no deploy needed |
+| D-293B | Owner deploy PASS — D-293C confirmed live (27/27) · deployed Worker version not captured |
+| D-293C | Live closeout — no deploy needed (closeout of D-293B deploy) |
+| D-294A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-291C, 2026-07-02) |
+| **Latest deployed Worker** | not captured (D-293C, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1285,6 +1323,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 107. **Owner dashboard layout changes must preserve `GET /api/my-humanx` as the data source unless separately audited** — `renderMe()` fetches from `GET /api/my-humanx`. Any future My HumanX improvement that requires a different endpoint, a new query parameter, or a `review_state` filter must be explicitly audited for owner/public data isolation before implementation. Do not add query parameters or additional endpoints under a frontend-layout-only task.
 
+108. **My HumanX Account card must remain visible even when Profile Settings controls are collapsed** — the Account card (`meAccountCardHtml()`) is a separate function and panel, always rendered above the Profile Settings `<details>` block. Any future `renderMeHtml()` change must not move `meAccountCardHtml()` inside the `<details>` block or make it conditional on Profile Settings state. The D-293B test (Account card separate from Profile Settings) must continue to pass.
+
+109. **Profile-edit UI polish must preserve profile save/copy behavior and public profile non-exposure locks** — `saveProfileSettingsUI` and `meCopyProfileLink` handlers, `meUpdateProfilePreview()` wiring, and the `me-profile-settings` class must not change under any owner-dashboard layout task. Any change to these handlers requires a separate spec. The profile settings panel must remain absent from `renderPublicProfileHtml()`.
+
+110. **Owner-dashboard layout changes must keep Recent Truths high enough for post-submit Review visibility** — Recent Truths must stay as the first content panel after the filter bar (D-291B). Any future `renderMeHtml()` reorder that moves Recent Truths below the Profile Settings block, My Content counts, or Recent Claims requires a new spec and explicit owner approval. The D-291B and D-293B positional tests must continue to pass.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1317,9 +1361,10 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Saved analysis assisted Truth draft | **COMPLETE** — D-287A audit (23 questions); D-287B implementation (`draftTruthFromAnalysis()`, prefill-only, `plainLanguageSummary` only); D-287C live PASS (31/31); baseline 3360/0/24/57. Draft action is owner/private only; auto-submit and auto-publish impossible; Review gate fully preserved. |
 | Owner workflow product polish | **COMPLETE** — D-289A product pass (15 questions); D-289B card copy consolidation (three stacked notes → one compact line); D-289C live PASS (33/33); baseline 3383/0/24/57. All safety meanings preserved. |
 | My HumanX Recent Truths prominence | **COMPLETE** — D-291A product pass (19 questions); D-291B reorder + Review explanation; D-291C live PASS (24/24); baseline 3405/0/24/57. Recent Truths now visible immediately after filter bar. |
+| My HumanX collapsible Profile Settings | **COMPLETE** — D-293A product pass (15 questions); D-293B `<details>/<summary>` wrap in `meProfileSettingsHtml()`; D-293C live PASS (27/27); baseline 3424/0/24/57. Profile Settings collapses by default; Account card always visible; counts/filter/Truths immediately reachable. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
-| Next owner-dashboard improvement | **Audit-first** — My HumanX Recent Truths prominence complete as of D-292A. Any further owner-dashboard improvement that changes data source, Review state visibility, or public/private boundary must start with an audit task before implementation. |
+| Next owner-dashboard improvement | **Open** — My HumanX post-submit landing page polish arc (D-291→D-293) is complete as of D-294A. Owner-dashboard layout is well-ordered. Next work can move beyond immediate post-submit friction unless a new live issue appears. Any change to data source, Review state visibility, or public/private boundary must still audit-first. |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
