@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3424 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3442 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-294A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint) + D-285 owner pending-Review Truth visibility (see D-286A checkpoint) + D-287 saved analysis assisted Truth draft (see D-288A checkpoint) + D-289 owner workflow product polish / saved-analysis card copy consolidation (see D-290A checkpoint) + D-291 My HumanX Recent Truths prominence (see D-292A checkpoint) + D-293 My HumanX collapsible Profile Settings (see D-294A checkpoint), current baseline 3424/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–110. D-295A product pass complete (docs only) — D-295B candidate: profile-setup nudge, frontend-only.
 
-### `D295A_MY_HUMANX_NEEDS_ATTENTION_PRODUCT_PASS.md` ⭐ CURRENT — D-295A MY HUMANX NEEDS ATTENTION PRODUCT PASS — DOCS ONLY
+### `D295B_MY_HUMANX_PROFILE_SETUP_NUDGE.md` ⭐ CURRENT — D-295B MY HUMANX PROFILE SETUP NUDGE — PENDING DEPLOY
+
+Adds a narrow, self-clearing profile-setup nudge to `renderMeHtml()`. Condition: `!profile_public && !profile_slug`. Copy: "Set up your public profile: open Profile Settings, choose a slug, and switch your profile public when ready." Placed above Account card. Self-clears once slug is set or profile goes public. No CSS/backend/schema changes. 18 new D-295B tests + 7 existing slice-window widenings. Baseline 3424 → 3442. Deploy needed (`public/app-v10.js` changed).
+
+### `D295A_MY_HUMANX_NEEDS_ATTENTION_PRODUCT_PASS.md` — D-295A MY HUMANX NEEDS ATTENTION PRODUCT PASS — DOCS ONLY
 
 15-question product pass on whether My HumanX needs a "Needs attention" strip. Conclusion: do not add a general count-based strip (duplicates My Content panel). D-295B candidate: narrow profile-setup nudge in `renderMeHtml()` — condition `!profile_public && !profile_slug`, one line, 3 tests, frontend-only, self-clears when profile is configured. Baseline 3424/0/24/57. No deploy needed.
 

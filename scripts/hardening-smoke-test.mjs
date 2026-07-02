@@ -6197,7 +6197,7 @@ test('D-137D: account card shows display name/email/handle/user id', () => {
 
 test('D-137D: counts render for claims, truths, evidence, and pressure', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 1000);
+  const slice = appSrc.slice(idx, idx + 1300);
   assert.ok(
     slice.includes("meCountsRow('Claims',counts.claims)") &&
     slice.includes("meCountsRow('Truths',counts.truths)") &&
@@ -6216,7 +6216,7 @@ test('D-137D: counts row renders all five review states', () => {
 
 test('D-137D/E: recent claims, truths, evidence, and pressure sections render', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 2100);
+  const slice = appSrc.slice(idx, idx + 2400);
   assert.ok(
     slice.includes('Recent Claims') && slice.includes('Recent Truths') && slice.includes('Recent Evidence') && slice.includes('Recent Pressure'),
     'renderMeHtml must render Recent Claims/Truths/Evidence/Pressure sections'
@@ -6225,7 +6225,7 @@ test('D-137D/E: recent claims, truths, evidence, and pressure sections render', 
 
 test('D-137D/E: belief snapshots section renders', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 1700);
+  const slice = appSrc.slice(idx, idx + 2000);
   assert.ok(
     slice.includes('Belief Snapshots') && slice.includes("meBeliefSnapshotsHtml(meVisibleSlice('snapshots',snapshots))"),
     'renderMeHtml must render a Belief Snapshots section sourced from data.belief_snapshots'
@@ -6397,7 +6397,7 @@ test('D-137E: state filter applies to claims/truths/evidence/pressure lists, not
 
 test('D-137E: counts remain full totals regardless of the active state filter', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 1000);
+  const slice = appSrc.slice(idx, idx + 1300);
   assert.ok(
     slice.includes('const counts=data.counts||{}') &&
     slice.includes("meCountsRow('Claims',counts.claims)") &&
@@ -6408,7 +6408,7 @@ test('D-137E: counts remain full totals regardless of the active state filter', 
 
 test('D-137E: section order puts Belief Snapshots before Recent Evidence/Pressure [updated D-291B]', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 2100);
+  const slice = appSrc.slice(idx, idx + 2400);
   const truthsAt = slice.indexOf('Recent Truths');
   const claimsAt = slice.indexOf('Recent Claims');
   const snapshotsAt = slice.indexOf('Belief Snapshots');
@@ -6924,7 +6924,7 @@ test('D-139B: Belief Mirror panel exists in the Me render path', () => {
 
 test('D-139B: Mirror is placed after Belief Snapshots [updated D-291B — Recent Truths now above]', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 2000);
+  const slice = appSrc.slice(idx, idx + 2300);
   const snapshotsAt = slice.indexOf('Belief Snapshots');
   const mirrorAt = slice.indexOf('meMirrorHtml(data)');
   // D-291B moved Recent Truths above Belief Snapshots/Mirror, so Mirror is now after Snapshots but not "before Recent Truths"
@@ -7221,7 +7221,7 @@ test('D-140B: no other public read route was added for profiles', () => {
 
 test('D-140B: frontend Profile Settings panel exists in Me, near the account card', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
-  const slice = appSrc.slice(idx, idx + 900);
+  const slice = appSrc.slice(idx, idx + 1300);
   assert.ok(
     appSrc.includes('function meProfileSettingsHtml') &&
     slice.includes('${meAccountCardHtml(u)}${meProfileSettingsHtml(data)}'),
@@ -24903,6 +24903,108 @@ console.log('\nD-248A: Review card metadata density regression lock');
   // 15. Drift/Belief expansion files untouched
   test('D-293B: Drift/Belief expansion files remain untouched', () => {
     assert.ok(!driftSrc.includes('D-293B'), 'belief-drift-expansion.js must not be modified by D-293B');
+  });
+}
+
+// ── Section D-295B: My HumanX profile setup nudge ────────────────────────────
+
+{
+  const rmeIdx295 = appSrc.indexOf('function renderMeHtml');
+  const rmeSlice295 = appSrc.slice(rmeIdx295, rmeIdx295 + 2500);
+
+  // 1. renderMeHtml contains a profile setup nudge
+  test('D-295B: renderMeHtml() contains a profile setup nudge', () => {
+    assert.ok(rmeSlice295.includes('profile_slug') && rmeSlice295.includes('profile_public') && rmeSlice295.includes('Profile Settings'), 'renderMeHtml must contain a profile setup nudge referencing Profile Settings');
+  });
+
+  // 2. Nudge condition checks !profile_public
+  test('D-295B: nudge condition checks profile_public', () => {
+    assert.ok(rmeSlice295.includes('profile_public'), 'nudge condition must reference profile_public');
+  });
+
+  // 3. Nudge condition checks !profile_slug
+  test('D-295B: nudge condition checks profile_slug', () => {
+    assert.ok(rmeSlice295.includes('profile_slug'), 'nudge condition must reference profile_slug');
+  });
+
+  // 4. Nudge points to Profile Settings
+  test('D-295B: nudge references Profile Settings', () => {
+    assert.ok(rmeSlice295.includes('Profile Settings'), 'nudge must reference Profile Settings');
+  });
+
+  // 5. Nudge asks owner to choose a slug
+  test('D-295B: nudge mentions slug', () => {
+    assert.ok(rmeSlice295.includes('slug'), 'nudge must mention slug');
+  });
+
+  // 6. Nudge says profile can be switched public when ready
+  test('D-295B: nudge mentions switching profile public when ready', () => {
+    assert.ok(rmeSlice295.includes('public when ready'), 'nudge must say "public when ready"');
+  });
+
+  // 7. No general count-based "Needs attention" strip
+  test('D-295B: no general Needs attention strip added', () => {
+    assert.ok(!rmeSlice295.includes('Needs attention') && !rmeSlice295.includes('needs attention'), 'must not add a general "Needs attention" strip');
+  });
+
+  // 8. My Content counts panel remains unchanged
+  test('D-295B: My Content counts panel preserved in renderMeHtml()', () => {
+    assert.ok(rmeSlice295.includes('meCountsRow') && rmeSlice295.includes('My Content'), 'My Content counts panel must remain in renderMeHtml()');
+  });
+
+  // 9. GET /api/my-humanx remains the data source
+  test('D-295B: renderMe() still calls GET /api/my-humanx', () => {
+    assert.ok(appSrc.includes("api('/api/my-humanx')"), 'renderMe must still call /api/my-humanx');
+  });
+
+  // 10. Account card remains visible
+  test('D-295B: meAccountCardHtml() still called in renderMeHtml()', () => {
+    assert.ok(rmeSlice295.includes('meAccountCardHtml'), 'Account card must remain in renderMeHtml()');
+  });
+
+  // 11. Profile Settings remains collapsible with <details>/<summary>
+  test('D-295B: meProfileSettingsHtml() still uses <details>/<summary> (D-293B preserved)', () => {
+    const profIdx295 = appSrc.indexOf('function meProfileSettingsHtml');
+    const profSlice295 = appSrc.slice(profIdx295, profIdx295 + 600);
+    assert.ok(profSlice295.includes('<details') && profSlice295.includes('<summary>Profile Settings</summary>'), 'Profile Settings must still use <details>/<summary>');
+  });
+
+  // 12. Recent Truths remains immediately after filter bar
+  test('D-295B: Recent Truths still immediately after filter bar in renderMeHtml()', () => {
+    const filterIdx295 = rmeSlice295.indexOf('meFilterBarHtml()');
+    const truthsIdx295 = rmeSlice295.indexOf('Recent Truths');
+    assert.ok(filterIdx295 !== -1 && truthsIdx295 !== -1 && filterIdx295 < truthsIdx295, 'Recent Truths must still come immediately after filter bar');
+  });
+
+  // 13. Review explanation preserved
+  test('D-295B: Review explanation "awaiting admin approval" preserved in renderMeHtml()', () => {
+    assert.ok(rmeSlice295.includes('awaiting admin approval'), 'Review explanation must remain unchanged');
+  });
+
+  // 14. Pending Review badge preserved
+  test('D-295B: ME_STATE_CLR review badge b-yellow preserved', () => {
+    assert.ok(appSrc.includes("review:'b-yellow'") || appSrc.includes('review:"b-yellow"'), 'Yellow Review badge must remain');
+  });
+
+  // 15. Public profile /u/:slug not touched inside renderMeHtml
+  test('D-295B: public profile route /u/:slug not referenced inside renderMeHtml()', () => {
+    assert.ok(!rmeSlice295.includes('/u/:slug') && !rmeSlice295.includes('/api/u/'), 'public profile route must not appear inside renderMeHtml()');
+  });
+
+  // 16. No backend/API/schema/storage changes — worker.js myHumanX() shape unchanged
+  test('D-295B: worker.js not modified — myHumanX() return shape unchanged', () => {
+    assert.ok(workerSrc.includes("pathname === '/api/my-humanx'") && workerSrc.includes('return json({'), 'myHumanX() return shape must remain unchanged');
+  });
+
+  // 17. No new CSS class added to styles.css for the nudge
+  test('D-295B: styles.css not modified — no new nudge CSS class added', () => {
+    assert.ok(!cssSrc.includes('me-profile-nudge') && !cssSrc.includes('profile-setup-nudge'), 'No new CSS class for nudge must be present in styles.css');
+  });
+
+  // 18. Drift/Belief expansion files untouched
+  test('D-295B: belief-drift-expansion.js not modified by D-295B', () => {
+    const driftSrc295 = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(driftSrc295.length > 0 && !driftSrc295.includes('profileNudge'), 'belief-drift-expansion.js must not reference profileNudge');
   });
 }
 
