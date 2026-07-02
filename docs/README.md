@@ -37,7 +37,7 @@ Expected results:
 | Script | Expected |
 |---|---|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3217 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3239 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-273A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run (9 mini-arcs, 721 tests, 14 deploys — see D-264A wrap-up) + D-265→D-266 Study entry / Back button style mini-arc (64 tests, 1 deploy — see D-267A checkpoint) + D-268→D-269 RunPack fallback guidance/generated-time mini-arc (69 tests, 1 deploy — see D-270A checkpoint) + D-271→D-272 RunPack AI-return import visibility mini-arc (73 tests, 1 deploy — see D-273A checkpoint), current baseline 3217/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–80.
 
-### `D274A_RUNPACK_SNAPSHOT_HASH_STALE_DETECTION_AUDIT.md` ⭐ CURRENT — D-274A RUNPACK SNAPSHOT-HASH STALE DETECTION AUDIT — DOCS ONLY
+### `D274B_RUNPACK_SNAPSHOT_HASH_STALE_DETECTION_IMPLEMENTATION.md` ⭐ CURRENT — D-274B RUNPACK SNAPSHOT-HASH STALE DETECTION — PENDING DEPLOY
+
+App + tests + docs. Deploy needed (`public/app-v10.js` changed). Baseline: 3239/0/24/57 (+22 new tests; 3 prior F-4-deferred tests updated). Implements F-4 (snapshot-hash stale detection). Single `if` block added to `detectPacketStaleness()`: `if(meta.source_snapshot_hash!=null&&simpleClaimHash(selected)!==meta.source_snapshot_hash)w.push('source snapshot changed')`. Guard ensures no false positives on old packets without the field. For fallback packets: exact comparison (same algorithm). For backend packets: coarser comparison (misses content edits that don't change counts — known acceptable limitation from D-274A audit). All D-271/D-272 locks preserved. F-5 (`packet_id` storage) still deferred. No backend/API/schema/CSP/worker/CSS/Drift/Belief changes.
+
+### `D274A_RUNPACK_SNAPSHOT_HASH_STALE_DETECTION_AUDIT.md` — D-274A RUNPACK SNAPSHOT-HASH STALE DETECTION AUDIT — DOCS ONLY
 
 Docs / read-only analysis only. No deploy needed. Baseline: 3217/0/24/57 (unchanged). Audits F-4 (snapshot-hash stale detection) before implementation. Key findings: (1) `source_snapshot_hash` field is present on both backend and fallback packets — set in `buildProvenanceMeta()` via `simpleClaimHash(claim)` (frontend fallback) and `workerSnapshotHash(detail)` (backend); (2) `simpleClaimHash` is already defined in `app-v10.js` line 564 — no new helper needed; (3) `selected` (loaded by `selectClaim()`) has all fields needed to recompute `simpleClaimHash(selected)` for comparison; (4) the comparison is **frontend-only feasible** — add one `if` block inside `detectPacketStaleness()` checking `simpleClaimHash(selected) !== meta.source_snapshot_hash`; (5) for fallback packets the comparison is exact (same algorithm); for backend packets it is coarser (misses content edits that don't change counts) — known and acceptable limitation; (6) no backend/schema/API changes needed for D-274B. D-274B recommended implementation: single `if` block in `detectPacketStaleness()`, ~20 regression tests, one deploy. All D-271/D-272 locks preserved — `rp-return-section`, auto-expand, `rp-return-next-step`, parser, `saveAnalysisResult`, public profile boundary all unaffected.
 
