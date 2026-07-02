@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-01 after D-270A RunPack fallback guidance / generated-time checkpoint.
-Previous checkpoint: 2026-07-01 after D-267A Study entry / Back button style checkpoint.
+Last updated: 2026-07-02 after D-273A RunPack AI-return import visibility checkpoint.
+Previous checkpoint: 2026-07-01 after D-270A RunPack fallback guidance / generated-time checkpoint.
 
 ---
 
@@ -34,10 +34,11 @@ Previous checkpoint: 2026-07-01 after D-267A Study entry / Back button style che
 | **D-264A checkpoint HEAD** | see `docs/README.md` after commit (D-264A Review ergonomics milestone wrap-up) |
 | **D-267A checkpoint HEAD** | see `docs/README.md` after commit (D-267A Study entry / Back button style checkpoint) |
 | **D-270A checkpoint HEAD** | see `docs/README.md` after commit (D-270A RunPack fallback guidance / generated-time checkpoint) |
+| **D-273A checkpoint HEAD** | see `docs/README.md` after commit (D-273A RunPack AI-return import visibility checkpoint) |
 
 ---
 
-## Current baseline (as of D-270A)
+## Current baseline (as of D-273A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -51,7 +52,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3144 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3217 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -467,6 +468,37 @@ This arc audited the Claim/RunPack flow, fixed the two highest-value friction fi
 | D-268C | Live closeout | Owner deploy PASS (2026-07-01). 36/36 live sanity PASS. |
 | D-269A | Regression lock | 44 new tests across 7 categories locking D-268B state permanently. Baseline 3100 → 3144. |
 
+### D-271→D-272 mini-arc: RunPack AI-return import visibility
+
+This arc addressed D-268A finding F-3 (Load AI Analysis Return section always collapsed), implemented the fix, confirmed it live, and locked it. The implementation was frontend-only. No backend/API/schema changes. No public truth-state changes. No Review/moderation changes.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-271A | Feature | `rp-return-section` now auto-expands when `lastPacket&&lastPacketClaimId===selected?.id`. New `rp-return-next-step` copy with no-auto-publish disclaimer. 27 new lock tests. Baseline 3171/0/24/57. |
+| D-271B | Live closeout | Owner deploy PASS (2026-07-01). 32/32 live sanity PASS. Deployed Worker version not captured. |
+| D-272A | Regression lock | 46 new tests across 7 categories. D-93B allowlist extended. Baseline 3171 → 3217. |
+| D-273A | Checkpoint | Docs only — no deploy. Baseline unchanged 3217/0/24/57. |
+
+### AI-return import visibility behavior (post D-271A)
+
+| Feature | Behavior |
+|---------|---------|
+| **`rp-return-section` visibility** | **Auto-expands** when `lastPacket&&lastPacketClaimId===selected?.id` — i.e. a matching packet is loaded for the current claim (D-271A) |
+| Section is gated | Only rendered when `selected` claim exists — not unconditionally shown |
+| `Load AI Analysis Return` title | Present in `rp-return-section` summary — unchanged |
+| **`rp-return-next-step` copy** | **New** (D-271A) — "After your AI analyses the packet, paste its JSON response here. Saving does not publish a truth automatically — it only loads analysis for this claim." |
+| `ev-origin-note` provenance note | Present in `rp-return-body` — "not independent external sources; not independent verification" — unchanged |
+| `analysisPaste` textarea | Present — unchanged |
+| `saveAnalysisResult` JSON.parse | Unchanged — validates with `JSON.parse(text)` |
+| `saveAnalysisResult` field extraction | Unchanged — `parsed.output \|\| parsed.result \|\| parsed.analysis \|\| parsed` |
+| `saveAnalysisResult` failure toast | Unchanged — "Paste valid JSON first" |
+| `saveAnalysisResult` success toast | Unchanged — "Analysis saved — verdict shown in the Analysis section." |
+| `saveAnalysisResult` route | Unchanged — posts to `/api/analysis` only |
+| Public truth state | Unchanged — analysis save does not change `review_state` |
+| `packet_id` advisory check | Advisory-only non-blocking toast — unchanged (F-5 deferred) |
+| F-4 snapshot-hash stale check | Not added (F-4 deferred) |
+| F-5 packet-ID storage | Not added (F-5 deferred) |
+
 ### Current RunPack fallback packet behavior (post D-268B)
 
 | Feature | Behavior |
@@ -766,7 +798,11 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-268B | Owner deploy PASS — D-268C confirmed live (36/36) |
 | D-268C | Live closeout — no deploy needed (closeout of D-268B deploy) |
 | D-269A | Tests / docs only — no deploy needed |
-| D-270A (this task) | Docs only — **no deploy needed** |
+| D-270A | Docs only — no deploy needed |
+| D-271A | Owner deploy PASS — D-271B confirmed live (32/32) · deployed Worker version not captured |
+| D-271B | Live closeout — no deploy needed (closeout of D-271A deploy) |
+| D-272A | Tests / docs only — no deploy needed |
+| D-273A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
@@ -938,6 +974,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 77. **Do not implement packet-ID storage without an explicit backend/schema/API decision** — F-5 (storing `packet_id` with saved analysis) requires an `analysis_results` schema migration. Do not add this under any frontend-only task.
 
+78. **Do not collapse `rp-return-section` by default without owner approval** — `rp-return-section` auto-expands when a matching RunPack is loaded (`lastPacket&&lastPacketClaimId===selected?.id`). Removing the conditional `open` attribute requires explicit owner approval and a D-272A lock update.
+
+79. **Do not remove `rp-return-next-step` or its no-auto-publish copy under a UI clarity task** — the `rp-return-next-step` paragraph and its "Saving does not publish a truth automatically" copy are D-272A-locked. Any change to this copy requires explicit owner approval and a D-272A lock update.
+
+80. **Next RunPack backend work (F-4/F-5) must be branch/PR style** — any implementation of snapshot-hash stale detection (F-4) or packet-ID storage (F-5) requires a backend/schema change and must follow branch/PR workflow with explicit owner approval before merge. Do not add these under any frontend-only or docs-only task.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -958,8 +1000,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 
 | Lane | Notes |
 |------|-------|
-| RunPack AI-return import visibility | F-3 deferred — auto-expand "Load AI Analysis Return" when packet is ready and no analysis saved |
-| Snapshot-hash stale detection | F-4 deferred — compare `source_snapshot_hash` in `detectPacketStaleness()` for content-level staleness |
+| RunPack AI-return import visibility | **COMPLETE** — F-3 addressed in D-271A/B; regression-locked in D-272A |
+| Snapshot-hash stale detection | F-4 deferred — compare `source_snapshot_hash` in `detectPacketStaleness()` for content-level staleness; requires backend/schema decision |
 | Packet-ID traceability backend/schema decision | F-5 deferred — store `packet_id` with saved analysis; requires schema migration |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
@@ -1152,4 +1194,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | D-268B | `732774c` | RunPack fallback guidance + generated-time summary — `instruction`/`output_contract` added to fallback packet; `rpRelativeTime()` helper; `rp-summary-generated` row; 25 tests |
 | D-268C | `e582d3d` | D-268B live closeout — owner deploy PASS; 36/36 live sanity PASS |
 | D-269A | `3a86b10` | RunPack fallback guidance/generated-time regression lock — 44 tests across 7 categories |
-| D-270A | this commit | **[Current]** RunPack fallback guidance/generated-time checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-270A | `6be4164` | RunPack fallback guidance/generated-time checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
+| D-271A | `f948b0e` | **[Arc start]** RunPack AI-return import visibility polish — `rp-return-section` auto-expands on matching RunPack; `rp-return-next-step` no-auto-publish copy; 27 tests |
+| D-271B | `cc4fec6` | D-271A live closeout — owner deploy PASS; 32/32 live sanity PASS; deployed Worker version not captured |
+| D-272A | `7d6d2bc` | RunPack AI-return import visibility regression lock — 46 tests across 7 categories; D-93B allowlist extended |
+| D-273A | this commit | **[Current]** RunPack AI-return import visibility checkpoint — `PROJECT_STATE.md` updated; docs only; no deploy |
