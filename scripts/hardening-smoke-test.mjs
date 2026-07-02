@@ -832,7 +832,7 @@ test('docs/README.md contains "Known-good checks" section', () => {
 // Self-reference: when new checks are added to this file, update docs/README.md
 // Known-good checks table and this assertion together in the same commit.
 test('docs/README.md documents hardening smoke count: 254 passed, 0 failed (legacy check — see D-93B Section 37)', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed') || readmeSrc.includes('2543 passed, 0 failed') || readmeSrc.includes('2573 passed, 0 failed') || readmeSrc.includes('2638 passed, 0 failed') || readmeSrc.includes('2652 passed, 0 failed') || readmeSrc.includes('2665 passed, 0 failed') || readmeSrc.includes('2681 passed, 0 failed') || readmeSrc.includes('2722 passed, 0 failed') || readmeSrc.includes('2730 passed, 0 failed') || readmeSrc.includes('2743 passed, 0 failed') || readmeSrc.includes('2758 passed, 0 failed') || readmeSrc.includes('2778 passed, 0 failed') || readmeSrc.includes('2813 passed, 0 failed') || readmeSrc.includes('2877 passed, 0 failed') || readmeSrc.includes('2903 passed, 0 failed') || readmeSrc.includes('2924 passed, 0 failed') || readmeSrc.includes('2959 passed, 0 failed') || readmeSrc.includes('2978 passed, 0 failed') || readmeSrc.includes('3011 passed, 0 failed') || readmeSrc.includes('3035 passed, 0 failed') || readmeSrc.includes('3075 passed, 0 failed') || readmeSrc.includes('3100 passed, 0 failed') || readmeSrc.includes('3144 passed, 0 failed') || readmeSrc.includes('3171 passed, 0 failed') || readmeSrc.includes('3217 passed, 0 failed') || readmeSrc.includes('3239 passed, 0 failed') || readmeSrc.includes('3263 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed') || readmeSrc.includes('2543 passed, 0 failed') || readmeSrc.includes('2573 passed, 0 failed') || readmeSrc.includes('2638 passed, 0 failed') || readmeSrc.includes('2652 passed, 0 failed') || readmeSrc.includes('2665 passed, 0 failed') || readmeSrc.includes('2681 passed, 0 failed') || readmeSrc.includes('2722 passed, 0 failed') || readmeSrc.includes('2730 passed, 0 failed') || readmeSrc.includes('2743 passed, 0 failed') || readmeSrc.includes('2758 passed, 0 failed') || readmeSrc.includes('2778 passed, 0 failed') || readmeSrc.includes('2813 passed, 0 failed') || readmeSrc.includes('2877 passed, 0 failed') || readmeSrc.includes('2903 passed, 0 failed') || readmeSrc.includes('2924 passed, 0 failed') || readmeSrc.includes('2959 passed, 0 failed') || readmeSrc.includes('2978 passed, 0 failed') || readmeSrc.includes('3011 passed, 0 failed') || readmeSrc.includes('3035 passed, 0 failed') || readmeSrc.includes('3075 passed, 0 failed') || readmeSrc.includes('3100 passed, 0 failed') || readmeSrc.includes('3144 passed, 0 failed') || readmeSrc.includes('3171 passed, 0 failed') || readmeSrc.includes('3217 passed, 0 failed') || readmeSrc.includes('3239 passed, 0 failed') || readmeSrc.includes('3288 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 test('docs/README.md documents belief engine count: 24 passed, 0 failed', () => {
@@ -2216,7 +2216,7 @@ test('D-93B: btn-archive-artifact uses larger font-size (10px) in styles.css', (
 });
 
 test('D-93B: docs/README.md documents hardening smoke count: 254 passed, 0 failed', () => {
-  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed') || readmeSrc.includes('2543 passed, 0 failed') || readmeSrc.includes('2573 passed, 0 failed') || readmeSrc.includes('2638 passed, 0 failed') || readmeSrc.includes('2652 passed, 0 failed') || readmeSrc.includes('2665 passed, 0 failed') || readmeSrc.includes('2681 passed, 0 failed') || readmeSrc.includes('2722 passed, 0 failed') || readmeSrc.includes('2730 passed, 0 failed') || readmeSrc.includes('2743 passed, 0 failed') || readmeSrc.includes('2758 passed, 0 failed') || readmeSrc.includes('2778 passed, 0 failed') || readmeSrc.includes('2813 passed, 0 failed') || readmeSrc.includes('2877 passed, 0 failed') || readmeSrc.includes('2903 passed, 0 failed') || readmeSrc.includes('2924 passed, 0 failed') || readmeSrc.includes('2959 passed, 0 failed') || readmeSrc.includes('2978 passed, 0 failed') || readmeSrc.includes('3011 passed, 0 failed') || readmeSrc.includes('3035 passed, 0 failed') || readmeSrc.includes('3075 passed, 0 failed') || readmeSrc.includes('3100 passed, 0 failed') || readmeSrc.includes('3144 passed, 0 failed') || readmeSrc.includes('3171 passed, 0 failed') || readmeSrc.includes('3217 passed, 0 failed') || readmeSrc.includes('3239 passed, 0 failed') || readmeSrc.includes('3263 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
+  assert.ok(readmeSrc.includes('254 passed, 0 failed') || readmeSrc.includes('266 passed, 0 failed') || readmeSrc.includes('267 passed, 0 failed') || readmeSrc.includes('272 passed, 0 failed') || readmeSrc.includes('286 passed, 0 failed') || readmeSrc.includes('299 passed, 0 failed') || readmeSrc.includes('312 passed, 0 failed') || readmeSrc.includes('324 passed, 0 failed') || readmeSrc.includes('328 passed, 0 failed') || readmeSrc.includes('340 passed, 0 failed') || readmeSrc.includes('353 passed, 0 failed') || readmeSrc.includes('357 passed, 0 failed') || readmeSrc.includes('362 passed, 0 failed') || readmeSrc.includes('372 passed, 0 failed') || readmeSrc.includes('375 passed, 0 failed') || readmeSrc.includes('383 passed, 0 failed') || readmeSrc.includes('392 passed, 0 failed') || readmeSrc.includes('403 passed, 0 failed') || readmeSrc.includes('416 passed, 0 failed') || readmeSrc.includes('479 passed, 0 failed') || readmeSrc.includes('498 passed, 0 failed') || readmeSrc.includes('655 passed, 0 failed') || readmeSrc.includes('724 passed, 0 failed') || readmeSrc.includes('763 passed, 0 failed') || readmeSrc.includes('781 passed, 0 failed') || readmeSrc.includes('827 passed, 0 failed') || readmeSrc.includes('842 passed, 0 failed') || readmeSrc.includes('883 passed, 0 failed') || readmeSrc.includes('907 passed, 0 failed') || readmeSrc.includes('925 passed, 0 failed') || readmeSrc.includes('951 passed, 0 failed') || readmeSrc.includes('970 passed, 0 failed') || readmeSrc.includes('983 passed, 0 failed') || readmeSrc.includes('993 passed, 0 failed') || readmeSrc.includes('1000 passed, 0 failed') || readmeSrc.includes('1006 passed, 0 failed') || readmeSrc.includes('1016 passed, 0 failed') || readmeSrc.includes('1223 passed, 0 failed') || readmeSrc.includes('1240 passed, 0 failed') || readmeSrc.includes('1249 passed, 0 failed') || readmeSrc.includes('1261 passed, 0 failed') || readmeSrc.includes('1274 passed, 0 failed') || readmeSrc.includes('1525 passed, 0 failed') || readmeSrc.includes('1537 passed, 0 failed') || readmeSrc.includes('1549 passed, 0 failed') || readmeSrc.includes('1558 passed, 0 failed') || readmeSrc.includes('1566 passed, 0 failed') || readmeSrc.includes('1578 passed, 0 failed') || readmeSrc.includes('1589 passed, 0 failed') || readmeSrc.includes('1886 passed, 0 failed') || readmeSrc.includes('1914 passed, 0 failed') || readmeSrc.includes('1933 passed, 0 failed') || readmeSrc.includes('1957 passed, 0 failed') || readmeSrc.includes('1980 passed, 0 failed') || readmeSrc.includes('2035 passed, 0 failed') || readmeSrc.includes('2078 passed, 0 failed') || readmeSrc.includes('2157 passed, 0 failed') || readmeSrc.includes('2177 passed, 0 failed') || readmeSrc.includes('2186 passed, 0 failed') || readmeSrc.includes('2209 passed, 0 failed') || readmeSrc.includes('2221 passed, 0 failed') || readmeSrc.includes('2237 passed, 0 failed') || readmeSrc.includes('2257 passed, 0 failed') || readmeSrc.includes('2275 passed, 0 failed') || readmeSrc.includes('2289 passed, 0 failed') || readmeSrc.includes('2290 passed, 0 failed') || readmeSrc.includes('2308 passed, 0 failed') || readmeSrc.includes('2327 passed, 0 failed') || readmeSrc.includes('2347 passed, 0 failed') || readmeSrc.includes('2366 passed, 0 failed') || readmeSrc.includes('2403 passed, 0 failed') || readmeSrc.includes('2418 passed, 0 failed') || readmeSrc.includes('2429 passed, 0 failed') || readmeSrc.includes('2448 passed, 0 failed') || readmeSrc.includes('2467 passed, 0 failed') || readmeSrc.includes('2485 passed, 0 failed') || readmeSrc.includes('2526 passed, 0 failed') || readmeSrc.includes('2543 passed, 0 failed') || readmeSrc.includes('2573 passed, 0 failed') || readmeSrc.includes('2638 passed, 0 failed') || readmeSrc.includes('2652 passed, 0 failed') || readmeSrc.includes('2665 passed, 0 failed') || readmeSrc.includes('2681 passed, 0 failed') || readmeSrc.includes('2722 passed, 0 failed') || readmeSrc.includes('2730 passed, 0 failed') || readmeSrc.includes('2743 passed, 0 failed') || readmeSrc.includes('2758 passed, 0 failed') || readmeSrc.includes('2778 passed, 0 failed') || readmeSrc.includes('2813 passed, 0 failed') || readmeSrc.includes('2877 passed, 0 failed') || readmeSrc.includes('2903 passed, 0 failed') || readmeSrc.includes('2924 passed, 0 failed') || readmeSrc.includes('2959 passed, 0 failed') || readmeSrc.includes('2978 passed, 0 failed') || readmeSrc.includes('3011 passed, 0 failed') || readmeSrc.includes('3035 passed, 0 failed') || readmeSrc.includes('3075 passed, 0 failed') || readmeSrc.includes('3100 passed, 0 failed') || readmeSrc.includes('3144 passed, 0 failed') || readmeSrc.includes('3171 passed, 0 failed') || readmeSrc.includes('3217 passed, 0 failed') || readmeSrc.includes('3239 passed, 0 failed') || readmeSrc.includes('3288 passed, 0 failed'), 'docs/README.md must document hardening smoke expected count');
 });
 
 // ── Section 38 — D-93D: Review UI context for Truth-derived / borderline-derived claims ──
@@ -23586,6 +23586,172 @@ console.log('\nD-248A: Review card metadata density regression lock');
     assert.ok(
       !migSrc.includes('wrangler') && !migSrc.includes('d1 execute'),
       'Migration file must not contain live-apply commands — migration is created but not applied'
+    );
+  });
+}
+
+// ── D-277B — Saved analysis RunPack provenance visibility ────────────────────
+{
+  const aiIdx277 = appSrc.indexOf('function analysisItem(');
+  const aiEnd277 = appSrc.indexOf('\n', aiIdx277 + 1);
+  const aiSlice277 = appSrc.slice(aiIdx277, aiEnd277 > aiIdx277 ? aiEnd277 : aiIdx277 + 1200);
+
+  const pubProfIdx277 = appSrc.indexOf('renderPublicProfileHtml');
+  const pubProfEnd277 = appSrc.indexOf('\n', pubProfIdx277 + 1);
+  const pubProfSlice277 = appSrc.slice(pubProfIdx277, pubProfEnd277 > pubProfIdx277 ? pubProfEnd277 : pubProfIdx277 + 4000);
+
+  // 1. analysisItem renders "Saved from RunPack:"
+  test('D-277B: analysisItem renders "Saved from RunPack:" provenance line', () => {
+    assert.ok(aiSlice277.includes('Saved from RunPack:'), 'analysisItem must contain "Saved from RunPack:" provenance line');
+  });
+
+  // 2. Provenance line uses a.packetId
+  test('D-277B: analysisItem provenance line uses a.packetId', () => {
+    assert.ok(aiSlice277.includes('a.packetId'), 'analysisItem must read a.packetId for the provenance line');
+  });
+
+  // 3. packetId is escaped with esc()
+  test('D-277B: analysisItem escapes packetId with esc()', () => {
+    assert.ok(aiSlice277.includes('esc(a.packetId)'), 'analysisItem must escape packetId with esc() for XSS safety');
+  });
+
+  // 4. Provenance line is conditional — hidden when packetId is absent
+  test('D-277B: analysisItem provenance line is conditional (hidden when packetId absent)', () => {
+    assert.ok(
+      aiSlice277.includes('a.packetId?') || aiSlice277.includes('a.packetId ?'),
+      'analysisItem provenance line must be conditional — null/absent packetId must render nothing'
+    );
+  });
+
+  // 5. Provenance line uses ev-origin-note and small classes
+  test('D-277B: analysisItem provenance line uses ev-origin-note and small classes', () => {
+    const provenanceZone = aiSlice277.slice(aiSlice277.indexOf('Saved from RunPack:') - 100, aiSlice277.indexOf('Saved from RunPack:') + 50);
+    assert.ok(
+      provenanceZone.includes('ev-origin-note') && provenanceZone.includes('small'),
+      'provenance line must use existing ev-origin-note and small classes'
+    );
+  });
+
+  // 6. No CSS changes — styles.css not modified
+  test('D-277B: styles.css not modified by D-277B', () => {
+    assert.ok(!cssSrc.includes('D-277B'), 'styles.css must not be modified by D-277B');
+  });
+
+  // 7. No backend/API/schema/storage changes — analysis-results.js not modified
+  test('D-277B: analysis-results.js not modified by D-277B', () => {
+    const handlerSrc = readFileSync(path.join(__dirname, '../src/analysis-results.js'), 'utf8');
+    assert.ok(!handlerSrc.includes('D-277B'), 'src/analysis-results.js must not be modified by D-277B');
+  });
+
+  // 8. Public profile does not expose packetId
+  test('D-277B: renderPublicProfileHtml does not expose packetId (boundary lock)', () => {
+    assert.ok(!pubProfSlice277.includes('packetId'), 'packetId must not appear in renderPublicProfileHtml');
+  });
+
+  // 9. Public profile does not expose "Saved from RunPack"
+  test('D-277B: renderPublicProfileHtml does not expose "Saved from RunPack"', () => {
+    assert.ok(!pubProfSlice277.includes('Saved from RunPack'), '"Saved from RunPack" must not appear in public profile');
+  });
+
+  // 10. Review/moderation unchanged
+  test('D-277B: requestApproveReview still defined (moderation lock)', () => {
+    assert.ok(appSrc.includes('requestApproveReview'), 'requestApproveReview must still be defined');
+  });
+
+  test('D-277B: requestRejectReview still defined (moderation lock)', () => {
+    assert.ok(appSrc.includes('requestRejectReview'), 'requestRejectReview must still be defined');
+  });
+
+  // 11. D-275 packet-ID storage locks preserved
+  test('D-277B [D-275 lock]: analysis_results.packet_id column exists in migration 0017', () => {
+    const migSrc = readFileSync(path.join(__dirname, '../migrations/0017_analysis_results_packet_id.sql'), 'utf8');
+    assert.ok(migSrc.includes('packet_id'), 'migration 0017 must define packet_id column');
+  });
+
+  test('D-277B [D-275 lock]: cleanText (not cleanId) used for packet_id sanitization', () => {
+    const handlerSrc = readFileSync(path.join(__dirname, '../src/analysis-results.js'), 'utf8');
+    assert.ok(
+      handlerSrc.includes('cleanText') && !handlerSrc.includes('cleanId(body.packet_id)'),
+      'packet_id must be sanitized with cleanText, not cleanId — cleanId strips underscores from rp_* IDs'
+    );
+  });
+
+  test('D-277B [D-275 lock]: saveAnalysisResult sends packet_id only from matching lastPacket', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 1200);
+    assert.ok(
+      sarSlice.includes('lastPacket') && sarSlice.includes('packet_id'),
+      'saveAnalysisResult must include packet_id sourced from lastPacket'
+    );
+  });
+
+  test('D-277B [D-275 lock]: saveAnalysisResult gates packet_id on lastPacketClaimId===selected?.id', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 1200);
+    assert.ok(
+      sarSlice.includes('lastPacketClaimId') && sarSlice.includes('selected?.id'),
+      'saveAnalysisResult must gate packet_id on lastPacketClaimId===selected?.id'
+    );
+  });
+
+  // 12. D-274 stale detection locks preserved
+  test('D-277B [D-274 lock]: detectPacketStaleness still checks source_snapshot_hash', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 900);
+    assert.ok(staleSlice.includes('source_snapshot_hash'), 'source_snapshot_hash stale check must still be present');
+  });
+
+  test('D-277B [D-274 lock]: detectPacketStaleness still calls simpleClaimHash(selected)', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 900);
+    assert.ok(staleSlice.includes('simpleClaimHash(selected)'), 'simpleClaimHash(selected) must still be called');
+  });
+
+  test('D-277B [D-274 lock]: detectPacketStaleness still pushes "source snapshot changed"', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 900);
+    assert.ok(staleSlice.includes('source snapshot changed'), '"source snapshot changed" must still be pushed');
+  });
+
+  test('D-277B [D-274 lock]: stale threshold 3600000ms unchanged', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 900);
+    assert.ok(staleSlice.includes('3600000'), 'stale threshold 3600000ms must be unchanged');
+  });
+
+  // 13. D-271/D-272 AI-return import locks preserved
+  test('D-277B [D-271 lock]: rp-return-section still present', () => {
+    assert.ok(appSrc.includes('rp-return-section'), 'rp-return-section must still be present in app');
+  });
+
+  test('D-277B [D-271 lock]: "Load AI Analysis Return" still present', () => {
+    assert.ok(appSrc.includes('Load AI Analysis Return'), '"Load AI Analysis Return" must still be present');
+  });
+
+  test('D-277B [D-272 lock]: rp-return-next-step still present', () => {
+    assert.ok(appSrc.includes('rp-return-next-step'), 'rp-return-next-step must still be present');
+  });
+
+  test('D-277B [D-272 lock]: no-auto-publish guidance still present', () => {
+    assert.ok(
+      appSrc.includes('Saving does not publish a truth automatically'),
+      '"Saving does not publish a truth automatically" must still be present'
+    );
+  });
+
+  test('D-277B [D-271 lock]: JSON.parse(text) validation unchanged in saveAnalysisResult', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 1200);
+    assert.ok(sarSlice.includes('JSON.parse(text)'), 'JSON.parse(text) must still be the primary parser in saveAnalysisResult');
+  });
+
+  test('D-277B [D-271 lock]: field extraction parsed.output||parsed.result||parsed.analysis||parsed unchanged', () => {
+    const sarIdx = appSrc.indexOf('async function saveAnalysisResult');
+    const sarSlice = appSrc.slice(sarIdx, sarIdx + 1200);
+    assert.ok(
+      sarSlice.includes('parsed.output||parsed.result||parsed.analysis||parsed') ||
+      sarSlice.includes('parsed.output || parsed.result || parsed.analysis || parsed'),
+      'field extraction pattern must be unchanged'
     );
   });
 }

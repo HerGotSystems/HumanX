@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-276A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc (F-4 stale detection + F-5 packet-ID storage — see D-276A checkpoint), current baseline 3263/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–83.
 
-### `D277A_SAVED_ANALYSIS_PROVENANCE_VISIBILITY_AUDIT.md` ⭐ CURRENT — D-277A SAVED ANALYSIS PROVENANCE VISIBILITY AUDIT — DOCS ONLY
+### `D277B_SAVED_ANALYSIS_RUNPACK_PROVENANCE_VISIBILITY.md` ⭐ CURRENT — D-277B SAVED ANALYSIS RUNPACK PROVENANCE VISIBILITY — PENDING DEPLOY
+
+Frontend-only implementation of RunPack provenance line in `analysisItem()`. `public/app-v10.js` line 466 modified — one conditional `<p class="small ev-origin-note">Saved from RunPack: ${esc(a.packetId)}</p>` added after the existing disclaimer, before the meters block. No backend/schema/migration/CSS/index/worker changes. Baseline: 3288 passed, 0 failed / 24 (belief-engine) / 57 (route, 1 known warn) (+25 tests). Deploy needed — `public/app-v10.js` changed.
+
+### `D277A_SAVED_ANALYSIS_PROVENANCE_VISIBILITY_AUDIT.md` — D-277A SAVED ANALYSIS PROVENANCE VISIBILITY AUDIT — DOCS ONLY
 
 Audit of whether `packetId` (stored in `analysis_results.packet_id` since D-275D) should be rendered in the owner/private Study view. Docs only — no code changes. Baseline: 3263/0/24/57 (unchanged). Conclusion: **frontend-only implementation is safe**. `packetId` is already returned by `GET /api/claims/:id` but not yet rendered. D-277B target: add one conditional `<p class="small ev-origin-note">Saved from RunPack: ${esc(a.packetId)}</p>` to `analysisItem()` in `public/app-v10.js` line 466. ~12 new regression tests. No backend/schema/migration changes needed. Public profile and public truth surfaces confirmed unexposed.
 
