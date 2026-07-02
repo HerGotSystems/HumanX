@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-278A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc (see D-278A checkpoint), current baseline 3288/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–86.
 
-### `D278A_SAVED_ANALYSIS_PROVENANCE_VISIBILITY_CHECKPOINT.md` ⭐ CURRENT — D-278A SAVED ANALYSIS PROVENANCE VISIBILITY CHECKPOINT — DOCS ONLY
+### `D279A_OWNER_RUNPACK_WORKFLOW_CONTINUITY_AUDIT.md` ⭐ CURRENT — D-279A OWNER RUNPACK WORKFLOW CONTINUITY AUDIT — DOCS ONLY
+
+Audit of the full owner/private RunPack workflow now that F-3/F-4/F-5 and saved-analysis provenance are all live. Docs only. Baseline: 3288/0/24/57 (unchanged). Conclusion: **workflow is logically complete**. One clear frontend-only D-279B candidate identified: rename `source snapshot changed` in `detectPacketStaleness()` to clearer user-facing copy (e.g. `claim updated since packet`). No backend/schema/storage changes needed. Two minor secondary findings: dual `analysisPaste` entry points (informational, F-1) and advisory toast jargon (F-4, lower priority). Public profile and Review/moderation surfaces confirmed separate.
+
+### `D278A_SAVED_ANALYSIS_PROVENANCE_VISIBILITY_CHECKPOINT.md` — D-278A SAVED ANALYSIS PROVENANCE VISIBILITY CHECKPOINT — DOCS ONLY
 
 Docs-only checkpoint closing the D-277 saved analysis provenance visibility arc. No code changes. No deploy. Baseline: 3288/0/24/57 (unchanged). Records D-277 arc summary (audit → implementation → live closeout), D-277B implementation details, visibility boundary table, D-271/D-272/D-274/D-275/D-277 lock confirmation, and safe-next rules 84–86. Commit direct to main.
 
