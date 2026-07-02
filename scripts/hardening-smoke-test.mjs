@@ -24744,6 +24744,168 @@ console.log('\nD-248A: Review card metadata density regression lock');
   });
 }
 
+// ── Section D-293B: My HumanX collapsible Profile Settings ───────────────────
+{
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const cssSrc293 = readFileSync(path.join(__dirname, '../public/styles.css'), 'utf8');
+
+  const profFnIdx = appSrc.indexOf('function meProfileSettingsHtml(');
+  const profFnSlice = appSrc.slice(profFnIdx, profFnIdx + 2000);
+
+  const renderMeIdx = appSrc.indexOf('async function renderMe(');
+  const renderMeSlice = appSrc.slice(renderMeIdx, renderMeIdx + 400);
+
+  const renderMeHtmlIdx = appSrc.indexOf('function renderMeHtml(');
+  const renderMeHtmlSlice = appSrc.slice(renderMeHtmlIdx, renderMeHtmlIdx + 3000);
+
+  const submitTruthIdx = appSrc.indexOf('async function submitTruth(');
+  const submitTruthSlice = appSrc.slice(submitTruthIdx, submitTruthIdx + 800);
+
+  const draftFnIdx = appSrc.indexOf('async function draftTruthFromAnalysis(');
+  const draftFnSlice = appSrc.slice(draftFnIdx, draftFnIdx + 600);
+
+  const pubProfIdx = appSrc.indexOf('renderPublicProfileHtml');
+  const pubProfSlice = appSrc.slice(pubProfIdx, pubProfIdx + 4000);
+
+  const driftSrc = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+
+  // 1. meProfileSettingsHtml uses <details
+  test('D-293B: meProfileSettingsHtml uses <details for collapsible Profile Settings', () => {
+    assert.ok(profFnSlice.includes('<details'), 'meProfileSettingsHtml must use <details for collapsible profile settings');
+  });
+
+  // 2. meProfileSettingsHtml uses <summary>Profile Settings
+  test('D-293B: meProfileSettingsHtml uses <summary>Profile Settings as the toggle label', () => {
+    assert.ok(profFnSlice.includes('<summary>Profile Settings</summary>'), 'meProfileSettingsHtml must use <summary>Profile Settings</summary>');
+  });
+
+  // 3a. Editable controls: profile slug input inside details
+  test('D-293B: profile slug input is inside the collapsible <details> block', () => {
+    const detailsStart = profFnSlice.indexOf('<details');
+    const detailsEnd = profFnSlice.indexOf('</details>');
+    const slugIdx = profFnSlice.indexOf('meProfileSlugInput');
+    assert.ok(detailsStart !== -1 && detailsEnd !== -1 && slugIdx > detailsStart && slugIdx < detailsEnd,
+      'meProfileSlugInput must appear inside <details> block');
+  });
+
+  // 3b. Editable controls: bio textarea inside details
+  test('D-293B: bio textarea is inside the collapsible <details> block', () => {
+    const detailsStart = profFnSlice.indexOf('<details');
+    const detailsEnd = profFnSlice.indexOf('</details>');
+    const bioIdx = profFnSlice.indexOf('meProfileBioInput');
+    assert.ok(detailsStart !== -1 && detailsEnd !== -1 && bioIdx > detailsStart && bioIdx < detailsEnd,
+      'meProfileBioInput must appear inside <details> block');
+  });
+
+  // 3c. Editable controls: profile visibility toggle inside details
+  test('D-293B: profile visibility toggle is inside the collapsible <details> block', () => {
+    const detailsStart = profFnSlice.indexOf('<details');
+    const detailsEnd = profFnSlice.indexOf('</details>');
+    const toggleIdx = profFnSlice.indexOf('meProfilePublicToggle');
+    assert.ok(detailsStart !== -1 && detailsEnd !== -1 && toggleIdx > detailsStart && toggleIdx < detailsEnd,
+      'meProfilePublicToggle must appear inside <details> block');
+  });
+
+  // 3d. Editable controls: Save button inside details
+  test('D-293B: Save button is inside the collapsible <details> block', () => {
+    const detailsStart = profFnSlice.indexOf('<details');
+    const detailsEnd = profFnSlice.indexOf('</details>');
+    const saveIdx = profFnSlice.indexOf('saveProfileSettingsUI');
+    assert.ok(detailsStart !== -1 && detailsEnd !== -1 && saveIdx > detailsStart && saveIdx < detailsEnd,
+      'saveProfileSettingsUI button must appear inside <details> block');
+  });
+
+  // 3e. Editable controls: public link copy inside details
+  test('D-293B: public link copy button is inside the collapsible <details> block', () => {
+    const detailsStart = profFnSlice.indexOf('<details');
+    const detailsEnd = profFnSlice.indexOf('</details>');
+    const copyIdx = profFnSlice.indexOf('meCopyProfileLink');
+    assert.ok(detailsStart !== -1 && detailsEnd !== -1 && copyIdx > detailsStart && copyIdx < detailsEnd,
+      'meCopyProfileLink button must appear inside <details> block');
+  });
+
+  // 4. Account card remains outside / independent of Profile Settings block
+  test('D-293B: meAccountCardHtml is separate from meProfileSettingsHtml', () => {
+    assert.ok(appSrc.includes('function meAccountCardHtml('), 'meAccountCardHtml must still be defined');
+    assert.ok(!profFnSlice.includes('meAccountCardHtml'), 'meAccountCardHtml must not be called from meProfileSettingsHtml');
+    assert.ok(renderMeHtmlSlice.includes('meAccountCardHtml(u)'), 'renderMeHtml must still call meAccountCardHtml separately');
+  });
+
+  // 5. GET /api/my-humanx remains the data source
+  test('D-293B: renderMe still calls GET /api/my-humanx', () => {
+    assert.ok(renderMeSlice.includes('/api/my-humanx'), 'renderMe must still call GET /api/my-humanx');
+  });
+
+  // 6. Recent Truths remains immediately after the filter bar
+  test('D-293B: Recent Truths still appears immediately after the filter bar in renderMeHtml', () => {
+    const filterBarPos = renderMeHtmlSlice.indexOf('meFilterBarHtml()');
+    const truthsPos = renderMeHtmlSlice.indexOf('Recent Truths');
+    const claimsPos = renderMeHtmlSlice.indexOf('Recent Claims');
+    assert.ok(filterBarPos !== -1 && truthsPos !== -1 && claimsPos !== -1 &&
+      truthsPos > filterBarPos && truthsPos < claimsPos,
+      'Recent Truths must still appear immediately after the filter bar and before Recent Claims');
+  });
+
+  // 7. Review explanation remains
+  test('D-293B: Review explanation "awaiting admin approval" remains in renderMeHtml', () => {
+    assert.ok(
+      renderMeHtmlSlice.includes('Review: awaiting admin approval — goes Public when approved'),
+      'Review explanation must still be present in renderMeHtml'
+    );
+  });
+
+  // 8. Pending Review badge preserved
+  test('D-293B: b-yellow badge for Review state remains preserved', () => {
+    assert.ok(appSrc.includes("ME_STATE_CLR={public:'b-green',review:'b-yellow'") ||
+      appSrc.includes("review:'b-yellow'"),
+      'ME_STATE_CLR.review must still be b-yellow');
+  });
+
+  // 9. Truth submission still uses review_state
+  test('D-293B: Truth submission still references review_state', () => {
+    assert.ok(appSrc.includes('review_state'), 'review_state must still exist in app');
+    assert.ok(!submitTruthSlice.includes('review_state=\'public\''),
+      'submitTruth must not bypass review_state=review');
+  });
+
+  // 10. D-285B post-submit navigation preserved
+  test('D-293B [D-285B lock]: post-submit navigation to My HumanX preserved', () => {
+    assert.ok(submitTruthSlice.includes('renderMe()'), 'submitTruth must still call renderMe()');
+    assert.ok(submitTruthSlice.includes('tab-me'), 'submitTruth must still activate tab-me');
+    assert.ok(
+      submitTruthSlice.includes('Submitted for Review') && submitTruthSlice.includes('My HumanX with the Review badge'),
+      'submitTruth post-submit toast must still be preserved'
+    );
+  });
+
+  // 11. Draft Truth remains draft-only
+  test('D-293B: draftTruthFromAnalysis does not call submitTruth()', () => {
+    assert.ok(!draftFnSlice.includes('submitTruth('), 'draftTruthFromAnalysis must not call submitTruth()');
+  });
+
+  // 12. Public profile unaffected
+  test('D-293B: renderPublicProfileHtml does not include meProfileSettingsHtml', () => {
+    assert.ok(!pubProfSlice.includes('meProfileSettingsHtml'), 'meProfileSettingsHtml must not appear in renderPublicProfileHtml');
+    assert.ok(!pubProfSlice.includes('me-profile-settings'), 'me-profile-settings class must not appear in public profile');
+  });
+
+  // 13. No backend/API/schema/storage changes
+  test('D-293B: No backend/API/schema/storage changes', () => {
+    const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+    assert.ok(!workerSrc.includes('D-293B'), 'src/worker.js must not be modified by D-293B');
+  });
+
+  // 14. No CSS changes
+  test('D-293B: No CSS changes (styles.css unchanged)', () => {
+    assert.ok(!cssSrc293.includes('D-293B'), 'styles.css must not be modified by D-293B');
+  });
+
+  // 15. Drift/Belief expansion files untouched
+  test('D-293B: Drift/Belief expansion files remain untouched', () => {
+    assert.ok(!driftSrc.includes('D-293B'), 'belief-drift-expansion.js must not be modified by D-293B');
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
