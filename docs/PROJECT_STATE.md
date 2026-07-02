@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-290A owner workflow product polish checkpoint.
-Previous checkpoint: 2026-07-02 after D-288A saved analysis assisted Truth draft checkpoint.
+Last updated: 2026-07-02 after D-292A My HumanX Recent Truths prominence checkpoint.
+Previous checkpoint: 2026-07-02 after D-290A owner workflow product polish checkpoint.
 
 ---
 
@@ -43,10 +43,11 @@ Previous checkpoint: 2026-07-02 after D-288A saved analysis assisted Truth draft
 | **D-286A checkpoint HEAD** | see `docs/README.md` after commit (D-286A owner pending-Review Truth visibility checkpoint) |
 | **D-288A checkpoint HEAD** | see `docs/README.md` after commit (D-288A saved analysis assisted Truth draft checkpoint) |
 | **D-290A checkpoint HEAD** | see `docs/README.md` after commit (D-290A owner workflow product polish checkpoint) |
+| **D-292A checkpoint HEAD** | see `docs/README.md` after commit (D-292A My HumanX Recent Truths prominence checkpoint) |
 
 ---
 
-## Current baseline (as of D-290A)
+## Current baseline (as of D-292A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -60,7 +61,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3383 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3405 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -644,6 +645,36 @@ This arc ran a product pass over the full owner workflow (D-289A), identified th
 
 **Tests added in arc:** 23 new tests + 8 updated (3360 → 3383 total). **Deploys:** 1 (D-289B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
 
+### D-291 mini-arc: My HumanX Recent Truths prominence
+
+This arc ran a product pass over the My HumanX owner dashboard (D-291A), identified that "Recent Truths" was buried after six dense sections in `renderMeHtml()`, and moved it immediately after the filter bar to improve post-submit owner visibility (D-291B). D-291C was the live closeout.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-291A | Product pass (docs) | Full 19-question product pass over My HumanX as the post-submit Truth landing page. Key finding: "Recent Truths" panel was at the 12th position in `renderMeHtml()` — after Account card, Profile Settings, My Content counts, filter bar, Recent Claims, Belief Snapshots, Belief Mirror, Belief Reflection, and Reflection Avatar. An owner arriving from "Submit Truth for Review" (D-285B) had to scroll past all of these before seeing their just-submitted Truth. D-291B candidate: move "Recent Truths" above "Recent Claims". Docs only. Baseline unchanged: 3383/0/24/57. |
+| D-291B | Frontend | `renderMeHtml()`: moved "Recent Truths" `<div class="panel">` block immediately after `${meFilterBarHtml()}`, before "Recent Claims". Added `<p class="small builder-field-note">Review: awaiting admin approval — goes Public when approved.</p>` inside the panel. 20 new D-291B tests; 2 existing tests updated (D-137E "section order", D-139B "Mirror placement") to reflect new order. Baseline 3383 → 3405. |
+| D-291C | Live closeout | Owner deploy PASS (2026-07-02). 24/24 live sanity PASS. Deployed Worker version not captured. |
+| D-292A | Checkpoint (docs) | Closes D-291 arc. No deploy. Baseline unchanged 3405/0/24/57. |
+
+**D-291 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| `Recent Truths` position | Immediately after the filter bar — first content panel |
+| `Recent Truths` before Recent Claims | Yes |
+| `Recent Truths` before Belief Snapshots / Mirror / Reflection / Avatar | Yes |
+| Review explanation copy | `"Review: awaiting admin approval — goes Public when approved."` present in Recent Truths panel |
+| Yellow `Review` badge | Preserved — `ME_STATE_CLR.review = 'b-yellow'` unchanged |
+| Data source | `GET /api/my-humanx` unchanged — no filter on `review_state`; all owner truths returned |
+| `review_state='review'` on submission | Yes — `src/truths.js` unchanged |
+| Admin Review gate | Unchanged — only admin `POST /api/review/decision` can approve |
+| Public profile `/u/:slug` | Unaffected — `renderPublicProfileHtml()` not modified |
+| Saved analysis separate from Truth submission | Yes — `saveAnalysisResult()` → `/api/analysis` only; unchanged |
+| D-285B post-submit navigation | Preserved — `submitTruth()`, `submitBuilderTruth()`, `promoteBelief('truth')` all still call `renderMe()` + `tab-me`; toast unchanged |
+| No backend/API/schema/CSS/index/worker changes in D-291 | Confirmed |
+
+**Tests added in arc:** 20 new tests + 2 updated (3383 → 3405 total). **Deploys:** 1 (D-291B/C). **Schema migrations applied:** 0. **No backend/API/CSS/index/worker/analysis-results/truths changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -903,6 +934,9 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | No new public data fields in D-287 | **Confirmed** — frontend-only change; zero new API/schema/storage fields; no backend/migration/CSP changes | D-287B |
 | Compact context line on public profile (post D-289) | **Blocked** — `analysisItem()` still absent from `renderPublicProfileHtml()`; consolidated compact line (`"Private analysis · not public truth · not independent verification · RunPack: rp_..."`) is owner/private only; `packetId` not exposed | D-289B test 15 |
 | No new public data fields in D-289 | **Confirmed** — frontend-only copy consolidation; zero new API/schema/storage fields; no backend/migration/CSS/CSP changes | D-289B |
+| Recent Truths / Review explanation in public profile | **Not exposed** — `renderMeHtml()` is owner-private; `meRecentTruthsHtml()` is not called from `renderPublicProfileHtml()`; "Review: awaiting admin approval" explanation copy is owner-dashboard-only | D-291B tests 7–9 |
+| Pending Review Truths on public profile (post D-291) | **Not exposed** — My HumanX `renderMeHtml()` reorder did not alter `renderPublicProfileHtml()`; pending Review truths remain absent from `/u/:slug`; `COALESCE(review_state,'public')='public'` filter on public route unchanged | D-291B test 8 |
+| No new public data fields in D-291 | **Confirmed** — frontend-only template reorder and copy addition; zero new API/schema/storage fields; no backend/migration/CSS/CSP changes | D-291B |
 
 ---
 
@@ -1014,9 +1048,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-289A | Docs only — no deploy needed |
 | D-289B | Owner deploy PASS — D-289C confirmed live (33/33) · deployed Worker version not captured |
 | D-289C | Live closeout — no deploy needed (closeout of D-289B deploy) |
-| D-290A (this task) | Docs only — **no deploy needed** |
+| D-290A | Docs only — no deploy needed |
+| D-291A | Docs only — no deploy needed |
+| D-291B | Owner deploy PASS — D-291C confirmed live (24/24) · deployed Worker version not captured |
+| D-291C | Live closeout — no deploy needed (closeout of D-291B deploy) |
+| D-292A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-289C, 2026-07-02) |
+| **Latest deployed Worker** | not captured (D-291C, 2026-07-02) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1241,6 +1279,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 104. **Any future card layout change in `analysisItem()` must preserve the draft-only Truth action and Review gate locks** — `analysisItem()` now carries both the compact context line and the `"Draft Truth from analysis"` button. Any card layout change must pass D-287B tests 1–23 and D-289B tests 10–18 unchanged, or update each affected lock with explicit owner approval before merging.
 
+105. **My HumanX is now the post-submit owner landing page — pending Review Truth visibility must stay high on the page** — "Recent Truths" is immediately after the filter bar in `renderMeHtml()`. Any future `renderMeHtml()` reorder must not move "Recent Truths" below "Recent Claims" or "Belief Snapshots" without a new spec and explicit owner approval. The D-291B positional tests (D-137E, D-139B, D-291B tests 2–5) must continue to pass.
+
+106. **Review badge explanations must preserve admin Review gate meaning and must not imply automatic publication** — the Review explanation copy `"Review: awaiting admin approval — goes Public when approved."` makes clear that approval is a manual admin action. Any future reword of this copy must not imply self-publication, automatic approval, or an owner-controlled publish action. Copy changes require owner approval and a README/doc update.
+
+107. **Owner dashboard layout changes must preserve `GET /api/my-humanx` as the data source unless separately audited** — `renderMe()` fetches from `GET /api/my-humanx`. Any future My HumanX improvement that requires a different endpoint, a new query parameter, or a `review_state` filter must be explicitly audited for owner/public data isolation before implementation. Do not add query parameters or additional endpoints under a frontend-layout-only task.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1272,9 +1316,10 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Saved analysis ↔ Truth boundary | **COMPLETE** — D-281A/B/C + D-283A; boundary structurally confirmed; copy accurate; no auto-publish path exists |
 | Saved analysis assisted Truth draft | **COMPLETE** — D-287A audit (23 questions); D-287B implementation (`draftTruthFromAnalysis()`, prefill-only, `plainLanguageSummary` only); D-287C live PASS (31/31); baseline 3360/0/24/57. Draft action is owner/private only; auto-submit and auto-publish impossible; Review gate fully preserved. |
 | Owner workflow product polish | **COMPLETE** — D-289A product pass (15 questions); D-289B card copy consolidation (three stacked notes → one compact line); D-289C live PASS (33/33); baseline 3383/0/24/57. All safety meanings preserved. |
+| My HumanX Recent Truths prominence | **COMPLETE** — D-291A product pass (19 questions); D-291B reorder + Review explanation; D-291C live PASS (24/24); baseline 3405/0/24/57. Recent Truths now visible immediately after filter bar. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
-| Next owner-facing improvement | **Open** — the RunPack/saved-analysis/Truth arc is complete as of D-290A. Future owner-facing work should start with a new product pass or explicit owner pain point. Do not extend this arc without a fresh trigger. |
+| Next owner-dashboard improvement | **Audit-first** — My HumanX Recent Truths prominence complete as of D-292A. Any further owner-dashboard improvement that changes data source, Review state visibility, or public/private boundary must start with an audit task before implementation. |
 | HumanX home/Belief Engine navigation cohesion audit | Entry points, back-navigation, and framing between main app and Belief Engine |
 | Study page content hierarchy audit | Study page layout, section ordering, dock/content density |
 | Open related claim / related item navigation | Follow-up on D-239A remaining findings |
