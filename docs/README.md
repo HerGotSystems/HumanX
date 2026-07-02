@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-290A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint) + D-285 owner pending-Review Truth visibility (see D-286A checkpoint) + D-287 saved analysis assisted Truth draft (see D-288A checkpoint) + D-289 owner workflow product polish / saved-analysis card copy consolidation (see D-290A checkpoint), current baseline 3383/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–104.
 
-### `D290A_OWNER_WORKFLOW_PRODUCT_POLISH_CHECKPOINT.md` ⭐ CURRENT — D-290A OWNER WORKFLOW PRODUCT POLISH CHECKPOINT — DOCS ONLY
+### `D291A_MY_HUMANX_OWNER_DASHBOARD_PRODUCT_PASS.md` ⭐ CURRENT — D-291A MY HUMANX OWNER DASHBOARD PRODUCT PASS — DOCS ONLY
+
+Product pass over My HumanX now that it is the post-submit Truth landing page. Key finding: "Recent Truths" is buried after 6+ sections — an owner who just submitted a Truth cannot see it without scrolling past Account card, Profile Settings, counts, filter bar, Recent Claims, Belief Snapshots, Mirror, Reflection, and Avatar. D-291B candidate: move "Recent Truths" above "Recent Claims" in `renderMeHtml()` + add a brief "Review means awaiting admin approval" note. Classification: frontend-only. Baseline 3383/0/24/57. No deploy needed.
+
+### `D290A_OWNER_WORKFLOW_PRODUCT_POLISH_CHECKPOINT.md` — D-290A OWNER WORKFLOW PRODUCT POLISH CHECKPOINT — DOCS ONLY
 
 Closes the D-289 arc. Records: D-289A product pass (15 questions; stacked card notes identified as highest friction); D-289B card copy consolidation (three stacked notes → one compact line, all safety meanings preserved); D-289C live PASS (33/33). Safe-next rules 102–104 added. Baseline 3383/0/24/57. No deploy needed.
 
