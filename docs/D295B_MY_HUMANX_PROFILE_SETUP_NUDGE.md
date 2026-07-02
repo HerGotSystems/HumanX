@@ -1,7 +1,7 @@
 # D-295B — My HumanX Profile Setup Nudge
 
 **Scope:** Frontend-only (`public/app-v10.js`, `scripts/hardening-smoke-test.mjs`)
-**Status:** COMPLETE — owner deploy needed
+**Status:** COMPLETE — owner deployed (D-295C live closeout: 27/27 PASS)
 **Branch:** main (direct commit)
 **Baseline before D-295B:** 3424 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Baseline after D-295B:** 3442 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
@@ -146,4 +146,39 @@ Tests D-137D, D-137D/E (×2), D-137E (×2), D-139B, D-140B used fixed `appSrc.sl
 | Task | Deploy | Result |
 |------|--------|--------|
 | D-295A | No | Product pass / docs only |
-| D-295B | **Pending — owner deploy required** | `public/app-v10.js` changed |
+| D-295B | **Yes — owner deployed** | PASS — D-295C live closeout (27/27) |
+| D-295C | No | Live closeout |
+
+### D-295C Live Sanity (2026-07-02) — 27/27 PASS
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Owner opens My HumanX without console-breaking errors | PASS |
+| 3 | Profile setup nudge appears when no slug and not public | PASS |
+| 4 | Nudge copy: "Set up your public profile: open Profile Settings, choose a slug, and switch your profile public when ready." | PASS |
+| 5 | Nudge appears above the Account card | PASS |
+| 6 | Nudge points owner toward Profile Settings | PASS |
+| 7 | Nudge is not a general count-based "Needs attention" strip | PASS |
+| 8 | My Content counts not duplicated by nudge | PASS |
+| 9 | Account card remains visible | PASS |
+| 10 | Profile Settings remains collapsible | PASS |
+| 11 | Profile Settings can be expanded to edit slug/public state | PASS |
+| 12 | After setting slug and refreshing, nudge self-clears | PASS |
+| 13 | After making profile public and refreshing, nudge self-clears | PASS |
+| 14 | No dismiss state required | PASS |
+| 15 | No localStorage behavior introduced | PASS |
+| 16 | My HumanX data source remains `GET /api/my-humanx` | PASS |
+| 17 | Recent Truths remains immediately after filter bar | PASS |
+| 18 | Review explanation: `"Review: awaiting admin approval — goes Public when approved."` | PASS |
+| 19 | Pending Review Truths still show yellow `Review` badge | PASS |
+| 20 | Truth submission still uses `review_state='review'` | PASS |
+| 21 | D-285B post-submit navigation preserved (`renderMe()`, `tab-me`, toast) | PASS |
+| 22 | `Draft Truth from analysis` remains draft-only | PASS |
+| 23 | Public profile `/u/:slug` unaffected | PASS |
+| 24 | Review/moderation unchanged | PASS |
+| 25 | No backend/API/schema/storage behavior changed | PASS |
+| 26 | Drift/Belief expansion unaffected | PASS |
+| 27 | No console errors | PASS |
+
+**Deployed Worker version:** not captured
