@@ -53,9 +53,13 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-292A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint) + D-285 owner pending-Review Truth visibility (see D-286A checkpoint) + D-287 saved analysis assisted Truth draft (see D-288A checkpoint) + D-289 owner workflow product polish / saved-analysis card copy consolidation (see D-290A checkpoint) + D-291 My HumanX Recent Truths prominence (see D-292A checkpoint), current baseline 3405/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–107.
 
-### `D293B_MY_HUMANX_COLLAPSIBLE_PROFILE_SETTINGS.md` ⭐ CURRENT — D-293B MY HUMANX COLLAPSIBLE PROFILE SETTINGS — PENDING DEPLOY
+### `D293B_MY_HUMANX_COLLAPSIBLE_PROFILE_SETTINGS.md` ⭐ CURRENT — D-293C MY HUMANX COLLAPSIBLE PROFILE SETTINGS LIVE CLOSEOUT — DOCS ONLY
 
-Profile Settings editable controls wrapped in native `<details>/<summary>` in `meProfileSettingsHtml()`. Panel now collapses by default — slug, bio, toggle, Save, and Copy link collapse under "Profile Settings ▸"; Account card above and My Content counts/filter/Recent Truths below are immediately visible. 15 new D-293B tests. Baseline 3405 → 3424 / 0 / 24 / 57. Frontend-only, no backend changes. Deploy needed.
+Live closeout for D-293B. Owner deployed 2026-07-02. 27/27 live sanity PASS. D-293B doc updated to mark deploy PASS. Baseline unchanged 3424/0/24/57. No code changes.
+
+### `D293B_MY_HUMANX_COLLAPSIBLE_PROFILE_SETTINGS.md` — D-293B MY HUMANX COLLAPSIBLE PROFILE SETTINGS — LIVE ✓
+
+Profile Settings editable controls wrapped in native `<details>/<summary>` in `meProfileSettingsHtml()`. Panel now collapses by default — slug, bio, toggle, Save, and Copy link collapse under "Profile Settings ▸"; Account card above and My Content counts/filter/Recent Truths below are immediately visible. 15 new D-293B tests. Baseline 3405 → 3424 / 0 / 24 / 57. Frontend-only, no backend changes. Owner deployed 2026-07-02 — 27/27 live sanity PASS (D-293C).
 
 ### `D293A_MY_HUMANX_DASHBOARD_PURPOSE_PRODUCT_PASS.md` — D-293A MY HUMANX DASHBOARD PURPOSE PRODUCT PASS — DOCS ONLY
 

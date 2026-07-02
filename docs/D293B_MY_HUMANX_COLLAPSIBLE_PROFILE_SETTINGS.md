@@ -1,7 +1,7 @@
 # D-293B — My HumanX Collapsible Profile Settings
 
 **Scope:** Frontend-only (`public/app-v10.js`, `scripts/hardening-smoke-test.mjs`)
-**Status:** COMPLETE — pending deploy
+**Status:** COMPLETE — owner deployed (D-293C live closeout: 27/27 PASS)
 **Branch:** main (direct commit)
 **Baseline before D-293B:** 3405 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Baseline after D-293B:** 3424 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
@@ -159,4 +159,39 @@ The `<h3>Profile Settings</h3>` heading is replaced by `<details><summary>Profil
 | Task | Deploy | Result |
 |------|--------|--------|
 | D-293A | No | Product pass / docs only |
-| D-293B | Pending | — |
+| D-293B | **Yes — owner deployed** | PASS — D-293C live closeout (27/27) |
+| D-293C | No | Live closeout |
+
+### D-293C Live Sanity (2026-07-02) — 27/27 PASS
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Owner opens My HumanX without console-breaking errors | PASS |
+| 3 | Account card remains visible | PASS |
+| 4 | Profile Settings summary is visible | PASS |
+| 5 | Profile Settings controls are collapsed behind native details/summary | PASS |
+| 6 | Expanding Profile Settings reveals profile visibility toggle | PASS |
+| 7 | Expanding Profile Settings reveals slug input | PASS |
+| 8 | Expanding Profile Settings reveals bio textarea | PASS |
+| 9 | Expanding Profile Settings reveals preview/guardrail copy | PASS |
+| 10 | Expanding Profile Settings reveals Save button | PASS |
+| 11 | Expanding Profile Settings reveals Copy public link button/output | PASS |
+| 12 | Profile save behavior remains unchanged | PASS |
+| 13 | Public-link copy behavior remains unchanged | PASS |
+| 14 | My Content counts remain visible/reachable | PASS |
+| 15 | Filter bar remains visible/reachable | PASS |
+| 16 | Recent Truths remains immediately after the filter bar | PASS |
+| 17 | Review explanation: `"Review: awaiting admin approval — goes Public when approved."` | PASS |
+| 18 | Pending Review Truths still show yellow `Review` badge | PASS |
+| 19 | Truth submission still uses `review_state='review'` | PASS |
+| 20 | D-285B post-submit navigation preserved (`renderMe()`, `tab-me`, toast) | PASS |
+| 21 | `Draft Truth from analysis` remains draft-only | PASS |
+| 22 | Public profile `/u/:slug` unaffected | PASS |
+| 23 | Review/moderation unchanged | PASS |
+| 24 | My HumanX data source remains `GET /api/my-humanx` | PASS |
+| 25 | No backend/API/schema/storage behavior changed | PASS |
+| 26 | Drift/Belief expansion unaffected | PASS |
+| 27 | No console errors | PASS |
+
+**Deployed Worker version:** not captured
