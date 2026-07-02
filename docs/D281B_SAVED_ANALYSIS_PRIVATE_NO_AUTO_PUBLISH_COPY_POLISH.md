@@ -1,7 +1,7 @@
 # D-281B — Saved Analysis Private / No-Auto-Publish Copy Polish
 
 **Scope:** Frontend (`public/app-v10.js`) + tests + docs
-**Status:** PENDING DEPLOY
+**Status:** COMPLETE — owner deploy PASS (D-281C, 2026-07-02) — 25/25 live sanity PASS
 **Branch:** main (direct commit)
 **Baseline before:** 3298 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Baseline after:** 3317 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
@@ -13,7 +13,8 @@
 **Backend changes:** None — `src/analysis-results.js` not modified
 **Schema/migration changes:** None
 **Drift/Belief expansion files:** Unchanged
-**Deploy needed:** Yes — `public/app-v10.js` changed
+**Deploy needed:** No — deployed (D-281C, 2026-07-02)
+**Deployed Worker version:** not captured
 
 ---
 
@@ -145,3 +146,52 @@ Known warn: `/api/u/:slug — known parameterised route; implemented via regex i
 - Public profile rendering — not modified
 - No `alignment_labels` — permanently blocked
 - No `top_beliefs_json` in any public API
+
+---
+
+## D-281C — Live Closeout (2026-07-02)
+
+**Owner deploy:** PASS — `npx wrangler deploy`
+**Deployed Worker version:** not captured
+**Live sanity:** PASS — 25/25
+
+### Post-deploy static checks
+
+| Check | Result |
+|-------|--------|
+| `node --check public/app-v10.js` | no output, exit 0 |
+| `hardening-smoke-test.mjs` | `3317 passed, 0 failed` |
+| `belief-engine-static-check.mjs` | `24 passed, 0 failed` |
+| `worker-route-static-check.mjs` | `57 passed, 0 failed / 1 known warn` |
+
+Known warn: `/api/u/:slug — known parameterised route; implemented via regex in worker.js, not as a literal string (D-218A documented limitation)`
+
+### Live sanity results (25/25 PASS)
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Study/claim detail area opens without console-breaking errors | PASS |
+| 3 | Existing claim can be selected | PASS |
+| 4 | Saved analysis form still renders | PASS |
+| 5 | New form copy: `Saving analysis does not publish a truth automatically — it only stores private analysis for this claim.` | PASS |
+| 6 | Saved analysis still saves normally | PASS |
+| 7 | `saveAnalysisResult()` still posts only to `/api/analysis` | PASS |
+| 8 | Saving analysis does not create, submit, approve, or publish a Truth | PASS |
+| 9 | Saved analysis cards still render | PASS |
+| 10 | New card copy: `Private analysis note — not public truth.` | PASS |
+| 11 | Existing saved-analysis disclaimer still appears | PASS |
+| 12 | Saved-analysis provenance still appears when `packetId` exists: `Saved from RunPack: rp_...` | PASS |
+| 13 | Saved-analysis provenance absent when `packetId` absent | PASS |
+| 14 | Public profile `/u/:slug` does not expose private/no-auto-publish copy | PASS |
+| 15 | Public profile `/u/:slug` does not expose `Saved from RunPack` | PASS |
+| 16 | Public profile `/u/:slug` does not expose `packetId` | PASS |
+| 17 | Public truth behavior unchanged | PASS |
+| 18 | Review/moderation unchanged | PASS |
+| 19 | AI-return import area still works (`rp-return-section`, `Load AI Analysis Return`, `rp-return-next-step`, `Saving does not publish a truth automatically`) | PASS |
+| 20 | Parser behavior unchanged (`JSON.parse`, `parsed.output\|\|parsed.result\|\|parsed.analysis\|\|parsed`) | PASS |
+| 21 | Stale detection still works: `claim updated since packet` | PASS |
+| 22 | D-275 packet-ID save behavior still works | PASS |
+| 23 | Drift/Belief expansion unaffected | PASS |
+| 24 | No backend/API/schema/storage behavior changed | PASS |
+| 25 | No console errors | PASS |
