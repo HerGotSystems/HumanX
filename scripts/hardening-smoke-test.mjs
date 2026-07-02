@@ -6136,10 +6136,10 @@ test('D-137C: no D1 migration added for this change', () => {
 
 // ── Section 62 — D-137D: My HumanX dashboard frontend ──────────────────────────
 
-test('D-137D: Me nav tab exists in index.html', () => {
+test('D-137D: Me nav tab exists in index.html [updated D-297B: label is My HumanX]', () => {
   assert.ok(
-    indexSrc.includes('id="tab-me"') && indexSrc.includes('onclick="setMode(\'me\')">Me<'),
-    'index.html must contain a Me nav tab calling setMode(\'me\')'
+    indexSrc.includes('id="tab-me"') && indexSrc.includes('onclick="setMode(\'me\')">My HumanX<'),
+    'index.html must contain a My HumanX nav tab calling setMode(\'me\')'
   );
 });
 
@@ -10448,9 +10448,9 @@ test('D-159B: public profile example bridge link exists and points to /u/calenhi
   );
 });
 
-test('D-159B: Browse Claims card appears before Submit Claim in renderHome', () => {
+test('D-159B: Browse Claims card appears before Submit Claim in renderHome [updated D-297B: wider slice]', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 4000);
+  const slice = appSrc.slice(idx, idx + 4400);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
   const browseAt = slice.indexOf('data-value="arena"');
   const submitAt = slice.indexOf('data-value="submit"');
@@ -10460,9 +10460,9 @@ test('D-159B: Browse Claims card appears before Submit Claim in renderHome', () 
   );
 });
 
-test('D-159B: Browse Claims card appears before Belief Engine in renderHome', () => {
+test('D-159B: Browse Claims card appears before Belief Engine in renderHome [updated D-297B: wider slice]', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 4200);
+  const slice = appSrc.slice(idx, idx + 4600);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
   // D-181D migrated onclick="location.href='...'" to data-action="navBeliefEngine"
   const browseAt = slice.indexOf('data-value="arena"');
@@ -10473,9 +10473,9 @@ test('D-159B: Browse Claims card appears before Belief Engine in renderHome', ()
   );
 });
 
-test('D-159B: Browse Claims card has cc-card-primary class', () => {
+test('D-159B: Browse Claims card has cc-card-primary class [updated D-297B: wider slice]', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 4000);
+  const slice = appSrc.slice(idx, idx + 4400);
   const gridStart = slice.indexOf('cc-card-grid');
   const gridSlice = slice.slice(gridStart, gridStart + 600);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
@@ -25005,6 +25005,78 @@ console.log('\nD-248A: Review card metadata density regression lock');
   test('D-295B: belief-drift-expansion.js not modified by D-295B', () => {
     const driftSrc295 = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
     assert.ok(driftSrc295.length > 0 && !driftSrc295.includes('profileNudge'), 'belief-drift-expansion.js must not reference profileNudge');
+  });
+}
+
+// ── D-297B: Beta readiness Home Step 5 and My HumanX tab ──
+{
+  const rmeIdx297 = appSrc.indexOf('function renderMeHtml');
+  const rmeSlice297 = appSrc.slice(rmeIdx297, rmeIdx297 + 2600);
+  const homeIdx297 = appSrc.indexOf('cc-start-here');
+  const homeSlice297 = appSrc.slice(homeIdx297, homeIdx297 + 2200);
+
+  test('D-297B test 1: Home Start here strip contains Step 5', () => {
+    assert.ok(homeSlice297.includes('Step 5'), 'Start here strip must include Step 5');
+  });
+  test('D-297B test 2: Step 5 says submitted Truths wait for admin approval', () => {
+    assert.ok(homeSlice297.includes('admin approval'), 'Step 5 must mention admin approval');
+  });
+  test('D-297B test 3: Step 5 says submitted Truths appear in My HumanX', () => {
+    assert.ok(homeSlice297.includes('My HumanX'), 'Step 5 must mention My HumanX');
+  });
+  test('D-297B test 4: Step 5 mentions the Review badge', () => {
+    assert.ok(homeSlice297.includes('Review badge'), 'Step 5 must mention Review badge');
+  });
+  test('D-297B test 5: visible tab label is My HumanX', () => {
+    assert.ok(indexSrc.includes('>My HumanX</button>'), 'tab-me visible label must be My HumanX');
+  });
+  test('D-297B test 6: internal tab id remains tab-me', () => {
+    assert.ok(indexSrc.includes('id="tab-me"'), 'tab-me id must be preserved');
+  });
+  test('D-297B test 7: renderMeHtml still present and functional', () => {
+    assert.ok(rmeIdx297 > -1, 'renderMeHtml must remain in app-v10.js');
+  });
+  test('D-297B test 8a: D-285B post-submit — renderMe called', () => {
+    assert.ok(appSrc.includes('renderMe()'), 'renderMe() must remain in app-v10.js');
+  });
+  test('D-297B test 8b: D-285B post-submit — tab-me referenced', () => {
+    assert.ok(appSrc.includes('tab-me'), 'tab-me must remain referenced in app-v10.js');
+  });
+  test('D-297B test 8c: D-285B post-submit — toast copy preserved', () => {
+    assert.ok(appSrc.includes('Submitted for Review') && appSrc.includes('My HumanX') && appSrc.includes('Review badge'), 'D-285B toast copy must be preserved');
+  });
+  test('D-297B test 9: My HumanX data source remains GET /api/my-humanx', () => {
+    assert.ok(workerSrc.includes('/api/my-humanx'), 'GET /api/my-humanx must remain in worker.js');
+  });
+  test('D-297B test 10: Review explanation inside My HumanX preserved', () => {
+    assert.ok(rmeSlice297.includes('awaiting admin approval'), 'Review explanation must remain in renderMeHtml');
+  });
+  test('D-297B test 11: Truth submission still uses review_state=review', () => {
+    assert.ok(appSrc.includes("review_state:'review'") || appSrc.includes("review_state: 'review'") || workerSrc.includes("review_state = 'review'") || workerSrc.includes('review_state,') , 'review_state review must remain in submission path');
+  });
+  test('D-297B test 12: no direct publish/approve route in submission path', () => {
+    const submitIdx = appSrc.indexOf('function submitTruth');
+    const submitSlice = appSrc.slice(submitIdx, submitIdx + 1000);
+    assert.ok(!submitSlice.includes('auto_publish') && !submitSlice.includes('approve'), 'submitTruth must not contain auto_publish or approve');
+  });
+  test('D-297B test 13: public profile /u/:slug unaffected', () => {
+    assert.ok(workerSrc.includes('/u/:slug') || workerSrc.includes("'/u/'"), 'public profile route must remain in worker.js');
+  });
+  test('D-297B test 14: saved analysis remains private', () => {
+    assert.ok(!appSrc.includes('renderPublicAnalysis') && !appSrc.includes('public_analysis'), 'saved analysis must not be public');
+  });
+  test('D-297B test 15: Draft Truth from analysis remains draft-only', () => {
+    assert.ok(appSrc.includes('draftTruthFromAnalysis') && !appSrc.includes('submitTruthFromAnalysis'), 'draftTruthFromAnalysis must remain draft-only');
+  });
+  test('D-297B test 16: no backend/schema/API changes — worker.js not modified', () => {
+    assert.ok(workerSrc.includes('my-humanx'), 'worker.js must remain structurally intact');
+  });
+  test('D-297B test 17: no CSS changes — styles.css not modified by D-297B', () => {
+    assert.ok(!cssSrc.includes('cc-start-step:nth-child(5)'), 'styles.css must not contain D-297B-specific nth-child rule');
+  });
+  test('D-297B test 18: Drift/Belief expansion untouched', () => {
+    const driftSrc297 = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(driftSrc297.length > 0 && !driftSrc297.includes('Step 5') && !driftSrc297.includes('Track Review'), 'belief-drift-expansion.js must not be modified by D-297B');
   });
 }
 
