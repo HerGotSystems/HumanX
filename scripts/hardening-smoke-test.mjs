@@ -6406,18 +6406,19 @@ test('D-137E: counts remain full totals regardless of the active state filter', 
   );
 });
 
-test('D-137E: section order puts Belief Snapshots before Recent Truths/Evidence/Pressure', () => {
+test('D-137E: section order puts Belief Snapshots before Recent Evidence/Pressure [updated D-291B]', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
   const slice = appSrc.slice(idx, idx + 2100);
+  const truthsAt = slice.indexOf('Recent Truths');
   const claimsAt = slice.indexOf('Recent Claims');
   const snapshotsAt = slice.indexOf('Belief Snapshots');
-  const truthsAt = slice.indexOf('Recent Truths');
   const evidenceAt = slice.indexOf('Recent Evidence');
   const pressureAt = slice.indexOf('Recent Pressure');
+  // D-291B moved Recent Truths above Recent Claims and Belief Snapshots
   assert.ok(
-    claimsAt !== -1 && snapshotsAt !== -1 && truthsAt !== -1 && evidenceAt !== -1 && pressureAt !== -1 &&
-    claimsAt < snapshotsAt && snapshotsAt < truthsAt && truthsAt < evidenceAt && evidenceAt < pressureAt,
-    'renderMeHtml must order sections: Account, Counts, Recent Claims, Belief Snapshots, Recent Truths, Recent Evidence, Recent Pressure'
+    truthsAt !== -1 && claimsAt !== -1 && snapshotsAt !== -1 && evidenceAt !== -1 && pressureAt !== -1 &&
+    truthsAt < claimsAt && claimsAt < snapshotsAt && snapshotsAt < evidenceAt && evidenceAt < pressureAt,
+    'renderMeHtml must order sections: Recent Truths, Recent Claims, Belief Snapshots, Recent Evidence, Recent Pressure (D-291B)'
   );
 });
 
@@ -6921,16 +6922,16 @@ test('D-139B: Belief Mirror panel exists in the Me render path', () => {
   );
 });
 
-test('D-139B: Mirror is placed after Belief Snapshots and before Recent Truths', () => {
+test('D-139B: Mirror is placed after Belief Snapshots [updated D-291B — Recent Truths now above]', () => {
   const idx = appSrc.indexOf('function renderMeHtml');
   const slice = appSrc.slice(idx, idx + 2000);
   const snapshotsAt = slice.indexOf('Belief Snapshots');
   const mirrorAt = slice.indexOf('meMirrorHtml(data)');
-  const truthsAt = slice.indexOf('Recent Truths');
+  // D-291B moved Recent Truths above Belief Snapshots/Mirror, so Mirror is now after Snapshots but not "before Recent Truths"
   assert.ok(
-    snapshotsAt !== -1 && mirrorAt !== -1 && truthsAt !== -1 &&
-    snapshotsAt < mirrorAt && mirrorAt < truthsAt,
-    'renderMeHtml must place the Belief Mirror panel between Belief Snapshots and Recent Truths'
+    snapshotsAt !== -1 && mirrorAt !== -1 &&
+    snapshotsAt < mirrorAt,
+    'renderMeHtml must place the Belief Mirror panel after Belief Snapshots (D-291B: Recent Truths is now above both)'
   );
 });
 
@@ -24562,6 +24563,184 @@ console.log('\nD-248A: Review card metadata density regression lock');
   test('D-289B: Drift/Belief expansion files remain untouched', () => {
     const driftSrc = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
     assert.ok(!driftSrc.includes('D-289B'), 'belief-drift-expansion.js must not be modified by D-289B');
+  });
+}
+
+// ── Section D-291B: My HumanX Recent Truths prominence and Review explanation ─
+{
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const cssSrc291 = readFileSync(path.join(__dirname, '../public/styles.css'), 'utf8');
+
+  const renderMeHtmlIdx = appSrc.indexOf('function renderMeHtml(');
+  const renderMeHtmlSlice = appSrc.slice(renderMeHtmlIdx, renderMeHtmlIdx + 3000);
+
+  const submitTruthIdx = appSrc.indexOf('async function submitTruth(');
+  const submitTruthSlice = appSrc.slice(submitTruthIdx, submitTruthIdx + 800);
+
+  const draftFnIdx = appSrc.indexOf('async function draftTruthFromAnalysis(');
+  const draftFnSlice = appSrc.slice(draftFnIdx, draftFnIdx + 800);
+
+  const saveSliceIdx = appSrc.indexOf('async function saveAnalysisResult(');
+  const saveSlice = appSrc.slice(saveSliceIdx, saveSliceIdx + 800);
+
+  const pubProfIdx = appSrc.indexOf('renderPublicProfileHtml');
+  const pubProfSlice = appSrc.slice(pubProfIdx, pubProfIdx + 4000);
+
+  const analysisItemIdx = appSrc.indexOf('function analysisItem(');
+  const analysisItemSlice = appSrc.slice(analysisItemIdx, analysisItemIdx + 2000);
+
+  // 1. renderMeHtml renders Recent Truths
+  test('D-291B: renderMeHtml renders Recent Truths panel', () => {
+    assert.ok(renderMeHtmlSlice.includes('Recent Truths'), 'renderMeHtml must render "Recent Truths" panel');
+  });
+
+  // 2. Recent Truths appears before Recent Claims
+  test('D-291B: Recent Truths appears before Recent Claims in renderMeHtml', () => {
+    const truthsPos = renderMeHtmlSlice.indexOf('Recent Truths');
+    const claimsPos = renderMeHtmlSlice.indexOf('Recent Claims');
+    assert.ok(truthsPos >= 0 && claimsPos >= 0 && truthsPos < claimsPos,
+      'Recent Truths must appear before Recent Claims in renderMeHtml');
+  });
+
+  // 3. Recent Truths appears before Belief Snapshots / Belief Mirror / Belief Reflection
+  test('D-291B: Recent Truths appears before Belief Snapshots in renderMeHtml', () => {
+    const truthsPos = renderMeHtmlSlice.indexOf('Recent Truths');
+    const snapPos = renderMeHtmlSlice.indexOf('Belief Snapshots');
+    assert.ok(truthsPos >= 0 && snapPos >= 0 && truthsPos < snapPos,
+      'Recent Truths must appear before Belief Snapshots in renderMeHtml');
+  });
+
+  test('D-291B: Recent Truths appears before Belief Mirror in renderMeHtml', () => {
+    const truthsPos = renderMeHtmlSlice.indexOf('Recent Truths');
+    const mirrorPos = renderMeHtmlSlice.indexOf('meMirrorHtml');
+    assert.ok(truthsPos >= 0 && mirrorPos >= 0 && truthsPos < mirrorPos,
+      'Recent Truths must appear before Belief Mirror in renderMeHtml');
+  });
+
+  test('D-291B: Recent Truths appears before Belief Reflection in renderMeHtml', () => {
+    const truthsPos = renderMeHtmlSlice.indexOf('Recent Truths');
+    const reflPos = renderMeHtmlSlice.indexOf('meBeliefReflectionHtml');
+    assert.ok(truthsPos >= 0 && reflPos >= 0 && truthsPos < reflPos,
+      'Recent Truths must appear before Belief Reflection in renderMeHtml');
+  });
+
+  // 4. Review explanation note present
+  test('D-291B: Review explanation note "awaiting admin approval" is present in renderMeHtml', () => {
+    assert.ok(
+      renderMeHtmlSlice.includes('Review: awaiting admin approval — goes Public when approved'),
+      'renderMeHtml must include Review explanation note'
+    );
+  });
+
+  // 5. Yellow Review badge preserved in meRecentTruthsHtml
+  test('D-291B: meRecentTruthsHtml still uses b-yellow badge for Review state', () => {
+    const truthsFnIdx = appSrc.indexOf('function meRecentTruthsHtml(');
+    const truthsFnSlice = appSrc.slice(truthsFnIdx, truthsFnIdx + 600);
+    assert.ok(truthsFnSlice.includes('b-yellow') || appSrc.includes("ME_STATE_CLR={public:'b-green',review:'b-yellow'"),
+      'Review state must still use b-yellow badge color');
+  });
+
+  // 6. My HumanX still uses GET /api/my-humanx
+  test('D-291B: renderMe still calls GET /api/my-humanx', () => {
+    const renderMeIdx = appSrc.indexOf('async function renderMe(');
+    const renderMeSlice = appSrc.slice(renderMeIdx, renderMeIdx + 400);
+    assert.ok(renderMeSlice.includes('/api/my-humanx'), 'renderMe must still call GET /api/my-humanx');
+  });
+
+  // 7. Pending Truth visibility remains owner/private (meRecentTruthsHtml not in public profile)
+  test('D-291B: meRecentTruthsHtml is not called from renderPublicProfileHtml', () => {
+    assert.ok(!pubProfSlice.includes('meRecentTruthsHtml'), 'meRecentTruthsHtml must not appear in renderPublicProfileHtml');
+  });
+
+  // 8. Public profile unaffected
+  test('D-291B: renderPublicProfileHtml does not expose renderMeHtml or Recent Truths', () => {
+    assert.ok(!pubProfSlice.includes('renderMeHtml'), 'renderPublicProfileHtml must not call renderMeHtml');
+    assert.ok(!pubProfSlice.includes('Recent Truths'), '"Recent Truths" panel must not appear in public profile');
+  });
+
+  // 9. Public profile does not expose saved-analysis metadata
+  test('D-291B: public profile does not expose saved analysis metadata', () => {
+    assert.ok(!pubProfSlice.includes('analysisItem'), 'renderPublicProfileHtml must not call analysisItem');
+    assert.ok(!pubProfSlice.includes('packetId'), 'packetId must not appear in public profile');
+  });
+
+  // 10. Review/moderation unchanged
+  test('D-291B: Review/moderation handlers remain unchanged', () => {
+    assert.ok(appSrc.includes('requestApproveReview'), 'requestApproveReview must still be defined');
+    assert.ok(appSrc.includes('requestRejectReview'), 'requestRejectReview must still be defined');
+    assert.ok(appSrc.includes('reviewDecisionUI'), 'reviewDecisionUI must still be defined');
+  });
+
+  // 11. Truth submission still uses review_state
+  test('D-291B: Truth submission still references review_state', () => {
+    assert.ok(submitTruthSlice.includes('review_state') || appSrc.includes('review_state'),
+      'Truth submission must still produce review_state=review');
+  });
+
+  // 12. D-285B post-submit navigation preserved
+  test('D-291B [D-285B lock]: post-submit navigation to My HumanX preserved', () => {
+    assert.ok(submitTruthSlice.includes('renderMe()'), 'submitTruth must still call renderMe() after submission');
+    assert.ok(submitTruthSlice.includes('tab-me'), 'submitTruth must still activate tab-me after submission');
+    assert.ok(
+      submitTruthSlice.includes('Submitted for Review') && submitTruthSlice.includes('My HumanX with the Review badge'),
+      'submitTruth post-submit toast must still be preserved'
+    );
+  });
+
+  // 13. Saved analysis remains separate from Truth submission
+  test('D-291B: saveAnalysisResult still posts only to /api/analysis', () => {
+    assert.ok(saveSlice.includes('/api/analysis'), 'saveAnalysisResult must post to /api/analysis');
+    assert.ok(!saveSlice.includes('/api/truths'), 'saveAnalysisResult must not post to /api/truths');
+    assert.ok(!saveSlice.includes('/api/review'), 'saveAnalysisResult must not post to /api/review');
+  });
+
+  // 14. Draft Truth remains draft-only
+  test('D-291B: draftTruthFromAnalysis does not call submitTruth()', () => {
+    assert.ok(!draftFnSlice.includes('submitTruth('), 'draftTruthFromAnalysis must not call submitTruth()');
+    assert.ok(!draftFnSlice.includes('submitBuilderTruth('), 'draftTruthFromAnalysis must not call submitBuilderTruth()');
+  });
+
+  // 15. Draft action still uses plainLanguageSummary
+  test('D-291B: draft action still uses plainLanguageSummary', () => {
+    assert.ok(
+      analysisItemSlice.includes('a.plainLanguageSummary||raw.plain_language_summary'),
+      'draft action must still be conditional on plainLanguageSummary'
+    );
+  });
+
+  // 16. Draft action does not use verdict as Truth content
+  test('D-291B: draft action does not use verdict as Truth content', () => {
+    assert.ok(
+      !analysisItemSlice.includes('data-summary="${esc(verdict)}"'),
+      'draft action must not use verdict as truth content'
+    );
+  });
+
+  // 17. saveAnalysisResult still posts to /api/analysis (explicit route check)
+  test('D-291B: saveAnalysisResult route unchanged (/api/analysis only)', () => {
+    assert.ok(!saveSlice.includes('approve'), 'saveAnalysisResult must not call approve route');
+    assert.ok(!saveSlice.includes('reviewDecisionUI'), 'saveAnalysisResult must not call reviewDecisionUI');
+  });
+
+  // 18. No backend/API/schema/storage changes
+  test('D-291B: No backend/API/schema/storage changes', () => {
+    const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+    const analysisSrc = readFileSync(path.join(__dirname, '../src/analysis-results.js'), 'utf8');
+    const truthsSrc = readFileSync(path.join(__dirname, '../src/truths.js'), 'utf8');
+    assert.ok(!workerSrc.includes('D-291B'), 'src/worker.js must not be modified by D-291B');
+    assert.ok(!analysisSrc.includes('D-291B'), 'src/analysis-results.js must not be modified by D-291B');
+    assert.ok(!truthsSrc.includes('D-291B'), 'src/truths.js must not be modified by D-291B');
+  });
+
+  // 19. No CSS changes
+  test('D-291B: No CSS changes (styles.css unchanged)', () => {
+    assert.ok(!cssSrc291.includes('D-291B'), 'styles.css must not be modified by D-291B');
+  });
+
+  // 20. Drift/Belief expansion files untouched
+  test('D-291B: Drift/Belief expansion files remain untouched', () => {
+    const driftSrc = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(!driftSrc.includes('D-291B'), 'belief-drift-expansion.js must not be modified by D-291B');
   });
 }
 
