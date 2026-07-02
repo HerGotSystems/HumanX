@@ -53,7 +53,11 @@ Read these first when starting a new session or returning after time away.
 
 **Project state checkpoint:** [`docs/PROJECT_STATE.md`](PROJECT_STATE.md) — updated D-284A (2026-07-02). Covers D-210→D-218 hardening arc + D-220→D-225 public profile polish arc + full D-227→D-263 Review ergonomics run + D-265→D-266 Study entry / Back button style mini-arc + D-268→D-269 RunPack fallback guidance/generated-time mini-arc + D-271→D-272 RunPack AI-return import visibility mini-arc + D-274→D-275 RunPack provenance mini-arc + D-277 saved analysis provenance visibility mini-arc + D-279 stale warning wording mini-arc + D-281 saved analysis ↔ Truth boundary copy mini-arc + D-283 Truth drafting/Review workflow audit (see D-284A checkpoint), current baseline 3317/0/24/57, privacy boundary state, Drift/Belief expansion state, deployment state, safe next-work rules 1–95.
 
-### `D285A_OWNER_PENDING_REVIEW_TRUTH_VISIBILITY_AUDIT.md` ⭐ CURRENT — D-285A OWNER PENDING-REVIEW TRUTH VISIBILITY AUDIT — DOCS ONLY
+### `D285B_PENDING_REVIEW_TRUTH_POST_SUBMIT_NAVIGATION_COPY.md` ⭐ CURRENT — D-285B PENDING-REVIEW TRUTH POST-SUBMIT NAVIGATION COPY — DEPLOY NEEDED
+
+After owner Truth submission, navigate to My HumanX (where pending-Review Truths already appear with yellow "Review" badge) instead of the public Truths tab. Three paths updated: `submitTruth()`, `submitBuilderTruth()`, `promoteBelief('truth')`. New toast: `"Submitted for Review — you can see it in My HumanX with the Review badge."` No backend/schema/API/CSS/index change. 20 new tests + 1 existing test updated. Hardening: 3337/0/24/57 (+20). Deploy needed — `public/app-v10.js` changed.
+
+### `D285A_OWNER_PENDING_REVIEW_TRUTH_VISIBILITY_AUDIT.md` — D-285A OWNER PENDING-REVIEW TRUTH VISIBILITY AUDIT — DOCS ONLY
 
 Full audit of whether owners can see their own pending-Review Truths. Key finding: `GET /api/my-humanx` already returns all owner truths with no `review_state` filter (worker.js line 319); `meRecentTruthsHtml()` already renders them with a yellow "Review" badge. D-283A/D-284A F-1 finding was overstated. The only gap is post-submission UX: after `submitTruth()` the owner is navigated to the public Truths tab, not My HumanX. D-285B classification: frontend-only. No backend/schema/migration work needed. Baseline: 3317/0/24/57 (unchanged). No deploy needed.
 

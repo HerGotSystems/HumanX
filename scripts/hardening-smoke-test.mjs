@@ -902,8 +902,8 @@ test('evidenceCard Study Linked Claim button calls studyFromVault not selectClai
   );
 });
 
-test('promoteBelief truth path activates tab-truths', () => {
-  assert.ok(promoteBeliefBody.includes("'tab-truths'"), 'promoteBelief truth path must activate the Truths tab to keep tab highlight in sync');
+test('promoteBelief truth path activates tab-me (D-285B: navigates to My HumanX after Truth submission)', () => {
+  assert.ok(promoteBeliefBody.includes("'tab-me'"), 'promoteBelief truth path must activate tab-me so owner lands in My HumanX where pending Truth is visible (D-285B)');
 });
 
 test('promoteBelief claim path activates tab-arena', () => {
@@ -23966,6 +23966,193 @@ console.log('\nD-248A: Review card metadata density regression lock');
 
   test('D-281B [D-277 lock]: public profile does not expose Saved from RunPack', () => {
     assert.ok(!pubProfSlice.includes('Saved from RunPack'), '"Saved from RunPack" must not appear in public profile');
+  });
+}
+
+// ── Section D-285B: Pending-Review Truth post-submit navigation/copy ──────────
+{
+  const appSrc = readFileSync(path.join(__dirname, '../public/app-v10.js'), 'utf8');
+  const workerSrc = readFileSync(path.join(__dirname, '../src/worker.js'), 'utf8');
+
+  const submitTruthIdx = appSrc.indexOf('async function submitTruth(');
+  const submitTruthSlice = appSrc.slice(submitTruthIdx, submitTruthIdx + 800);
+
+  const submitBuilderTruthIdx = appSrc.indexOf('async function submitBuilderTruth(');
+  const submitBuilderTruthSlice = appSrc.slice(submitBuilderTruthIdx, submitBuilderTruthIdx + 800);
+
+  const promoteBeliefIdx = appSrc.indexOf('async function promoteBelief(');
+  const promoteBeliefSlice = appSrc.slice(promoteBeliefIdx, promoteBeliefIdx + 900);
+
+  const myHumanxIdx = appSrc.indexOf('async function renderMe(');
+  const myHumanxSlice = appSrc.slice(myHumanxIdx, myHumanxIdx + 600);
+
+  const meRecentTruthsIdx = appSrc.indexOf('function meRecentTruthsHtml(');
+  const meRecentTruthsSlice = appSrc.slice(meRecentTruthsIdx, meRecentTruthsIdx + 800);
+
+  const workerMyHumanxIdx = workerSrc.indexOf('function myHumanX(');
+  const workerMyHumanxSlice = workerSrc.slice(workerMyHumanxIdx, workerMyHumanxIdx + 1200);
+
+  const pubProfIdx = appSrc.indexOf('function renderPublicProfileHtml(');
+  const pubProfSlice = appSrc.slice(pubProfIdx, pubProfIdx + 4000);
+
+  const saveSliceIdx = appSrc.indexOf('async function saveAnalysisResult(');
+  const saveSlice = appSrc.slice(saveSliceIdx, saveSliceIdx + 1000);
+
+  const analysisItemIdx = appSrc.indexOf('function analysisItem(');
+  const analysisItemSlice = appSrc.slice(analysisItemIdx, analysisItemIdx + 1200);
+
+  // 1. submitTruth success path no longer navigates only to renderTruths
+  test('D-285B: submitTruth no longer calls renderTruths() after success', () => {
+    assert.ok(
+      !submitTruthSlice.includes("toast('Truth submitted for Review. It will appear publicly after approval.');await renderTruths()"),
+      'submitTruth must not call renderTruths() after success (D-285B)'
+    );
+  });
+
+  // 2. submitTruth success path navigates to renderMe
+  test('D-285B: submitTruth calls renderMe() after success', () => {
+    assert.ok(
+      submitTruthSlice.includes('await renderMe()'),
+      'submitTruth must call renderMe() after success (D-285B)'
+    );
+  });
+
+  // 3. submitBuilderTruth success path no longer navigates only to renderTruths
+  test('D-285B: submitBuilderTruth no longer calls renderTruths() after success', () => {
+    assert.ok(
+      !submitBuilderTruthSlice.includes("await renderTruths();toast('Saved as Truth for Review"),
+      'submitBuilderTruth must not call renderTruths() after success (D-285B)'
+    );
+  });
+
+  // 4. submitBuilderTruth success path navigates to renderMe
+  test('D-285B: submitBuilderTruth calls renderMe() after success', () => {
+    assert.ok(
+      submitBuilderTruthSlice.includes('await renderMe()'),
+      'submitBuilderTruth must call renderMe() after success (D-285B)'
+    );
+  });
+
+  // 5. promoteBelief truth path switches to tab-me not tab-truths
+  test('D-285B: promoteBelief truth path switches tab to tab-me', () => {
+    const truthPathIdx = promoteBeliefSlice.indexOf("target==='truth'");
+    const truthPath = promoteBeliefSlice.slice(truthPathIdx, truthPathIdx + 500);
+    assert.ok(
+      truthPath.includes('tab-me'),
+      'promoteBelief truth path must activate tab-me (D-285B)'
+    );
+  });
+
+  // 6. promoteBelief truth path calls renderMe not renderTruths
+  test('D-285B: promoteBelief truth path calls renderMe()', () => {
+    const truthPathIdx = promoteBeliefSlice.indexOf("target==='truth'");
+    const truthPath = promoteBeliefSlice.slice(truthPathIdx, truthPathIdx + 500);
+    assert.ok(
+      truthPath.includes('await renderMe()'),
+      'promoteBelief truth path must call renderMe() (D-285B)'
+    );
+  });
+
+  // 7. New toast copy mentions My HumanX
+  test('D-285B: post-submit toast mentions My HumanX', () => {
+    assert.ok(
+      appSrc.includes('you can see it in My HumanX'),
+      'Truth submission toast must mention My HumanX (D-285B)'
+    );
+  });
+
+  // 8. New toast copy mentions Review badge
+  test('D-285B: post-submit toast mentions Review badge', () => {
+    assert.ok(
+      appSrc.includes('Review badge'),
+      'Truth submission toast must mention Review badge (D-285B)'
+    );
+  });
+
+  // 9. GET /api/my-humanx remains the owner truth source
+  test('D-285B: renderMe() fetches from /api/my-humanx', () => {
+    assert.ok(
+      myHumanxSlice.includes('/api/my-humanx'),
+      'renderMe must fetch from /api/my-humanx (D-285B)'
+    );
+  });
+
+  // 10. meRecentTruthsHtml still renders pending Review truths using ME_STATE_LABELS
+  test('D-285B: meRecentTruthsHtml renders truths using ME_STATE_LABELS', () => {
+    assert.ok(
+      meRecentTruthsSlice.includes('ME_STATE_LABELS') || meRecentTruthsSlice.includes('review_state'),
+      'meRecentTruthsHtml must render truths with ME_STATE_LABELS or review_state (D-285B)'
+    );
+  });
+
+  // 11. Yellow Review badge constant preserved
+  test('D-285B: ME_STATE_CLR maps review state to b-yellow', () => {
+    assert.ok(
+      appSrc.includes("review:'b-yellow'"),
+      'ME_STATE_CLR must map review to b-yellow (D-285B)'
+    );
+  });
+
+  // 12. ME_STATE_LABELS maps review to Review label
+  test('D-285B: ME_STATE_LABELS maps review state to Review label', () => {
+    assert.ok(
+      appSrc.includes("review:'Review'"),
+      'ME_STATE_LABELS must map review to Review (D-285B)'
+    );
+  });
+
+  // 13. No direct publish/approve route called after Truth submission
+  test('D-285B: submitTruth does not call /api/review/decision', () => {
+    assert.ok(
+      !submitTruthSlice.includes('review/decision'),
+      'submitTruth must not call /api/review/decision (D-285B)'
+    );
+  });
+
+  // 14. Review/moderation handlers remain untouched (spot check)
+  test('D-285B: reviewDecisionUI still present and unchanged', () => {
+    assert.ok(
+      appSrc.includes('function reviewDecisionUI('),
+      'reviewDecisionUI must still be present (D-285B)'
+    );
+  });
+
+  // 15. Public profile query retains public-only filter (D-271/D-272 lock)
+  test('D-285B [D-271/D-272 lock]: rp-return-section still present in renderExport', () => {
+    const exportIdx = appSrc.indexOf('function renderExport(');
+    const exportSlice = appSrc.slice(exportIdx, exportIdx + 5000);
+    assert.ok(exportSlice.includes('rp-return-section'), 'renderExport must still contain rp-return-section (D-285B lock)');
+  });
+
+  // 16. Stale detection lock preserved (D-274/D-279)
+  test('D-285B [D-274/D-279 lock]: detectPacketStaleness still pushes "claim updated since packet"', () => {
+    const staleIdx = appSrc.indexOf('function detectPacketStaleness(');
+    const staleSlice = appSrc.slice(staleIdx, staleIdx + 800);
+    assert.ok(staleSlice.includes('claim updated since packet'), 'detectPacketStaleness must push "claim updated since packet" (D-285B lock)');
+  });
+
+  // 17. Packet-ID storage lock preserved (D-275)
+  test('D-285B [D-275 lock]: saveAnalysisResult gates packet_id on lastPacketClaimId===selected?.id', () => {
+    assert.ok(
+      saveSlice.includes('lastPacketClaimId===selected?.id') || saveSlice.includes('lastPacketClaimId === selected?.id'),
+      'saveAnalysisResult must gate packet_id on lastPacketClaimId===selected?.id (D-285B lock)'
+    );
+  });
+
+  // 18. Saved analysis ↔ truth boundary preserved (D-277/D-281)
+  test('D-285B [D-277/D-281 lock]: saveAnalysisResult posts only to /api/analysis', () => {
+    assert.ok(
+      saveSlice.includes('/api/analysis') && !saveSlice.includes('/api/truths'),
+      'saveAnalysisResult must post only to /api/analysis, not /api/truths (D-285B lock)'
+    );
+  });
+
+  test('D-285B [D-277/D-281 lock]: analysisItem still renders Saved from RunPack provenance line', () => {
+    assert.ok(analysisItemSlice.includes('Saved from RunPack:'), 'analysisItem must still render "Saved from RunPack:" provenance line (D-285B lock)');
+  });
+
+  test('D-285B [D-277/D-281 lock]: public profile does not expose Saved from RunPack', () => {
+    assert.ok(!pubProfSlice.includes('Saved from RunPack'), '"Saved from RunPack" must not appear in public profile (D-285B lock)');
   });
 }
 
