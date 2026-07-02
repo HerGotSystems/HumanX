@@ -1,7 +1,7 @@
 # D-287B — Saved Analysis Assisted Truth Draft
 
 **Scope:** Frontend + tests + docs
-**Status:** COMPLETE — deploy needed (`public/app-v10.js` changed)
+**Status:** COMPLETE — owner deployed (D-287C live closeout)
 **Branch:** main (direct commit)
 **Baseline before D-287B:** 3337 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Hardening after D-287B:** 3360 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
@@ -206,4 +206,45 @@ Known warn: `/api/u/:slug — known parameterised route; implemented via regex i
 | Task | Deploy | Result |
 |------|--------|--------|
 | D-287A | No | Docs only |
-| D-287B | **Yes — needed** | `public/app-v10.js` changed |
+| D-287B | **Yes — owner deployed** | PASS — D-287C live closeout |
+| D-287C | No | Live closeout |
+
+## Live Sanity (D-287C — owner-verified, 2026-07-02)
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Owner can open a claim/Study view without console-breaking errors | PASS |
+| 3 | Saved analysis cards still render | PASS |
+| 4 | Saved analysis cards with `plainLanguageSummary` show `Draft Truth from analysis` | PASS |
+| 5 | Saved analysis cards without `plainLanguageSummary` do not show the draft action | PASS |
+| 6 | Clicking `Draft Truth from analysis` switches to the Truths tab | PASS |
+| 7 | The existing Truth draft/submission UI renders | PASS |
+| 8 | `truthStatement` is prefilled from the saved analysis `plainLanguageSummary` | PASS |
+| 9 | The field is focused after drafting | PASS |
+| 10 | The draft action does not auto-submit | PASS |
+| 11 | The draft action does not auto-publish | PASS |
+| 12 | The draft action does not call approve/reject/review routes | PASS |
+| 13 | The owner must explicitly click the normal submit button to submit for Review | PASS |
+| 14 | Actual Truth submission still uses `review_state='review'` | PASS |
+| 15 | After actual submission, D-285B nav: My HumanX + toast `Submitted for Review — you can see it in My HumanX with the Review badge.` | PASS |
+| 16 | Pending submitted Truth appears in My HumanX with yellow `Review` badge | PASS |
+| 17 | `verdict` is not used as Truth content | PASS |
+| 18 | `Private analysis note — not public truth.` copy remains | PASS |
+| 19 | `Saving analysis does not publish a truth automatically — it only stores private analysis for this claim.` copy remains | PASS |
+| 20 | Saved analysis provenance `Saved from RunPack: rp_...` still works | PASS |
+| 21 | Public profile `/u/:slug` does not expose `Draft Truth from analysis`, saved analysis metadata, `Saved from RunPack`, or `packetId` | PASS |
+| 22 | Public Truth behavior unchanged | PASS |
+| 23 | Review/moderation behavior unchanged | PASS |
+| 24 | AI-return import locks preserved: `rp-return-section`, `Load AI Analysis Return`, `rp-return-next-step`, no-auto-publish copy | PASS |
+| 25 | Parser behavior unchanged: `JSON.parse`, `parsed.output \|\| parsed.result \|\| parsed.analysis \|\| parsed` | PASS |
+| 26 | `saveAnalysisResult()` still posts only to `/api/analysis` | PASS |
+| 27 | Stale detection still works: `claim updated since packet` | PASS |
+| 28 | Packet-ID storage still works | PASS |
+| 29 | Drift/Belief expansion unaffected | PASS |
+| 30 | No backend/API/schema/storage behavior changed | PASS |
+| 31 | No console errors | PASS |
+
+**Live sanity: 31/31 PASS**
+
+Deployed Worker version: not captured.
