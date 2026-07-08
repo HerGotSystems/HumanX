@@ -10448,9 +10448,9 @@ test('D-159B: public profile example bridge link exists and points to /u/calenhi
   );
 });
 
-test('D-159B: Browse Claims card appears before Submit Claim in renderHome [updated D-300B: wider slice]', () => {
+test('D-159B: Browse Claims card appears before Submit Claim in renderHome [updated D-302B: wider slice]', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 5600);
+  const slice = appSrc.slice(idx, idx + 6300);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
   const browseAt = slice.indexOf('data-value="arena"');
   const submitAt = slice.indexOf('data-value="submit"');
@@ -10460,9 +10460,9 @@ test('D-159B: Browse Claims card appears before Submit Claim in renderHome [upda
   );
 });
 
-test('D-159B: Browse Claims card appears before Belief Engine in renderHome [updated D-300B: wider slice]', () => {
+test('D-159B: Browse Claims card appears before Belief Engine in renderHome [updated D-302B: wider slice]', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 5800);
+  const slice = appSrc.slice(idx, idx + 6500);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
   // D-181D migrated onclick="location.href='...'" to data-action="navBeliefEngine"
   const browseAt = slice.indexOf('data-value="arena"');
@@ -10473,9 +10473,9 @@ test('D-159B: Browse Claims card appears before Belief Engine in renderHome [upd
   );
 });
 
-test('D-159B: Browse Claims card has cc-card-primary class [updated D-300B: wider slice]', () => {
+test('D-159B: Browse Claims card has cc-card-primary class [updated D-302B: wider slice]', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 5600);
+  const slice = appSrc.slice(idx, idx + 6300);
   const gridStart = slice.indexOf('cc-card-grid');
   const gridSlice = slice.slice(gridStart, gridStart + 600);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
@@ -25164,6 +25164,105 @@ console.log('\nD-248A: Review card metadata density regression lock');
   test('D-300B test 25: Drift/Belief expansion untouched by D-300B', () => {
     const driftSrc300 = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
     assert.ok(driftSrc300.length > 0 && !driftSrc300.includes('See it work') && !driftSrc300.includes('Example — not a real claim'), 'belief-drift-expansion.js must not be modified by D-300B');
+  });
+}
+
+// ── D-302B: Home collapsed HumanX words glossary ──
+{
+  const demoLabelIdx302 = appSrc.indexOf('Example — not a real claim');
+  const glossaryIdx302 = appSrc.indexOf('<summary>HumanX words');
+  const actionsIdx302 = appSrc.indexOf('<h2 class="cc-section-head">Actions</h2>');
+  const glossarySlice302 = appSrc.slice(glossaryIdx302, actionsIdx302);
+  const homeIdx302 = appSrc.indexOf('function renderHome');
+  const homeSlice302 = appSrc.slice(homeIdx302, homeIdx302 + 7500);
+
+  test('D-302B test 1: renderHome contains <details', () => {
+    assert.ok(appSrc.includes('<details'), 'renderHome must contain a <details> element');
+  });
+  test('D-302B test 2: renderHome contains <summary>HumanX words', () => {
+    assert.ok(appSrc.includes('<summary>HumanX words'), 'renderHome must contain <summary>HumanX words exactly (no attributes on summary)');
+  });
+  test('D-302B test 3: glossary includes Claim', () => {
+    assert.ok(glossarySlice302.includes('<b>Claim</b>'), 'glossary must define Claim');
+  });
+  test('D-302B test 4: glossary includes Truth', () => {
+    assert.ok(glossarySlice302.includes('<b>Truth</b>'), 'glossary must define Truth');
+  });
+  test('D-302B test 5: glossary includes Review', () => {
+    assert.ok(glossarySlice302.includes('<b>Review</b>'), 'glossary must define Review');
+  });
+  test('D-302B test 6: glossary includes Evidence', () => {
+    assert.ok(glossarySlice302.includes('<b>Evidence</b>'), 'glossary must define Evidence');
+  });
+  test('D-302B test 7: glossary includes My HumanX', () => {
+    assert.ok(glossarySlice302.includes('<b>My HumanX</b>'), 'glossary must define My HumanX');
+  });
+  test('D-302B test 8: glossary defines Review as admin approval / waiting for approval', () => {
+    assert.ok(glossarySlice302.includes('Admin approval'), 'Review definition must mention admin approval');
+  });
+  test('D-302B test 9: glossary does not describe Review as proof or verification', () => {
+    assert.ok(!glossarySlice302.includes('is proof') && !glossarySlice302.includes('verifies') && !glossarySlice302.includes('guarantees') && glossarySlice302.includes('not automatic proof'), 'Review definition must not claim to be proof/verification and must retain the not-automatic-proof disclaimer');
+  });
+  test('D-302B test 10: glossary defines My HumanX as private/owner dashboard', () => {
+    assert.ok(glossarySlice302.includes('private dashboard'), 'My HumanX definition must describe it as a private dashboard');
+  });
+  test('D-302B test 11: glossary defines Evidence as support/challenge/reasons/sources for claims', () => {
+    assert.ok(glossarySlice302.includes('Reasons or sources') && glossarySlice302.includes('support or challenge'), 'Evidence definition must use reasons/sources/support/challenge wording');
+  });
+  test('D-302B test 12: glossary does not use the inaccurate Truth sentence', () => {
+    assert.ok(!appSrc.includes('a claim approved for public display after Review'), 'the inaccurate Truth definition must not appear anywhere in app-v10.js');
+  });
+  test('D-302B test 13: glossary appears after the D-300 demo label', () => {
+    assert.ok(demoLabelIdx302 > -1 && glossaryIdx302 > -1 && demoLabelIdx302 < glossaryIdx302, 'glossary must appear after "Example — not a real claim" in renderHome');
+  });
+  test('D-302B test 14: glossary appears before the Actions section', () => {
+    assert.ok(glossaryIdx302 > -1 && actionsIdx302 > -1 && glossaryIdx302 < actionsIdx302, 'glossary must appear before the Actions section header');
+  });
+  test('D-302B test 15: D-300 demo card explanation preserved', () => {
+    assert.ok(appSrc.includes('HumanX turns a raw thought into a structured claim, shows what would need evidence, and keeps public Truths behind Review.'), 'D-300 demo card explanation must remain unchanged');
+  });
+  test('D-302B test 16: D-300 Review label preserved', () => {
+    assert.ok(appSrc.includes('Review state:') && appSrc.includes('example only, not verified'), 'D-300 Review-state label must remain unchanged');
+  });
+  test('D-302B test 17: Home Step 5 remains preserved', () => {
+    assert.ok(homeSlice302.includes('Step 5') && homeSlice302.includes('Track Review') && homeSlice302.includes('Submitted Truths wait for admin approval and appear in My HumanX with a Review badge.'), 'Home Step 5 copy must remain unchanged by D-302B');
+  });
+  test('D-302B test 18: visible tab label remains My HumanX', () => {
+    assert.ok(indexSrc.includes('>My HumanX</button>'), 'tab-me visible label must remain My HumanX after D-302B');
+  });
+  test('D-302B test 19: internal tab id remains tab-me', () => {
+    assert.ok(indexSrc.includes('id="tab-me"'), 'tab-me id must remain after D-302B');
+  });
+  test('D-302B test 20: Truth submissions still use review_state=review', () => {
+    assert.ok(appSrc.includes("review_state:'review'") || appSrc.includes("review_state: 'review'") || workerSrc.includes("review_state = 'review'") || workerSrc.includes('review_state,'), 'review_state review must remain in submission path after D-302B');
+  });
+  test('D-302B test 21: no auto-publish path introduced', () => {
+    const submitIdx302 = appSrc.indexOf('function submitTruth');
+    const submitSlice302 = appSrc.slice(submitIdx302, submitIdx302 + 1000);
+    assert.ok(!submitSlice302.includes('auto_publish') && !submitSlice302.includes('approve'), 'submitTruth must not contain auto_publish or approve after D-302B');
+  });
+  test('D-302B test 22: My HumanX data source remains GET /api/my-humanx', () => {
+    assert.ok(workerSrc.includes('/api/my-humanx'), 'GET /api/my-humanx must remain in worker.js after D-302B');
+  });
+  test('D-302B test 23: public profile /u/:slug remains unaffected', () => {
+    assert.ok(workerSrc.includes('/u/:slug') || workerSrc.includes("'/u/'"), 'public profile route must remain in worker.js after D-302B');
+    assert.ok(!glossarySlice302.includes('renderPublicProfileHtml'), 'glossary must not reference public profile rendering');
+  });
+  test('D-302B test 24: saved analysis remains private', () => {
+    assert.ok(!appSrc.includes('renderPublicAnalysis') && !appSrc.includes('public_analysis'), 'saved analysis must not be public after D-302B');
+  });
+  test('D-302B test 25: Draft Truth from analysis remains draft-only', () => {
+    assert.ok(appSrc.includes('draftTruthFromAnalysis') && !appSrc.includes('submitTruthFromAnalysis'), 'draftTruthFromAnalysis must remain draft-only after D-302B');
+  });
+  test('D-302B test 26: no backend/API/schema changes — worker.js unaffected by glossary', () => {
+    assert.ok(!workerSrc.includes('HumanX words') && !workerSrc.includes('Admin approval before it can go public'), 'worker.js must not reference glossary content');
+  });
+  test('D-302B test 27: no CSS changes required — styles.css does not contain new glossary-specific classes', () => {
+    assert.ok(!cssSrc.includes('humanx-words') && !cssSrc.includes('glossary-details') && !cssSrc.includes('cc-glossary'), 'styles.css must not contain new D-302B-specific glossary classes');
+  });
+  test('D-302B test 28: Drift/Belief expansion untouched by D-302B', () => {
+    const driftSrc302 = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(driftSrc302.length > 0 && !driftSrc302.includes('HumanX words') && !driftSrc302.includes('Admin approval before it can go public'), 'belief-drift-expansion.js must not be modified by D-302B');
   });
 }
 
