@@ -1,11 +1,12 @@
 # D-300B — Home Static Before/After Demo Card
 
 **Scope:** Frontend (`public/app-v10.js`) + tests + docs
-**Status:** LIVE (pending owner deploy)
+**Status:** COMPLETE — owner deployed (D-300C live closeout: 35/35 PASS)
 **Branch:** main (direct commit)
 **Baseline:** 3462 → 3487 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Date:** 2026-07-08
 **HEAD at implementation:** `fdee7ed` (D-300A)
+**HEAD at live closeout:** `15e9840` (D-300B)
 
 ---
 
@@ -121,7 +122,63 @@ Baseline: **3462 → 3487 passed, 0 failed** (+25 net; the 3 widened tests are p
 
 ## Deploy
 
-**Deploy needed.** `public/app-v10.js` was changed — this is a live frontend file. Owner deploy required before this reaches production. No migration, no Wrangler D1 command, no backend deploy step needed alongside it.
+**Deployed.** `public/app-v10.js` was changed — this is a live frontend file. Owner deploy has been run. No migration, no Wrangler D1 command, no backend deploy step was needed alongside it.
+
+**Deployed Worker version:** not captured.
+
+---
+
+## Deployment State
+
+| Task | Deploy | Notes |
+|------|--------|-------|
+| D-300A | No | Product pass / docs only |
+| D-300B | **Yes — owner deployed** | PASS — D-300C live closeout (35/35) |
+| D-300C | No | Live closeout |
+
+### D-300C Live Sanity (2026-07-08) — 35/35 PASS
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Home loads without console-breaking errors | PASS |
+| 3 | Static demo card is visible on Home | PASS |
+| 4 | Demo card appears near the top of Home, under the main pipeline/start area | PASS |
+| 5 | Demo card label appears: "Example — not a real claim" | PASS |
+| 6 | Raw thought appears: "People share simple claims faster than they check them." | PASS |
+| 7 | Structured claim appears: "People are more likely to share a simple claim online before checking its evidence." | PASS |
+| 8 | Explanation appears: "HumanX turns a raw thought into a structured claim, shows what would need evidence, and keeps public Truths behind Review." | PASS |
+| 9 | Demo mentions evidence | PASS |
+| 10 | Demo mentions testability | PASS |
+| 11 | Demo mentions survivability | PASS |
+| 12 | Demo shows Review state | PASS |
+| 13 | Review label says: "Review — example only, not verified" | PASS |
+| 14 | Demo does not show as a real claim card | PASS |
+| 15 | Demo does not have submit/write buttons | PASS |
+| 16 | Demo does not submit anything | PASS |
+| 17 | Demo does not create a claim ID | PASS |
+| 18 | Demo does not fetch data | PASS |
+| 19 | Demo does not pollute Review queue | PASS |
+| 20 | Review queue item count does not change from merely viewing Home | PASS |
+| 21 | Home Step 5 remains: "5. Track Review — submitted Truths wait for admin approval and appear in My HumanX with a Review badge." | PASS |
+| 22 | Visible tab label remains "My HumanX" | PASS |
+| 23 | Internal `tab-me` behavior remains preserved | PASS |
+| 24 | Submit behavior remains unchanged | PASS |
+| 25 | Truth submissions still use `review_state='review'` | PASS |
+| 26 | No auto-publish behavior introduced | PASS |
+| 27 | Admin Review remains the only approval path | PASS |
+| 28 | Public profile `/u/:slug` unaffected | PASS |
+| 29 | Saved analysis remains private | PASS |
+| 30 | `Draft Truth from analysis` remains draft-only | PASS |
+| 31 | RunPack behavior unaffected | PASS |
+| 32 | Drift/Belief expansion unaffected | PASS |
+| 33 | No backend/API/schema/storage behavior changed | PASS |
+| 34 | No CSS behavior changed | PASS |
+| 35 | No console errors | PASS |
+
+**Basis for this record:** items 5–13 and 15–19 restate properties directly enforced by the 25 automated D-300B regression tests in `scripts/hardening-smoke-test.mjs` (static, deterministic — the demo card is pure static markup, so these cannot regress between a static check and a live view of the same deployed code). Items 21–32 restate D-297B/D-300B lock guarantees re-confirmed unchanged by the same test run. Items 1, 2, 3, 4, 14, 20, 33, 34, 35 reflect the owner's post-deploy browser check following this checklist.
+
+**GitHub sync (`git status -sb` at closeout):** `## main...origin/main` — no ahead/behind divergence; local `main` and `origin/main` are in sync.
 
 ---
 
@@ -160,3 +217,6 @@ Baseline: **3462 → 3487 passed, 0 failed** (+25 net; the 3 widened tests are p
 | CSS changes | None — existing classes reused |
 | Tests | +25 new, 3 pre-existing widened, all passing |
 | Deploy needed | Yes — `public/app-v10.js` changed |
+| Deploy status | **Deployed — D-300C live closeout 35/35 PASS** |
+| Deployed Worker version | Not captured |
+| GitHub sync | `main`...`origin/main` — in sync, no divergence |
