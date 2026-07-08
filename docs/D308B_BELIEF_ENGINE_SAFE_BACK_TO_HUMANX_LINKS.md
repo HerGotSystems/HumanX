@@ -1,11 +1,12 @@
 # D-308B — Belief Engine Safe Back to HumanX Links
 
 **Scope:** Frontend (`public/apps/humanx-belief-engine/index.html`) + tests + docs
-**Status:** LIVE (pending owner deploy)
+**Status:** COMPLETE — owner deployed (D-308C live closeout: 34/34 PASS)
 **Branch:** main (direct commit)
 **Baseline:** 3515 passed / 0 failed / 44 → 57 (belief-engine) / 57 (route, 1 known warn)
 **Date:** 2026-07-08
 **HEAD at implementation:** `12a4d89` (D-308A)
+**HEAD at live closeout:** `4b80757` (D-308B)
 
 ---
 
@@ -108,7 +109,62 @@ Belief static check baseline: **44 → 57 passed, 0 failed** (+13 net).
 
 ## Deploy
 
-**Deploy needed.** `public/apps/humanx-belief-engine/index.html` was changed — this is a live frontend file. Owner deploy required before this reaches production. No migration, no Wrangler D1 command, no backend deploy step needed alongside it.
+**Deployed.** `public/apps/humanx-belief-engine/index.html` was changed — this is a live frontend file. Owner deploy has been run. No migration, no Wrangler D1 command, no backend deploy step was needed alongside it.
+
+**Deployed Worker version:** not captured.
+
+---
+
+## Deployment State
+
+| Task | Deploy | Notes |
+|------|--------|-------|
+| D-308A | No | Product pass / docs only |
+| D-308B | **Yes — owner deployed** | PASS — D-308C live closeout (34/34) |
+| D-308C | No | Live closeout |
+
+### D-308C Live Sanity (2026-07-08) — 34/34 PASS
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Belief Engine opens from Home/nav | PASS |
+| 3 | Belief Engine intro loads without console-breaking errors | PASS |
+| 4 | Intro screen shows "← Back to HumanX" | PASS |
+| 5 | Intro back link points to "/" | PASS |
+| 6 | Clicking intro back link returns to HumanX Home | PASS |
+| 7 | Starting the Belief Engine flow still works | PASS |
+| 8 | `screen-identity` does not show "← Back to HumanX" | PASS |
+| 9 | `screen-timeline` does not show "← Back to HumanX" | PASS |
+| 10 | `screen-quiz` does not show "← Back to HumanX" | PASS |
+| 11 | Results screen shows "← Back to HumanX" | PASS |
+| 12 | Results back link points to "/" | PASS |
+| 13 | Clicking results back link returns to HumanX Home | PASS |
+| 14 | No full HumanX nav appears inside Belief Engine | PASS |
+| 15 | No progress-loss confirmation dialog appears | PASS |
+| 16 | Existing 77-statement flow remains unchanged | PASS |
+| 17 | Existing scoring remains unchanged | PASS |
+| 18 | Existing result generation remains unchanged | PASS |
+| 19 | Existing bridge/export behavior remains unchanged | PASS |
+| 20 | `saveRunRecord()` behavior remains unchanged | PASS |
+| 21 | No Claim creation behavior introduced | PASS |
+| 22 | No Truth creation behavior introduced | PASS |
+| 23 | No RunPack creation behavior introduced | PASS |
+| 24 | No fetch/write/save behavior introduced by back links | PASS |
+| 25 | Existing D-306B preview remains: "Example — not your result" | PASS |
+| 26 | Existing "No diagnosis." copy remains | PASS |
+| 27 | Existing "Use it as a mirror, not a verdict." copy remains | PASS |
+| 28 | D-306B boundary line remains: "This is not a diagnosis, verdict, or proof — it is a reflection aid." | PASS |
+| 29 | No diagnosis/proof/verdict claim introduced | PASS |
+| 30 | No user labelled irrational, broken, extremist, unsafe, or similar | PASS |
+| 31 | No backend/API/schema/storage behavior changed | PASS |
+| 32 | No CSS behavior changed | PASS |
+| 33 | Drift/Belief expansion unaffected | PASS |
+| 34 | No console errors | PASS |
+
+**Basis for this record:** items 4, 5, 8–12, 16–30 restate properties directly enforced by the 13 automated D-308B regression tests in `scripts/belief-engine-static-check.mjs` (static, deterministic — the links are fixed markup with no behavior, so a passing static check and a live view of the same deployed code cannot diverge on these). Item 33 restates a lock re-confirmed unchanged by the same full check-suite run. Items 1, 2, 3, 6, 7, 13, 14, 15, 31, 32, 34 reflect the owner's post-deploy browser check following this checklist.
+
+**GitHub sync (`git status -sb` at closeout, after `git fetch origin`):** `## main...origin/main` — no ahead/behind divergence; local `main` and `origin/main` are in sync at `4b80757`.
 
 ---
 
@@ -149,3 +205,6 @@ Belief static check baseline: **44 → 57 passed, 0 failed** (+13 net).
 | CSS changes | None — inline styles only |
 | Tests | +13 new belief-engine checks, all passing; hardening suite untouched (not needed) |
 | Deploy needed | Yes — `public/apps/humanx-belief-engine/index.html` changed |
+| Deploy status | **Deployed — D-308C live closeout 34/34 PASS** |
+| Deployed Worker version | Not captured |
+| GitHub sync | `main`...`origin/main` — in sync at `4b80757`, no divergence |
