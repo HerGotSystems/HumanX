@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-02 after D-298A Beta readiness Home Step 5 and My HumanX tab checkpoint.
-Previous checkpoint: 2026-07-02 after D-296A My HumanX profile setup nudge checkpoint.
+Last updated: 2026-07-08 after D-301A Home static before/after demo card checkpoint.
+Previous checkpoint: 2026-07-02 after D-298A Beta readiness Home Step 5 and My HumanX tab checkpoint.
 
 ---
 
@@ -47,10 +47,11 @@ Previous checkpoint: 2026-07-02 after D-296A My HumanX profile setup nudge check
 | **D-294A checkpoint HEAD** | see `docs/README.md` after commit (D-294A My HumanX collapsible Profile Settings checkpoint) |
 | **D-296A checkpoint HEAD** | see `docs/README.md` after commit (D-296A My HumanX profile setup nudge checkpoint) |
 | **D-298A checkpoint HEAD** | see `docs/README.md` after commit (D-298A Beta readiness Home Step 5 and My HumanX tab checkpoint) |
+| **D-301A checkpoint HEAD** | see `docs/README.md` after commit (D-301A Home static before/after demo card checkpoint) |
 
 ---
 
-## Current baseline (as of D-298A)
+## Current baseline (as of D-301A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -64,7 +65,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3462 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3487 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -780,6 +781,49 @@ This arc ran a beta readiness product pass (D-297A), concluded that the post-sub
 
 **Tests added in arc:** 18 new tests + 4 existing test updates (3442 → 3462 total). **Deploys:** 1 (D-297B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
 
+### D-299A: HumanX first beta tester script
+
+Following the D-297 arc, D-299A produced a first beta tester script for Mike to use with one outside person: copy-paste tester start message, 11-step tester task list, 8 safe example claims, observation sheet, 10 post-test questions, success/failure criteria, next-action rules. Docs only — no deploy. Baseline unchanged 3462/0/24/57. Result: most invited testers did not respond or did not test; one outside tester likely submitted a real claim. This outcome is what motivated the D-300 arc below — HumanX cannot rely on a person walking a cold visitor through the app; it must demonstrate itself.
+
+### D-300 mini-arc: Home static before/after demo card
+
+This arc addressed the D-299A finding directly: since most invited testers do not respond, Home must show what HumanX *produces*, not just what it *is*, within the first 10–60 seconds for a cold visitor with no guide. D-300A audited the gap and recommended one static, clearly-labeled before/after demo card. D-300B implemented it, frontend-only. D-300C was the live closeout. A metadata-only correction recorded the deployed Worker version after the initial closeout understated it as "not captured."
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-300A | Product pass (docs) | 23-question pass on making HumanX self-explanatory to a cold visitor in 30–60 seconds. Conclusion: Home shows pipeline categories but never a worked example of the pipeline producing output. D-300B candidate: static, clearly-labeled ("Example — not a real claim") before/after demo card in `renderHome()`. Classified frontend-only. Docs only. Baseline unchanged: 3462/0/24/57. |
+| D-300B | Frontend | `renderHome()`: added one static demo card under the pipeline banner/Start Here strip, above the Actions card grid. Shows raw thought → structured claim → evidence/testability/survivability illustration → Review-state badge, doubly labeled "example only, not verified". Static markup only — no `data-action`, no `<button>`, no `fetch(`, no claim ID, no `/api/claims`/`/api/truths`/`/api/review` calls. Reused existing `cc-section`/`panel`/`small`/`badge`/`b-yellow` classes only — no CSS changes. 25 new tests + 3 pre-existing D-159B slice-window widenings (renderHome grew by 810 chars). Baseline 3462 → 3487. |
+| D-300C | Live closeout | Owner deploy PASS. 35/35 live sanity PASS. Deployed Worker version `866886a0-691f-417b-bbe6-77a2dd8ca1f2` (corrected after initial closeout recorded "not captured"). |
+| D-301A | Checkpoint (docs) | Closes D-300 arc. No deploy. Baseline unchanged 3487/0/24/57. |
+
+**D-300 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| Demo label | `Example — not a real claim` |
+| Raw thought | `People share simple claims faster than they check them.` |
+| Structured claim | `People are more likely to share a simple claim online before checking its evidence.` |
+| Illustration mentions evidence | Yes — `Evidence: example only` |
+| Illustration mentions testability | Yes — `Testability: high` |
+| Illustration mentions survivability | Yes — `Survivability: unknown` |
+| Explanation copy | `HumanX turns a raw thought into a structured claim, shows what would need evidence, and keeps public Truths behind Review.` |
+| Review-state label | `Review — example only, not verified` |
+| Demo is static-only | Confirmed — no `data-action`, no `<button>`, no `fetch(` |
+| Demo creates no claim ID | Confirmed |
+| Demo calls no `/api/claims`, `/api/truths`, or `/api/review` | Confirmed |
+| Demo cannot submit, fetch, write, or pollute Review | Confirmed |
+| Demo cannot be mistaken for verified truth | Confirmed — double explicit "example only" labeling |
+| CSS changes | None — existing classes reused |
+| Backend/API/schema/storage changes | None |
+| Home Step 5 (D-297B) | Preserved — `"Track Review — submitted Truths wait for admin approval and appear in My HumanX with a Review badge."` |
+| Visible tab label / internal id | `My HumanX` / `tab-me` — preserved |
+| Public profile `/u/:slug` | Unaffected |
+| Saved analysis | Private — unchanged |
+| Draft Truth from analysis | Draft-only — unchanged |
+| Drift/Belief expansion | Unaffected |
+
+**Tests added in arc:** 25 new tests + 3 pre-existing D-159B slice-window widenings (3462 → 3487 total). **Deploys:** 1 (D-300B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -1173,9 +1217,14 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-297A | Docs only — no deploy needed |
 | D-297B | Owner deploy PASS — D-297C confirmed live (25/25) · deployed Worker version not captured |
 | D-297C | Live closeout — no deploy needed (closeout of D-297B deploy) |
-| D-298A (this task) | Docs only — **no deploy needed** |
+| D-298A | Docs only — no deploy needed |
+| D-299A | Docs only — no deploy needed |
+| D-300A | Docs only — no deploy needed |
+| D-300B | Owner deploy PASS — D-300C confirmed live (35/35) |
+| D-300C | Live closeout — no deploy needed (closeout of D-300B deploy) · deployed Worker: `866886a0-691f-417b-bbe6-77a2dd8ca1f2` |
+| D-301A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-297B/C, 2026-07-02) |
+| **Latest deployed Worker** | `866886a0-691f-417b-bbe6-77a2dd8ca1f2` (D-300B/C, 2026-07-08) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1424,6 +1473,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 116. **Beta-readiness improvements should prefer copy/navigation clarity before new backend features** — The D-297A product pass found that all first-tester gaps were copy and navigation, not missing features. Future beta-readiness tasks should exhaust copy/navigation fixes first. A new backend feature, new API endpoint, or new schema column for onboarding purposes requires an audit task with explicit classification before implementation.
 
+117. **Home demo/example content must stay static-only unless a separate backend/demo-flow audit is completed** — the D-300B before/after demo card in `renderHome()` renders fixed text with no `data-action`, `fetch(`, claim ID, or write call. Any future change that makes the demo dynamic (reads real data, calls an API, or accepts input) requires a new audit task and explicit owner approval before implementation.
+
+118. **Demo/example content must stay clearly labelled as example-only and not verified** — the exact labels `Example — not a real claim` and `Review — example only, not verified` are load-bearing disclaimers, not incidental copy. Any future rewording must preserve both the "not a real claim" and "not verified" meanings. Removing or softening either disclaimer requires explicit owner approval.
+
+119. **Demo cards must never submit, fetch, write, create claim IDs, or pollute Review** — this applies to the D-300B card and any future Home/onboarding demo content. No demo/example element may call `/api/claims`, `/api/truths`, `/api/review`, or any write endpoint, and none may generate a claim ID or Review queue entry. Any proposal to make a demo interactive requires a separate spec covering Review-queue isolation before implementation.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1459,6 +1514,9 @@ These are suggestions only. Do not start any until explicitly assigned.
 | My HumanX collapsible Profile Settings | **COMPLETE** — D-293A product pass (15 questions); D-293B `<details>/<summary>` wrap in `meProfileSettingsHtml()`; D-293C live PASS (27/27); baseline 3424/0/24/57. Profile Settings collapses by default; Account card always visible; counts/filter/Truths immediately reachable. |
 | My HumanX profile setup nudge | **COMPLETE** — D-295A product pass (18 questions; general count strip ruled out); D-295B narrow nudge in `renderMeHtml()` (`!profile_public && !profile_slug` only); D-295C live PASS (27/27); baseline 3442/0/24/57. Nudge self-clears once slug set or profile_public true. No dismiss state. No localStorage. No backend/CSS changes. |
 | Beta readiness Home Step 5 and My HumanX tab | **COMPLETE** — D-297A product pass (22 questions; post-submit path unguided identified as top gap); D-297B Home Step 5 + "My HumanX" tab label (internal `tab-me` preserved); D-297C live PASS (25/25); baseline 3462/0/24/57. No backend/CSS/schema changes. |
+| HumanX first beta tester script | **COMPLETE** — D-299A produced a tester start message, 11-step task list, 8 safe example claims, observation sheet, and success/failure criteria. Docs only; baseline unchanged 3462/0/24/57. Result: most invited testers did not respond or test — this outcome directly motivated the D-300 arc. |
+| Home static before/after demo card | **COMPLETE** — D-300A product pass (23 questions; Home explains what HumanX is but not what it produces); D-300B static demo card in `renderHome()` (frontend-only, no CSS/backend/schema changes); D-300C live PASS (35/35), deployed Worker `866886a0-691f-417b-bbe6-77a2dd8ca1f2`; baseline 3462 → 3487/0/24/57. Demo is static-only, clearly labelled example-only, cannot submit/fetch/write/pollute Review. |
+| Next cold-visitor work | **Vocabulary clarity only if real users remain confused** — the D-297A vocabulary gap (Claim vs. Truth vs. Review vs. My HumanX not self-explanatory) is still present but unaddressed; the D-300 arc closed the "what does HumanX produce" gap instead. Do not start a glossary/tooltip layer unless a real user confusion is reported — this is a suggestion, not an assignment. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
 | Next owner-dashboard improvement | **Stop** — My HumanX polish arc (D-291→D-297) is complete as of D-298A. Owner-dashboard layout is well-ordered; profile nudge, collapsible settings, Recent Truths prominence, and beta-readiness onboarding copy are all live. Do not add further owner-dashboard improvements unless a real live friction appears and is explicitly assigned. Any change to data source, Review state visibility, or public/private boundary must still audit-first. |
