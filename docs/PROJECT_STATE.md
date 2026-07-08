@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-08 after D-303A Home collapsed HumanX words glossary checkpoint.
-Previous checkpoint: 2026-07-08 after D-301A Home static before/after demo card checkpoint.
+Last updated: 2026-07-08 after D-305A First outside submission Review intake checkpoint.
+Previous checkpoint: 2026-07-08 after D-303A Home collapsed HumanX words glossary checkpoint.
 
 ---
 
@@ -49,10 +49,11 @@ Previous checkpoint: 2026-07-08 after D-301A Home static before/after demo card 
 | **D-298A checkpoint HEAD** | see `docs/README.md` after commit (D-298A Beta readiness Home Step 5 and My HumanX tab checkpoint) |
 | **D-301A checkpoint HEAD** | see `docs/README.md` after commit (D-301A Home static before/after demo card checkpoint) |
 | **D-303A checkpoint HEAD** | see `docs/README.md` after commit (D-303A Home collapsed HumanX words glossary checkpoint) |
+| **D-305A checkpoint HEAD** | see `docs/README.md` after commit (D-305A First outside submission Review intake checkpoint) |
 
 ---
 
-## Current baseline (as of D-303A)
+## Current baseline (as of D-305A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -864,6 +865,36 @@ This arc addressed the D-300A "next cold-visitor work" lane: with the demo card 
 
 **Tests added in arc:** 28 new tests + 3 pre-existing D-159B slice-window widenings (3487 → 3515 total). **Deploys:** 1 (D-302B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
 
+### D-304 mini-arc: First outside submission Review intake protocol/log
+
+D-299A's tester script produced one confirmed real result: most invited testers did not respond, but one outside person likely submitted a real claim through the Builder flow, and it landed correctly in Review. This arc is a process arc, not a code arc — it establishes how Mike should look at that submission (and future ones) as product feedback first, publishable content second, without weakening or bypassing the Review gate. No app/backend/API/schema/storage changes anywhere in this arc.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-304A | Process protocol (docs) | Full intake protocol: what to record per Review item (claim, submitter, date, source path, evidence, wording clarity, real-vs-junk read); a do-not-publish-first rule; six classification categories (Real useful claim / needs better evidence / too vague / test-junk / sensitive-high-risk / duplicate-old-internal-test) each mapped to an action using only the existing Approve/Reject/Keep Pending decision set; the first known submission classified; 7 tester follow-up questions; safety boundaries reconfirmed; a reusable one-page intake table; next-action rules (wait for a 3-submission pattern; no features from one item; no queue-padding approvals). Docs only. Baseline unchanged: 3515/0/24/57. |
+| D-304B | Process log (docs) | Seeded row #1 of the intake table with the first confirmed outside submission (claim, submitter `anon-rtpuo3`, source Builder/CLAIM/REVIEW, dates from screenshot, category, action, product lesson, follow-up question). Docs only. Baseline unchanged: 3515/0/24/57. |
+| D-305A | Checkpoint (docs) | Closes D-304 arc. No deploy. Baseline unchanged 3515/0/24/57. |
+
+**D-304 guarantees (process, not code):**
+
+| Guarantee | Value |
+|-----------|-------|
+| First outside submissions must not be auto-approved | Confirmed — do-not-publish-first rule |
+| Review queue is intake/learning before it is a publishing decision | Confirmed |
+| Borderline useful submissions stay in Review until wording/evidence/public meaning are safe | Confirmed |
+| Do not approve borderline claims just to make public feed look active | Confirmed — explicit next-action rule |
+| Wait for at least 3 outside submissions before drawing pattern conclusions | Confirmed |
+| Create a product pass only if repeated confusion appears | Confirmed |
+| Do not add features from one odd submission | Confirmed |
+| Do not publish sensitive/political/medical/legal/financial claims casually | Confirmed — "Sensitive/high-risk" category exists specifically for this |
+| Review remains admin approval, not proof | Confirmed — unchanged from D-302B glossary/D-297 Step 5 wording |
+| Approval is not automatic verification | Confirmed |
+| Saved analysis remains private | Confirmed — unchanged |
+| Anonymous/beta tester submissions are not exposed beyond normal app behavior | Confirmed — intake-table notes are Mike's own offline record, never added to any public route |
+| First logged submission | "People who drive fast/expensive cars are less generous to other drivers and pedestrians..." — submitter `anon-rtpuo3`, source Builder/CLAIM/REVIEW, category Real useful claim / needs better evidence, action "Keep in Review; do not approve yet" |
+
+**Tests added in arc:** 0 (process/log docs only). **Deploys:** 0. **Schema migrations applied:** 0. **No app/backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -1267,7 +1298,10 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-302B | Owner deploy PASS — D-302C confirmed live (36/36) |
 | D-302C | Live closeout — no deploy needed (closeout of D-302B deploy) · deployed Worker: `3baab973-c299-4ee4-bb08-66a91f490e14` (corrected after initial closeout recorded "not captured") |
 | D-303A | Docs only — no deploy needed |
-| D-303B (this task) | Docs only — **no deploy needed** |
+| D-303B | Docs only — no deploy needed |
+| D-304A | Docs only (process protocol) — no deploy needed |
+| D-304B | Docs only (process log) — no deploy needed |
+| D-305A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
 | **Latest deployed Worker** | `3baab973-c299-4ee4-bb08-66a91f490e14` (D-302B/C, 2026-07-08) |
 
@@ -1530,6 +1564,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 122. **Do not change the meaning of Claim, Truth, Review, Evidence, or My HumanX without a product-pass audit** — the five D-302B glossary definitions were derived from a correction pass (D-302A) that found the naively-suggested Truth wording inaccurate. Any future change to what these five terms mean (not just their wording) requires a new product-pass-style audit before implementation, to avoid reintroducing an inaccurate definition or drifting from the existing Actions-card copy these definitions were derived from.
 
+123. **First outside submissions must be logged/classified before approval decisions** — per the D-304A/B intake protocol and log, any real outside/beta Review submission must be recorded in the intake table (claim, submitter, source, date, evidence, category, action, product lesson, follow-up question) and classified into one of the six D-304A categories before it is approved or rejected. Do not skip logging under time pressure to clear the queue.
+
+124. **Do not approve beta submissions merely to make the public feed look active** — this is the specific failure mode D-304A's do-not-publish-first rule exists to prevent. A first real outside submission creates emotional pressure to reward the tester by fast-tracking approval; that pressure must not override the normal wording/evidence/public-meaning bar. This applies permanently to all future outside submissions, not just the first one logged in D-304B.
+
+125. **Do not create new features from a single Review item; wait for repeated confusion or at least three outside submissions** — per D-304A/B next-action rules, one odd or confusing outside submission is a data point, not a spec. Do not open a new product-pass task off one Review item. Only escalate to a narrow product pass if the same confusion pattern repeats across at least two submissions, or wait for at least three outside submissions before drawing any broader conclusion.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1568,7 +1608,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | HumanX first beta tester script | **COMPLETE** — D-299A produced a tester start message, 11-step task list, 8 safe example claims, observation sheet, and success/failure criteria. Docs only; baseline unchanged 3462/0/24/57. Result: most invited testers did not respond or test — this outcome directly motivated the D-300 arc. |
 | Home static before/after demo card | **COMPLETE** — D-300A product pass (23 questions; Home explains what HumanX is but not what it produces); D-300B static demo card in `renderHome()` (frontend-only, no CSS/backend/schema changes); D-300C live PASS (35/35), deployed Worker `866886a0-691f-417b-bbe6-77a2dd8ca1f2`; baseline 3462 → 3487/0/24/57. Demo is static-only, clearly labelled example-only, cannot submit/fetch/write/pollute Review. |
 | Home collapsed HumanX words glossary | **COMPLETE** — D-302A product pass (22 questions; real vocabulary gaps confirmed after D-297/D-300 — My HumanX undefined, Truth/Claim scattered, Evidence under-defined, Review named before defined; suggested Truth wording found inaccurate and corrected); D-302B collapsed `<details>/<summary>HumanX words</summary>` glossary in `renderHome()` (frontend-only, no CSS/backend/schema changes); D-302C live PASS (36/36), deployed Worker `3baab973-c299-4ee4-bb08-66a91f490e14`; baseline 3487 → 3515/0/24/57. Glossary collapsed by default; Review defined as admin approval/not proof; Evidence defined as support/challenge; My HumanX defined as private dashboard. |
-| Next cold-visitor work | **Based on real confusion or Review-queue observations only — not more speculative polish** — the demo card (D-300), Step 5 (D-297), and vocabulary glossary (D-302) together close every gap identified across three consecutive product passes (D-297A, D-300A, D-302A). Do not start another speculative cold-visitor improvement without a concrete signal: a real tester's reported confusion, a pattern in submitted Review-queue items suggesting misunderstanding, or an explicit owner request. |
+| First outside submission Review intake | **COMPLETE** — D-304A process protocol (do-not-publish-first rule, 6 classification categories mapped to existing Approve/Reject/Keep Pending actions, 7 tester follow-up questions, safety boundaries reconfirmed); D-304B intake log seeded with the first confirmed outside submission (claim about fast/expensive-car drivers' generosity, submitter `anon-rtpuo3`, source Builder/CLAIM/REVIEW, category Real useful claim / needs better evidence, action "Keep in Review; do not approve yet"). Docs/process only — no app/backend/schema/API changes; baseline unchanged 3515/0/24/57. |
+| Next beta work | **Based on additional outside submissions or direct tester feedback only** — the demo card (D-300), Step 5 (D-297), vocabulary glossary (D-302), and Review-intake protocol (D-304) together close every self-demonstration gap identified across three consecutive product passes plus establish a process for real submissions. Do not start another speculative cold-visitor or beta-readiness improvement without a concrete signal: at least 2 more logged outside submissions, a repeated confusion pattern in the D-304B intake log, direct tester feedback, or an explicit owner request. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
 | Next owner-dashboard improvement | **Stop** — My HumanX polish arc (D-291→D-297) is complete as of D-298A. Owner-dashboard layout is well-ordered; profile nudge, collapsible settings, Recent Truths prominence, and beta-readiness onboarding copy are all live. Do not add further owner-dashboard improvements unless a real live friction appears and is explicitly assigned. Any change to data source, Review state visibility, or public/private boundary must still audit-first. |
