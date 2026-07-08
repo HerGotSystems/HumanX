@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-08 after D-301A Home static before/after demo card checkpoint.
-Previous checkpoint: 2026-07-02 after D-298A Beta readiness Home Step 5 and My HumanX tab checkpoint.
+Last updated: 2026-07-08 after D-303A Home collapsed HumanX words glossary checkpoint.
+Previous checkpoint: 2026-07-08 after D-301A Home static before/after demo card checkpoint.
 
 ---
 
@@ -48,10 +48,11 @@ Previous checkpoint: 2026-07-02 after D-298A Beta readiness Home Step 5 and My H
 | **D-296A checkpoint HEAD** | see `docs/README.md` after commit (D-296A My HumanX profile setup nudge checkpoint) |
 | **D-298A checkpoint HEAD** | see `docs/README.md` after commit (D-298A Beta readiness Home Step 5 and My HumanX tab checkpoint) |
 | **D-301A checkpoint HEAD** | see `docs/README.md` after commit (D-301A Home static before/after demo card checkpoint) |
+| **D-303A checkpoint HEAD** | see `docs/README.md` after commit (D-303A Home collapsed HumanX words glossary checkpoint) |
 
 ---
 
-## Current baseline (as of D-301A)
+## Current baseline (as of D-303A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -65,7 +66,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3487 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3515 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `24 passed, 0 failed (24 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -824,6 +825,45 @@ This arc addressed the D-299A finding directly: since most invited testers do no
 
 **Tests added in arc:** 25 new tests + 3 pre-existing D-159B slice-window widenings (3462 → 3487 total). **Deploys:** 1 (D-300B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
 
+### D-302 mini-arc: Home collapsed HumanX words glossary
+
+This arc addressed the D-300A "next cold-visitor work" lane: with the demo card and Step 5 both live, D-302A audited whether real vocabulary gaps still existed. They did — My HumanX was never defined on Home, Truth vs. Claim was only connected in one deep Actions card, Evidence had only a 3-word pipeline tagline, and Review was named at Step 3 before being defined at Step 5. D-302B implemented a single collapsed glossary. D-302C was the live closeout. The implementation was frontend-only. No backend/API/schema changes. No public truth-state changes. No Review/moderation changes.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-302A | Product pass (docs) | 22-question pass. Conclusion: real vocabulary gaps remain. Evaluated the task's five suggested plain-English definitions rather than accepting them as-is — found the suggested Truth wording ("a claim approved for public display after Review") **inaccurate**: it inverts HumanX's actual Truth→Claim conversion direction and contradicts existing Truth-card copy; corrected wording provided. D-302B candidate: collapsed `<details>/<summary>` "HumanX words" glossary below the demo card, above Actions. Classified frontend-only. Docs only. Baseline unchanged: 3487/0/24/57. |
+| D-302B | Frontend | `renderHome()`: added one collapsed `<details><summary>HumanX words</summary>` glossary, placed directly below the D-300 "See it work" demo card and above "Actions." Five one-line definitions (Claim, Truth, Review, Evidence, My HumanX) using the corrected D-302A wording — not the inaccurate suggested Truth wording. Collapsed by default — no `open` attribute. Reused existing `cc-section`/`panel`/`small` classes only — no CSS changes. 28 new tests + 3 pre-existing D-159B slice-window widenings (renderHome grew by 666 chars). Baseline 3487 → 3515. |
+| D-302C | Live closeout | Owner deploy PASS. 36/36 live sanity PASS. Deployed Worker version not captured. |
+| D-303A | Checkpoint (docs) | Closes D-302 arc. No deploy. Baseline unchanged 3515/0/24/57. |
+
+**D-302 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| Glossary summary | `HumanX words` |
+| Glossary collapsed by default | Yes — no `open` attribute |
+| Glossary placement | Below `Example — not a real claim` (D-300 demo label), above the Home Actions section |
+| Claim definition | "Something someone says might be true — testable, and open to evidence." |
+| Truth definition | "A belief people repeat as fact — recorded here, not proven here. It can be turned into a testable claim." |
+| Review definition | "Admin approval before it can go public — not automatic proof." |
+| Evidence definition | "Reasons or sources that support or challenge a claim." |
+| My HumanX definition | "Your private dashboard — your submissions, saved analysis, profile, and Review status." |
+| Review defined as admin approval, not proof/verification | Confirmed |
+| Evidence defined as support/challenge language, not magic verification | Confirmed |
+| My HumanX defined as private/owner dashboard | Confirmed |
+| Inaccurate Truth wording (`a claim approved for public display after Review`) | Confirmed absent from `app-v10.js` |
+| CSS changes | None — existing classes reused |
+| Backend/API/schema/storage changes | None |
+| D-300 demo card (label, explanation, Review label) | Preserved — untouched |
+| D-297 Home Step 5 | Preserved — untouched |
+| Visible tab label / internal id | `My HumanX` / `tab-me` — preserved |
+| Public profile `/u/:slug` | Unaffected |
+| Saved analysis | Private — unchanged |
+| Draft Truth from analysis | Draft-only — unchanged |
+| Drift/Belief expansion | Unaffected |
+
+**Tests added in arc:** 28 new tests + 3 pre-existing D-159B slice-window widenings (3487 → 3515 total). **Deploys:** 1 (D-302B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -1222,9 +1262,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-300A | Docs only — no deploy needed |
 | D-300B | Owner deploy PASS — D-300C confirmed live (35/35) |
 | D-300C | Live closeout — no deploy needed (closeout of D-300B deploy) · deployed Worker: `866886a0-691f-417b-bbe6-77a2dd8ca1f2` |
-| D-301A (this task) | Docs only — **no deploy needed** |
+| D-301A | Docs only — no deploy needed |
+| D-302A | Docs only — no deploy needed |
+| D-302B | Owner deploy PASS — D-302C confirmed live (36/36) |
+| D-302C | Live closeout — no deploy needed (closeout of D-302B deploy) · deployed Worker version not captured |
+| D-303A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | `866886a0-691f-417b-bbe6-77a2dd8ca1f2` (D-300B/C, 2026-07-08) |
+| **Latest deployed Worker** | not captured (D-302B/C, 2026-07-08) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1479,6 +1523,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 119. **Demo cards must never submit, fetch, write, create claim IDs, or pollute Review** — this applies to the D-300B card and any future Home/onboarding demo content. No demo/example element may call `/api/claims`, `/api/truths`, `/api/review`, or any write endpoint, and none may generate a claim ID or Review queue entry. Any proposal to make a demo interactive requires a separate spec covering Review-queue isolation before implementation.
 
+120. **Home glossary definitions must not describe Review as proof or automatic verification** — the D-302B "HumanX words" glossary's Review definition (`"Admin approval before it can go public — not automatic proof."`) is load-bearing, matching the same meaning already locked for the D-297 Step 5 and D-300 demo card. Any future reword must preserve both "admin approval" and the explicit negation of automatic proof/verification. Removing or softening either half requires explicit owner approval.
+
+121. **Vocabulary help should remain low-weight/collapsed unless real user testing proves it must be always visible** — the D-302B glossary is a collapsed `<details>/<summary>` by design (D-302A Q18 risk: an always-open glossary risks making Home too text-heavy, directly undercutting the D-300A "show value in 30–60 seconds" goal). Do not change it to an always-open block, a separate Help page, or an inline-tooltip system without evidence from real cold-visitor testing that the collapsed form is insufficient.
+
+122. **Do not change the meaning of Claim, Truth, Review, Evidence, or My HumanX without a product-pass audit** — the five D-302B glossary definitions were derived from a correction pass (D-302A) that found the naively-suggested Truth wording inaccurate. Any future change to what these five terms mean (not just their wording) requires a new product-pass-style audit before implementation, to avoid reintroducing an inaccurate definition or drifting from the existing Actions-card copy these definitions were derived from.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1516,7 +1566,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Beta readiness Home Step 5 and My HumanX tab | **COMPLETE** — D-297A product pass (22 questions; post-submit path unguided identified as top gap); D-297B Home Step 5 + "My HumanX" tab label (internal `tab-me` preserved); D-297C live PASS (25/25); baseline 3462/0/24/57. No backend/CSS/schema changes. |
 | HumanX first beta tester script | **COMPLETE** — D-299A produced a tester start message, 11-step task list, 8 safe example claims, observation sheet, and success/failure criteria. Docs only; baseline unchanged 3462/0/24/57. Result: most invited testers did not respond or test — this outcome directly motivated the D-300 arc. |
 | Home static before/after demo card | **COMPLETE** — D-300A product pass (23 questions; Home explains what HumanX is but not what it produces); D-300B static demo card in `renderHome()` (frontend-only, no CSS/backend/schema changes); D-300C live PASS (35/35), deployed Worker `866886a0-691f-417b-bbe6-77a2dd8ca1f2`; baseline 3462 → 3487/0/24/57. Demo is static-only, clearly labelled example-only, cannot submit/fetch/write/pollute Review. |
-| Next cold-visitor work | **Vocabulary clarity only if real users remain confused** — the D-297A vocabulary gap (Claim vs. Truth vs. Review vs. My HumanX not self-explanatory) is still present but unaddressed; the D-300 arc closed the "what does HumanX produce" gap instead. Do not start a glossary/tooltip layer unless a real user confusion is reported — this is a suggestion, not an assignment. |
+| Home collapsed HumanX words glossary | **COMPLETE** — D-302A product pass (22 questions; real vocabulary gaps confirmed after D-297/D-300 — My HumanX undefined, Truth/Claim scattered, Evidence under-defined, Review named before defined; suggested Truth wording found inaccurate and corrected); D-302B collapsed `<details>/<summary>HumanX words</summary>` glossary in `renderHome()` (frontend-only, no CSS/backend/schema changes); D-302C live PASS (36/36), deployed Worker version not captured; baseline 3487 → 3515/0/24/57. Glossary collapsed by default; Review defined as admin approval/not proof; Evidence defined as support/challenge; My HumanX defined as private dashboard. |
+| Next cold-visitor work | **Based on real confusion or Review-queue observations only — not more speculative polish** — the demo card (D-300), Step 5 (D-297), and vocabulary glossary (D-302) together close every gap identified across three consecutive product passes (D-297A, D-300A, D-302A). Do not start another speculative cold-visitor improvement without a concrete signal: a real tester's reported confusion, a pattern in submitted Review-queue items suggesting misunderstanding, or an explicit owner request. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
 | Next owner-dashboard improvement | **Stop** — My HumanX polish arc (D-291→D-297) is complete as of D-298A. Owner-dashboard layout is well-ordered; profile nudge, collapsible settings, Recent Truths prominence, and beta-readiness onboarding copy are all live. Do not add further owner-dashboard improvements unless a real live friction appears and is explicitly assigned. Any change to data source, Review state visibility, or public/private boundary must still audit-first. |
