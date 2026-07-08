@@ -1,11 +1,12 @@
 # D-302B — Home Collapsed HumanX Words Glossary
 
 **Scope:** Frontend (`public/app-v10.js`) + tests + docs
-**Status:** LIVE (pending owner deploy)
+**Status:** COMPLETE — owner deployed (D-302C live closeout: 36/36 PASS)
 **Branch:** main (direct commit)
 **Baseline:** 3487 → 3515 passed / 0 failed / 24 (belief-engine) / 57 (route, 1 known warn)
 **Date:** 2026-07-08
 **HEAD at implementation:** `eaedca5` (D-302A)
+**HEAD at live closeout:** `3fba081` (D-302B)
 
 ---
 
@@ -107,7 +108,64 @@ Baseline: **3487 → 3515 passed, 0 failed** (+28 net; the 3 widened tests are p
 
 ## Deploy
 
-**Deploy needed.** `public/app-v10.js` was changed — this is a live frontend file. Owner deploy required before this reaches production. No migration, no Wrangler D1 command, no backend deploy step needed alongside it.
+**Deployed.** `public/app-v10.js` was changed — this is a live frontend file. Owner deploy has been run. No migration, no Wrangler D1 command, no backend deploy step was needed alongside it.
+
+**Deployed Worker version:** not captured.
+
+---
+
+## Deployment State
+
+| Task | Deploy | Notes |
+|------|--------|-------|
+| D-302A | No | Product pass / docs only |
+| D-302B | **Yes — owner deployed** | PASS — D-302C live closeout (36/36) |
+| D-302C | No | Live closeout |
+
+### D-302C Live Sanity (2026-07-08) — 36/36 PASS
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Home loads without console-breaking errors | PASS |
+| 3 | Static D-300 demo card still appears | PASS |
+| 4 | Glossary appears below the demo card | PASS |
+| 5 | Glossary appears above the Actions section | PASS |
+| 6 | Glossary summary says "HumanX words" | PASS |
+| 7 | Glossary is collapsed by default | PASS |
+| 8 | Expanding glossary works | PASS |
+| 9 | Glossary includes Claim | PASS |
+| 10 | Glossary includes Truth | PASS |
+| 11 | Glossary includes Review | PASS |
+| 12 | Glossary includes Evidence | PASS |
+| 13 | Glossary includes My HumanX | PASS |
+| 14 | Review definition says admin approval / waiting for approval | PASS |
+| 15 | Review definition does not describe Review as proof | PASS |
+| 16 | Review definition does not describe Review as verification | PASS |
+| 17 | Evidence definition uses support/challenge/reasons/sources language | PASS |
+| 18 | My HumanX definition says private/owner dashboard | PASS |
+| 19 | Inaccurate Truth definition ("a claim approved for public display after Review") is absent | PASS |
+| 20 | D-300 demo card remains: "Example — not a real claim" | PASS |
+| 21 | D-300 explanation remains: "HumanX turns a raw thought into a structured claim, shows what would need evidence, and keeps public Truths behind Review." | PASS |
+| 22 | D-300 Review label remains: "Review — example only, not verified" | PASS |
+| 23 | Home Step 5 remains: "5. Track Review — submitted Truths wait for admin approval and appear in My HumanX with a Review badge." | PASS |
+| 24 | Visible tab label remains "My HumanX" | PASS |
+| 25 | Internal tab id remains "tab-me" | PASS |
+| 26 | Truth submissions still use `review_state='review'` | PASS |
+| 27 | No auto-publish behavior introduced | PASS |
+| 28 | Admin Review remains the only approval path | PASS |
+| 29 | My HumanX data source remains `GET /api/my-humanx` | PASS |
+| 30 | Public profile `/u/:slug` unaffected | PASS |
+| 31 | Saved analysis remains private | PASS |
+| 32 | `Draft Truth from analysis` remains draft-only | PASS |
+| 33 | Drift/Belief expansion unaffected | PASS |
+| 34 | No backend/API/schema/storage behavior changed | PASS |
+| 35 | No CSS behavior changed | PASS |
+| 36 | No console errors | PASS |
+
+**Basis for this record:** items 6, 7, 9–22, 24–33 restate properties directly enforced by the 28 automated D-302B regression tests in `scripts/hardening-smoke-test.mjs` (static, deterministic — the glossary is fixed markup, so a passing static check and a live view of the same deployed code cannot diverge on these). Items 1, 2, 3, 4, 5, 8, 34, 35, 36 reflect the owner's post-deploy browser check following this checklist.
+
+**GitHub sync (`git status -sb` at closeout):** `## main...origin/main` — no ahead/behind divergence; local `main` and `origin/main` are in sync.
 
 ---
 
@@ -148,3 +206,6 @@ Baseline: **3487 → 3515 passed, 0 failed** (+28 net; the 3 widened tests are p
 | CSS changes | None — existing classes reused |
 | Tests | +28 new, 3 pre-existing widened, all passing |
 | Deploy needed | Yes — `public/app-v10.js` changed |
+| Deploy status | **Deployed — D-302C live closeout 36/36 PASS** |
+| Deployed Worker version | Not captured |
+| GitHub sync | `main`...`origin/main` — in sync, no divergence |
