@@ -17,7 +17,7 @@ Closes the D-308 Belief Engine safe back-link arc with a checkpoint, so future B
 
 ## GitHub Sync
 
-`git status -sb` (after `git fetch origin`) at the start of this task showed `## main...origin/main [ahead 1]`: local `main` (`4e680ca`, the D-308C commit) is one commit ahead of `origin/main`. This mirrors the same push-lag pattern seen at previous checkpoints in this arc (D-306D, D-307A) — the D-308C push has not yet reached GitHub despite being expected to. This is a push-status observation, not a content problem; it does not block this docs-only checkpoint, and should be resolved by the owner re-running `git push origin main`.
+**Resolved.** D-308C and D-309A are now pushed to `origin/main`. `git status -sb` shows `## main...origin/main` — `origin/main` is synced at `996c3c4`, no divergence. The discrepancy noted at the start of this task (local `main` one commit ahead of `origin/main` — the D-308C push had not yet reached GitHub) has been resolved by the owner's subsequent `git push origin main`.
 
 ---
 
@@ -145,7 +145,7 @@ All of the above were re-confirmed passing via the full check suite (hardening 3
 
 | Check | Result |
 |---|---|
-| `git status -sb` (before this commit, after fetch) | `## main...origin/main [ahead 1]` — D-308C push pending, noted above |
+| `git status -sb` | `## main...origin/main` — synced at `996c3c4`, no divergence |
 | `node scripts/hardening-smoke-test.mjs` | 3515 passed, 0 failed |
 | `node scripts/belief-engine-static-check.mjs` | 57 passed, 0 failed |
 | `node scripts/worker-route-static-check.mjs` | 57 passed, 0 failed, 1 known warn (`/api/u/:slug`, D-218A) |
