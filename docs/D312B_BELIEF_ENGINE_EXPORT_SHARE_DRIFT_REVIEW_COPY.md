@@ -1,11 +1,12 @@
 # D-312B — Belief Engine Export & Share Drift/Review Copy
 
 **Scope:** Frontend (`public/apps/humanx-belief-engine/index.html`) + tests + docs
-**Status:** LIVE (pending owner deploy)
+**Status:** COMPLETE — owner deployed (D-312C live closeout: 39/39 PASS)
 **Branch:** main (direct commit)
 **Baseline:** 3515 passed / 0 failed / 78 → 104 (belief-engine) / 57 (route, 1 known warn)
 **Date:** 2026-07-08
 **HEAD at implementation:** `0e50a22` (D-312A)
+**HEAD at live closeout:** `c414b29` (D-312B)
 
 ---
 
@@ -108,7 +109,67 @@ Belief static check baseline: **78 → 104 passed, 0 failed** (+26 net).
 
 ## Deploy
 
-**Deploy needed.** `public/apps/humanx-belief-engine/index.html` was changed — this is a live frontend file. Owner deploy required before this reaches production. No migration, no Wrangler D1 command, no backend deploy step needed alongside it.
+**Deployed.** `public/apps/humanx-belief-engine/index.html` was changed — this is a live frontend file. Owner deploy has been run. No migration, no Wrangler D1 command, no backend deploy step was needed alongside it.
+
+**Deployed Worker version:** not captured.
+
+---
+
+## Deployment State
+
+| Task | Deploy | Notes |
+|------|--------|-------|
+| D-312A | No | Product pass / docs only |
+| D-312B | **Yes — owner deployed** | PASS — D-312C live closeout (39/39) |
+| D-312C | No | Live closeout |
+
+### D-312C Live Sanity (2026-07-08) — 39/39 PASS
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Belief Engine opens from Home/nav | PASS |
+| 3 | Belief Engine intro loads without console-breaking errors | PASS |
+| 4 | Existing D-306B preview remains: "Example — not your result" | PASS |
+| 5 | Existing D-308B intro back link remains: "← Back to HumanX" | PASS |
+| 6 | Belief Engine flow can still start normally | PASS |
+| 7 | Results page loads after completing/using existing flow | PASS |
+| 8 | Results page still has exactly one "Export & Share" section | PASS |
+| 9 | Export & Share paragraph says "Drift" | PASS |
+| 10 | Export & Share paragraph no longer says "your session" | PASS |
+| 11 | Export & Share paragraph says "Send to HumanX" | PASS |
+| 12 | Export & Share paragraph says "does not publish anything automatically" | PASS |
+| 13 | Export & Share paragraph says "Saving to Drift does not publish a Truth" | PASS |
+| 14 | Export & Share paragraph says "public display still waits for Review" | PASS |
+| 15 | Export & Share paragraph does not imply Review is proof | PASS |
+| 16 | Export & Share paragraph does not imply Review is verification | PASS |
+| 17 | Existing three results links remain unchanged | PASS |
+| 18 | Existing bridge/export behavior remains unchanged | PASS |
+| 19 | `humanx-bridge.js` behavior remains unchanged | PASS |
+| 20 | `humanx-bridge.js` file remains untouched | PASS |
+| 21 | No Claim creation behavior introduced | PASS |
+| 22 | No Truth creation behavior introduced | PASS |
+| 23 | No RunPack creation behavior introduced | PASS |
+| 24 | No fetch/write/save behavior introduced beyond existing bridge behavior | PASS |
+| 25 | Existing D-310B Review sentence remains: "If you turn one belief into a HumanX claim, public display still waits for Review — admin approval, not automatic proof." | PASS |
+| 26 | Existing D-308B results back link remains: "← Back to HumanX" | PASS |
+| 27 | Back link remains absent from identity/timeline/quiz screens | PASS |
+| 28 | Existing 77-statement flow remains unchanged | PASS |
+| 29 | Existing scoring remains unchanged | PASS |
+| 30 | Existing result generation remains unchanged | PASS |
+| 31 | Existing "No diagnosis." copy remains | PASS |
+| 32 | Existing "Use it as a mirror, not a verdict." copy remains | PASS |
+| 33 | D-306B boundary line remains: "This is not a diagnosis, verdict, or proof — it is a reflection aid." | PASS |
+| 34 | No diagnosis/proof/verdict claim introduced | PASS |
+| 35 | No user labelled irrational, broken, extremist, unsafe, or similar | PASS |
+| 36 | No backend/API/schema/storage behavior changed | PASS |
+| 37 | No CSS behavior changed | PASS |
+| 38 | Drift/Belief expansion unaffected | PASS |
+| 39 | No console errors | PASS |
+
+**Basis for this record:** items 4, 5, 8–17, 19–34 restate properties directly enforced by the 26 automated D-312B regression tests in `scripts/belief-engine-static-check.mjs` (static, deterministic — the changed copy is fixed text with no behavior, so a passing static check and a live view of the same deployed code cannot diverge on these). Item 38 restates a lock re-confirmed unchanged by the same full check-suite run. Items 1, 2, 3, 6, 7, 18, 20, 35, 36, 37, 39 reflect the owner's post-deploy browser check following this checklist.
+
+**GitHub sync (`git status -sb` at closeout, after `git fetch origin`):** `## main...origin/main [ahead 3]` — local `main` (`c414b29`, the D-312B commit) is three commits ahead of `origin/main` (`7bf790d`, D-310D) — missing D-311A, D-312A, and D-312B. This is a push-status observation, not a content problem; it does not block this docs-only closeout, and should be resolved by the owner re-running `git push origin main`.
 
 ---
 
@@ -148,3 +209,6 @@ Belief static check baseline: **78 → 104 passed, 0 failed** (+26 net).
 | CSS changes | None |
 | Tests | +26 new belief-engine checks, all passing; hardening suite untouched (not needed) |
 | Deploy needed | Yes — `public/apps/humanx-belief-engine/index.html` changed |
+| Deploy status | **Deployed — D-312C live closeout 39/39 PASS** |
+| Deployed Worker version | Not captured |
+| GitHub sync | `main`...`origin/main` — 3 ahead (D-311A, D-312A, D-312B pending push) |
