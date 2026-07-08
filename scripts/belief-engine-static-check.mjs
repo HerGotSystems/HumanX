@@ -240,6 +240,179 @@ async function main() {
     'public/apps/humanx-belief-engine/index.html'
   );
 
+  // ── 8b. D-306B: intro static output preview ───────────────────────────────
+
+  const introIdx = beliefHtml.indexOf('id="screen-intro"');
+  const startQuizIdx = beliefHtml.indexOf('onclick="startQuiz()"');
+  const previewIdx = beliefHtml.indexOf('Example — not your result');
+
+  checkContains(
+    beliefHtml,
+    'Example — not your result',
+    'Belief Engine HTML contains D-306B preview label: "Example — not your result"',
+    'Belief Engine HTML missing D-306B preview label: "Example — not your result"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'After the questions, Belief Engine gives you a mirror-style snapshot like this.',
+    'Belief Engine HTML contains D-306B preview intro line',
+    'Belief Engine HTML missing D-306B preview intro line',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Profile Snapshot',
+    'Belief Engine HTML contains D-306B preview mini-snapshot label: "Profile Snapshot"',
+    'Belief Engine HTML missing D-306B preview mini-snapshot label: "Profile Snapshot"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Strong signal',
+    'Belief Engine HTML contains D-306B preview row: "Strong signal"',
+    'Belief Engine HTML missing D-306B preview row: "Strong signal"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'You prefer beliefs that can be tested',
+    'Belief Engine HTML contains D-306B preview row copy: "You prefer beliefs that can be tested"',
+    'Belief Engine HTML missing D-306B preview row copy: "You prefer beliefs that can be tested"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Pressure check',
+    'Belief Engine HTML contains D-306B preview row: "Pressure check"',
+    'Belief Engine HTML missing D-306B preview row: "Pressure check"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'social pressure',
+    'Belief Engine HTML contains D-306B preview row copy: "social pressure"',
+    'Belief Engine HTML missing D-306B preview row copy: "social pressure"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Next step',
+    'Belief Engine HTML contains D-306B preview row: "Next step"',
+    'Belief Engine HTML missing D-306B preview row: "Next step"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Turn one belief into a clearer claim',
+    'Belief Engine HTML contains D-306B preview row copy: "Turn one belief into a clearer claim"',
+    'Belief Engine HTML missing D-306B preview row copy: "Turn one belief into a clearer claim"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'not a diagnosis, verdict, or proof',
+    'Belief Engine HTML contains D-306B preview boundary line: "not a diagnosis, verdict, or proof"',
+    'Belief Engine HTML missing D-306B preview boundary line: "not a diagnosis, verdict, or proof"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  if (introIdx !== -1 && previewIdx !== -1 && startQuizIdx !== -1 && previewIdx > introIdx && previewIdx < startQuizIdx) {
+    pass('D-306B preview appears inside the intro screen, before the Begin Mapping / startQuiz() flow marker');
+  } else {
+    fail(
+      'D-306B preview does not appear before the Begin Mapping / startQuiz() flow marker',
+      `screen-intro at ${introIdx}, preview at ${previewIdx}, startQuiz() at ${startQuizIdx}`
+    );
+  }
+
+  const previewSliceEnd = beliefHtml.indexOf('</section>', previewIdx);
+  const previewSlice = previewIdx !== -1 && previewSliceEnd !== -1 ? beliefHtml.slice(previewIdx - 400, previewSliceEnd) : '';
+
+  checkAbsent(
+    previewSlice,
+    '<button',
+    'D-306B preview does not add a button',
+    'D-306B preview must not contain a <button> element',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    previewSlice,
+    'fetch(',
+    'D-306B preview does not add fetch/write/save behavior',
+    'D-306B preview must not contain a fetch( call',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    previewSlice,
+    'onclick',
+    'D-306B preview has no onclick handlers (no interactive/save behavior)',
+    'D-306B preview must not contain an onclick handler',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    previewSlice,
+    'localStorage',
+    'D-306B preview does not add localStorage behavior',
+    'D-306B preview must not reference localStorage',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    previewSlice,
+    'sessionStorage',
+    'D-306B preview does not add sessionStorage behavior',
+    'D-306B preview must not reference sessionStorage',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  const claimTruthMarkers = ['/api/belief-promote', '/api/claims', '/api/truths', '/api/runpack', 'promoteBelief', 'generateRunPack'];
+  const claimTruthFound = claimTruthMarkers.filter(m => previewSlice.includes(m));
+  if (claimTruthFound.length === 0) {
+    pass('D-306B preview does not create Claim/Truth/RunPack behavior');
+  } else {
+    fail(
+      'D-306B preview must not reference Claim/Truth/RunPack creation',
+      `Found: ${claimTruthFound.map(m => `"${m}"`).join(', ')}`
+    );
+  }
+
+  checkContains(
+    beliefHtml,
+    'No diagnosis.',
+    'D-306B preserves existing "No diagnosis." intro copy',
+    'D-306B must not remove existing "No diagnosis." intro copy',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Use it as a mirror, not a verdict.',
+    'D-306B preserves existing "mirror not a verdict" results copy',
+    'D-306B must not remove existing "mirror not a verdict" results copy',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    '77',
+    'D-306B preserves existing 77-statement marker',
+    'D-306B must not remove the 77-statement marker',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
   // ── 9. No accidental API key / secret exposure ────────────────────────────
 
   const keyMarkers = ['sk-ant-', 'sk-proj-', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'Bearer '];
