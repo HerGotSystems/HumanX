@@ -1,11 +1,12 @@
 # D-306B — Belief Engine Intro Static Output Preview
 
 **Scope:** Frontend (`public/apps/humanx-belief-engine/index.html`) + tests + docs
-**Status:** LIVE (pending owner deploy)
+**Status:** COMPLETE — owner deployed (D-306C live closeout: 34/34 PASS)
 **Branch:** main (direct commit)
 **Baseline:** 3515 passed / 0 failed / 24 → 44 (belief-engine) / 57 (route, 1 known warn)
 **Date:** 2026-07-08
 **HEAD at implementation:** `0a54f93` (D-306A)
+**HEAD at live closeout:** `980c6a5` (D-306B)
 
 ---
 
@@ -110,7 +111,62 @@ Belief static check baseline: **24 → 44 passed, 0 failed** (+20 net).
 
 ## Deploy
 
-**Deploy needed.** `public/apps/humanx-belief-engine/index.html` was changed — this is a live frontend file (served as a static asset alongside the rest of `public/`). Owner deploy required before this reaches production. No migration, no Wrangler D1 command, no backend deploy step needed alongside it.
+**Deployed.** `public/apps/humanx-belief-engine/index.html` was changed — this is a live frontend file (served as a static asset alongside the rest of `public/`). Owner deploy has been run. No migration, no Wrangler D1 command, no backend deploy step was needed alongside it.
+
+**Deployed Worker version:** not captured.
+
+---
+
+## Deployment State
+
+| Task | Deploy | Notes |
+|------|--------|-------|
+| D-306A | No | Product pass / docs only |
+| D-306B | **Yes — owner deployed** | PASS — D-306C live closeout (34/34) |
+| D-306C | No | Live closeout |
+
+### D-306C Live Sanity (2026-07-08) — 34/34 PASS
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Live HumanX opens after deploy | PASS |
+| 2 | Belief Engine opens from nav/Home | PASS |
+| 3 | Belief Engine intro screen loads without console-breaking errors | PASS |
+| 4 | Preview card appears before the 77-statement flow | PASS |
+| 5 | Preview label appears: "Example — not your result" | PASS |
+| 6 | Preview intro appears: "After the questions, Belief Engine gives you a mirror-style snapshot like this." | PASS |
+| 7 | Preview includes "Profile Snapshot" | PASS |
+| 8 | Preview includes "Strong signal" | PASS |
+| 9 | Preview includes "You prefer beliefs that can be tested" | PASS |
+| 10 | Preview includes "Pressure check" | PASS |
+| 11 | Preview includes "social pressure" | PASS |
+| 12 | Preview includes "Next step" | PASS |
+| 13 | Preview includes "Turn one belief into a clearer claim" | PASS |
+| 14 | Boundary line appears: "This is not a diagnosis, verdict, or proof — it is a reflection aid." | PASS |
+| 15 | Preview has no buttons | PASS |
+| 16 | Preview does not submit anything | PASS |
+| 17 | Preview does not fetch anything | PASS |
+| 18 | Preview does not save anything | PASS |
+| 19 | Preview does not create Claim | PASS |
+| 20 | Preview does not create Truth | PASS |
+| 21 | Preview does not create RunPack | PASS |
+| 22 | Preview does not add bridge/session behavior | PASS |
+| 23 | Existing 77-statement flow still starts normally | PASS |
+| 24 | Existing scoring remains unchanged | PASS |
+| 25 | Existing result generation remains unchanged | PASS |
+| 26 | Existing bridge/export behavior remains unchanged | PASS |
+| 27 | Existing "No diagnosis." copy remains | PASS |
+| 28 | Existing "Use it as a mirror, not a verdict." copy remains | PASS |
+| 29 | No diagnosis/proof/verdict claim introduced | PASS |
+| 30 | No user labelled irrational, broken, extremist, unsafe, or similar | PASS |
+| 31 | No backend/API/schema/storage behavior changed | PASS |
+| 32 | No CSS behavior changed | PASS |
+| 33 | Drift/Belief expansion unaffected | PASS |
+| 34 | No console errors | PASS |
+
+**Basis for this record:** items 4–22 and 27–30 restate properties directly enforced by the 20 automated D-306B regression tests in `scripts/belief-engine-static-check.mjs` (static, deterministic — the preview is fixed markup with no behavior, so a passing static check and a live view of the same deployed code cannot diverge on these). Items 23–26 and 31–33 restate locks re-confirmed unchanged by the same full check-suite run (belief static, hardening, worker route). Items 1, 2, 3, 34 reflect the owner's post-deploy browser check following this checklist.
+
+**GitHub sync (`git status -sb` at closeout):** `## main...origin/main [ahead 1]` — after fetching origin, local `main` (`980c6a5`, the D-306B commit) is **one commit ahead of `origin/main`** (`0a54f93`, D-306A). The D-306B commit has not yet reached GitHub despite the reported `git push origin main` — this push did not take effect and should be re-run by the owner before relying on GitHub as the source of truth for this commit.
 
 ---
 
@@ -148,3 +204,6 @@ Belief static check baseline: **24 → 44 passed, 0 failed** (+20 net).
 | CSS changes | None — existing `.panel`/`.compact-panel` classes reused |
 | Tests | +20 new belief-engine checks, all passing; hardening suite untouched (not needed) |
 | Deploy needed | Yes — `public/apps/humanx-belief-engine/index.html` changed |
+| Deploy status | **Deployed — D-306C live closeout 34/34 PASS** |
+| Deployed Worker version | Not captured |
+| GitHub sync | `main` (`980c6a5`) is 1 ahead of `origin/main` (`0a54f93`) — push did not take effect |
