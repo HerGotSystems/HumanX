@@ -10448,9 +10448,9 @@ test('D-159B: public profile example bridge link exists and points to /u/calenhi
   );
 });
 
-test('D-159B: Browse Claims card appears before Submit Claim in renderHome [updated D-297B: wider slice]', () => {
+test('D-159B: Browse Claims card appears before Submit Claim in renderHome [updated D-300B: wider slice]', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 4400);
+  const slice = appSrc.slice(idx, idx + 5600);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
   const browseAt = slice.indexOf('data-value="arena"');
   const submitAt = slice.indexOf('data-value="submit"');
@@ -10460,9 +10460,9 @@ test('D-159B: Browse Claims card appears before Submit Claim in renderHome [upda
   );
 });
 
-test('D-159B: Browse Claims card appears before Belief Engine in renderHome [updated D-297B: wider slice]', () => {
+test('D-159B: Browse Claims card appears before Belief Engine in renderHome [updated D-300B: wider slice]', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 4600);
+  const slice = appSrc.slice(idx, idx + 5800);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
   // D-181D migrated onclick="location.href='...'" to data-action="navBeliefEngine"
   const browseAt = slice.indexOf('data-value="arena"');
@@ -10473,9 +10473,9 @@ test('D-159B: Browse Claims card appears before Belief Engine in renderHome [upd
   );
 });
 
-test('D-159B: Browse Claims card has cc-card-primary class [updated D-297B: wider slice]', () => {
+test('D-159B: Browse Claims card has cc-card-primary class [updated D-300B: wider slice]', () => {
   const idx = appSrc.indexOf('function renderHome');
-  const slice = appSrc.slice(idx, idx + 4400);
+  const slice = appSrc.slice(idx, idx + 5600);
   const gridStart = slice.indexOf('cc-card-grid');
   const gridSlice = slice.slice(gridStart, gridStart + 600);
   // D-181C migrated onclick="setMode('arena')" to data-action="setMode" data-value="arena"
@@ -25077,6 +25077,93 @@ console.log('\nD-248A: Review card metadata density regression lock');
   test('D-297B test 18: Drift/Belief expansion untouched', () => {
     const driftSrc297 = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
     assert.ok(driftSrc297.length > 0 && !driftSrc297.includes('Step 5') && !driftSrc297.includes('Track Review'), 'belief-drift-expansion.js must not be modified by D-297B');
+  });
+}
+
+// ── D-300B: Home static before/after demo card ──
+{
+  const demoIdx300 = appSrc.indexOf('See it work');
+  const demoEndIdx300 = appSrc.indexOf('<h2 class="cc-section-head">Actions</h2>', demoIdx300);
+  const demoSlice300 = appSrc.slice(demoIdx300, demoEndIdx300);
+  const homeIdx300 = appSrc.indexOf('cc-start-here');
+  const homeSlice300 = appSrc.slice(homeIdx300, homeIdx300 + 4000);
+
+  test('D-300B test 1: renderHome demo card contains "Example — not a real claim"', () => {
+    assert.ok(demoSlice300.includes('Example — not a real claim'), 'demo card must contain the exact label "Example — not a real claim"');
+  });
+  test('D-300B test 2: demo card contains raw thought wording', () => {
+    assert.ok(demoSlice300.includes('People share simple claims faster than they check them.'), 'demo card must contain the exact raw thought text');
+  });
+  test('D-300B test 3: demo card contains structured claim wording', () => {
+    assert.ok(demoSlice300.includes('People are more likely to share a simple claim online before checking its evidence.'), 'demo card must contain the exact structured claim text');
+  });
+  test('D-300B test 4: demo card explains HumanX turns a raw thought into a structured claim', () => {
+    assert.ok(demoSlice300.includes('HumanX turns a raw thought into a structured claim, shows what would need evidence, and keeps public Truths behind Review.'), 'demo card must contain the exact explanatory copy');
+  });
+  test('D-300B test 5: demo card mentions evidence', () => {
+    assert.ok(demoSlice300.includes('Evidence: example only'), 'demo card must mention evidence illustration');
+  });
+  test('D-300B test 6: demo card mentions testability', () => {
+    assert.ok(demoSlice300.includes('Testability: high'), 'demo card must mention testability illustration');
+  });
+  test('D-300B test 7: demo card mentions survivability', () => {
+    assert.ok(demoSlice300.includes('Survivability: unknown'), 'demo card must mention survivability illustration');
+  });
+  test('D-300B test 8: demo card includes Review state', () => {
+    assert.ok(demoSlice300.includes('Review state:') && demoSlice300.includes('badge b-yellow">Review<'), 'demo card must include a Review state badge');
+  });
+  test('D-300B test 9: demo card says example only / not verified', () => {
+    assert.ok(demoSlice300.includes('example only, not verified'), 'demo card must say example only, not verified');
+  });
+  test('D-300B test 10: demo card does not include a submit/fetch/write action', () => {
+    assert.ok(!demoSlice300.includes('data-action') && !demoSlice300.includes('fetch(') && !demoSlice300.includes('<button'), 'demo card must be static only — no data-action, fetch, or button elements');
+  });
+  test('D-300B test 11: demo card does not create a claim ID or call claim creation APIs', () => {
+    assert.ok(!demoSlice300.includes('claimId') && !demoSlice300.includes('createClaim') && !demoSlice300.includes('submitTruth') && !demoSlice300.includes('submitBuilderTruth'), 'demo card must not reference claim/truth creation functions or IDs');
+  });
+  test('D-300B test 12: demo card does not call /api/claims', () => {
+    assert.ok(!demoSlice300.includes('/api/claims'), 'demo card must not call /api/claims');
+  });
+  test('D-300B test 13: demo card does not call /api/truths', () => {
+    assert.ok(!demoSlice300.includes('/api/truths'), 'demo card must not call /api/truths');
+  });
+  test('D-300B test 14: demo card does not call /api/review', () => {
+    assert.ok(!demoSlice300.includes('/api/review'), 'demo card must not call /api/review');
+  });
+  test('D-300B test 15: Truth submission review_state=review unchanged by D-300B', () => {
+    assert.ok(appSrc.includes("review_state:'review'") || appSrc.includes("review_state: 'review'") || workerSrc.includes("review_state = 'review'") || workerSrc.includes('review_state,'), 'review_state review must remain in submission path after D-300B');
+  });
+  test('D-300B test 16: Home Step 5 remains preserved', () => {
+    assert.ok(homeSlice300.includes('Step 5') && homeSlice300.includes('Track Review') && homeSlice300.includes('Submitted Truths wait for admin approval and appear in My HumanX with a Review badge.'), 'Home Step 5 copy must remain unchanged by D-300B');
+  });
+  test('D-300B test 17: visible tab label remains My HumanX', () => {
+    assert.ok(indexSrc.includes('>My HumanX</button>'), 'tab-me visible label must remain My HumanX after D-300B');
+  });
+  test('D-300B test 18: internal tab id remains tab-me', () => {
+    assert.ok(indexSrc.includes('id="tab-me"'), 'tab-me id must remain after D-300B');
+  });
+  test('D-300B test 19: My HumanX data source remains GET /api/my-humanx', () => {
+    assert.ok(workerSrc.includes('/api/my-humanx'), 'GET /api/my-humanx must remain in worker.js after D-300B');
+  });
+  test('D-300B test 20: public profile /u/:slug remains unaffected', () => {
+    assert.ok(workerSrc.includes('/u/:slug') || workerSrc.includes("'/u/'"), 'public profile route must remain in worker.js after D-300B');
+    assert.ok(!appSrc.includes('renderPublicProfileHtml') || !demoSlice300.includes('renderPublicProfileHtml'), 'demo card must not reference public profile rendering');
+  });
+  test('D-300B test 21: saved analysis remains private', () => {
+    assert.ok(!appSrc.includes('renderPublicAnalysis') && !appSrc.includes('public_analysis'), 'saved analysis must not be public after D-300B');
+  });
+  test('D-300B test 22: Draft Truth from analysis remains draft-only', () => {
+    assert.ok(appSrc.includes('draftTruthFromAnalysis') && !appSrc.includes('submitTruthFromAnalysis'), 'draftTruthFromAnalysis must remain draft-only after D-300B');
+  });
+  test('D-300B test 23: no backend/API/schema changes — worker.js unaffected by demo card', () => {
+    assert.ok(!workerSrc.includes('See it work') && !workerSrc.includes('Example — not a real claim'), 'worker.js must not reference the demo card content');
+  });
+  test('D-300B test 24: no CSS changes required — styles.css does not contain new demo-specific classes', () => {
+    assert.ok(!cssSrc.includes('cc-demo-card') && !cssSrc.includes('cc-demo-section') && !cssSrc.includes('cc-demo-row'), 'styles.css must not contain new D-300B-specific demo classes');
+  });
+  test('D-300B test 25: Drift/Belief expansion untouched by D-300B', () => {
+    const driftSrc300 = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(driftSrc300.length > 0 && !driftSrc300.includes('See it work') && !driftSrc300.includes('Example — not a real claim'), 'belief-drift-expansion.js must not be modified by D-300B');
   });
 }
 
