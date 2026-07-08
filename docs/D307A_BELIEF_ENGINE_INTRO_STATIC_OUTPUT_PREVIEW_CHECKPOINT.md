@@ -17,7 +17,7 @@ Closes the D-306 Belief Engine intro preview arc with a checkpoint, so future Be
 
 ## GitHub Sync
 
-`git status -sb` (after `git fetch origin`) at the start of this task showed `## main...origin/main [ahead 1]`: local `main` (`a4b289b`, the D-306D commit) is one commit ahead of `origin/main` (`5a30671`, D-306C). This mirrors the same discrepancy pattern seen before D-306D — the D-306D push has not yet reached GitHub. This is a push-status observation, not a content problem; it is noted here for accuracy and should be resolved by the owner re-running `git push origin main` when convenient. It does not block this docs-only checkpoint.
+**Resolved.** D-306D and D-307A are now pushed to `origin/main`. `git status -sb` shows `## main...origin/main` — `origin/main` is synced at `b2d00cd`, no divergence. The discrepancy noted at the start of this task (local `main` one commit ahead of `origin/main` — the D-306D push had not yet reached GitHub) has been resolved by the owner's subsequent `git push origin main`.
 
 ---
 
@@ -145,7 +145,7 @@ All of the above were re-confirmed passing via the full check suite (hardening 3
 
 | Check | Result |
 |---|---|
-| `git status -sb` (before this commit, after fetch) | `## main...origin/main [ahead 1]` — D-306D push pending, noted above |
+| `git status -sb` | `## main...origin/main` — synced at `b2d00cd`, no divergence |
 | `node scripts/hardening-smoke-test.mjs` | 3515 passed, 0 failed |
 | `node scripts/belief-engine-static-check.mjs` | 44 passed, 0 failed |
 | `node scripts/worker-route-static-check.mjs` | 57 passed, 0 failed, 1 known warn (`/api/u/:slug`, D-218A) |
