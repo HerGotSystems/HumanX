@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-08 after D-307A Belief Engine intro static output preview checkpoint.
-Previous checkpoint: 2026-07-08 after D-305A First outside submission Review intake checkpoint.
+Last updated: 2026-07-08 after D-309A Belief Engine safe Back to HumanX links checkpoint.
+Previous checkpoint: 2026-07-08 after D-307A Belief Engine intro static output preview checkpoint.
 
 ---
 
@@ -51,10 +51,11 @@ Previous checkpoint: 2026-07-08 after D-305A First outside submission Review int
 | **D-303A checkpoint HEAD** | see `docs/README.md` after commit (D-303A Home collapsed HumanX words glossary checkpoint) |
 | **D-305A checkpoint HEAD** | see `docs/README.md` after commit (D-305A First outside submission Review intake checkpoint) |
 | **D-307A checkpoint HEAD** | see `docs/README.md` after commit (D-307A Belief Engine intro static output preview checkpoint) |
+| **D-309A checkpoint HEAD** | see `docs/README.md` after commit (D-309A Belief Engine safe Back to HumanX links checkpoint) |
 
 ---
 
-## Current baseline (as of D-307A)
+## Current baseline (as of D-309A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -69,7 +70,7 @@ node scripts/worker-route-static-check.mjs
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
 | `hardening-smoke-test.mjs` | `3515 passed, 0 failed` |
-| `belief-engine-static-check.mjs` | `44 passed, 0 failed (44 hard checks)` |
+| `belief-engine-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
 ### Known warning (non-blocking)
@@ -933,6 +934,45 @@ This arc audited the Belief Engine (`public/apps/humanx-belief-engine/index.html
 
 **Tests added in arc:** 20 new belief-engine checks (24 → 44 total). **Deploys:** 1 (D-306B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
 
+### D-308 mini-arc: Belief Engine safe Back to HumanX links
+
+This arc addressed the D-306A secondary finding (deferred at the time): Belief Engine had no in-tab exit path back to HumanX across most of its screens. D-308A audited exactly which screens are safe to add a link to, based on a concrete technical finding — `saveRunRecord()` only persists quiz answers once, at full completion, with no incremental autosave — so a link on the active quiz/timeline screens would risk real progress loss. D-308B implemented the link on the two provably safe screens only. D-308C was the live closeout. No backend/API/schema changes anywhere in this arc.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-308A | Product pass (docs) | 22-question navigation audit. Confirmed zero `<header>`/`<nav>` elements anywhere in the Belief Engine file; all screen transitions are internal-only; the only existing exits are three `target="_blank"` links at the very bottom of results. Found `saveRunRecord()` fires exactly once, in `finishQuiz()`, with no incremental autosave — so a back-link is only safe on `screen-intro` (no answers yet) and `screen-results` (already saved). D-308B candidate: `← Back to HumanX` link (→ `/`) on those two screens only. Classified frontend-only. Docs only. Baseline unchanged: 3515/0/44/57. |
+| D-308B | Frontend | Added `<a href="/" style="...">← Back to HumanX</a>` as the first element inside `screen-intro` and `screen-results` in `public/apps/humanx-belief-engine/index.html`. Intentionally absent from `screen-identity`, `screen-timeline`, `screen-quiz`. No CSS changes — inline styles only, matching the file's existing ad hoc pattern. 13 new tests in `scripts/belief-engine-static-check.mjs`, each scoped to a single screen via string slices bounded by adjacent `id="screen-*"` markers. Belief static baseline 44 → 57. |
+| D-308C | Live closeout | Owner deploy PASS. 34/34 live sanity PASS. Deployed Worker version not captured. |
+| D-309A | Checkpoint (docs) | Closes D-308 arc. No deploy. Baseline unchanged 3515/57/57. |
+
+**D-308 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| Intro screen link | `← Back to HumanX` present |
+| Results screen link | `← Back to HumanX` present |
+| Both links point to | `/` |
+| Identity screen | Link absent — confirmed |
+| Timeline screen | Link absent — confirmed |
+| Quiz screen | Link absent — confirmed |
+| Full HumanX nav added | No |
+| Progress-loss confirmation dialog added | No |
+| Existing 77-statement flow, scoring, result generation | Unchanged |
+| Existing bridge/export behavior | Unchanged |
+| `saveRunRecord()` behavior | Unchanged |
+| Claim/Truth/RunPack creation from links | None — verified absent near both links |
+| fetch/write/save behavior from links | None |
+| D-306B preview (`Example — not your result`) | Preserved |
+| `No diagnosis.` copy | Preserved |
+| `Use it as a mirror, not a verdict.` copy | Preserved |
+| D-306B boundary line (`not a diagnosis, verdict, or proof`) | Preserved |
+| No diagnosis/proof/verdict claim introduced | Confirmed |
+| No user labelled irrational/broken/extremist/unsafe | Confirmed |
+| CSS changes | None — inline styles only |
+| Backend/API/schema/storage changes | None |
+
+**Tests added in arc:** 13 new belief-engine checks (44 → 57 total). **Deploys:** 1 (D-308B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -1344,9 +1384,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-306B | Owner deploy PASS — D-306C confirmed live (34/34) |
 | D-306C | Live closeout — no deploy needed (closeout of D-306B deploy) · deployed Worker: `1025ccf7-5953-448f-817c-2b229c525a0d` (corrected in D-306D after initial closeout recorded "not captured") |
 | D-306D | Metadata correction — no deploy needed |
-| D-307A (this task) | Docs only — **no deploy needed** |
+| D-307A | Docs only — no deploy needed |
+| D-308A | Docs only (product pass) — no deploy needed |
+| D-308B | Owner deploy PASS — D-308C confirmed live (34/34) |
+| D-308C | Live closeout — no deploy needed (closeout of D-308B deploy) · deployed Worker version not captured |
+| D-309A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | `1025ccf7-5953-448f-817c-2b229c525a0d` (D-306B/C, 2026-07-08) |
+| **Latest deployed Worker** | not captured (D-308B/C, 2026-07-08) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1619,6 +1663,12 @@ CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deplo
 
 128. **Do not add Belief Engine Claim/Truth/RunPack creation from the intro preview without a dedicated audit** — D-306A explicitly deferred any direct "turn this belief into a claim" bridge due to cross-app/session risk (the standalone Belief Engine page has no access to the main SPA's session/auth state beyond the shared-localStorage trick in `humanx-bridge.js`). The D-306B preview must remain inert; any future interactive bridge from the intro screen (or elsewhere in Belief Engine) requires its own audit task before implementation, per the same pattern already used for RunPack F-4/F-5 and saved-analysis-to-Truth (D-287A).
 
+129. **Belief Engine Back to HumanX links must remain absent from active progress-risk screens unless autosave/progress-loss handling is separately audited** — the D-308B `← Back to HumanX` links exist only on `screen-intro` and `screen-results` because `saveRunRecord()` only persists answers once, at full completion, with no incremental autosave. Do not add the link (or any other exit affordance) to `screen-identity`, `screen-timeline`, or `screen-quiz` without first adding incremental answer autosave or a progress-loss confirmation dialog — both are their own audited feature, not a copy/link change.
+
+130. **Belief Engine intro/results links may return to HumanX Home, but must not create Claim/Truth/RunPack behavior** — the D-308B links are plain `<a href="/">` navigation only. Any future change to these links (or any similar exit affordance) must not attach a `fetch(`, `promoteBelief`, `generateRunPack`, or any `/api/belief-promote`/`/api/claims`/`/api/truths`/`/api/runpack` call. If a future task wants the back link to also save or promote something, that is a new feature requiring its own audit, not an extension of this link.
+
+131. **Do not add full HumanX navigation inside Belief Engine without a dedicated product pass** — D-308A explicitly rejected importing the main app's full nav bar/tabs into the standalone Belief Engine as disproportionate to the gap it was fixing. Belief Engine remains a deliberately focused, single-purpose standalone screen (D-306A). Any future proposal to add persistent multi-tab navigation there requires its own product-pass audit and explicit owner approval.
+
 11. **Hard security rules (permanent):**
     - Do NOT touch `selectClaim`, `studyFromVault`, `attachEvidencePrompt`
     - Do NOT touch Review decision handlers: `inspectReviewItem`, `reviewDecisionUI`, `requestApproveReview`, `requestRejectReview`, `cancelApproveReview`, `cancelRejectReview`
@@ -1659,7 +1709,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Home collapsed HumanX words glossary | **COMPLETE** — D-302A product pass (22 questions; real vocabulary gaps confirmed after D-297/D-300 — My HumanX undefined, Truth/Claim scattered, Evidence under-defined, Review named before defined; suggested Truth wording found inaccurate and corrected); D-302B collapsed `<details>/<summary>HumanX words</summary>` glossary in `renderHome()` (frontend-only, no CSS/backend/schema changes); D-302C live PASS (36/36), deployed Worker `3baab973-c299-4ee4-bb08-66a91f490e14`; baseline 3487 → 3515/0/24/57. Glossary collapsed by default; Review defined as admin approval/not proof; Evidence defined as support/challenge; My HumanX defined as private dashboard. |
 | First outside submission Review intake | **COMPLETE** — D-304A process protocol (do-not-publish-first rule, 6 classification categories mapped to existing Approve/Reject/Keep Pending actions, 7 tester follow-up questions, safety boundaries reconfirmed); D-304B intake log seeded with the first confirmed outside submission (claim about fast/expensive-car drivers' generosity, submitter `anon-rtpuo3`, source Builder/CLAIM/REVIEW, category Real useful claim / needs better evidence, action "Keep in Review; do not approve yet"). Docs/process only — no app/backend/schema/API changes; baseline unchanged 3515/0/24/57. |
 | Belief Engine intro static output preview | **COMPLETE** — D-306A product pass (audit of Belief Engine + connected belief-flow; zero safety-boundary violations found; main gap: no worked-example output before the 77-statement commitment); D-306B static "Example — not your result" preview added to `#screen-intro` in `public/apps/humanx-belief-engine/index.html` (frontend-only, no CSS/backend/schema changes, 20 new tests); D-306C live PASS (34/34); D-306D corrected deployed Worker version to `1025ccf7-5953-448f-817c-2b229c525a0d` and resolved a GitHub push discrepancy; belief static baseline 24 → 44/0. Preview is static-only, cannot submit/fetch/write/create Claim-Truth-RunPack, and preserves all existing "no diagnosis"/"mirror not a verdict" safety copy. |
-| Next Belief Engine work | **One narrow audited friction at a time — not bundled** — D-306A also surfaced three secondary findings deliberately left unfixed: (1) no persistent navigation back to HumanX from inside Belief Engine until the end of results; (2) Home's Belief Engine card copy compresses the real Drift-then-promote bridge; (3) dead `buildBeliefSnapshot()`/`classifyBelief()`/`beliefPreview()` stubs in `app-v10.js` implying an abandoned "quick record" path. Any future Belief Engine work should pick exactly one of these (or a similarly narrow, audited friction) rather than bundling navigation/bridge/dead-stub cleanup into a single task. |
+| Belief Engine safe Back to HumanX links | **COMPLETE** — D-308A product pass (confirmed zero in-tab exit path across 4 of 5 screens; found `saveRunRecord()` only persists once, at full completion, with no incremental autosave — so a link is only safe on `screen-intro`/`screen-results`); D-308B added `← Back to HumanX` (→ `/`) to those two screens only, intentionally absent from `screen-identity`/`screen-timeline`/`screen-quiz` (frontend-only, no CSS/backend/schema changes, 13 new tests); D-308C live PASS (34/34), deployed Worker version not captured; belief static baseline 44 → 57/0. Links create no Claim/Truth/RunPack/fetch behavior; all existing safety copy and D-306B preview preserved. |
+| Next Belief Engine work | **One narrow audited friction at a time — not bundled** — with navigation now fixed (D-308), remaining secondary findings from D-306A are: (1) Home's Belief Engine card copy compresses the real Drift-then-promote bridge; (2) dead `buildBeliefSnapshot()`/`classifyBelief()`/`beliefPreview()` stubs in `app-v10.js` implying an abandoned "quick record" path; (3) result-page HumanX handoff clarity (the existing bottom-of-results `target="_blank"` links could be clearer about what happens next). Any future Belief Engine work should pick exactly one of bridge-copy precision, the abandoned quick-record stubs, or result-page handoff clarity — not bundled together. |
 | Next beta work | **Based on additional outside submissions or direct tester feedback only** — the demo card (D-300), Step 5 (D-297), vocabulary glossary (D-302), and Review-intake protocol (D-304) together close every self-demonstration gap identified across three consecutive product passes plus establish a process for real submissions. Do not start another speculative cold-visitor or beta-readiness improvement without a concrete signal: at least 2 more logged outside submissions, a repeated confusion pattern in the D-304B intake log, direct tester feedback, or an explicit owner request. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
