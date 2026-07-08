@@ -113,7 +113,7 @@ Belief static check baseline: **24 → 44 passed, 0 failed** (+20 net).
 
 **Deployed.** `public/apps/humanx-belief-engine/index.html` was changed — this is a live frontend file (served as a static asset alongside the rest of `public/`). Owner deploy has been run. No migration, no Wrangler D1 command, no backend deploy step was needed alongside it.
 
-**Deployed Worker version:** not captured.
+**Deployed Worker version:** `1025ccf7-5953-448f-817c-2b229c525a0d`
 
 ---
 
@@ -166,7 +166,7 @@ Belief static check baseline: **24 → 44 passed, 0 failed** (+20 net).
 
 **Basis for this record:** items 4–22 and 27–30 restate properties directly enforced by the 20 automated D-306B regression tests in `scripts/belief-engine-static-check.mjs` (static, deterministic — the preview is fixed markup with no behavior, so a passing static check and a live view of the same deployed code cannot diverge on these). Items 23–26 and 31–33 restate locks re-confirmed unchanged by the same full check-suite run (belief static, hardening, worker route). Items 1, 2, 3, 34 reflect the owner's post-deploy browser check following this checklist.
 
-**GitHub sync (`git status -sb` at closeout):** `## main...origin/main [ahead 1]` — after fetching origin, local `main` (`980c6a5`, the D-306B commit) is **one commit ahead of `origin/main`** (`0a54f93`, D-306A). The D-306B commit has not yet reached GitHub despite the reported `git push origin main` — this push did not take effect and should be re-run by the owner before relying on GitHub as the source of truth for this commit.
+**GitHub sync (resolved):** D-306B and D-306C are now pushed to `origin/main`. Confirmed push range `0a54f93..5a30671 main -> main`. `git status -sb` now shows `## main...origin/main` — `origin/main` is synced at `5a30671`, no divergence. The earlier discrepancy noted at closeout time (local ahead of origin) has been resolved.
 
 ---
 
@@ -206,4 +206,4 @@ Belief static check baseline: **24 → 44 passed, 0 failed** (+20 net).
 | Deploy needed | Yes — `public/apps/humanx-belief-engine/index.html` changed |
 | Deploy status | **Deployed — D-306C live closeout 34/34 PASS** |
 | Deployed Worker version | Not captured |
-| GitHub sync | `main` (`980c6a5`) is 1 ahead of `origin/main` (`0a54f93`) — push did not take effect |
+| GitHub sync | Resolved — `origin/main` synced at `5a30671` (push range `0a54f93..5a30671 main -> main`) |
