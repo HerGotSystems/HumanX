@@ -537,6 +537,188 @@ async function main() {
     'public/apps/humanx-belief-engine/index.html'
   );
 
+  // ── 8d. D-310B: results Review handoff sentence ───────────────────────────
+
+  const reviewSentence = 'If you turn one belief into a HumanX claim, public display still waits for Review — admin approval, not automatic proof.';
+  const nextTestIdx = resultsScreenSlice.indexOf('What to Test Next');
+  const reviewSentenceIdx = resultsScreenSlice.indexOf(reviewSentence);
+  const nextActionRowIdx = resultsScreenSlice.indexOf('next-action-row');
+
+  checkContains(
+    resultsScreenSlice,
+    reviewSentence,
+    'D-310B: screen-results contains the Review handoff sentence',
+    'D-310B: screen-results missing the Review handoff sentence',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'Review',
+    'D-310B: Review handoff sentence mentions "Review"',
+    'D-310B: Review handoff sentence must mention "Review"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'admin approval',
+    'D-310B: Review handoff sentence includes admin approval meaning',
+    'D-310B: Review handoff sentence must include admin approval meaning',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'not automatic proof',
+    'D-310B: Review handoff sentence includes "not automatic proof"',
+    'D-310B: Review handoff sentence must include "not automatic proof"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  if (nextTestIdx !== -1 && reviewSentenceIdx !== -1 && nextActionRowIdx !== -1 && nextTestIdx < reviewSentenceIdx && reviewSentenceIdx < nextActionRowIdx) {
+    pass('D-310B: Review handoff sentence appears inside the existing "What to Test Next" section, before the next-action links');
+  } else {
+    fail(
+      'D-310B: Review handoff sentence must appear inside "What to Test Next", before the next-action links',
+      `"What to Test Next" at ${nextTestIdx}, sentence at ${reviewSentenceIdx}, next-action-row at ${nextActionRowIdx}`
+    );
+  }
+
+  const whatToTestNextCount = (beliefHtml.match(/What to Test Next/g) || []).length;
+  if (whatToTestNextCount === 1) {
+    pass('D-310B: no second/new "What to Test Next" card was added — exactly one occurrence');
+  } else {
+    fail(
+      'D-310B: "What to Test Next" must appear exactly once (no duplicate card)',
+      `Found ${whatToTestNextCount} occurrences`
+    );
+  }
+
+  checkContains(
+    resultsScreenSlice,
+    'https://humanx.rinkimirikata.com/#claims',
+    'D-310B: existing "Browse Claims" link preserved',
+    'D-310B: existing "Browse Claims" link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'https://humanx.rinkimirikata.com/#submit',
+    'D-310B: existing "Submit a Claim" link preserved',
+    'D-310B: existing "Submit a Claim" link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'https://humanx.rinkimirikata.com/#truths',
+    'D-310B: existing "Browse Truths" link preserved',
+    'D-310B: existing "Browse Truths" link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'humanx-bridge.js',
+    'D-310B: existing bridge/export script reference preserved',
+    'D-310B: existing bridge/export script reference must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  const reviewSentenceArea = resultsScreenSlice.slice(Math.max(0, reviewSentenceIdx - 50), reviewSentenceIdx + reviewSentence.length + 50);
+  const noCreationMarkers = ['/api/belief-promote', '/api/claims', '/api/truths', '/api/runpack', 'promoteBelief', 'generateRunPack', 'fetch(', 'localStorage', 'sessionStorage'];
+  const creationFound = noCreationMarkers.filter(m => reviewSentenceArea.includes(m));
+  if (creationFound.length === 0) {
+    pass('D-310B: Review handoff sentence adds no Claim/Truth/RunPack creation or fetch/write/save behavior');
+  } else {
+    fail(
+      'D-310B: Review handoff sentence must not introduce Claim/Truth/RunPack creation or fetch/write/save behavior',
+      `Found: ${creationFound.map(m => `"${m}"`).join(', ')}`
+    );
+  }
+
+  checkContains(
+    introScreenSlice,
+    '← Back to HumanX',
+    'D-310B: existing D-308B intro back link preserved',
+    'D-310B: existing D-308B intro back link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    '← Back to HumanX',
+    'D-310B: existing D-308B results back link preserved',
+    'D-310B: existing D-308B results back link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    identityScreenSlice,
+    '← Back to HumanX',
+    'D-310B: back link still absent from screen-identity',
+    'D-310B: back link must remain absent from screen-identity',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    timelineScreenSlice,
+    '← Back to HumanX',
+    'D-310B: back link still absent from screen-timeline',
+    'D-310B: back link must remain absent from screen-timeline',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    quizScreenSlice,
+    '← Back to HumanX',
+    'D-310B: back link still absent from screen-quiz',
+    'D-310B: back link must remain absent from screen-quiz',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Example — not your result',
+    'D-310B: existing D-306B preview label preserved',
+    'D-310B: existing D-306B preview label must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'No diagnosis.',
+    'D-310B: existing "No diagnosis." copy preserved',
+    'D-310B: existing "No diagnosis." copy must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Use it as a mirror, not a verdict.',
+    'D-310B: existing "mirror not a verdict" copy preserved',
+    'D-310B: existing "mirror not a verdict" copy must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'This is not a diagnosis, verdict, or proof — it is a reflection aid.',
+    'D-310B: existing D-306B boundary line preserved',
+    'D-310B: existing D-306B boundary line must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    reviewSentenceArea,
+    'is proof',
+    'D-310B: Review handoff sentence does not claim Review is proof',
+    'D-310B: Review handoff sentence must not claim Review is proof',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
   // ── 9. No accidental API key / secret exposure ────────────────────────────
 
   const keyMarkers = ['sk-ant-', 'sk-proj-', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'Bearer '];
