@@ -110,7 +110,7 @@ Baseline: **3487 → 3515 passed, 0 failed** (+28 net; the 3 widened tests are p
 
 **Deployed.** `public/app-v10.js` was changed — this is a live frontend file. Owner deploy has been run. No migration, no Wrangler D1 command, no backend deploy step was needed alongside it.
 
-**Deployed Worker version:** not captured.
+**Deployed Worker version:** `3baab973-c299-4ee4-bb08-66a91f490e14`
 
 ---
 
@@ -207,5 +207,5 @@ Baseline: **3487 → 3515 passed, 0 failed** (+28 net; the 3 widened tests are p
 | Tests | +28 new, 3 pre-existing widened, all passing |
 | Deploy needed | Yes — `public/app-v10.js` changed |
 | Deploy status | **Deployed — D-302C live closeout 36/36 PASS** |
-| Deployed Worker version | Not captured |
+| Deployed Worker version | `3baab973-c299-4ee4-bb08-66a91f490e14` |
 | GitHub sync | `main`...`origin/main` — in sync, no divergence |
