@@ -719,6 +719,230 @@ async function main() {
     'public/apps/humanx-belief-engine/index.html'
   );
 
+  // ── 8e. D-312B: Export & Share Drift/Review copy ──────────────────────────
+
+  const exportShareSentence = 'Download or copy your pressure map. "Send to HumanX" saves a snapshot to your Drift — it does not publish anything automatically. Saving to Drift does not publish a Truth; any public display still waits for Review.';
+  const exportShareIdx = resultsScreenSlice.indexOf(exportShareSentence);
+  const shareHeadingIdx = resultsScreenSlice.indexOf('Export &amp; Share');
+  const shareActionsIdx = resultsScreenSlice.indexOf('class="results-actions"');
+
+  checkContains(
+    resultsScreenSlice,
+    exportShareSentence,
+    'D-312B: Export & Share copy contains the updated Drift/Review paragraph',
+    'D-312B: Export & Share copy missing the updated Drift/Review paragraph',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'to your Drift',
+    'D-312B: Export & Share copy mentions "Drift" as the save destination',
+    'D-312B: Export & Share copy must mention "Drift" as the save destination',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    beliefHtml,
+    'your session',
+    'D-312B: vague "your session" wording removed from index.html',
+    'D-312B: vague "your session" wording must not remain in index.html',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'Review',
+    'D-312B: Export & Share copy mentions "Review"',
+    'D-312B: Export & Share copy must mention "Review"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'does not publish a Truth',
+    'D-312B: Export & Share copy says saving does not publish a Truth',
+    'D-312B: Export & Share copy must say saving does not publish a Truth',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  const exportShareArea = exportShareIdx !== -1 ? resultsScreenSlice.slice(exportShareIdx, exportShareIdx + exportShareSentence.length) : '';
+
+  checkAbsent(
+    exportShareArea,
+    'is proof',
+    'D-312B: Export & Share copy does not claim Review is proof',
+    'D-312B: Export & Share copy must not claim Review is proof',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    exportShareArea,
+    'verified',
+    'D-312B: Export & Share copy does not claim Review is verification',
+    'D-312B: Export & Share copy must not claim Review is verification',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  if (shareHeadingIdx !== -1 && exportShareIdx !== -1 && shareActionsIdx !== -1 && shareHeadingIdx < exportShareIdx && exportShareIdx < shareActionsIdx) {
+    pass('D-312B: Drift/Review copy appears inside the existing Export & Share section');
+  } else {
+    fail(
+      'D-312B: Drift/Review copy must appear inside the existing Export & Share section',
+      `"Export & Share" heading at ${shareHeadingIdx}, copy at ${exportShareIdx}, results-actions at ${shareActionsIdx}`
+    );
+  }
+
+  const exportShareHeadingCount = (beliefHtml.match(/Export &amp; Share/g) || []).length;
+  if (exportShareHeadingCount === 1) {
+    pass('D-312B: no second/new Export & Share card was added — exactly one occurrence');
+  } else {
+    fail(
+      'D-312B: "Export & Share" must appear exactly once (no duplicate card)',
+      `Found ${exportShareHeadingCount} occurrences`
+    );
+  }
+
+  checkContains(
+    resultsScreenSlice,
+    'https://humanx.rinkimirikata.com/#claims',
+    'D-312B: existing "Browse Claims" link preserved',
+    'D-312B: existing "Browse Claims" link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'https://humanx.rinkimirikata.com/#submit',
+    'D-312B: existing "Submit a Claim" link preserved',
+    'D-312B: existing "Submit a Claim" link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'https://humanx.rinkimirikata.com/#truths',
+    'D-312B: existing "Browse Truths" link preserved',
+    'D-312B: existing "Browse Truths" link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'humanx-bridge.js',
+    'D-312B: existing bridge/export script reference preserved',
+    'D-312B: existing bridge/export script reference must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  if (bridgeJs !== null) {
+    checkContains(
+      bridgeJs,
+      'for your own review only',
+      'D-312B: humanx-bridge.js untouched — pre-existing injected note text unchanged',
+      'D-312B: humanx-bridge.js must not be modified by this task',
+      'public/apps/humanx-belief-engine/humanx-bridge.js'
+    );
+    checkContains(
+      bridgeJs,
+      'Saved: dimension scores, alignment patterns, contradiction summary, and moral-scenario responses.',
+      'D-312B: humanx-bridge.js untouched — pre-existing "Saved:" list unchanged',
+      'D-312B: humanx-bridge.js "Saved:" list must not be modified by this task',
+      'public/apps/humanx-belief-engine/humanx-bridge.js'
+    );
+  }
+
+  const noCreationMarkersExportShare = ['/api/belief-promote', '/api/claims', '/api/truths', '/api/runpack', 'promoteBelief', 'generateRunPack', 'fetch(', 'localStorage', 'sessionStorage'];
+  const creationFoundExportShare = noCreationMarkersExportShare.filter(m => exportShareArea.includes(m));
+  if (creationFoundExportShare.length === 0) {
+    pass('D-312B: Export & Share copy adds no Claim/Truth/RunPack creation or fetch/write/save behavior');
+  } else {
+    fail(
+      'D-312B: Export & Share copy must not introduce Claim/Truth/RunPack creation or fetch/write/save behavior',
+      `Found: ${creationFoundExportShare.map(m => `"${m}"`).join(', ')}`
+    );
+  }
+
+  checkContains(
+    beliefHtml,
+    'If you turn one belief into a HumanX claim, public display still waits for Review — admin approval, not automatic proof.',
+    'D-312B: existing D-310B Review handoff sentence preserved',
+    'D-312B: existing D-310B Review handoff sentence must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    introScreenSlice,
+    '← Back to HumanX',
+    'D-312B: existing D-308B intro back link preserved',
+    'D-312B: existing D-308B intro back link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    '← Back to HumanX',
+    'D-312B: existing D-308B results back link preserved',
+    'D-312B: existing D-308B results back link must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    identityScreenSlice,
+    '← Back to HumanX',
+    'D-312B: back link still absent from screen-identity',
+    'D-312B: back link must remain absent from screen-identity',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    timelineScreenSlice,
+    '← Back to HumanX',
+    'D-312B: back link still absent from screen-timeline',
+    'D-312B: back link must remain absent from screen-timeline',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    quizScreenSlice,
+    '← Back to HumanX',
+    'D-312B: back link still absent from screen-quiz',
+    'D-312B: back link must remain absent from screen-quiz',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Example — not your result',
+    'D-312B: existing D-306B preview label preserved',
+    'D-312B: existing D-306B preview label must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'No diagnosis.',
+    'D-312B: existing "No diagnosis." copy preserved',
+    'D-312B: existing "No diagnosis." copy must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Use it as a mirror, not a verdict.',
+    'D-312B: existing "mirror not a verdict" copy preserved',
+    'D-312B: existing "mirror not a verdict" copy must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'This is not a diagnosis, verdict, or proof — it is a reflection aid.',
+    'D-312B: existing D-306B boundary line preserved',
+    'D-312B: existing D-306B boundary line must remain unchanged',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
   // ── 9. No accidental API key / secret exposure ────────────────────────────
 
   const keyMarkers = ['sk-ant-', 'sk-proj-', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'Bearer '];
