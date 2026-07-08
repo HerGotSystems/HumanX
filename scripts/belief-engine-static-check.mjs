@@ -413,6 +413,130 @@ async function main() {
     'public/apps/humanx-belief-engine/index.html'
   );
 
+  // ── 8c. D-308B: safe Back to HumanX links ─────────────────────────────────
+
+  const introStart = beliefHtml.indexOf('id="screen-intro"');
+  const identityStart = beliefHtml.indexOf('id="screen-identity"');
+  const timelineStart = beliefHtml.indexOf('id="screen-timeline"');
+  const quizStart = beliefHtml.indexOf('id="screen-quiz"');
+  const resultsStart = beliefHtml.indexOf('id="screen-results"');
+  const scriptStart = beliefHtml.indexOf('<script>');
+
+  const introScreenSlice = beliefHtml.slice(introStart, identityStart);
+  const identityScreenSlice = beliefHtml.slice(identityStart, timelineStart);
+  const timelineScreenSlice = beliefHtml.slice(timelineStart, quizStart);
+  const quizScreenSlice = beliefHtml.slice(quizStart, resultsStart);
+  const resultsScreenSlice = beliefHtml.slice(resultsStart, scriptStart);
+
+  checkContains(
+    introScreenSlice,
+    '← Back to HumanX',
+    'D-308B: screen-intro contains "← Back to HumanX"',
+    'D-308B: screen-intro missing "← Back to HumanX"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    introScreenSlice,
+    'href="/"',
+    'D-308B: screen-intro back link points to "/"',
+    'D-308B: screen-intro back link does not point to "/"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    '← Back to HumanX',
+    'D-308B: screen-results contains "← Back to HumanX"',
+    'D-308B: screen-results missing "← Back to HumanX"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    resultsScreenSlice,
+    'href="/"',
+    'D-308B: screen-results back link points to "/"',
+    'D-308B: screen-results back link does not point to "/"',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    identityScreenSlice,
+    '← Back to HumanX',
+    'D-308B: screen-identity does not contain "← Back to HumanX" (progress-loss risk screen)',
+    'D-308B: screen-identity must not contain the back link — progress-loss risk',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    timelineScreenSlice,
+    '← Back to HumanX',
+    'D-308B: screen-timeline does not contain "← Back to HumanX" (progress-loss risk screen)',
+    'D-308B: screen-timeline must not contain the back link — progress-loss risk',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    quizScreenSlice,
+    '← Back to HumanX',
+    'D-308B: screen-quiz does not contain "← Back to HumanX" (progress-loss risk screen)',
+    'D-308B: screen-quiz must not contain the back link — progress-loss risk',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  const backLinkMarkers = ['/api/belief-promote', '/api/claims', '/api/truths', '/api/runpack', 'promoteBelief', 'generateRunPack', 'fetch('];
+  const introBackLinkArea = introScreenSlice.slice(0, introScreenSlice.indexOf('← Back to HumanX') + 50);
+  const resultsBackLinkArea = resultsScreenSlice.slice(0, resultsScreenSlice.indexOf('← Back to HumanX') + 50);
+  const backLinkFound = backLinkMarkers.filter(m => introBackLinkArea.includes(m) || resultsBackLinkArea.includes(m));
+  if (backLinkFound.length === 0) {
+    pass('D-308B back links do not create Claim/Truth/RunPack behavior or add fetch/write/save behavior');
+  } else {
+    fail(
+      'D-308B back links must not reference Claim/Truth/RunPack creation or fetch/write/save behavior',
+      `Found: ${backLinkFound.map(m => `"${m}"`).join(', ')}`
+    );
+  }
+
+  checkContains(
+    beliefHtml,
+    'function saveRunRecord',
+    'D-308B preserves saveRunRecord() function unchanged',
+    'D-308B must not remove saveRunRecord()',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Example — not your result',
+    'D-308B preserves existing D-306B preview label',
+    'D-308B must not remove the D-306B preview label',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'No diagnosis.',
+    'D-308B preserves existing "No diagnosis." intro copy',
+    'D-308B must not remove existing "No diagnosis." intro copy',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkContains(
+    beliefHtml,
+    'Use it as a mirror, not a verdict.',
+    'D-308B preserves existing "mirror not a verdict" results copy',
+    'D-308B must not remove existing "mirror not a verdict" results copy',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
+  checkAbsent(
+    beliefHtml,
+    'irrational',
+    'D-308B does not introduce "irrational" user-labeling language',
+    'D-308B must not introduce "irrational" user-labeling language',
+    'public/apps/humanx-belief-engine/index.html'
+  );
+
   // ── 9. No accidental API key / secret exposure ────────────────────────────
 
   const keyMarkers = ['sk-ant-', 'sk-proj-', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'Bearer '];
