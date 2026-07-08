@@ -158,7 +158,7 @@ Belief static check baseline: **57 → 78 passed, 0 failed** (+21 net).
 
 **Basis for this record:** items 4, 5, 8–29, 31–33 restate properties directly enforced by the 21 automated D-310B regression tests in `scripts/belief-engine-static-check.mjs` (static, deterministic — the new sentence is fixed text with no behavior, so a passing static check and a live view of the same deployed code cannot diverge on these). Item 34 restates a lock re-confirmed unchanged by the same full check-suite run. Items 1, 2, 3, 6, 7, 30, 35 reflect the owner's post-deploy browser check following this checklist.
 
-**GitHub sync (`git status -sb` at closeout, after `git fetch origin`):** `## main...origin/main [ahead 3]` — local `main` (`21fc011`, the D-310B commit) is three commits ahead of `origin/main` (`996c3c4`, D-309A) — missing D-309B, D-310A, and D-310B. This is a push-status observation, not a content problem; it does not block this docs-only closeout, and should be resolved by the owner re-running `git push origin main`.
+**Resolved.** `19f4757` (D-309B), `02359b6` (D-310A), `21fc011` (D-310B), and `892703a` (D-310C) are now all pushed to `origin/main`. `git status -sb` shows `## main...origin/main` — `origin/main` is synced at `892703a`, no divergence. Verified directly via `git fetch origin` + `git ls-remote origin refs/heads/main` (returned `892703a`), not just local cached ahead/behind state. The discrepancy noted at D-310C closeout time has been resolved by the owner's subsequent `git push origin main`.
 
 ---
 
@@ -201,4 +201,4 @@ Belief static check baseline: **57 → 78 passed, 0 failed** (+21 net).
 | Deploy needed | Yes — `public/apps/humanx-belief-engine/index.html` changed |
 | Deploy status | **Deployed — D-310C live closeout 35/35 PASS** |
 | Deployed Worker version | Not captured |
-| GitHub sync | `main`...`origin/main` — 3 ahead (D-309B, D-310A, D-310B pending push) |
+| GitHub sync | Resolved — `origin/main` synced at `892703a` (D-309B/D-310A/D-310B/D-310C all pushed) |
