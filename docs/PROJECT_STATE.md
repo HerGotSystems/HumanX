@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-08 after D-311A Belief Engine results Review handoff sentence checkpoint.
-Previous checkpoint: 2026-07-08 after D-309A Belief Engine safe Back to HumanX links checkpoint.
+Last updated: 2026-07-08 after D-313A Belief Engine Export & Share Drift/Review copy checkpoint.
+Previous checkpoint: 2026-07-08 after D-311A Belief Engine results Review handoff sentence checkpoint.
 
 ---
 
@@ -53,10 +53,11 @@ Previous checkpoint: 2026-07-08 after D-309A Belief Engine safe Back to HumanX l
 | **D-307A checkpoint HEAD** | see `docs/README.md` after commit (D-307A Belief Engine intro static output preview checkpoint) |
 | **D-309A checkpoint HEAD** | see `docs/README.md` after commit (D-309A Belief Engine safe Back to HumanX links checkpoint) |
 | **D-311A checkpoint HEAD** | see `docs/README.md` after commit (D-311A Belief Engine results Review handoff sentence checkpoint) |
+| **D-313A checkpoint HEAD** | see `docs/README.md` after commit (D-313A Belief Engine Export & Share Drift/Review copy checkpoint) |
 
 ---
 
-## Current baseline (as of D-311A)
+## Current baseline (as of D-313A)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -71,7 +72,7 @@ node scripts/worker-route-static-check.mjs
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
 | `hardening-smoke-test.mjs` | `3515 passed, 0 failed` |
-| `belief-engine-static-check.mjs` | `78 passed, 0 failed (78 hard checks)` |
+| `belief-engine-static-check.mjs` | `104 passed, 0 failed (104 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
 ### Known warning (non-blocking)
@@ -1015,6 +1016,44 @@ This arc addressed the D-309A "result-page HumanX handoff clarity" narrow candid
 
 **Tests added in arc:** 21 new belief-engine checks (57 → 78 total). **Deploys:** 1 (D-310B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift changes.**
 
+### D-312 mini-arc: Belief Engine Export & Share Drift/Review copy
+
+This arc addressed the D-311A "bridge-copy precision" narrow candidate. D-312A audited the results-page bridge/export wording across its three copy surfaces (the static Export & Share paragraph, `humanx-bridge.js`'s injected note, and its post-click alert) and found the static paragraph said the snapshot saves "to your session" — vague, and inconsistent with the rest of the app's "Drift" vocabulary — and never mentioned Review. Two deeper findings inside `humanx-bridge.js` itself (a "your own review" vs. capitalized-Review terminology collision, and a "Saved:" list that undersells the actual payload) were explicitly deferred, not fixed, since touching `humanx-bridge.js` was out of scope for this arc. D-312B tightened only the static paragraph. D-312C was the live closeout. D-312D corrected a GitHub push-status discrepancy (docs-only, no implementation change). No backend/API/schema changes, and no `humanx-bridge.js` changes, anywhere in this arc.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-312A | Product pass (docs) | 22-question audit of bridge/export copy. Found the static Export & Share paragraph vague ("to your session") and silent on Review. Deferred two `humanx-bridge.js`-internal findings (terminology collision, incomplete "Saved:" list) to a separate, explicitly-scoped bridge-script pass. Zero safety-boundary violations found. D-312B candidate: tighten the static paragraph only. Classified frontend-only copy/tests. Docs only. Baseline unchanged: 3515/0/78/57. |
+| D-312B | Frontend | Replaced `"to your session"` with `"to your Drift"` and appended `"Saving to Drift does not publish a Truth; any public display still waits for Review."` inside the existing static `<p>` in the "Export & Share" section of `public/apps/humanx-belief-engine/index.html`. No new card, no link changes, `humanx-bridge.js` untouched. No CSS changes. 26 new tests in `scripts/belief-engine-static-check.mjs`. Belief static baseline 78 → 104. |
+| D-312C | Live closeout | Owner deploy PASS. 39/39 live sanity PASS. Deployed Worker version not captured. |
+| D-312D | Metadata correction | Corrected a GitHub push-status discrepancy noted at D-312C closeout (local ahead of origin) — resolved after the owner's subsequent push; confirmed via `git ls-remote`. Docs only. |
+| D-313A | Checkpoint (docs) | Closes D-312 arc. No deploy. Baseline unchanged 3515/104/57. |
+
+**D-312 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| Export & Share paragraph (exact) | `"Download or copy your pressure map. \"Send to HumanX\" saves a snapshot to your Drift — it does not publish anything automatically. Saving to Drift does not publish a Truth; any public display still waits for Review."` |
+| "session" wording replaced with "Drift" | Confirmed — `"your session"` no longer appears anywhere in the file |
+| Review/public-display reinforcement added | Confirmed |
+| No new "Export & Share" card | Confirmed — exactly one occurrence |
+| Existing three "What to Test Next" links | Unchanged |
+| `humanx-bridge.js` | Untouched — confirmed via preserved-content tests |
+| Bridge/export behavior | Unchanged |
+| Claim/Truth/RunPack creation from the new copy | None |
+| fetch/write/save behavior beyond existing bridge behavior | None |
+| Existing 77-statement flow, scoring, result generation | Unchanged |
+| D-310B Review handoff sentence | Preserved verbatim |
+| D-308B `← Back to HumanX` links | Preserved — present on intro/results only |
+| Back link absent from identity/timeline/quiz | Confirmed |
+| D-306B preview and safety copy (`No diagnosis.`, `mirror not a verdict`, boundary line) | Preserved |
+| No diagnosis/proof/verdict claim introduced | Confirmed |
+| No user labelled irrational/broken/extremist/unsafe | Confirmed |
+| CSS changes | None |
+| Backend/API/schema/storage changes | None |
+| Deployed Worker version | Not captured |
+
+**Tests added in arc:** 26 new belief-engine checks (78 → 104 total). **Deploys:** 1 (D-312B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift/bridge changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -1435,9 +1474,14 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-310B | Owner deploy PASS — D-310C confirmed live (35/35) |
 | D-310C | Live closeout — no deploy needed (closeout of D-310B deploy) · deployed Worker version not captured |
 | D-310D | Metadata correction (GitHub sync) — no deploy needed |
-| D-311A (this task) | Docs only — **no deploy needed** |
+| D-311A | Docs only — no deploy needed |
+| D-312A | Docs only (product pass) — no deploy needed |
+| D-312B | Owner deploy PASS — D-312C confirmed live (39/39) |
+| D-312C | Live closeout — no deploy needed (closeout of D-312B deploy) · deployed Worker version not captured |
+| D-312D | Metadata correction (GitHub sync) — no deploy needed |
+| D-313A (this task) | Docs only — **no deploy needed** |
 | **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-310B/C, 2026-07-08) |
+| **Latest deployed Worker** | not captured (D-312B/C, 2026-07-08) |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1764,7 +1808,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Belief Engine intro static output preview | **COMPLETE** — D-306A product pass (audit of Belief Engine + connected belief-flow; zero safety-boundary violations found; main gap: no worked-example output before the 77-statement commitment); D-306B static "Example — not your result" preview added to `#screen-intro` in `public/apps/humanx-belief-engine/index.html` (frontend-only, no CSS/backend/schema changes, 20 new tests); D-306C live PASS (34/34); D-306D corrected deployed Worker version to `1025ccf7-5953-448f-817c-2b229c525a0d` and resolved a GitHub push discrepancy; belief static baseline 24 → 44/0. Preview is static-only, cannot submit/fetch/write/create Claim-Truth-RunPack, and preserves all existing "no diagnosis"/"mirror not a verdict" safety copy. |
 | Belief Engine safe Back to HumanX links | **COMPLETE** — D-308A product pass (confirmed zero in-tab exit path across 4 of 5 screens; found `saveRunRecord()` only persists once, at full completion, with no incremental autosave — so a link is only safe on `screen-intro`/`screen-results`); D-308B added `← Back to HumanX` (→ `/`) to those two screens only, intentionally absent from `screen-identity`/`screen-timeline`/`screen-quiz` (frontend-only, no CSS/backend/schema changes, 13 new tests); D-308C live PASS (34/34), deployed Worker version not captured; belief static baseline 44 → 57/0. Links create no Claim/Truth/RunPack/fetch behavior; all existing safety copy and D-306B preview preserved. |
 | Belief Engine results Review handoff sentence | **COMPLETE** — D-310A product pass (corrected its own framing: "What to Test Next" already existed, no new card needed; real gap: "Review" never appeared anywhere in the file); D-310B added one sentence to that existing section (`"...public display still waits for Review — admin approval, not automatic proof."`), no new card, no link/bridge changes (frontend-only, no CSS/backend/schema changes, 21 new tests); D-310C live PASS (35/35), deployed Worker version not captured; D-310D resolved a GitHub push-status discrepancy (docs only); belief static baseline 57 → 78/0. Sentence creates no Claim/Truth/RunPack/fetch behavior; all existing safety copy, D-306B preview, and D-308B back links preserved. |
-| Next Belief Engine work | **One narrow audited friction at a time — not bundled** — with navigation (D-308) and result-page handoff clarity (D-310) now both fixed, remaining secondary findings from D-306A are: (1) Home's Belief Engine card copy compresses the real Drift-then-promote bridge; (2) dead `buildBeliefSnapshot()`/`classifyBelief()`/`beliefPreview()` stubs in `app-v10.js` implying an abandoned "quick record" path. Any future Belief Engine work should pick exactly one of bridge-copy precision or the abandoned quick-record stubs — not bundled together. |
+| Belief Engine bridge-copy precision (Export & Share Drift/Review copy) | **COMPLETE** — D-312A product pass (audited the three bridge/export copy surfaces — static Export & Share paragraph, `humanx-bridge.js`'s injected note, its post-click alert; found the static paragraph vague ("to your session") and silent on Review; deferred two `humanx-bridge.js`-internal findings to a separate, explicitly-scoped bridge-script pass); D-312B tightened only the static paragraph — replaced "session" with "Drift," added a Review reinforcement (frontend-only, no CSS/backend/schema changes, `humanx-bridge.js` untouched, 26 new tests); D-312C live PASS (39/39), deployed Worker version not captured; D-312D resolved a GitHub push-status discrepancy (docs only); belief static baseline 78 → 104/0. Copy creates no Claim/Truth/RunPack/fetch behavior; all existing safety copy, D-306B preview, D-310B Review sentence, and D-308B back links preserved. |
+| Next Belief Engine work | **One narrow audited friction remains** — with navigation (D-308), result-page handoff clarity (D-310), and bridge-copy precision (D-312) now all fixed, the one remaining secondary finding from D-306A is the dead `buildBeliefSnapshot()`/`classifyBelief()`/`beliefPreview()` stubs in `app-v10.js`, implying an abandoned "quick record" path. Any future Belief Engine work should audit that stub gap on its own — not bundled with anything else. |
 | Next beta work | **Based on additional outside submissions or direct tester feedback only** — the demo card (D-300), Step 5 (D-297), vocabulary glossary (D-302), and Review-intake protocol (D-304) together close every self-demonstration gap identified across three consecutive product passes plus establish a process for real submissions. Do not start another speculative cold-visitor or beta-readiness improvement without a concrete signal: at least 2 more logged outside submissions, a repeated confusion pattern in the D-304B intake log, direct tester feedback, or an explicit owner request. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
