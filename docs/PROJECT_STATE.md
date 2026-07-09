@@ -1,7 +1,7 @@
 # HumanX Project State Checkpoint
 
-Last updated: 2026-07-08 after D-313A Belief Engine Export & Share Drift/Review copy checkpoint.
-Previous checkpoint: 2026-07-08 after D-311A Belief Engine results Review handoff sentence checkpoint.
+Last updated: 2026-07-08 after D-313E Belief Engine abandoned quick-record stubs cleanup checkpoint.
+Previous checkpoint: 2026-07-08 after D-313A Belief Engine Export & Share Drift/Review copy checkpoint.
 
 ---
 
@@ -54,10 +54,11 @@ Previous checkpoint: 2026-07-08 after D-311A Belief Engine results Review handof
 | **D-309A checkpoint HEAD** | see `docs/README.md` after commit (D-309A Belief Engine safe Back to HumanX links checkpoint) |
 | **D-311A checkpoint HEAD** | see `docs/README.md` after commit (D-311A Belief Engine results Review handoff sentence checkpoint) |
 | **D-313A checkpoint HEAD** | see `docs/README.md` after commit (D-313A Belief Engine Export & Share Drift/Review copy checkpoint) |
+| **D-313E checkpoint HEAD** | see `docs/README.md` after commit (D-313E Belief Engine abandoned quick-record stubs cleanup checkpoint) |
 
 ---
 
-## Current baseline (as of D-313A)
+## Current baseline (as of D-313E)
 
 Run before and after any change. All must pass with exit 0.
 
@@ -71,7 +72,7 @@ node scripts/worker-route-static-check.mjs
 | Script | Expected |
 |--------|----------|
 | `node --check public/app-v10.js` | no output, exit 0 |
-| `hardening-smoke-test.mjs` | `3515 passed, 0 failed` |
+| `hardening-smoke-test.mjs` | `3529 passed, 0 failed` |
 | `belief-engine-static-check.mjs` | `104 passed, 0 failed (104 hard checks)` |
 | `worker-route-static-check.mjs` | `57 passed, 0 failed (57 hard checks)` |
 
@@ -1054,6 +1055,39 @@ This arc addressed the D-311A "bridge-copy precision" narrow candidate. D-312A a
 
 **Tests added in arc:** 26 new belief-engine checks (78 → 104 total). **Deploys:** 1 (D-312B/C). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift/bridge changes.**
 
+### D-313 mini-arc: Belief Engine abandoned quick-record stubs cleanup
+
+This arc addressed the last remaining narrow Belief Engine candidate named at D-313A: the abandoned "quick record" stub cluster first flagged in D-306A. D-313B audited and confirmed the cluster was truly dead. D-313C locked that confirmed-dead state with regression tests before allowing removal, per this arc's own explicit gate ("do not remove unless tiny, frontend-only, dead, and test-covered"). D-313D performed the removal once all four gating conditions were met. This is a hardening-suite arc, not a belief-engine-static-check arc — the stub cluster lived in `public/app-v10.js`, not the standalone Belief Engine file. No backend/API/schema changes anywhere in this arc.
+
+| Task | Type | What it did |
+|------|------|-------------|
+| D-313A | Checkpoint (docs) | Closed the prior D-312 (Export & Share Drift/Review copy) arc. Named the abandoned quick-record stubs as the sole remaining narrow Belief Engine candidate. No deploy. Baseline unchanged 3515/104/57. |
+| D-313B | Audit (docs) | Located the exact six-item dead cluster (`n`, `v`, `buildBeliefSnapshot`, `classifyBelief`, `beliefPreview`, `saveBeliefMirror`) in `public/app-v10.js` lines 148–152. Confirmed via direct inspection of all four action-dispatch maps and `public/index.html` that none are reachable. Confirmed no Claim/Truth/RunPack/Drift/Review/backend behavior. Found zero test coverage. Recommended a test lock before removal. Docs only. Baseline unchanged: 3515/0/104/57. |
+| D-313C | Tests | Added 14 regression tests to `scripts/hardening-smoke-test.mjs` locking the confirmed-dead state: dispatch-map absence, `n`/`v` call-site absence, `index.html` absence, exact stub-body verbatim locks, no fetch/API/backend reference, no Claim/Truth/RunPack/Review creation path, and preservation of the real `isFullBeliefProfile`/`beliefSnapshotCard`/`belief-drift-expansion.js` display logic, plus a control check on the real neighboring `promoteBelief`. Hardening baseline 3515 → 3529. |
+| D-313D | Frontend cleanup — **deploy pending** | Deleted the five dead lines and the two stray `window.beliefPreview`/`window.saveBeliefMirror` exports from `public/app-v10.js`. `promoteBelief()` and its export left untouched. Converted D-313C tests 8–10 from "body matches audited text" to "no longer exists" / "export removed"; tests 1–7 and 11–14 unchanged and still passing. Test count unchanged at 14. Baseline unchanged 3529/104/57 (a zero-risk, test-covered deletion). `public/app-v10.js` changed — owner deploy not yet confirmed/recorded as of this checkpoint. |
+| D-313E | Checkpoint (docs) | Closes D-313 arc. No deploy. Baseline unchanged 3529/104/57. |
+
+**D-313 guarantees (live):**
+
+| Guarantee | Value |
+|-----------|-------|
+| `n(id)`, `v(id)` | Removed — no longer defined anywhere |
+| `buildBeliefSnapshot()` | Removed — no longer defined anywhere |
+| `classifyBelief()` | Removed — no longer defined anywhere |
+| `beliefPreview()` | Removed — no longer defined, `window.beliefPreview` export also removed |
+| `saveBeliefMirror()` | Removed — no longer defined, `window.saveBeliefMirror` export also removed |
+| `promoteBelief()` | Untouched — confirmed by diff and by regression test |
+| `window.promoteBelief=promoteBelief` | Untouched — confirmed present by regression test |
+| `isFullBeliefProfile` | Untouched — live, tested labeling logic |
+| `beliefSnapshotCard` | Untouched — live, tested card-rendering logic |
+| `belief-drift-expansion.js` "quick record" badge | Untouched — live display logic |
+| Backend/API/D1/schema/storage/auth/migration changes | None |
+| Test count in D-313C/D block | Unchanged — 14 (3 converted in purpose, not added) |
+| Hardening baseline | 3515 → 3529 (test-lock addition in D-313C; unchanged through D-313D removal) |
+| Deploy status | **Pending** — `public/app-v10.js` changed in D-313D; no live closeout/deploy confirmation has been recorded yet |
+
+**Tests added in arc:** 14 new hardening-suite checks (3515 → 3529 total). **Deploys:** 1 needed, not yet confirmed (D-313D — `public/app-v10.js` changed; awaiting owner deploy + live closeout). **Schema migrations applied:** 0. **No backend/API/CSS/worker/analysis-results/truths/belief-drift/bridge changes.**
+
 ### D-274→D-275 RunPack provenance behavior (post D-274B + D-275D)
 
 | Feature | Behavior |
@@ -1479,9 +1513,13 @@ The upstream `belief-drift-expansion` branch was merged into main around D-242A.
 | D-312B | Owner deploy PASS — D-312C confirmed live (39/39) |
 | D-312C | Live closeout — no deploy needed (closeout of D-312B deploy) · deployed Worker version not captured |
 | D-312D | Metadata correction (GitHub sync) — no deploy needed |
-| D-313A (this task) | Docs only — **no deploy needed** |
-| **Current deploy needed** | **No** |
-| **Latest deployed Worker** | not captured (D-312B/C, 2026-07-08) |
+| D-313A | Docs only — no deploy needed |
+| D-313B | Docs only (audit) — no deploy needed |
+| D-313C | Tests only — no deploy needed |
+| D-313D | Frontend cleanup — **`public/app-v10.js` changed, deploy needed, not yet confirmed/live** |
+| D-313E (this task) | Docs only — **no deploy needed** |
+| **Current deploy needed** | **Yes — D-313D (`public/app-v10.js`), pending owner deploy + live closeout** |
+| **Latest deployed Worker** | not captured (D-312B/C, 2026-07-08) — unchanged, since D-313D has not yet been deployed |
 
 CC session wrangler deploy always fails (VPN/proxy/certificate issue). All deploys require owner manual terminal execution. This is expected and permanent.
 
@@ -1809,7 +1847,8 @@ These are suggestions only. Do not start any until explicitly assigned.
 | Belief Engine safe Back to HumanX links | **COMPLETE** — D-308A product pass (confirmed zero in-tab exit path across 4 of 5 screens; found `saveRunRecord()` only persists once, at full completion, with no incremental autosave — so a link is only safe on `screen-intro`/`screen-results`); D-308B added `← Back to HumanX` (→ `/`) to those two screens only, intentionally absent from `screen-identity`/`screen-timeline`/`screen-quiz` (frontend-only, no CSS/backend/schema changes, 13 new tests); D-308C live PASS (34/34), deployed Worker version not captured; belief static baseline 44 → 57/0. Links create no Claim/Truth/RunPack/fetch behavior; all existing safety copy and D-306B preview preserved. |
 | Belief Engine results Review handoff sentence | **COMPLETE** — D-310A product pass (corrected its own framing: "What to Test Next" already existed, no new card needed; real gap: "Review" never appeared anywhere in the file); D-310B added one sentence to that existing section (`"...public display still waits for Review — admin approval, not automatic proof."`), no new card, no link/bridge changes (frontend-only, no CSS/backend/schema changes, 21 new tests); D-310C live PASS (35/35), deployed Worker version not captured; D-310D resolved a GitHub push-status discrepancy (docs only); belief static baseline 57 → 78/0. Sentence creates no Claim/Truth/RunPack/fetch behavior; all existing safety copy, D-306B preview, and D-308B back links preserved. |
 | Belief Engine bridge-copy precision (Export & Share Drift/Review copy) | **COMPLETE** — D-312A product pass (audited the three bridge/export copy surfaces — static Export & Share paragraph, `humanx-bridge.js`'s injected note, its post-click alert; found the static paragraph vague ("to your session") and silent on Review; deferred two `humanx-bridge.js`-internal findings to a separate, explicitly-scoped bridge-script pass); D-312B tightened only the static paragraph — replaced "session" with "Drift," added a Review reinforcement (frontend-only, no CSS/backend/schema changes, `humanx-bridge.js` untouched, 26 new tests); D-312C live PASS (39/39), deployed Worker version not captured; D-312D resolved a GitHub push-status discrepancy (docs only); belief static baseline 78 → 104/0. Copy creates no Claim/Truth/RunPack/fetch behavior; all existing safety copy, D-306B preview, D-310B Review sentence, and D-308B back links preserved. |
-| Next Belief Engine work | **One narrow audited friction remains** — with navigation (D-308), result-page handoff clarity (D-310), and bridge-copy precision (D-312) now all fixed, the one remaining secondary finding from D-306A is the dead `buildBeliefSnapshot()`/`classifyBelief()`/`beliefPreview()` stubs in `app-v10.js`, implying an abandoned "quick record" path. Any future Belief Engine work should audit that stub gap on its own — not bundled with anything else. |
+| Belief Engine abandoned quick-record stubs cleanup | **COMPLETE (code) — deploy pending** — D-313B audit confirmed the six-item stub cluster (`n`, `v`, `buildBeliefSnapshot`, `classifyBelief`, `beliefPreview`, `saveBeliefMirror`) in `app-v10.js` lines 148–152 was truly dead (unreachable from all dispatch maps and `index.html`, zero test coverage); D-313C added a 14-test regression lock before allowing removal; D-313D deleted the cluster and its two stray `window.*` exports, converted the three body-lock tests to existence-lock tests, and left `promoteBelief()`/`isFullBeliefProfile`/`beliefSnapshotCard`/`belief-drift-expansion.js` display logic fully untouched. Hardening baseline 3515 → 3529/0. No backend/API/D1/schema/storage/auth/migration changes. `public/app-v10.js` changed in D-313D — **owner deploy and live closeout have not yet been recorded** as of this checkpoint. |
+| Next Belief Engine work | **No known outstanding Belief Engine finding remains** — with navigation (D-308), result-page handoff clarity (D-310), bridge-copy precision (D-312), and the abandoned quick-record stubs (D-313) all now addressed, every secondary finding from the original D-306A audit is closed. Future Belief Engine work should wait for a new, real signal (a fresh audit, an owner request, or observed user confusion) rather than manufacturing another speculative polish pass. D-313D's deploy + live closeout should be completed before starting anything new. |
 | Next beta work | **Based on additional outside submissions or direct tester feedback only** — the demo card (D-300), Step 5 (D-297), vocabulary glossary (D-302), and Review-intake protocol (D-304) together close every self-demonstration gap identified across three consecutive product passes plus establish a process for real submissions. Do not start another speculative cold-visitor or beta-readiness improvement without a concrete signal: at least 2 more logged outside submissions, a repeated confusion pattern in the D-304B intake log, direct tester feedback, or an explicit owner request. |
 | Next RunPack/provenance work | **Audit-first** — F-3/F-4/F-5, provenance display, stale wording polish, boundary copy, and card copy consolidation all complete; any further RunPack backend work requires an audit task; any "analysis → Truth" action requires audit + explicit owner approval |
 | Next Truth workflow work | **Audit-first** — pending-Review visibility, post-submission navigation, analysis-assisted draft, and owner workflow product polish now complete; any further Truth UX, analysis-to-Truth automation, or Review state change requires an audit task before implementation |
