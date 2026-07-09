@@ -25266,13 +25266,16 @@ console.log('\nD-248A: Review card metadata density regression lock');
   });
 }
 
-// ── D-313C: Belief Engine abandoned quick-record stubs regression lock ──
+// ── D-313C/D: Belief Engine abandoned quick-record stubs regression lock ──
 {
-  // D-313B found this exact six-item dead cluster in app-v10.js lines 148–152.
-  // These tests lock the confirmed-dead state so a future cleanup (D-313D+)
-  // can verify removal is behavior-neutral, and so nobody silently "wires up"
-  // one of these stubs to real Claim/Truth/RunPack/Drift/Review/backend
-  // behavior without updating this lock.
+  // D-313B found a six-item dead cluster (n, v, buildBeliefSnapshot,
+  // classifyBelief, beliefPreview, saveBeliefMirror) that used to live in
+  // app-v10.js lines 148–152. D-313C locked the confirmed-dead state before
+  // removal; D-313D deleted the cluster and its two stray window exports
+  // (window.beliefPreview, window.saveBeliefMirror). Tests 8–10 below were
+  // converted from "stub bodies match audited text" to "stubs do not exist."
+  // This block still guards against anyone silently re-adding one of these
+  // names with real Claim/Truth/RunPack/Drift/Review/backend behavior.
 
   const dispatchMapStart = appSrc.indexOf('_D181B_ZERO_PARAM_ACTIONS={');
   const dispatchMapEnd = appSrc.indexOf("document.addEventListener('click',function _dataAction");
@@ -25310,29 +25313,22 @@ console.log('\nD-248A: Review card metadata density regression lock');
     assert.ok(found.length === 0, `index.html must not reference: ${found.join(', ')}`);
   });
 
-  test('D-313C test 8: stub function bodies remain exactly as audited (no accidental behavior added)', () => {
-    assert.ok(appSrc.includes('function buildBeliefSnapshot(){return{}}'), 'buildBeliefSnapshot() must remain an empty-object stub');
-    assert.ok(appSrc.includes("function classifyBelief(){return'open belief'}"), 'classifyBelief() must remain a hardcoded-string stub');
-    assert.ok(appSrc.includes('function beliefPreview(){}'), 'beliefPreview() must remain an empty no-op');
-    assert.ok(appSrc.includes("async function saveBeliefMirror(){location.href='/apps/humanx-belief-engine/'}"), 'saveBeliefMirror() must remain a pure redirect with no save behavior');
+  test('D-313D test 8: the four named abandoned stub functions no longer exist', () => {
+    assert.ok(!appSrc.includes('function buildBeliefSnapshot'), 'buildBeliefSnapshot() must be fully removed');
+    assert.ok(!appSrc.includes('function classifyBelief'), 'classifyBelief() must be fully removed');
+    assert.ok(!appSrc.includes('function beliefPreview'), 'beliefPreview() must be fully removed');
+    assert.ok(!appSrc.includes('function saveBeliefMirror'), 'saveBeliefMirror() must be fully removed');
   });
 
-  test('D-313C test 9: stub cluster contains no fetch/API/backend calls', () => {
-    const stubIdx = appSrc.indexOf('function n(id)');
-    const stubEnd = appSrc.indexOf('async function promoteBelief');
-    const stubSlice = appSrc.slice(stubIdx, stubEnd);
-    const riskyMarkers = ['fetch(', '/api/', 'promoteBelief(', 'generateRunPack', 'localStorage', 'sessionStorage'];
-    const foundRisky = riskyMarkers.filter(m => stubSlice.includes(m));
-    assert.ok(foundRisky.length === 0, `stub cluster must not reference: ${foundRisky.join(', ')}`);
+  test('D-313D test 9: the n(id)/v(id) helper definitions no longer exist', () => {
+    assert.ok(!appSrc.includes('function n(id)'), 'n(id) helper definition must be fully removed');
+    assert.ok(!appSrc.includes('function v(id)'), 'v(id) helper definition must be fully removed');
   });
 
-  test('D-313C test 10: stub cluster creates no Claim/Truth/RunPack/Drift/Review behavior', () => {
-    const stubIdx = appSrc.indexOf('function n(id)');
-    const stubEnd = appSrc.indexOf('async function promoteBelief');
-    const stubSlice = appSrc.slice(stubIdx, stubEnd);
-    const creationMarkers = ['/api/claims', '/api/truths', '/api/runpack', '/api/belief-promote', 'review_state'];
-    const foundCreation = creationMarkers.filter(m => stubSlice.includes(m));
-    assert.ok(foundCreation.length === 0, `stub cluster must not reference: ${foundCreation.join(', ')}`);
+  test('D-313D test 10: stray window exports for beliefPreview and saveBeliefMirror are removed', () => {
+    assert.ok(!appSrc.includes('window.beliefPreview=beliefPreview'), 'window.beliefPreview export must be removed');
+    assert.ok(!appSrc.includes('window.saveBeliefMirror=saveBeliefMirror'), 'window.saveBeliefMirror export must be removed');
+    assert.ok(appSrc.includes('window.promoteBelief=promoteBelief'), 'window.promoteBelief export must remain — promoteBelief is real, wired behavior and must not be touched');
   });
 
   test('D-313C test 11: real quick-record/full-profile labeling logic remains intact (isFullBeliefProfile)', () => {
