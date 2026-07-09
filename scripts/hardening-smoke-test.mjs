@@ -25266,6 +25266,94 @@ console.log('\nD-248A: Review card metadata density regression lock');
   });
 }
 
+// ── D-313C: Belief Engine abandoned quick-record stubs regression lock ──
+{
+  // D-313B found this exact six-item dead cluster in app-v10.js lines 148–152.
+  // These tests lock the confirmed-dead state so a future cleanup (D-313D+)
+  // can verify removal is behavior-neutral, and so nobody silently "wires up"
+  // one of these stubs to real Claim/Truth/RunPack/Drift/Review/backend
+  // behavior without updating this lock.
+
+  const dispatchMapStart = appSrc.indexOf('_D181B_ZERO_PARAM_ACTIONS={');
+  const dispatchMapEnd = appSrc.indexOf("document.addEventListener('click',function _dataAction");
+  const dispatchMapSlice = appSrc.slice(dispatchMapStart, dispatchMapEnd);
+
+  test('D-313C test 1: dispatch-map region is non-empty (sanity check for slice bounds)', () => {
+    assert.ok(dispatchMapStart !== -1 && dispatchMapEnd !== -1 && dispatchMapEnd > dispatchMapStart, 'dispatch-map slice bounds must be found');
+    assert.ok(dispatchMapSlice.length > 500, 'dispatch-map slice must contain the four action maps');
+  });
+
+  test('D-313C test 2: buildBeliefSnapshot absent from all action-dispatch maps', () => {
+    assert.ok(!dispatchMapSlice.includes('buildBeliefSnapshot'), 'buildBeliefSnapshot must remain unwired to any data-action dispatch');
+  });
+
+  test('D-313C test 3: classifyBelief absent from all action-dispatch maps', () => {
+    assert.ok(!dispatchMapSlice.includes('classifyBelief'), 'classifyBelief must remain unwired to any data-action dispatch');
+  });
+
+  test('D-313C test 4: beliefPreview absent from all action-dispatch maps', () => {
+    assert.ok(!dispatchMapSlice.includes('beliefPreview'), 'beliefPreview must remain unwired to any data-action dispatch, despite being exported to window');
+  });
+
+  test('D-313C test 5: saveBeliefMirror absent from all action-dispatch maps', () => {
+    assert.ok(!dispatchMapSlice.includes('saveBeliefMirror'), 'saveBeliefMirror must remain unwired to any data-action dispatch, despite being exported to window');
+  });
+
+  test('D-313C test 6: no live call-site invokes n(id) or v(id) helpers', () => {
+    assert.ok(!/\bn\(['"]/.test(appSrc), 'n(id) helper must have zero call sites (only its own definition may reference "n(id)")');
+    assert.ok(!/\bv\(['"]/.test(appSrc), 'v(id) helper must have zero call sites (only its own definition may reference "v(id)")');
+  });
+
+  test('D-313C test 7: index.html contains no reference to any of the six abandoned stub names', () => {
+    const stubNames = ['buildBeliefSnapshot', 'classifyBelief', 'beliefPreview', 'saveBeliefMirror'];
+    const found = stubNames.filter(n => indexSrc.includes(n));
+    assert.ok(found.length === 0, `index.html must not reference: ${found.join(', ')}`);
+  });
+
+  test('D-313C test 8: stub function bodies remain exactly as audited (no accidental behavior added)', () => {
+    assert.ok(appSrc.includes('function buildBeliefSnapshot(){return{}}'), 'buildBeliefSnapshot() must remain an empty-object stub');
+    assert.ok(appSrc.includes("function classifyBelief(){return'open belief'}"), 'classifyBelief() must remain a hardcoded-string stub');
+    assert.ok(appSrc.includes('function beliefPreview(){}'), 'beliefPreview() must remain an empty no-op');
+    assert.ok(appSrc.includes("async function saveBeliefMirror(){location.href='/apps/humanx-belief-engine/'}"), 'saveBeliefMirror() must remain a pure redirect with no save behavior');
+  });
+
+  test('D-313C test 9: stub cluster contains no fetch/API/backend calls', () => {
+    const stubIdx = appSrc.indexOf('function n(id)');
+    const stubEnd = appSrc.indexOf('async function promoteBelief');
+    const stubSlice = appSrc.slice(stubIdx, stubEnd);
+    const riskyMarkers = ['fetch(', '/api/', 'promoteBelief(', 'generateRunPack', 'localStorage', 'sessionStorage'];
+    const foundRisky = riskyMarkers.filter(m => stubSlice.includes(m));
+    assert.ok(foundRisky.length === 0, `stub cluster must not reference: ${foundRisky.join(', ')}`);
+  });
+
+  test('D-313C test 10: stub cluster creates no Claim/Truth/RunPack/Drift/Review behavior', () => {
+    const stubIdx = appSrc.indexOf('function n(id)');
+    const stubEnd = appSrc.indexOf('async function promoteBelief');
+    const stubSlice = appSrc.slice(stubIdx, stubEnd);
+    const creationMarkers = ['/api/claims', '/api/truths', '/api/runpack', '/api/belief-promote', 'review_state'];
+    const foundCreation = creationMarkers.filter(m => stubSlice.includes(m));
+    assert.ok(foundCreation.length === 0, `stub cluster must not reference: ${foundCreation.join(', ')}`);
+  });
+
+  test('D-313C test 11: real quick-record/full-profile labeling logic remains intact (isFullBeliefProfile)', () => {
+    assert.ok(appSrc.includes('isFullBeliefProfile'), 'isFullBeliefProfile must remain defined — this is live, tested display logic, not part of the dead stub cluster');
+  });
+
+  test('D-313C test 12: real quick-record/full-profile card rendering remains intact (beliefSnapshotCard)', () => {
+    assert.ok(appSrc.includes('function beliefSnapshotCard(s)'), 'beliefSnapshotCard must remain defined — renders real full/quick snapshot cards, not part of the dead stub cluster');
+    assert.ok(appSrc.includes("full?'full profile':") , 'beliefSnapshotCard must still label full vs. quick snapshots');
+  });
+
+  test('D-313C test 13: belief-drift-expansion.js quick-record badge rendering remains intact', () => {
+    const driftSrc313 = readFileSync(path.join(__dirname, '../public/belief-drift-expansion.js'), 'utf8');
+    assert.ok(driftSrc313.includes('quick record'), 'belief-drift-expansion.js must still render the "quick record" badge label — this is live display logic, not part of the dead stub cluster');
+  });
+
+  test('D-313C test 14: promoteBelief (the real, wired neighbor function) remains correctly dispatched', () => {
+    assert.ok(dispatchMapSlice.includes('promoteBelief:b=>promoteBelief(b.dataset.id,b.dataset.value)'), 'promoteBelief must remain wired in _D181F_DUAL_ACTIONS — confirms the dispatch-map check itself is meaningful, not a false negative');
+  });
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
