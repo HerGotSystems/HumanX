@@ -7,6 +7,8 @@ const schema=await readFile(new URL('../migrations/0010_untested_schema.sql',imp
 const triggers=await readFile(new URL('../migrations/0011_untested_triggers.sql',import.meta.url),'utf8');
 const entry=await readFile(new URL('../src/worker-entry.js',import.meta.url),'utf8');
 const ui=await readFile(new URL('../public/apps/untested/index.html',import.meta.url),'utf8');
+const localSmoke=await readFile(new URL('./untested-trigger-smoke.py',import.meta.url),'utf8');
+const remoteSmoke=await readFile(new URL('./untested-remote-trigger-smoke.mjs',import.meta.url),'utf8');
 
 for(const table of ['untested_instrument_versions','untested_instrument_copy','untested_confidence_definitions','untested_scenario_definitions','untested_variant_definitions','untested_choice_definitions','untested_sessions','untested_responses']) test(`schema contains ${table}`,()=>assert.ok(schema.includes(`CREATE TABLE IF NOT EXISTS ${table}`)));
 test('responses use composite session/version FK',()=>assert.ok(schema.includes('FOREIGN KEY (session_id, instrument_version)')));
@@ -21,8 +23,14 @@ for(const name of ['copy','conf','scenario','variant','choice']){
 }
 test('session trigger requires sealed hash',()=>assert.ok(triggers.includes('sealed_at IS NOT NULL')&&triggers.includes('content_hash IS NOT NULL')));
 test('entry delegates non-UNTESTED traffic',()=>assert.ok(entry.includes('return humanxWorker.fetch(request, env, ctx)')));
+test('anonymous session route is rate-limited',()=>assert.ok(entry.includes("url.pathname === '/api/untested/session'")&&entry.includes('untested-session:')&&entry.includes('UNTESTED_SESSION_LIMIT')));
+test('UNTESTED rate limit fails closed',()=>assert.ok(entry.includes("error: 'RATE_LIMIT_UNAVAILABLE'")&&entry.includes('status: 503')));
 test('UI states limitation',()=>assert.ok(ui.includes('This does not test what you would actually do')));
 test('UI has no consistency score',()=>assert.ok(ui.includes('There is no consistency score')));
+test('local trigger smoke uses in-memory SQLite',()=>assert.ok(localSmoke.includes('sqlite3.connect(":memory:")')));
+test('local trigger smoke covers stale seal',()=>assert.ok(localSmoke.includes('stale revision cannot seal')));
+test('remote probe requires explicit irreversible confirmation',()=>assert.ok(remoteSmoke.includes('LEAVE_SEALED_SMOKE_VERSION')));
+test('remote probe never applies migrations',()=>assert.ok(!remoteSmoke.includes('migrations apply')&&!remoteSmoke.includes('--file')));
 
 const bundle=UNTESTED_TESTING.authoredBundle();
 UNTESTED_TESTING.validateBundle(bundle);
