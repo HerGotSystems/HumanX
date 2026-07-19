@@ -11,6 +11,9 @@
  *     --database humanx --confirm-live-write LEAVE_SEALED_SMOKE_VERSION
  */
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const args = process.argv.slice(2);
 const valueAfter = flag => {
@@ -30,18 +33,30 @@ const session = `unt-smoke-${Date.now()}`;
 let passed = 0;
 
 function wrangler(sql, { expectFailure = false, marker = '' } = {}) {
-  const run = spawnSync(
-    'npx',
-    ['wrangler', 'd1', 'execute', database, '--remote', '--command', sql],
-    { encoding: 'utf8', shell: process.platform === 'win32' }
-  );
-  const launchError = run.error ? `${run.error.name}: ${run.error.message}` : '';
-  const output = `${run.stdout || ''}\n${run.stderr || ''}${launchError ? `\n${launchError}` : ''}`;
+  const dir = mkdtempSync(join(tmpdir(), 'humanx-untested-smoke-'));
+  const file = join(dir, 'statement.sql');
+  writeFileSync(file, `${sql.trim()}\n`, 'utf8');
+
+  let run;
+  try {
+    if (process.platform === 'win32') {
+      const comspec = process.env.ComSpec || 'cmd.exe';
+      const command = `npx wrangler d1 execute "${database}" --remote --yes --file="${file}"`;
+      run = spawnSync(comspec, ['/d', '/s', '/c', command], { encoding: 'utf8' });
+    } else {
+      run = spawnSync('npx', ['wrangler', 'd1', 'execute', database, '--remote', '--yes', '--file', file], { encoding: 'utf8' });
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+
+  const launchError = run?.error ? `${run.error.name}: ${run.error.message}` : '';
+  const output = `${run?.stdout || ''}\n${run?.stderr || ''}${launchError ? `\n${launchError}` : ''}`;
   if (expectFailure) {
-    if (run.status === 0) throw new Error(`Expected failure but command succeeded:\n${sql}`);
+    if (run?.status === 0) throw new Error(`Expected failure but command succeeded:\n${sql}`);
     if (marker && !output.includes(marker)) throw new Error(`Expected ${marker}, got:\n${output}`);
-  } else if (run.status !== 0) {
-    throw new Error(`Command failed (${run.status}):\n${sql}\n${output}`);
+  } else if (run?.status !== 0) {
+    throw new Error(`Command failed (${run?.status}):\n${sql}\n${output}`);
   }
   return output;
 }
