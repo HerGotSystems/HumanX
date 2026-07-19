@@ -31,8 +31,19 @@ if (!database || confirmation !== 'LEAVE_SEALED_SMOKE_VERSION') {
 const version = `untested-smoke-${Date.now()}`;
 const session = `unt-smoke-${Date.now()}`;
 let passed = 0;
+let sealed = false;
 
-function wrangler(sql, { expectFailure = false, marker = '' } = {}) {
+function windowsRun(command) {
+  const comspec = process.env.ComSpec || 'cmd.exe';
+  return spawnSync(comspec, ['/d', '/s', '/c', command], { encoding: 'utf8' });
+}
+
+function outputFor(run) {
+  const launchError = run?.error ? `${run.error.name}: ${run.error.message}` : '';
+  return `${run?.stdout || ''}\n${run?.stderr || ''}${launchError ? `\n${launchError}` : ''}`;
+}
+
+function mutation(sql, { expectFailure = false, marker = '' } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'humanx-untested-smoke-'));
   const file = join(dir, 'statement.sql');
   writeFileSync(file, `${sql.trim()}\n`, 'utf8');
@@ -40,9 +51,7 @@ function wrangler(sql, { expectFailure = false, marker = '' } = {}) {
   let run;
   try {
     if (process.platform === 'win32') {
-      const comspec = process.env.ComSpec || 'cmd.exe';
-      const command = `npx wrangler d1 execute ${database} --remote --yes --file="${file}"`;
-      run = spawnSync(comspec, ['/d', '/s', '/c', command], { encoding: 'utf8' });
+      run = windowsRun(`npx wrangler d1 execute ${database} --remote --yes --file="${file}"`);
     } else {
       run = spawnSync('npx', ['wrangler', 'd1', 'execute', database, '--remote', '--yes', '--file', file], { encoding: 'utf8' });
     }
@@ -50,8 +59,7 @@ function wrangler(sql, { expectFailure = false, marker = '' } = {}) {
     rmSync(dir, { recursive: true, force: true });
   }
 
-  const launchError = run?.error ? `${run.error.name}: ${run.error.message}` : '';
-  const output = `${run?.stdout || ''}\n${run?.stderr || ''}${launchError ? `\n${launchError}` : ''}`;
+  const output = outputFor(run);
   if (expectFailure) {
     if (run?.status === 0) throw new Error(`Expected failure but command succeeded:\n${sql}`);
     if (marker && !output.includes(marker)) throw new Error(`Expected ${marker}, got:\n${output}`);
@@ -61,62 +69,131 @@ function wrangler(sql, { expectFailure = false, marker = '' } = {}) {
   return output;
 }
 
+function query(sql) {
+  let run;
+  if (process.platform === 'win32') {
+    const escaped = sql.replaceAll('"', '""');
+    run = windowsRun(`npx wrangler d1 execute ${database} --remote --yes --json --command="${escaped}"`);
+  } else {
+    run = spawnSync('npx', ['wrangler', 'd1', 'execute', database, '--remote', '--yes', '--json', '--command', sql], { encoding: 'utf8' });
+  }
+
+  const output = outputFor(run);
+  if (run?.status !== 0) throw new Error(`Query failed (${run?.status}):\n${sql}\n${output}`);
+
+  const clean = String(run.stdout || '').replace(/\x1B\[[0-?]*[ -\/]*[@-~]/g, '').trim();
+  const start = clean.indexOf('[');
+  const end = clean.lastIndexOf(']');
+  if (start < 0 || end < start) throw new Error(`Could not parse Wrangler JSON output:\n${output}`);
+
+  let payload;
+  try {
+    payload = JSON.parse(clean.slice(start, end + 1));
+  } catch (error) {
+    throw new Error(`Invalid Wrangler JSON output: ${error.message}\n${output}`);
+  }
+  return payload.flatMap(item => Array.isArray(item?.results) ? item.results : []);
+}
+
 function check(name, fn) {
   fn();
   passed += 1;
   console.log(`PASS ${name}`);
 }
 
+function cleanupSessions() {
+  mutation(`DELETE FROM untested_sessions WHERE session_id IN ('${session}','${session}-early');`);
+}
+
+function cleanupDraftVersion(draftVersion) {
+  mutation(`DELETE FROM untested_sessions WHERE instrument_version='${draftVersion}';`);
+  mutation(`DELETE FROM untested_choice_definitions WHERE instrument_version='${draftVersion}';`);
+  mutation(`DELETE FROM untested_variant_definitions WHERE instrument_version='${draftVersion}';`);
+  mutation(`DELETE FROM untested_scenario_definitions WHERE instrument_version='${draftVersion}';`);
+  mutation(`DELETE FROM untested_confidence_definitions WHERE instrument_version='${draftVersion}';`);
+  mutation(`DELETE FROM untested_instrument_copy WHERE instrument_version='${draftVersion}';`);
+  mutation(`DELETE FROM untested_instrument_versions WHERE instrument_version='${draftVersion}' AND sealed_at IS NULL;`);
+}
+
+function cleanupDraft() {
+  cleanupDraftVersion(version);
+}
+
+function cleanupAbandonedDrafts() {
+  const rows = query("SELECT instrument_version FROM untested_instrument_versions WHERE instrument_version GLOB 'untested-smoke-*' AND sealed_at IS NULL ORDER BY instrument_version;");
+  for (const row of rows) cleanupDraftVersion(row.instrument_version);
+  if (rows.length) console.log(`Cleaned ${rows.length} abandoned unsealed smoke draft(s).`);
+}
+
 console.log(`Remote D1: ${database}`);
 console.log(`Permanent sealed smoke version: ${version}`);
 
-check('create draft version', () => wrangler(
-  `INSERT INTO untested_instrument_versions (instrument_version,created_at) VALUES ('${version}',${Date.now()});`
-));
+try {
+  cleanupAbandonedDrafts();
 
-check('unsealed session rejected', () => wrangler(
-  `INSERT INTO untested_sessions (session_id,instrument_version,created_at) VALUES ('${session}-early','${version}',${Date.now()});`,
-  { expectFailure: true, marker: 'UNTESTED_VERSION_NOT_SEALED' }
-));
+  check('create draft version', () => mutation(
+    `INSERT INTO untested_instrument_versions (instrument_version,created_at) VALUES ('${version}',${Date.now()});`
+  ));
 
-check('definition insert increments revision', () => {
-  wrangler(`INSERT INTO untested_instrument_copy VALUES ('${version}','open','close','confidence','results');`);
-  const output = wrangler(`SELECT draft_revision FROM untested_instrument_versions WHERE instrument_version='${version}';`);
-  if (!/draft_revision[\s\S]*1/.test(output)) throw new Error(`Expected draft_revision=1, got:\n${output}`);
-});
+  check('unsealed session rejected', () => mutation(
+    `INSERT INTO untested_sessions (session_id,instrument_version,created_at) VALUES ('${session}-early','${version}',${Date.now()});`,
+    { expectFailure: true, marker: 'UNTESTED_VERSION_NOT_SEALED' }
+  ));
 
-check('stale revision cannot seal', () => {
-  wrangler(`UPDATE untested_instrument_copy SET opening_text='open-2' WHERE instrument_version='${version}';`);
-  wrangler(`UPDATE untested_instrument_versions SET content_hash='${'a'.repeat(64)}',sealed_at=${Date.now()} WHERE instrument_version='${version}' AND sealed_at IS NULL AND draft_revision=1;`);
-  const output = wrangler(`SELECT sealed_at,draft_revision FROM untested_instrument_versions WHERE instrument_version='${version}';`);
-  if (!/draft_revision[\s\S]*2/.test(output) || !/sealed_at[\s\S]*null/i.test(output)) throw new Error(`Stale seal was not rejected:\n${output}`);
-});
+  check('definition insert increments revision', () => {
+    mutation(`INSERT INTO untested_instrument_copy VALUES ('${version}','open','close','confidence','results');`);
+    const row = query(`SELECT draft_revision FROM untested_instrument_versions WHERE instrument_version='${version}';`)[0];
+    if (Number(row?.draft_revision) !== 1) throw new Error(`Expected draft_revision=1, got ${JSON.stringify(row)}`);
+  });
 
-check('matching revision seals', () => wrangler(
-  `UPDATE untested_instrument_versions SET content_hash='${'b'.repeat(64)}',sealed_at=${Date.now()} WHERE instrument_version='${version}' AND sealed_at IS NULL AND draft_revision=2;`
-));
+  check('stale revision cannot seal', () => {
+    mutation(`UPDATE untested_instrument_copy SET opening_text='open-2' WHERE instrument_version='${version}';`);
+    mutation(`UPDATE untested_instrument_versions SET content_hash='${'a'.repeat(64)}',sealed_at=${Date.now()} WHERE instrument_version='${version}' AND sealed_at IS NULL AND draft_revision=1;`);
+    const row = query(`SELECT sealed_at,draft_revision FROM untested_instrument_versions WHERE instrument_version='${version}';`)[0];
+    if (Number(row?.draft_revision) !== 2 || row?.sealed_at !== null) throw new Error(`Stale seal was not rejected: ${JSON.stringify(row)}`);
+  });
 
-check('session accepted after seal', () => wrangler(
-  `INSERT INTO untested_sessions (session_id,instrument_version,created_at) VALUES ('${session}','${version}',${Date.now()});`
-));
+  check('matching revision seals', () => {
+    const expectedHash = 'b'.repeat(64);
+    mutation(`UPDATE untested_instrument_versions SET content_hash='${expectedHash}',sealed_at=${Date.now()} WHERE instrument_version='${version}' AND sealed_at IS NULL AND draft_revision=2;`);
+    const row = query(`SELECT content_hash,sealed_at FROM untested_instrument_versions WHERE instrument_version='${version}';`)[0];
+    if (row?.content_hash !== expectedHash || row?.sealed_at === null || row?.sealed_at === undefined) throw new Error(`Matching seal failed: ${JSON.stringify(row)}`);
+    sealed = true;
+  });
 
-check('sealed insert rejected', () => wrangler(
-  `INSERT INTO untested_confidence_definitions VALUES ('${version}',0,'No',0);`,
-  { expectFailure: true, marker: 'UNTESTED_VERSION_SEALED' }
-));
-check('sealed update rejected', () => wrangler(
-  `UPDATE untested_instrument_copy SET opening_text='mutated' WHERE instrument_version='${version}';`,
-  { expectFailure: true, marker: 'UNTESTED_VERSION_SEALED' }
-));
-check('sealed delete rejected', () => wrangler(
-  `DELETE FROM untested_instrument_copy WHERE instrument_version='${version}';`,
-  { expectFailure: true, marker: 'UNTESTED_VERSION_SEALED' }
-));
-check('sealed version mutation rejected', () => wrangler(
-  `UPDATE untested_instrument_versions SET content_hash='${'c'.repeat(64)}' WHERE instrument_version='${version}';`,
-  { expectFailure: true, marker: 'UNTESTED_VERSION_IMMUTABLE' }
-));
+  check('session accepted after seal', () => mutation(
+    `INSERT INTO untested_sessions (session_id,instrument_version,created_at) VALUES ('${session}','${version}',${Date.now()});`
+  ));
 
-wrangler(`DELETE FROM untested_sessions WHERE session_id='${session}';`);
-console.log(`\n${passed} passed, 0 failed`);
-console.log(`Sealed smoke version retained intentionally: ${version}`);
+  check('sealed insert rejected', () => mutation(
+    `INSERT INTO untested_confidence_definitions VALUES ('${version}',0,'No',0);`,
+    { expectFailure: true, marker: 'UNTESTED_VERSION_SEALED' }
+  ));
+  check('sealed update rejected', () => mutation(
+    `UPDATE untested_instrument_copy SET opening_text='mutated' WHERE instrument_version='${version}';`,
+    { expectFailure: true, marker: 'UNTESTED_VERSION_SEALED' }
+  ));
+  check('sealed delete rejected', () => mutation(
+    `DELETE FROM untested_instrument_copy WHERE instrument_version='${version}';`,
+    { expectFailure: true, marker: 'UNTESTED_VERSION_SEALED' }
+  ));
+  check('sealed version mutation rejected', () => mutation(
+    `UPDATE untested_instrument_versions SET content_hash='${'c'.repeat(64)}' WHERE instrument_version='${version}';`,
+    { expectFailure: true, marker: 'UNTESTED_VERSION_IMMUTABLE' }
+  ));
+
+  cleanupSessions();
+  console.log(`\n${passed} passed, 0 failed`);
+  console.log(`Sealed smoke version retained intentionally: ${version}`);
+} catch (error) {
+  try {
+    if (sealed) cleanupSessions();
+    else cleanupDraft();
+    console.error(sealed
+      ? `Cleaned smoke sessions; sealed version retained: ${version}`
+      : `Cleaned interrupted unsealed smoke draft: ${version}`);
+  } catch (cleanupError) {
+    console.error(`Cleanup failed for ${version}: ${cleanupError.message}`);
+  }
+  throw error;
+}
