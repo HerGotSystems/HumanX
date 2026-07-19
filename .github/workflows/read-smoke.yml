@@ -1,12 +1,8 @@
 name: HumanX Read Smoke
 
-# Triggers:
-#   - workflow_dispatch: manual run from GitHub Actions UI
-#   - pull_request: runs on every PR to main (read-only, no secrets required)
-#
-# This workflow only calls GET endpoints on the live HumanX Worker.
-# It does not mutate any data, does not use Wrangler, does not touch D1,
-# and does not require any GitHub secrets.
+# PR runs validate the checked-out branch without touching live infrastructure.
+# Manual workflow_dispatch runs keep the original read-only production smoke.
+# Neither path performs POST/PUT/PATCH/DELETE, Wrangler, D1 commands, or migrations.
 
 on:
   workflow_dispatch:
@@ -31,7 +27,16 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Run read-only smoke test
+      - name: Validate PR branch
+        if: github.event_name == 'pull_request'
+        run: |
+          node --check src/worker-entry.js
+          node --check src/untested.js
+          node scripts/untested-static-check.mjs
+          python3 scripts/untested-trigger-smoke.py
+
+      - name: Run production read-only smoke test
+        if: github.event_name == 'workflow_dispatch'
         env:
           HUMANX_BASE_URL: https://humanx.rinkimirikata.com
         run: node scripts/read-endpoint-smoke-test.mjs
