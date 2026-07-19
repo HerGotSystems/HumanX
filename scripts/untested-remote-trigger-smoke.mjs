@@ -41,7 +41,7 @@ function wrangler(sql, { expectFailure = false, marker = '' } = {}) {
   try {
     if (process.platform === 'win32') {
       const comspec = process.env.ComSpec || 'cmd.exe';
-      const command = `npx wrangler d1 execute "${database}" --remote --yes --file="${file}"`;
+      const command = `npx wrangler d1 execute ${database} --remote --yes --file="${file}"`;
       run = spawnSync(comspec, ['/d', '/s', '/c', command], { encoding: 'utf8' });
     } else {
       run = spawnSync('npx', ['wrangler', 'd1', 'execute', database, '--remote', '--yes', '--file', file], { encoding: 'utf8' });
