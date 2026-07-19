@@ -31,11 +31,12 @@ let passed = 0;
 
 function wrangler(sql, { expectFailure = false, marker = '' } = {}) {
   const run = spawnSync(
-    process.platform === 'win32' ? 'npx.cmd' : 'npx',
+    'npx',
     ['wrangler', 'd1', 'execute', database, '--remote', '--command', sql],
-    { encoding: 'utf8' }
+    { encoding: 'utf8', shell: process.platform === 'win32' }
   );
-  const output = `${run.stdout || ''}\n${run.stderr || ''}`;
+  const launchError = run.error ? `${run.error.name}: ${run.error.message}` : '';
+  const output = `${run.stdout || ''}\n${run.stderr || ''}${launchError ? `\n${launchError}` : ''}`;
   if (expectFailure) {
     if (run.status === 0) throw new Error(`Expected failure but command succeeded:\n${sql}`);
     if (marker && !output.includes(marker)) throw new Error(`Expected ${marker}, got:\n${output}`);
