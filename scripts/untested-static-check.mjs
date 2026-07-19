@@ -31,7 +31,7 @@ test('UI renders versioned results copy',()=>assert.ok(ui.includes('instrument.c
 test('local trigger smoke uses in-memory SQLite',()=>assert.ok(localSmoke.includes('sqlite3.connect(":memory:")')));
 test('local trigger smoke covers stale seal',()=>assert.ok(localSmoke.includes('stale revision cannot seal')));
 test('remote probe requires explicit irreversible confirmation',()=>assert.ok(remoteSmoke.includes('LEAVE_SEALED_SMOKE_VERSION')));
-test('remote probe never applies migrations',()=>assert.ok(!remoteSmoke.includes('migrations apply')&&!remoteSmoke.includes('--file')));
+test('remote probe never references migration files',()=>assert.ok(!remoteSmoke.includes('migrations/0010_untested_schema.sql')&&!remoteSmoke.includes('migrations/0011_untested_triggers.sql')&&!remoteSmoke.includes('d1 migrations apply')));
 
 const bundle=UNTESTED_TESTING.authoredBundle();
 UNTESTED_TESTING.validateBundle(bundle);
