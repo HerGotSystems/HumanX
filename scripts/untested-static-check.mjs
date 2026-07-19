@@ -25,8 +25,9 @@ test('session trigger requires sealed hash',()=>assert.ok(triggers.includes('sea
 test('entry delegates non-UNTESTED traffic',()=>assert.ok(entry.includes('return humanxWorker.fetch(request, env, ctx)')));
 test('anonymous session route is rate-limited',()=>assert.ok(entry.includes("url.pathname === '/api/untested/session'")&&entry.includes('untested-session:')&&entry.includes('UNTESTED_SESSION_LIMIT')));
 test('UNTESTED rate limit fails closed',()=>assert.ok(entry.includes("error: 'RATE_LIMIT_UNAVAILABLE'")&&entry.includes('status: 503')));
-test('UI states limitation',()=>assert.ok(ui.includes('This does not test what you would actually do')));
-test('UI has no consistency score',()=>assert.ok(ui.includes('There is no consistency score')));
+test('UI renders versioned opening copy',()=>assert.ok(ui.includes('instrument.copy.opening_text')));
+test('UI renders versioned confidence copy',()=>assert.ok(ui.includes('instrument.copy.confidence_prompt_text')));
+test('UI renders versioned results copy',()=>assert.ok(ui.includes('instrument.copy.results_intro_text')&&ui.includes('instrument.copy.closing_text')));
 test('local trigger smoke uses in-memory SQLite',()=>assert.ok(localSmoke.includes('sqlite3.connect(":memory:")')));
 test('local trigger smoke covers stale seal',()=>assert.ok(localSmoke.includes('stale revision cannot seal')));
 test('remote probe requires explicit irreversible confirmation',()=>assert.ok(remoteSmoke.includes('LEAVE_SEALED_SMOKE_VERSION')));
@@ -34,6 +35,8 @@ test('remote probe never applies migrations',()=>assert.ok(!remoteSmoke.includes
 
 const bundle=UNTESTED_TESTING.authoredBundle();
 UNTESTED_TESTING.validateBundle(bundle);
+test('canonical opening states limitation',()=>assert.ok(bundle.copy.opening_text.includes('This does not test what you would actually do')));
+test('canonical results copy rejects consistency score',()=>assert.ok(bundle.copy.results_intro_text.includes('There is no consistency score')));
 const first=await UNTESTED_TESTING.sha256(bundle);
 const second=await UNTESTED_TESTING.sha256(JSON.parse(JSON.stringify(bundle)));
 test('canonical SHA-256 fixture is deterministic',()=>assert.equal(first,second));
