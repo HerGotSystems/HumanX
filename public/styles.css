@@ -749,7 +749,7 @@ details[open]>.dock-section-head::after{transform:rotate(90deg)}
 .rov-rej{border-color:#ff3b5c40;color:#ff3b5c}
 .rov-pressure{border-color:#f0a83a40;color:#f0a83a}
 .rov-sep{width:1px;height:10px;background:var(--line);margin:0 2px}.review-kb-hint{font-size:9px;color:var(--muted);letter-spacing:.04em;padding:3px 0;margin-top:3px;opacity:.7}
-.commandbar{position:relative}
+.commandbar{position:relative}.main-language-switch{display:flex;align-items:center;gap:3px;margin-left:auto;padding:3px;border:1px solid var(--line);border-radius:999px;background:#080b12}.main-language-switch a{min-width:34px;padding:5px 8px;border-radius:999px;color:var(--muted);font-size:10px;font-weight:800;text-align:center;text-decoration:none}.main-language-switch a:hover{color:var(--text)}.main-language-switch a.active{background:rgba(87,184,255,.16);box-shadow:inset 0 0 0 1px rgba(87,184,255,.5);color:var(--text)}
 .who-verified{color:var(--green);border-color:#39ff9f66}
 .account-panel-popover{position:absolute;top:32px;right:0;z-index:60;width:240px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 14px 34px #000a}
 .account-panel-popover[hidden]{display:none}
@@ -936,4 +936,5 @@ details[open].me-avatar-why .me-avatar-why-summary::before{content:'▾ '}
 .inv-overview-desc{color:var(--muted);margin:4px 0 0}
 .inv-overview-note{margin:4px 0 2px}
 @media(max-width:900px){.inv-overview[open] .inv-overview-grid{grid-template-columns:1fr}}
+.main-language-switch{margin-left:0}
 @media print{details.inv-overview{display:block}details.inv-overview>*{display:revert}}
