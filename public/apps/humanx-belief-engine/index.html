@@ -2686,7 +2686,7 @@ function drawShareCard(scores,alignments,contradictions){
     const v=meta[k]??50;
     const color=v>65?'#39ff9f':v<35?'#ff3b5c':'#57b8ff';
     ctx.fillStyle=color;ctx.font=`bold 22px Syne,sans-serif`;ctx.fillText(v,x,y+18);
-    ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';ctx.fillText(l,x,y+30);
+    ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';ctx.fillText(hxDisplay(l),x,y+30);
     ctx.fillStyle='#1a2035';ctx.fillRect(x,y+36,120,4);
     ctx.fillStyle=color;ctx.fillRect(x,y+36,v*1.2,4);
   });
@@ -2696,16 +2696,16 @@ function drawShareCard(scores,alignments,contradictions){
   if(origin[0]){
     ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';ctx.fillText('ORIGIN SIGNAL',320,290);
     ctx.fillStyle='#c8d0e0';ctx.font='12px Inter,sans-serif';
-    wrapTextCard(ctx,origin[0],320,308,560,16);
+    wrapTextCard(ctx,hxDisplay(origin[0]),320,308,560,16);
   }
 
   // Stress test signal
   const stress=state.metaReport?.stress||[];
   if(stress[0]){
     ctx.fillStyle='#8c97ad';ctx.font='10px Inter,sans-serif';ctx.fillText('STRESS POSITION',320,358);
-    ctx.fillStyle='#facc15';ctx.font='bold 12px Inter,sans-serif';ctx.fillText(stress[0][0],320,374);
+    ctx.fillStyle='#facc15';ctx.font='bold 12px Inter,sans-serif';ctx.fillText(hxDisplay(stress[0][0]),320,374);
     ctx.fillStyle='#c8d0e0';ctx.font='11px Inter,sans-serif';
-    wrapTextCard(ctx,stress[0][1],320,390,560,15);
+    wrapTextCard(ctx,hxDisplay(stress[0][1]),320,390,560,15);
   }
 
   // Behavioral top signals
@@ -2717,7 +2717,7 @@ function drawShareCard(scores,alignments,contradictions){
     const lv=behavLevel(b.score);
     const y=433+i*18;
     ctx.fillStyle=lv.color;ctx.font='bold 11px Inter,sans-serif';
-    ctx.fillText(`${lv.label.toUpperCase()}  ${b.label}`,320,y);
+    ctx.fillText(`${hxDisplay(lv.label).toUpperCase()}  ${hxDisplay(b.label)}`,320,y);
   });
   ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(40,450);ctx.lineTo(W-40,450);ctx.stroke();
@@ -2787,6 +2787,6 @@ window.state = state;
 render();
 </script>
 <script src="./humanx-bridge.js"></script>
-<script type="module" src="./belief-language.js?v=3"></script>
+<script type="module" src="./belief-language.js?v=4"></script>
 </body>
 </html>
