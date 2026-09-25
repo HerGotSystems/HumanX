@@ -1,5 +1,6 @@
 import { BELIEF_CATEGORIES_CS, BELIEF_EXACT_CS, BELIEF_PLACEHOLDERS_CS, BELIEF_QUESTIONS_CS, BELIEF_TIMELINE_CS } from './belief-copy.js';
 import { BELIEF_IDENTITY_OPTIONS_CS, BELIEF_WORLDVIEW_GROUPS_CS, BELIEF_WORLDVIEWS_CS } from './belief-worldviews-cs.js';
+import { BELIEF_CONTRADICTIONS_CS, BELIEF_DIMENSIONS_CS, BELIEF_SYSTEMS_CS } from './belief-results-cs.js';
 import { languageSwitcherMarkup, pathWithLanguage, resolveLanguage } from '../shared/language.js';
 
 const language = resolveLanguage({ search: location.search, browserLanguage: navigator.language });
@@ -25,6 +26,9 @@ function translateDynamic(value) {
     if (group.sourceNote && text === group.sourceNote) return group.note;
   }
   if (BELIEF_WORLDVIEWS_CS[text]) return BELIEF_WORLDVIEWS_CS[text].label;
+  if (BELIEF_DIMENSIONS_CS[text]) return BELIEF_DIMENSIONS_CS[text].label;
+  if (BELIEF_SYSTEMS_CS[text]) return BELIEF_SYSTEMS_CS[text].label;
+  if (BELIEF_CONTRADICTIONS_CS[text]) return BELIEF_CONTRADICTIONS_CS[text].label;
   let match = text.match(/^Category (\d+) of (\d+)$/);
   if (match) return `Kategorie ${match[1]} z ${match[2]}`;
   match = text.match(/^(\d+)\/(\d+) answered$/);
@@ -152,6 +156,18 @@ window.HX_BELIEF_I18N = Object.freeze({
   worldview(label, fallbackDescription = '') {
     if (language !== 'cs') return { label, desc: fallbackDescription };
     return BELIEF_WORLDVIEWS_CS[label] || { label, desc: fallbackDescription };
+  },
+  dimension(label, fallbackDescription = '') {
+    if (language !== 'cs') return { label, desc: fallbackDescription };
+    return BELIEF_DIMENSIONS_CS[label] || { label, desc: fallbackDescription };
+  },
+  system(name, fallbackDescription = '') {
+    if (language !== 'cs') return { label: name, desc: fallbackDescription };
+    return BELIEF_SYSTEMS_CS[name] || { label: name, desc: fallbackDescription };
+  },
+  contradiction(title, fallbackDescription = '') {
+    if (language !== 'cs') return { label: title, desc: fallbackDescription };
+    return BELIEF_CONTRADICTIONS_CS[title] || { label: title, desc: fallbackDescription };
   },
   text(key, english) {
     if (language !== 'cs') return english;

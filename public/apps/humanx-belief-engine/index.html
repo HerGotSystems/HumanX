@@ -1998,7 +1998,7 @@ function renderForensicDimBars(scores){
   el.innerHTML=FORENSIC_DIMS.map(d=>{
     const v=scores[d.k]??50;
     return`<div class="dim-row">
-      <span class="dim-name">${d.label}</span>
+      <span class="dim-name">${escHtml(hxDisplay(d.label))}</span>
       <div class="dim-bar"><div class="dim-fill" style="width:${v}%;background:${d.color}"></div></div>
       <span class="dim-score">${v}</span>
     </div>`;
@@ -2166,12 +2166,12 @@ function renderFragmentation(scores){
   const fp=$id('frag-panel');
   if(!fp)return;
   const frags=calcFragmentation(scores);
-  const top3=frags.slice(0,3).map(f=>f.name).join(' · ');
+  const top3=frags.slice(0,3).map(f=>hxDisplay(f.name)).join(' · ');
   fp.innerHTML=`
     <div class="frag-bars">
       ${frags.slice(0,8).map(f=>`
         <div class="frag-row">
-          <span class="frag-name">${escHtml(f.name)}</span>
+          <span class="frag-name">${escHtml(hxDisplay(f.name))}</span>
           <div class="frag-pct-bar"><div class="frag-pct-fill" style="width:${f.pct}%"></div></div>
           <span class="frag-pct-num">${f.pct}%</span>
         </div>`).join('')}
@@ -2408,7 +2408,7 @@ function renderResults(){
   const top2=DIMS.slice().sort((a,b)=>(scores[b.k]??50)-(scores[a.k]??50)).slice(0,2);
   const bot2=DIMS.slice().sort((a,b)=>(scores[a.k]??50)-(scores[b.k]??50)).slice(0,2);
   $id('results-tagline').textContent=
-    `High ${top2.map(d=>d.label).join(' · ')}  ·  Low ${bot2.map(d=>d.label).join(' · ')}`;
+    `High ${top2.map(d=>hxDisplay(d.label)).join(' · ')}  ·  Low ${bot2.map(d=>hxDisplay(d.label)).join(' · ')}`;
 
   const mp=$id('result-mode-pill');
   if(mp){
@@ -2421,37 +2421,41 @@ function renderResults(){
   $id('dim-bars').innerHTML=DIMS.map(d=>{
     const v=scores[d.k]??50;
     return`<div class="dim-row">
-      <span class="dim-name">${d.label}</span>
+      <span class="dim-name">${escHtml(hxDisplay(d.label))}</span>
       <div class="dim-bar"><div class="dim-fill" style="width:${v}%;background:${d.color}"></div></div>
       <span class="dim-score">${v}</span>
     </div>`;
   }).join('');
   // Alignments (top 7)
-  $id('align-list').innerHTML=alignments.slice(0,7).map(a=>`
-    <div class="align-row">
+  $id('align-list').innerHTML=alignments.slice(0,7).map(a=>{
+    const display=window.HX_BELIEF_I18N?.system?.(a.name,a.desc)||{label:a.name,desc:a.desc};
+    return`<div class="align-row">
       <div class="align-head">
-        <span class="align-name">${escHtml(a.name)}</span>
+        <span class="align-name">${escHtml(display.label)}</span>
         <span class="align-pct">${a.similarity}%</span>
       </div>
-      <div class="align-desc">${escHtml(a.desc)}</div>
+      <div class="align-desc">${escHtml(display.desc)}</div>
       <div class="align-bar"><div class="align-fill" style="width:${a.similarity}%"></div></div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   // DNA chips
   const dominant=DIMS.filter(d=>(scores[d.k]??50)>65);
   const weak=DIMS.filter(d=>(scores[d.k]??50)<35);
   $id('dna-chips').innerHTML=
-    dominant.map(d=>`<span class="dna-chip"><b style="color:${d.color}">↑</b>${d.label}</span>`).join('')+
-    weak.map(d=>`<span class="dna-chip"><b style="color:#4a5568">↓</b>${d.label}</span>`).join('')||
+    dominant.map(d=>`<span class="dna-chip"><b style="color:${d.color}">↑</b>${escHtml(hxDisplay(d.label))}</span>`).join('')+
+    weak.map(d=>`<span class="dna-chip"><b style="color:#4a5568">↓</b>${escHtml(hxDisplay(d.label))}</span>`).join('')||
     `<span style="color:var(--muted);font-size:13px">Balanced worldview — no extreme dimensions detected.</span>`;
   // Contradictions
   if(contradictions.length===0){
     $id('contra-list').innerHTML=`<p class="no-contra">No major internal contradictions detected in your responses.</p>`;
   } else {
-    $id('contra-list').innerHTML=contradictions.map(c=>`
-      <div class="contra-item ${c.severity}">
-        <div class="contra-title">${escHtml(c.title)}</div>
-        <div class="contra-desc">${escHtml(c.desc)}</div>
-      </div>`).join('');
+    $id('contra-list').innerHTML=contradictions.map(c=>{
+      const display=window.HX_BELIEF_I18N?.contradiction?.(c.title,c.desc)||{label:c.title,desc:c.desc};
+      return`<div class="contra-item ${c.severity}">
+        <div class="contra-title">${escHtml(display.label)}</div>
+        <div class="contra-desc">${escHtml(display.desc)}</div>
+      </div>`;
+    }).join('');
   }
   // V5 forensic panels
   renderForensicPanels(scores,contradictions);
@@ -2622,7 +2626,7 @@ function drawRadar(scores){
     ctx.fillStyle=d.color;
     ctx.textAlign=x<cx-5?'right':x>cx+5?'left':'center';
     ctx.textBaseline=y<cy-5?'bottom':y>cy+5?'top':'middle';
-    ctx.fillText(d.label,x,y);
+    ctx.fillText(hxDisplay(d.label),x,y);
   });
 }
 
@@ -2663,7 +2667,7 @@ function drawShareCard(scores,alignments,contradictions){
   ctx.fillText('WORLDVIEW ASSEMBLY',40,370);
   frags.slice(0,4).forEach((f,i)=>{
     const y=388+i*22;
-    ctx.fillStyle='#c8d0e0';ctx.font=`12px Inter,sans-serif`;ctx.fillText(f.name,40,y);
+    ctx.fillStyle='#c8d0e0';ctx.font=`12px Inter,sans-serif`;ctx.fillText(hxDisplay(f.name),40,y);
     ctx.fillStyle='#a066ff';ctx.font='bold 12px Inter,sans-serif';ctx.fillText(`${f.pct}%`,270,y);
   });
 
@@ -2783,6 +2787,6 @@ window.state = state;
 render();
 </script>
 <script src="./humanx-bridge.js"></script>
-<script type="module" src="./belief-language.js?v=2"></script>
+<script type="module" src="./belief-language.js?v=3"></script>
 </body>
 </html>
