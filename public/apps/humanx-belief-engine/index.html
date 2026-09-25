@@ -4,12 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>HumanX — Belief Engine</title>
+<link rel="stylesheet" href="../shared/language.css?v=1">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800;900&family=Inter:wght@400;500;600&display=swap');
 :root{
   --bg:#07080d;--panel:#10131d;--panel2:#151a27;--line:#273044;
   --text:#eef3ff;--muted:#8c97ad;--red:#ff3b5c;--green:#39ff9f;
-  --yellow:#ffd166;--blue:#57b8ff;--purple:#a066ff;--orange:#ff8c42;
+  --yellow:#ffd166;--blue:#57b8ff;--purple:#a066ff;--violet:#a066ff;--orange:#ff8c42;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -404,6 +405,9 @@ canvas#share-canvas{width:100%;border-radius:16px;border:1px solid var(--line);b
 .next-action-row{display:flex;gap:10px;flex-wrap:wrap}
 .next-action-link{flex:1;min-width:140px;border:1px solid rgba(87,184,255,.3);background:rgba(87,184,255,.06);color:var(--blue);border-radius:13px;padding:11px 14px;font-size:13px;text-align:center;text-decoration:none;display:block;transition:background .15s,border-color .15s}
 .next-action-link:hover{background:rgba(87,184,255,.12);border-color:rgba(87,184,255,.5)}
+.belief-language-wrap{position:fixed;z-index:500;top:14px;right:14px;padding:6px 8px;border:1px solid var(--line);border-radius:12px;background:rgba(7,8,13,.92);backdrop-filter:blur(10px)}
+.czech-core-note{max-width:620px;margin:0 auto 20px;padding:10px 14px;border:1px solid rgba(87,184,255,.3);border-radius:12px;background:rgba(87,184,255,.07);color:var(--blue);font-size:12px;line-height:1.5}
+@media(max-width:620px){.belief-language-wrap{position:static;align-self:flex-end;margin:10px 10px 0}.screen{padding-top:12px}}
 </style>
 </head>
 <body>
@@ -2774,5 +2778,6 @@ window.state = state;
 render();
 </script>
 <script src="./humanx-bridge.js"></script>
+<script type="module" src="./belief-language.js?v=1"></script>
 </body>
 </html>
