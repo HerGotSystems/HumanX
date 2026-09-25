@@ -1476,6 +1476,7 @@ const state = {
 };
 
 function $id(id){return document.getElementById(id)}
+function hxDisplay(value){return window.HX_BELIEF_I18N?.translate?.(value)||value}
 
 function scrollTopNow(){ requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'})); }
 function currentViewKey(){ return `${state.phase}:${state.catIndex}`; }
@@ -1758,8 +1759,9 @@ function detectContradictions(answers,scores){
 // ─── RENDER ───────────────────────────────────────────────────────────────────
 function showInfo(name, desc){
   if(!desc) return;
-  $id('info-drawer-name').textContent = name;
-  $id('info-drawer-desc').textContent = desc;
+  const display=window.HX_BELIEF_I18N?.worldview?.(name,desc)||{label:name,desc};
+  $id('info-drawer-name').textContent = display.label;
+  $id('info-drawer-desc').textContent = display.desc;
   $id('info-drawer').classList.add('open');
   $id('info-backdrop').classList.add('open');
 }
@@ -1819,16 +1821,19 @@ function renderIdentityChips(){
   // Grouped worldview — each chip gets a ? info button
   $id('chips-worldview').innerHTML = WORLDVIEW_GROUPS.map(g => `
     <div class="id-group">
-      <div class="id-group-label">${g.group}</div>
-      ${g.note ? `<div class="id-group-note">${g.note}</div>` : ''}
+      <div class="id-group-label">${escHtml(hxDisplay(g.group))}</div>
+      ${g.note ? `<div class="id-group-note">${escHtml(hxDisplay(g.note))}</div>` : ''}
       <div style="display:flex;flex-wrap:wrap;gap:0">
         ${g.options.map(o => chipPair(o.label, o.desc||'', state.identity.worldview.includes(o.label), `toggleWorldview`, false)).join('')}
       </div>
     </div>`).join('');
 
-  // God count — objects now
+  // God count — current data is strings; retain object compatibility for older saved builds
   $id('chips-godcount').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0">` +
-    GOD_COUNT_OPTIONS.map(o => chipPair(o.label, o.desc||'', state.identity.godCount===o.label, `setGodCount`, true, 'god')).join('') +
+    GOD_COUNT_OPTIONS.map(o => {
+      const label=typeof o==='string'?o:o.label;
+      return chipPair(label, typeof o==='string'?'':(o.desc||''), state.identity.godCount===label, `setGodCount`, true, 'god');
+    }).join('') +
     `</div>`;
 
   // Political
@@ -1847,7 +1852,7 @@ function chipPair(label, desc, isActive, toggleFn, isSolo, extraClass=''){
   const hasDesc = desc && desc.length > 0;
   return `<span class="chip-pair">
     <button class="id-chip ${isSolo?'solo':''} ${extraClass} ${isActive?'active':''}"
-            onclick="${toggleFn}('${safeLabel}')">${escHtml(label)}</button>${
+            onclick="${toggleFn}('${safeLabel}')">${escHtml(hxDisplay(label))}</button>${
     hasDesc ? `<button class="chip-info-btn" onclick="showInfo('${safeLabel}',\`${desc.replace(/`/g,"'")}\`)" title="What does this mean?">?</button>` : ''
   }</span>`;
 }
@@ -2778,6 +2783,6 @@ window.state = state;
 render();
 </script>
 <script src="./humanx-bridge.js"></script>
-<script type="module" src="./belief-language.js?v=1"></script>
+<script type="module" src="./belief-language.js?v=2"></script>
 </body>
 </html>

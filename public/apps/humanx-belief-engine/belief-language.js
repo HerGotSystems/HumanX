@@ -1,4 +1,5 @@
 import { BELIEF_CATEGORIES_CS, BELIEF_EXACT_CS, BELIEF_PLACEHOLDERS_CS, BELIEF_QUESTIONS_CS, BELIEF_TIMELINE_CS } from './belief-copy.js';
+import { BELIEF_IDENTITY_OPTIONS_CS, BELIEF_WORLDVIEW_GROUPS_CS, BELIEF_WORLDVIEWS_CS } from './belief-worldviews-cs.js';
 import { languageSwitcherMarkup, pathWithLanguage, resolveLanguage } from '../shared/language.js';
 
 const language = resolveLanguage({ search: location.search, browserLanguage: navigator.language });
@@ -18,6 +19,12 @@ function preserveSpacing(source, replacement) {
 function translateDynamic(value) {
   const text = String(value || '').trim();
   if (BELIEF_EXACT_CS[text]) return BELIEF_EXACT_CS[text];
+  if (BELIEF_IDENTITY_OPTIONS_CS[text]) return BELIEF_IDENTITY_OPTIONS_CS[text];
+  if (BELIEF_WORLDVIEW_GROUPS_CS[text]) return BELIEF_WORLDVIEW_GROUPS_CS[text].label;
+  for (const group of Object.values(BELIEF_WORLDVIEW_GROUPS_CS)) {
+    if (group.sourceNote && text === group.sourceNote) return group.note;
+  }
+  if (BELIEF_WORLDVIEWS_CS[text]) return BELIEF_WORLDVIEWS_CS[text].label;
   let match = text.match(/^Category (\d+) of (\d+)$/);
   if (match) return `Kategorie ${match[1]} z ${match[2]}`;
   match = text.match(/^(\d+)\/(\d+) answered$/);
@@ -105,7 +112,7 @@ function addBetaNotice() {
   const note = document.createElement('p');
   note.id = 'czech-core-note';
   note.className = 'czech-core-note';
-  note.textContent = 'Česká beta: všech 77 tvrzení, volby a hlavní ovládání jsou česky. Některé dlouhé popisy volitelných světonázorů a podrobné analytické komentáře ve výsledku zatím zůstávají anglicky.';
+  note.textContent = 'Česká beta: otázky, volitelné světonázory a hlavní ovládání jsou česky. Některé podrobné analytické komentáře ve výsledku zatím zůstávají anglicky.';
   intro.querySelector('.intro-logo')?.insertAdjacentElement('afterend', note);
 }
 
@@ -139,6 +146,13 @@ function setupSelector() {
 
 window.HX_BELIEF_I18N = Object.freeze({
   language,
+  translate(value) {
+    return language === 'cs' ? (translateDynamic(value) || value) : value;
+  },
+  worldview(label, fallbackDescription = '') {
+    if (language !== 'cs') return { label, desc: fallbackDescription };
+    return BELIEF_WORLDVIEWS_CS[label] || { label, desc: fallbackDescription };
+  },
   text(key, english) {
     if (language !== 'cs') return english;
     const strings = {
