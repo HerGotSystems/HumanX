@@ -1,5 +1,6 @@
 (() => {
   const HUMANX_USER_KEY = 'humanx_public_user_v1';
+  const bt = (key, english) => window.HX_BELIEF_I18N?.text?.(key, english) || english;
 
   function getOrCreateHumanXUser() {
     try {
@@ -120,13 +121,13 @@
     const btn = document.getElementById('send-humanx-btn');
     const old = btn ? btn.textContent : '';
     try {
-      if (!window.state || !window.state.scores) throw new Error('No completed Belief Engine result found. Finish the report first.');
+      if (!window.state || !window.state.scores) throw new Error(bt('noResult', 'No completed Belief Engine result found. Finish the report first.'));
       const user = getOrCreateHumanXUser();
       await ensureHumanXSession(user);
       const snapshot = buildHumanXBeliefSnapshot();
       if (btn) {
         btn.disabled = true;
-        btn.textContent = 'Sending…';
+        btn.textContent = bt('sending', 'Sending…');
       }
       const res = await fetch('/api/belief-snapshots', {
         method: 'POST',
@@ -149,14 +150,14 @@
         })
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || data.error || 'HumanX save failed');
-      if (btn) btn.textContent = 'Saved to HumanX ✓';
-      alert('Snapshot saved to HumanX. Open the main app → Drift to see it. It is not published; turning it into a Truth or Claim enters Review before becoming visible to others. Nothing has been proven or verified.');
+      if (!res.ok) throw new Error(data.message || data.error || bt('saveFailed', 'HumanX save failed'));
+      if (btn) btn.textContent = bt('saved', 'Saved to HumanX ✓');
+      alert(bt('savedAlert', 'Snapshot saved to HumanX. Open the main app → Drift to see it. It is not published; turning it into a Truth or Claim enters Review before becoming visible to others. Nothing has been proven or verified.'));
       return data;
     } catch (err) {
       if (btn) {
         btn.disabled = false;
-        btn.textContent = old || 'Send to HumanX';
+        btn.textContent = old || bt('send', 'Send to HumanX');
       }
       alert(err.message || String(err));
       throw err;
@@ -170,12 +171,12 @@
     btn.id = 'send-humanx-btn';
     btn.className = 'btn-action';
     btn.type = 'button';
-    btn.textContent = 'Send to HumanX';
+    btn.textContent = bt('send', 'Send to HumanX');
     btn.onclick = sendBeliefEngineToHumanX;
     const note = document.createElement('p');
     note.id = 'send-humanx-note';
     note.style.cssText = 'font-size:11px;color:#8c97ad;line-height:1.5;margin:10px 0 4px;';
-    note.textContent = 'Saved: dimension scores, alignment patterns, contradiction summary, and moral-scenario responses. Not saved: private timeline text or free-text answers you typed. Nothing is published — the snapshot enters your Drift for your own review only.';
+    note.textContent = bt('bridgeNote', 'Saved: dimension scores, alignment patterns, contradiction summary, and moral-scenario responses. Not saved: private timeline text or free-text answers you typed. Nothing is published — the snapshot enters your Drift for your own review only.');
     actions.insertBefore(btn, actions.firstChild);
     if (!document.getElementById('send-humanx-note')) actions.insertBefore(note, btn);
   }
